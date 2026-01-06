@@ -3,6 +3,7 @@
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,6 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Timebox 1: Student Profile (student self-view)
+    Route::get('/student/profile', [StudentProfileController::class, 'show'])->name('student.profile.show');
+    Route::patch('/student/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
     // Timebox 1: Courses (read-only for students)
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');

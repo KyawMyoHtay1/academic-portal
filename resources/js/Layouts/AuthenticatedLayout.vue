@@ -13,6 +13,12 @@ const navigation = computed(() => [
         href: route("dashboard"),
         active: route().current("dashboard"),
     },
+    // Timebox 1: Student Profile (student self-view)
+    {
+        name: "My Profile",
+        href: route("student.profile.show"),
+        active: route().current("student.profile.*"),
+    },
     // Timebox 1: Courses (read-only for students)
     {
         name: "Courses",
