@@ -1,45 +1,32 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 defineProps({
-    courses: {
+    users: {
         type: Array,
         required: true,
     },
 });
 
-const deleteCourse = (courseId) => {
-    if (
-        !confirm(
-            "Are you sure you want to delete this course? This action cannot be undone."
-        )
-    ) {
-        return;
-    }
-
-    router.delete(route("admin.courses.destroy", courseId), {
-        preserveScroll: true,
-    });
+const getRoleBadgeClass = (role) => {
+    const classes = {
+        student: "bg-blue-100 text-blue-800",
+        teacher: "bg-purple-100 text-purple-800",
+        staff: "bg-emerald-100 text-emerald-800",
+    };
+    return classes[role] || "bg-slate-100 text-slate-800";
 };
 </script>
 
 <template>
-    <Head title="Course Management" />
+    <Head title="User Management" />
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between gap-4">
-                <h2 class="text-xl font-semibold leading-tight text-slate-900">
-                    Course Management
-                </h2>
-                <Link
-                    :href="route('admin.courses.create')"
-                    class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                >
-                    Create Course
-                </Link>
-            </div>
+            <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                User Management
+            </h2>
         </template>
 
         <div class="py-12">
@@ -49,14 +36,15 @@ const deleteCourse = (courseId) => {
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                         >
-                            All Courses
+                            All Users
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Manage course offerings for the university
+                            Manage user accounts and assign roles (student,
+                            teacher, staff)
                         </p>
                     </div>
 
-                    <!-- Courses Table -->
+                    <!-- Users Table -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -65,25 +53,25 @@ const deleteCourse = (courseId) => {
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Course Code
+                                        Name
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Title
+                                        Email
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Credits
+                                        Role
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Semester
+                                        Created
                                     </th>
                                     <th
                                         scope="col"
@@ -95,65 +83,59 @@ const deleteCourse = (courseId) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="courses.length === 0"
+                                    v-if="users.length === 0"
                                     class="bg-white"
                                 >
                                     <td
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No courses found. Create your first
-                                        course to get started.
+                                        No users found.
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="course in courses"
-                                    :key="course.id"
+                                    v-for="user in users"
+                                    :key="user.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900"
                                     >
-                                        {{ course.course_code }}
+                                        {{ user.name }}
                                     </td>
                                     <td
                                         class="px-4 py-4 text-sm text-slate-700"
                                     >
-                                        {{ course.title }}
+                                        {{ user.email }}
+                                    </td>
+                                    <td
+                                        class="whitespace-nowrap px-4 py-4 text-sm"
+                                    >
+                                        <span
+                                            :class="getRoleBadgeClass(user.role)"
+                                            class="inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize"
+                                        >
+                                            {{ user.role }}
+                                        </span>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
                                     >
-                                        {{ course.credits }}
-                                    </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
-                                    >
-                                        {{ course.semester }}
+                                        {{
+                                            new Date(
+                                                user.created_at
+                                            ).toLocaleDateString()
+                                        }}
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <div class="flex items-center justify-end gap-2">
-                                            <Link
-                                                :href="route('admin.courses.edit', course.id)"
-                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <Link
-                                                :href="route('admin.courses.assign-teachers', course.id)"
-                                                class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
-                                            >
-                                                Assign Teachers
-                                            </Link>
-                                            <button
-                                                @click="deleteCourse(course.id)"
-                                                class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
+                                        <Link
+                                            :href="route('admin.users.edit', user.id)"
+                                            class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                        >
+                                            Edit
+                                        </Link>
                                     </td>
                                 </tr>
                             </tbody>

@@ -11,6 +11,7 @@ const page = usePage();
 const navigation = computed(() => {
     const user = page.props.auth?.user;
     const isStaff = user?.role === "staff";
+    const isTeacher = user?.role === "teacher";
 
     const items = [
         {
@@ -20,8 +21,8 @@ const navigation = computed(() => {
         },
     ];
 
-    // Student features (show for students or if not staff)
-    if (!isStaff) {
+    // Student features (show for students only)
+    if (user?.role === "student") {
         items.push(
             {
                 name: "My Profile",
@@ -40,6 +41,15 @@ const navigation = computed(() => {
                 active: route().current("my-courses.*"),
             }
         );
+    }
+
+    // Teacher features
+    if (isTeacher) {
+        items.push({
+            name: "My Teaching Courses",
+            href: route("teacher.courses.index"),
+            active: route().current("teacher.courses.*"),
+        });
     }
 
     // Staff admin features

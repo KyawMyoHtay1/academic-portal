@@ -5,9 +5,11 @@ use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffCourseController;
+use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\TeacherCoursesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -61,10 +63,19 @@ Route::middleware('auth')->group(function () {
             'destroy' => 'admin.courses.destroy',
         ]);
 
+        // Teacher Assignment to Courses (staff only)
+        Route::get('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'edit'])->name('admin.courses.assign-teachers');
+        Route::put('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'update'])->name('admin.courses.assign-teachers.update');
+
         // User Management (role assignment)
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');
         Route::get('/admin/users/{user}/edit', [StaffUserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/admin/users/{user}', [StaffUserController::class, 'update'])->name('admin.users.update');
+    });
+
+    // Timebox 3: Teacher Features (teacher only)
+    Route::middleware('role:teacher')->group(function () {
+        Route::get('/teacher/courses', [TeacherCoursesController::class, 'index'])->name('teacher.courses.index');
     });
 });
 

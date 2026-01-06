@@ -56,6 +56,15 @@ class User extends Authenticatable
     }
 
     /**
+     * The courses this user teaches (if they are a teacher).
+     */
+    public function teachingCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_teacher', 'user_id', 'course_id')
+            ->withTimestamps();
+    }
+
+    /**
      * Check if the user has a specific role.
      */
     public function hasRole(string $role): bool

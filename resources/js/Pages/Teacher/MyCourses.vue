@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 
 defineProps({
     courses: {
@@ -8,38 +8,16 @@ defineProps({
         required: true,
     },
 });
-
-const deleteCourse = (courseId) => {
-    if (
-        !confirm(
-            "Are you sure you want to delete this course? This action cannot be undone."
-        )
-    ) {
-        return;
-    }
-
-    router.delete(route("admin.courses.destroy", courseId), {
-        preserveScroll: true,
-    });
-};
 </script>
 
 <template>
-    <Head title="Course Management" />
+    <Head title="My Teaching Courses" />
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between gap-4">
-                <h2 class="text-xl font-semibold leading-tight text-slate-900">
-                    Course Management
-                </h2>
-                <Link
-                    :href="route('admin.courses.create')"
-                    class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                >
-                    Create Course
-                </Link>
-            </div>
+            <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                My Teaching Courses
+            </h2>
         </template>
 
         <div class="py-12">
@@ -49,10 +27,10 @@ const deleteCourse = (courseId) => {
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                         >
-                            All Courses
+                            Assigned Courses
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Manage course offerings for the university
+                            Courses you are assigned to teach
                         </p>
                     </div>
 
@@ -85,12 +63,6 @@ const deleteCourse = (courseId) => {
                                     >
                                         Semester
                                     </th>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Actions
-                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -99,11 +71,11 @@ const deleteCourse = (courseId) => {
                                     class="bg-white"
                                 >
                                     <td
-                                        colspan="5"
+                                        colspan="4"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No courses found. Create your first
-                                        course to get started.
+                                        No courses assigned yet. Contact
+                                        administration to be assigned to courses.
                                     </td>
                                 </tr>
                                 <tr
@@ -130,30 +102,6 @@ const deleteCourse = (courseId) => {
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
                                     >
                                         {{ course.semester }}
-                                    </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-right text-sm"
-                                    >
-                                        <div class="flex items-center justify-end gap-2">
-                                            <Link
-                                                :href="route('admin.courses.edit', course.id)"
-                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <Link
-                                                :href="route('admin.courses.assign-teachers', course.id)"
-                                                class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
-                                            >
-                                                Assign Teachers
-                                            </Link>
-                                            <button
-                                                @click="deleteCourse(course.id)"
-                                                class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

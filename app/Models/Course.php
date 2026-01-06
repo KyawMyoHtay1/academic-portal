@@ -24,6 +24,15 @@ class Course extends Model
         return $this->belongsToMany(Student::class, 'course_student')
             ->withTimestamps();
     }
+
+    /**
+     * The teachers assigned to this course.
+     */
+    public function teachers()
+    {
+        return $this->belongsToMany(User::class, 'course_teacher', 'course_id', 'user_id')
+            ->withTimestamps();
+    }
 }
 
 
