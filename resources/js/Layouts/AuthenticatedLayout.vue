@@ -3,42 +3,72 @@ import { computed, ref } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 
 const showingMobileSidebar = ref(false);
+const page = usePage();
 
-const navigation = computed(() => [
-    {
-        name: "Dashboard",
-        href: route("dashboard"),
-        active: route().current("dashboard"),
-    },
-    // Timebox 1: Student Profile (student self-view)
-    {
-        name: "My Profile",
-        href: route("student.profile.show"),
-        active: route().current("student.profile.*"),
-    },
-    // Timebox 1: Courses (with enrollment)
-    {
-        name: "Courses",
-        href: route("courses.index"),
-        active: route().current("courses.*"),
-    },
-    // Timebox 1: My Courses (student's enrolled courses)
-    {
-        name: "My Courses",
-        href: route("my-courses.index"),
-        active: route().current("my-courses.*"),
-    },
-    // Placeholders for future modules (Timebox 2+)
-    { name: "Students", href: "/students", active: false },
-    { name: "Grades", href: "/grades", active: false },
-    { name: "Fees", href: "/fees", active: false },
-    { name: "Timetable", href: "/timetable", active: false },
-    { name: "Attendance", href: "/attendance", active: false },
-    { name: "Communication", href: "/communication", active: false },
-]);
+const navigation = computed(() => {
+    const user = page.props.auth?.user;
+    const isStaff = user?.role === "staff";
+
+    const items = [
+        {
+            name: "Dashboard",
+            href: route("dashboard"),
+            active: route().current("dashboard"),
+        },
+    ];
+
+    // Student features (show for students or if not staff)
+    if (!isStaff) {
+        items.push(
+            {
+                name: "My Profile",
+                href: route("student.profile.show"),
+                active: route().current("student.profile.*"),
+            },
+            {
+                name: "Courses",
+                href: route("courses.index"),
+                active:
+                    route().current("courses.*") && !route().current("admin.*"),
+            },
+            {
+                name: "My Courses",
+                href: route("my-courses.index"),
+                active: route().current("my-courses.*"),
+            }
+        );
+    }
+
+    // Staff admin features
+    if (isStaff) {
+        items.push(
+            {
+                name: "Manage Courses",
+                href: route("admin.courses.index"),
+                active: route().current("admin.courses.*"),
+            },
+            {
+                name: "Manage Students",
+                href: route("students.index"),
+                active: route().current("students.*"),
+            }
+        );
+    }
+
+    // Placeholders for future modules
+    items.push(
+        { name: "Grades", href: "/grades", active: false },
+        { name: "Fees", href: "/fees", active: false },
+        { name: "Timetable", href: "/timetable", active: false },
+        { name: "Attendance", href: "/attendance", active: false },
+        { name: "Communication", href: "/communication", active: false }
+    );
+
+    return items;
+});
 </script>
 
 <template>
