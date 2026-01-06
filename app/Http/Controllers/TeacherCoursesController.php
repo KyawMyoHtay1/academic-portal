@@ -17,13 +17,13 @@ class TeacherCoursesController extends Controller
 
         // Get courses assigned to this teacher
         $courses = $user->teachingCourses()
-            ->orderBy('course_code')
+            ->orderBy('courses.course_code')
             ->get([
-                'id',
-                'course_code',
-                'title',
-                'credits',
-                'semester',
+                'courses.id',
+                'courses.course_code',
+                'courses.title',
+                'courses.credits',
+                'courses.semester',
             ]);
 
         return Inertia::render('Teacher/MyCourses', [
