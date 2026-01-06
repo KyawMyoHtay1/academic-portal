@@ -15,6 +15,15 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                portal: {
+                    navy: '#0f172a',
+                    navySoft: '#1e293b',
+                    gold: '#fbbf24',
+                    sky: '#0ea5e9',
+                    background: '#f3f4f6',
+                },
+            },
         },
     },
 

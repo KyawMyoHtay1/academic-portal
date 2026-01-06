@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global academic portal styling tweaks */
+body {
+    @apply bg-portal-background text-gray-900;
+}
+
+.portal-gradient {
+    @apply bg-gradient-to-br from-portal-navy via-portal-navySoft to-slate-900;
+}
+
+.portal-card {
+    @apply rounded-xl bg-white/90 shadow-sm ring-1 ring-slate-200;
+}
+
+.portal-badge {
+    @apply inline-flex items-center rounded-full bg-portal-navy/5 px-3 py-0.5 text-xs font-medium text-portal-navy;
+}
