@@ -13,9 +13,14 @@ const navigation = computed(() => [
         href: route("dashboard"),
         active: route().current("dashboard"),
     },
-    // Placeholders for core academic modules from your proposal
+    // Timebox 1: Courses (read-only for students)
+    {
+        name: "Courses",
+        href: route("courses.index"),
+        active: route().current("courses.*"),
+    },
+    // Placeholders for future modules (Timebox 2+)
     { name: "Students", href: "/students", active: false },
-    { name: "Courses", href: "/courses", active: false },
     { name: "Grades", href: "/grades", active: false },
     { name: "Fees", href: "/fees", active: false },
     { name: "Timetable", href: "/timetable", active: false },
