@@ -52,8 +52,8 @@ const navigation = computed(() => {
             },
             {
                 name: "Manage Students",
-                href: route("students.index"),
-                active: route().current("students.*"),
+                href: route("admin.users.index"),
+                active: route().current("admin.users.*"),
             }
         );
     }

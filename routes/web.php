@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffCourseController;
+use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
 use Illuminate\Foundation\Application;
@@ -59,6 +60,11 @@ Route::middleware('auth')->group(function () {
             'update' => 'admin.courses.update',
             'destroy' => 'admin.courses.destroy',
         ]);
+
+        // User Management (role assignment)
+        Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');
+        Route::get('/admin/users/{user}/edit', [StaffUserController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/admin/users/{user}', [StaffUserController::class, 'update'])->name('admin.users.update');
     });
 });
 
