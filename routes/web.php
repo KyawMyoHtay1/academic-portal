@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseRegistrationController;
+use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
@@ -30,8 +32,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/student/profile', [StudentProfileController::class, 'show'])->name('student.profile.show');
     Route::patch('/student/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
-    // Timebox 1: Courses (read-only for students)
+    // Timebox 1: Courses (with enrollment)
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+
+    // Timebox 1: Course Registration
+    Route::post('/courses/{course}/enroll', [CourseRegistrationController::class, 'enroll'])->name('courses.enroll');
+    Route::delete('/courses/{course}/unenroll', [CourseRegistrationController::class, 'unenroll'])->name('courses.unenroll');
+
+    // Timebox 1: My Courses (student's enrolled courses)
+    Route::get('/my-courses', [MyCoursesController::class, 'index'])->name('my-courses.index');
 
     // Timebox 1: Student Management (staff/admin area - will add role checks later)
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');

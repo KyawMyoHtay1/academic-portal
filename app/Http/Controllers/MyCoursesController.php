@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class MyCoursesController extends Controller
+{
+    /**
+     * Display the authenticated student's enrolled courses.
+     * Timebox 1: Student self-view only.
+     */
+    public function index(): Response
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return Inertia::render('MyCourses/Index', [
+                'courses' => [],
+                'message' => 'No student record found. Please contact administration to create your student profile.',
+            ]);
+        }
+
+        $courses = $student->courses()
+            ->orderBy('course_code')
+            ->get([
+                'courses.id',
+                'courses.course_code',
+                'courses.title',
+                'courses.credits',
+                'courses.semester',
+                'course_student.created_at as enrolled_at',
+            ]);
+
+        return Inertia::render('MyCourses/Index', [
+            'courses' => $courses,
+        ]);
+    }
+}
+

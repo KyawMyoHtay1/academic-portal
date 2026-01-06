@@ -19,11 +19,17 @@ const navigation = computed(() => [
         href: route("student.profile.show"),
         active: route().current("student.profile.*"),
     },
-    // Timebox 1: Courses (read-only for students)
+    // Timebox 1: Courses (with enrollment)
     {
         name: "Courses",
         href: route("courses.index"),
         active: route().current("courses.*"),
+    },
+    // Timebox 1: My Courses (student's enrolled courses)
+    {
+        name: "My Courses",
+        href: route("my-courses.index"),
+        active: route().current("my-courses.*"),
     },
     // Placeholders for future modules (Timebox 2+)
     { name: "Students", href: "/students", active: false },

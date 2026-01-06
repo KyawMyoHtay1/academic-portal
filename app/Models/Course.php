@@ -15,6 +15,15 @@ class Course extends Model
         'credits',
         'semester',
     ];
+
+    /**
+     * The students enrolled in this course.
+     */
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'course_student')
+            ->withTimestamps();
+    }
 }
 
 

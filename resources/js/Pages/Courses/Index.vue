@@ -1,13 +1,27 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
+import { computed } from "vue";
 
-defineProps({
+const props = defineProps({
     courses: {
         type: Array,
         required: true,
     },
+    hasStudentRecord: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const enroll = (courseId) => {
+    router.post(route("courses.enroll", courseId), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Page will refresh automatically with updated enrollment status
+        },
+    });
+};
 </script>
 
 <template>
@@ -22,6 +36,35 @@ defineProps({
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Alert if no student record -->
+                <div
+                    v-if="!hasStudentRecord"
+                    class="mb-6 rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200"
+                >
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg
+                                class="h-5 w-5 text-amber-400"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-amber-700">
+                                You need a student record to enroll in courses.
+                                Please contact administration to create your
+                                student profile.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <div>
@@ -31,7 +74,7 @@ defineProps({
                                 Course Catalog
                             </p>
                             <p class="mt-1 text-sm text-slate-600">
-                                Browse available courses for registration
+                                Browse available courses and enroll in courses
                             </p>
                         </div>
                     </div>
@@ -65,6 +108,13 @@ defineProps({
                                     >
                                         Semester
                                     </th>
+                                    <th
+                                        v-if="hasStudentRecord"
+                                        scope="col"
+                                        class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -73,7 +123,7 @@ defineProps({
                                     class="bg-white"
                                 >
                                     <td
-                                        colspan="4"
+                                        :colspan="hasStudentRecord ? 5 : 4"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No courses available yet.
@@ -104,28 +154,30 @@ defineProps({
                                     >
                                         {{ course.semester }}
                                     </td>
+                                    <td
+                                        v-if="hasStudentRecord"
+                                        class="whitespace-nowrap px-4 py-4 text-right text-sm"
+                                    >
+                                        <span
+                                            v-if="course.is_enrolled"
+                                            class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800"
+                                        >
+                                            Enrolled
+                                        </span>
+                                        <button
+                                            v-else
+                                            @click="enroll(course.id)"
+                                            class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                        >
+                                            Register
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- Info Note -->
-                    <div
-                        v-if="courses.length > 0"
-                        class="mt-6 rounded-lg bg-slate-50 p-4 text-xs text-slate-600"
-                    >
-                        <p class="font-semibold text-slate-700">
-                            Note:
-                        </p>
-                        <p class="mt-1">
-                            Course registration functionality will be available
-                            in the next phase. For now, you can browse available
-                            courses.
-                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
-

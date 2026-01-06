@@ -24,6 +24,15 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * The courses that the student is enrolled in.
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_student')
+            ->withTimestamps();
+    }
 }
 
 
