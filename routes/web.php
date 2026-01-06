@@ -42,10 +42,12 @@ Route::middleware('auth')->group(function () {
     // Timebox 1: My Courses (student's enrolled courses)
     Route::get('/my-courses', [MyCoursesController::class, 'index'])->name('my-courses.index');
 
-    // Timebox 1: Student Management (staff/admin area - will add role checks later)
-    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
-    Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
-    Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+    // Timebox 2: Student Management (staff/admin only)
+    Route::middleware('role:staff')->group(function () {
+        Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+        Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
+        Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+    });
 });
 
 require __DIR__.'/auth.php';
