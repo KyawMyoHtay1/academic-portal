@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fee;
 use App\Models\Student;
+use App\Notifications\FeeStatusUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -63,10 +64,16 @@ class StaffFeeController extends Controller
             'due_date' => ['required', 'date'],
         ]);
 
-        Fee::create([
+        $fee = Fee::create([
             ...$data,
             'status' => 'pending',
         ]);
+
+        // Notify the student about the new fee
+        $student = Student::find($fee->student_id);
+        if ($student && $student->user) {
+            $student->user->notify(new FeeStatusUpdated($fee));
+        }
 
         return redirect()
             ->route('admin.fees.index')
@@ -119,7 +126,17 @@ class StaffFeeController extends Controller
             $data['paid_date'] = null;
         }
 
+        $originalStatus = $fee->status;
+
         $fee->update($data);
+
+        // Notify the student if the status changed
+        if ($fee->status !== $originalStatus) {
+            $student = Student::find($fee->student_id);
+            if ($student && $student->user) {
+                $student->user->notify(new FeeStatusUpdated($fee));
+            }
+        }
 
         return redirect()
             ->route('admin.fees.index')

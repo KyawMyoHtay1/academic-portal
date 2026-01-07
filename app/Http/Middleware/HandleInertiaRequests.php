@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Message;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,9 +38,10 @@ class HandleInertiaRequests extends Middleware
             ],
             'unread' => [
                 'messages' => $user
-                    ? Message::where('receiver_id', $user->id)
-                        ->where('read', false)
-                        ->count()
+                    ? $user->receivedMessages()->where('read', false)->count()
+                    : 0,
+                'notifications' => $user
+                    ? $user->unreadNotifications()->count()
                     : 0,
             ],
         ];

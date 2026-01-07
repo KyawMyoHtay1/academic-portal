@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Course;
+use App\Models\Student;
+use App\Notifications\AttendanceAlert;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -93,9 +95,9 @@ class TeacherAttendanceController extends Controller
             }
         }
 
-        // Save or update attendance records
+        // Save or update attendance records and notify students
         foreach ($data['attendance'] as $record) {
-            Attendance::updateOrCreate(
+            $attendance = Attendance::updateOrCreate(
                 [
                     'course_id' => $course->id,
                     'student_id' => $record['student_id'],
@@ -105,6 +107,11 @@ class TeacherAttendanceController extends Controller
                     'status' => $record['status'],
                 ]
             );
+
+            $student = Student::find($record['student_id']);
+            if ($student && $student->user) {
+                $student->user->notify(new AttendanceAlert($attendance));
+            }
         }
 
         return redirect()

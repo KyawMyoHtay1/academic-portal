@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Timetable;
+use App\Notifications\TimetableUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -63,7 +64,17 @@ class StaffTimetableController extends Controller
             'location' => ['nullable', 'string', 'max:255'],
         ]);
 
-        Timetable::create($data);
+        $timetable = Timetable::create($data);
+
+        // Notify enrolled students and assigned teachers
+        $course = $timetable->course;
+        $notifiables = collect()
+            ->merge($course->students->pluck('user'))
+            ->merge($course->teachers);
+
+        $notifiables->filter()->each(function ($user) use ($timetable) {
+            $user->notify(new TimetableUpdated($timetable, 'created'));
+        });
 
         return redirect()
             ->route('admin.timetables.index')
@@ -105,6 +116,16 @@ class StaffTimetableController extends Controller
         ]);
 
         $timetable->update($data);
+
+        // Notify enrolled students and assigned teachers
+        $course = $timetable->course;
+        $notifiables = collect()
+            ->merge($course->students->pluck('user'))
+            ->merge($course->teachers);
+
+        $notifiables->filter()->each(function ($user) use ($timetable) {
+            $user->notify(new TimetableUpdated($timetable, 'updated'));
+        });
 
         return redirect()
             ->route('admin.timetables.index')

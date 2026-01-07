@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Grade;
+use App\Models\Student;
+use App\Notifications\GradePublished;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -105,9 +107,9 @@ class TeacherGradesController extends Controller
             }
         }
 
-        // Save grades (idempotent via updateOrCreate)
+        // Save grades (idempotent via updateOrCreate) and notify students
         foreach ($data['grades'] as $record) {
-            Grade::updateOrCreate(
+            $grade = Grade::updateOrCreate(
                 [
                     'course_id' => $course->id,
                     'student_id' => $record['student_id'],
@@ -117,6 +119,11 @@ class TeacherGradesController extends Controller
                     'score' => $record['score'],
                 ]
             );
+
+            $student = Student::find($record['student_id']);
+            if ($student && $student->user) {
+                $student->user->notify(new GradePublished($grade));
+            }
         }
 
         return redirect()

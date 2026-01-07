@@ -20,6 +20,7 @@ use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
 use App\Http\Controllers\TeacherTimetableController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,10 @@ Route::middleware('auth')->group(function () {
 
     // Announcements (all authenticated users)
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+        // Notifications (all authenticated users)
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     // Messaging
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
