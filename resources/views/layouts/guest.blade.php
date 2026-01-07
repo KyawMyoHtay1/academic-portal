@@ -4,23 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'University Portal')</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        :root {
+            --portal-navy: #0b1f3a;
+            --portal-gold: #f4b400;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
-    <nav class="bg-white shadow">
+<body class="bg-gradient-to-b from-slate-50 via-white to-slate-100 font-sans text-slate-900">
+    <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
         <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-            <a href="{{ route('guest.home') }}" class="text-xl font-bold text-blue-700">University Portal</a>
+            <a href="{{ route('guest.home') }}" class="flex items-center gap-2 text-xl font-bold text-[color:var(--portal-navy)]">
+                <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-[color:var(--portal-gold)] text-[color:var(--portal-navy)] shadow-inner">UA</span>
+                <span>University Portal</span>
+            </a>
             <div class="flex flex-wrap items-center gap-3 text-sm">
-                <a href="{{ route('guest.home') }}" class="text-gray-700 hover:text-blue-700">Home</a>
-                <a href="{{ route('guest.courses') }}" class="text-gray-700 hover:text-blue-700">Courses</a>
-                <a href="{{ route('guest.news') }}" class="text-gray-700 hover:text-blue-700">News</a>
-                <a href="{{ route('guest.about') }}" class="text-gray-700 hover:text-blue-700">About</a>
-                <a href="{{ route('guest.contact') }}" class="text-gray-700 hover:text-blue-700">Contact</a>
+                <a href="{{ route('guest.home') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Home</a>
+                <a href="{{ route('guest.courses') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Courses</a>
+                <a href="{{ route('guest.news') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">News</a>
+                <a href="{{ route('guest.about') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">About</a>
+                <a href="{{ route('guest.contact') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Contact</a>
                 @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="bg-blue-600 text-white px-4 py-1.5 rounded hover:bg-blue-700">Login</a>
+                    <a href="{{ route('login') }}" class="rounded-full bg-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">Login</a>
                 @endif
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="bg-gray-200 text-gray-800 px-4 py-1.5 rounded hover:bg-gray-300">Register</a>
+                    <a href="{{ route('register') }}" class="rounded-full border border-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)] hover:text-white">Register</a>
                 @endif
             </div>
         </div>
@@ -30,8 +39,8 @@
         @yield('content')
     </main>
 
-    <footer class="bg-white shadow mt-12 py-6">
-        <div class="container mx-auto text-center text-gray-600 text-sm">
+    <footer class="bg-white border-t border-slate-200 shadow-inner mt-12 py-6">
+        <div class="container mx-auto text-center text-slate-600 text-sm">
             &copy; {{ date('Y') }} University Portal. All rights reserved.
         </div>
     </footer>
