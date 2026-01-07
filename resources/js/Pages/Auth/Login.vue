@@ -104,11 +104,11 @@ const submit = () => {
                     </Link>
 
                     <PrimaryButton
-                        class="sm:ms-2"
+                        class="sm:ms-2 rounded-full px-5 py-2 text-sm font-semibold shadow-sm"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
                     >
-                        Log in
+                        Login
                     </PrimaryButton>
                 </div>
             </div>
