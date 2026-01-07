@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
 
 defineProps({
     users: {
@@ -17,6 +17,20 @@ const getRoleBadgeClass = (role) => {
     };
     return classes[role] || "bg-slate-100 text-slate-800";
 };
+
+const deleteUser = (id) => {
+    if (
+        !confirm(
+            "Are you sure you want to delete this user? This action cannot be undone."
+        )
+    ) {
+        return;
+    }
+
+    router.delete(route("admin.users.destroy", id), {
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -24,9 +38,17 @@ const getRoleBadgeClass = (role) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-slate-900">
-                User Management
-            </h2>
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                    User Management
+                </h2>
+                <Link
+                    :href="route('admin.users.create')"
+                    class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                >
+                    Add User
+                </Link>
+            </div>
         </template>
 
         <div class="py-12">
@@ -130,12 +152,22 @@ const getRoleBadgeClass = (role) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <Link
-                                            :href="route('admin.users.edit', user.id)"
-                                            class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                        <div
+                                            class="flex items-center justify-end gap-2"
                                         >
-                                            Edit
-                                        </Link>
+                                            <Link
+                                                :href="route('admin.users.edit', user.id)"
+                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                @click="deleteUser(user.id)"
+                                                class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

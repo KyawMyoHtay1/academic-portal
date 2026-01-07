@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,6 +31,20 @@ class StaffUserController extends Controller
     }
 
     /**
+     * Show the form for creating a new user.
+     */
+    public function create(): Response
+    {
+        return Inertia::render('Admin/Users/Create', [
+            'availableRoles' => [
+                'student',
+                'teacher',
+                'staff',
+            ],
+        ]);
+    }
+
+    /**
      * Show the form for editing a user (including role assignment).
      */
     public function edit(User $user): Response
@@ -50,6 +65,32 @@ class StaffUserController extends Controller
     }
 
     /**
+     * Store a newly created user.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+            'role' => ['required', 'in:student,teacher,staff'],
+        ]);
+
+        // Simple initial password for demonstration; in a real system you would trigger a reset.
+        $password = 'Password123!';
+
+        User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'role' => $data['role'],
+            'password' => Hash::make($password),
+        ]);
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User created successfully. An initial password has been set.');
+    }
+
+    /**
      * Update the specified user.
      */
     public function update(Request $request, User $user): RedirectResponse
@@ -65,6 +106,18 @@ class StaffUserController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'User updated successfully.');
+    }
+
+    /**
+     * Remove the specified user.
+     */
+    public function destroy(User $user): RedirectResponse
+    {
+        $user->delete();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User deleted successfully.');
     }
 }
 

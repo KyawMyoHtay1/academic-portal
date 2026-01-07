@@ -63,6 +63,50 @@ class StudentController extends Controller
             ->route('students.index')
             ->with('success', 'Student created successfully.');
     }
+
+    public function edit(Student $student): Response
+    {
+        return Inertia::render('Students/Edit', [
+            'student' => [
+                'id' => $student->id,
+                'student_no' => $student->student_no,
+                'full_name' => $student->full_name,
+                'dob' => $student->dob,
+                'email' => $student->email,
+                'phone' => $student->phone,
+                'programme' => $student->programme,
+                'intake_year' => $student->intake_year,
+            ],
+        ]);
+    }
+
+    public function update(Request $request, Student $student): RedirectResponse
+    {
+        $data = $request->validate([
+            'student_no' => ['required', 'string', 'max:50', 'unique:students,student_no,' . $student->id],
+            'full_name' => ['required', 'string', 'max:255'],
+            'dob' => ['nullable', 'date'],
+            'email' => ['required', 'email', 'max:255', 'unique:students,email,' . $student->id],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'programme' => ['required', 'string', 'max:255'],
+            'intake_year' => ['required', 'string', 'max:10'],
+        ]);
+
+        $student->update($data);
+
+        return redirect()
+            ->route('students.index')
+            ->with('success', 'Student updated successfully.');
+    }
+
+    public function destroy(Student $student): RedirectResponse
+    {
+        $student->delete();
+
+        return redirect()
+            ->route('students.index')
+            ->with('success', 'Student deleted successfully.');
+    }
 }
 
 

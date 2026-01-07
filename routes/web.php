@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffFeeController;
+use App\Http\Controllers\StaffTimetableController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTimetableController;
@@ -67,6 +68,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
         Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
         Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+        Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
+        Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
+        Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
 
         // Course Management
         Route::resource('admin/courses', StaffCourseController::class)->names([
@@ -84,8 +88,11 @@ Route::middleware('auth')->group(function () {
 
         // User Management (role assignment)
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');
+        Route::get('/admin/users/create', [StaffUserController::class, 'create'])->name('admin.users.create');
+        Route::post('/admin/users', [StaffUserController::class, 'store'])->name('admin.users.store');
         Route::get('/admin/users/{user}/edit', [StaffUserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/admin/users/{user}', [StaffUserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [StaffUserController::class, 'destroy'])->name('admin.users.destroy');
 
         // Fee Management (staff only)
         Route::resource('admin/fees', StaffFeeController::class)->names([
