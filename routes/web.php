@@ -20,6 +20,7 @@ use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
 use App\Http\Controllers\TeacherTimetableController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -66,6 +67,16 @@ Route::middleware('auth')->group(function () {
 
     // Announcements (all authenticated users)
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+
+    // Messaging
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/create', [MessageController::class, 'create'])
+        ->middleware('role:staff') // staff can send; teachers also checked in controller
+        ->name('messages.create');
+    Route::post('/messages', [MessageController::class, 'store'])
+        ->middleware('role:staff')
+        ->name('messages.store');
+    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
 
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {

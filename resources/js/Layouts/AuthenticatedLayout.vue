@@ -59,6 +59,11 @@ const navigation = computed(() => {
                 name: "Announcements",
                 href: route("announcements.index"),
                 active: route().current("announcements.*"),
+            },
+            {
+                name: "Messages",
+                href: route("messages.index"),
+                active: route().current("messages.*"),
             }
         );
     }
@@ -90,6 +95,11 @@ const navigation = computed(() => {
                 name: "Announcements",
                 href: route("announcements.index"),
                 active: route().current("announcements.*"),
+            },
+            {
+                name: "Messages",
+                href: route("messages.index"),
+                active: route().current("messages.*"),
             }
         );
     }
@@ -126,6 +136,11 @@ const navigation = computed(() => {
                 name: "Announcements",
                 href: route("admin.announcements.index"),
                 active: route().current("admin.announcements.*"),
+            },
+            {
+                name: "Messages",
+                href: route("messages.index"),
+                active: route().current("messages.*"),
             }
         );
     }
