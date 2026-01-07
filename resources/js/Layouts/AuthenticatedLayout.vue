@@ -44,6 +44,11 @@ const navigation = computed(() => {
                 name: "Grades",
                 href: route("student.grades.index"),
                 active: route().current("student.grades.*"),
+            },
+            {
+                name: "Fees",
+                href: route("student.fees.index"),
+                active: route().current("student.fees.*"),
             }
         );
     }
@@ -86,14 +91,17 @@ const navigation = computed(() => {
                 name: "Manage Users",
                 href: route("admin.users.index"),
                 active: route().current("admin.users.*"),
+            },
+            {
+                name: "Manage Fees",
+                href: route("admin.fees.index"),
+                active: route().current("admin.fees.*"),
             }
         );
     }
 
     // Placeholders for future modules
     items.push(
-        { name: "Grades", href: "/grades", active: false },
-        { name: "Fees", href: "/fees", active: false },
         { name: "Timetable", href: "/timetable", active: false },
         { name: "Communication", href: "/communication", active: false }
     );

@@ -6,8 +6,10 @@ use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
+use App\Http\Controllers\StaffFeeController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentFeeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\TeacherAttendanceController;
@@ -52,6 +54,10 @@ Route::middleware('auth')->group(function () {
     // Student Grades (read-only)
     Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
 
+    // Student Fees (view and pay)
+    Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
+    Route::post('/student/fees/{fee}/pay', [StudentFeeController::class, 'pay'])->name('student.fees.pay');
+
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {
         // Student Management
@@ -77,6 +83,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');
         Route::get('/admin/users/{user}/edit', [StaffUserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/admin/users/{user}', [StaffUserController::class, 'update'])->name('admin.users.update');
+
+        // Fee Management (staff only)
+        Route::resource('admin/fees', StaffFeeController::class)->names([
+            'index' => 'admin.fees.index',
+            'create' => 'admin.fees.create',
+            'store' => 'admin.fees.store',
+            'edit' => 'admin.fees.edit',
+            'update' => 'admin.fees.update',
+            'destroy' => 'admin.fees.destroy',
+        ]);
     });
 
     // Timebox 3: Teacher Features (teacher only)
