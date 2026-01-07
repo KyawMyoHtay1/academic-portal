@@ -39,6 +39,11 @@ const navigation = computed(() => {
                 name: "My Courses",
                 href: route("my-courses.index"),
                 active: route().current("my-courses.*"),
+            },
+            {
+                name: "Grades",
+                href: route("student.grades.index"),
+                active: route().current("student.grades.*"),
             }
         );
     }
@@ -55,6 +60,11 @@ const navigation = computed(() => {
                 name: "Mark Attendance",
                 href: route("teacher.attendance.index"),
                 active: route().current("teacher.attendance.*"),
+            },
+            {
+                name: "Grades",
+                href: route("teacher.grades.index"),
+                active: route().current("teacher.grades.*"),
             }
         );
     }

@@ -8,9 +8,11 @@ use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
+use App\Http\Controllers\TeacherGradesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -47,6 +49,9 @@ Route::middleware('auth')->group(function () {
     // Timebox 1: My Courses (student's enrolled courses)
     Route::get('/my-courses', [MyCoursesController::class, 'index'])->name('my-courses.index');
 
+    // Student Grades (read-only)
+    Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
+
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {
         // Student Management
@@ -82,6 +87,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/teacher/attendance', [TeacherAttendanceController::class, 'index'])->name('teacher.attendance.index');
         Route::get('/teacher/attendance/{course}', [TeacherAttendanceController::class, 'show'])->name('teacher.attendance.show');
         Route::post('/teacher/attendance/{course}', [TeacherAttendanceController::class, 'store'])->name('teacher.attendance.store');
+
+        // Grades Management
+        Route::get('/teacher/grades', [TeacherGradesController::class, 'index'])->name('teacher.grades.index');
+        Route::get('/teacher/grades/{course}', [TeacherGradesController::class, 'show'])->name('teacher.grades.show');
+        Route::post('/teacher/grades/{course}', [TeacherGradesController::class, 'store'])->name('teacher.grades.store');
     });
 });
 

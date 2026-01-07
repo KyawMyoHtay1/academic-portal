@@ -41,6 +41,14 @@ class Student extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    /**
+     * The grades recorded for this student.
+     */
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
 }
 
 
