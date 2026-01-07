@@ -29,12 +29,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Guest-facing public pages (read-only)
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+    return view('guest.home', [
         'publicCourses' => Course::orderBy('course_code')
             ->take(6)
             ->get(['id', 'course_code', 'title', 'credits', 'semester']),
@@ -42,7 +39,33 @@ Route::get('/', function () {
             ->take(5)
             ->get(['id', 'title', 'body', 'created_at']),
     ]);
-});
+})->name('guest.home');
+
+Route::get('/guest/courses', function () {
+    return view('guest.courses', [
+        'courses' => Course::orderBy('course_code')->get([
+            'id',
+            'course_code',
+            'title',
+            'credits',
+            'semester',
+        ]),
+    ]);
+})->name('guest.courses');
+
+Route::get('/guest/news', function () {
+    return view('guest.news', [
+        'announcements' => Announcement::orderBy('created_at', 'desc')->get([
+            'id',
+            'title',
+            'body',
+            'created_at',
+        ]),
+    ]);
+})->name('guest.news');
+
+Route::view('/guest/about', 'guest.about')->name('guest.about');
+Route::view('/guest/contact', 'guest.contact')->name('guest.contact');
 
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
