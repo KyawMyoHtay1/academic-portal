@@ -12,6 +12,11 @@ const props = defineProps({
 const markAsRead = (id) => {
     router.post(route("messages.read", id), {}, { preserveScroll: true });
 };
+
+const statusBadgeClass = (read) =>
+    read
+        ? "inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+        : "inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700";
 </script>
 
 <template>
@@ -53,21 +58,22 @@ const markAsRead = (id) => {
                         }"
                     >
                         <div>
-                            <p class="text-xs text-slate-500">
-                                From: <span class="font-medium">{{ message.sender }}</span>
-                                · <span>{{ message.created_at }}</span>
+                            <p class="text-xs text-slate-500 flex items-center gap-2">
+                                <span>From: <span class="font-medium">{{ message.sender }}</span></span>
+                                <span>·</span>
+                                <span>{{ message.created_at }}</span>
+                                <span :class="statusBadgeClass(message.read)">
+                                    {{ message.read ? "Read" : "Unread" }}
+                                </span>
                             </p>
-                            <p class="mt-2 text-sm text-slate-800 whitespace-pre-line">
+                            <p
+                                class="mt-2 text-sm text-slate-800 whitespace-pre-line"
+                                :class="{ 'font-semibold': !message.read }"
+                            >
                                 {{ message.body }}
                             </p>
                         </div>
                         <div class="flex flex-col items-end gap-2">
-                            <span
-                                v-if="!message.read"
-                                class="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700"
-                            >
-                                New
-                            </span>
                             <button
                                 v-if="!message.read"
                                 @click="markAsRead(message.id)"

@@ -151,6 +151,22 @@ const navigation = computed(() => {
 
 <template>
     <div class="min-h-screen bg-portal-background">
+        <!-- Flash messages -->
+        <div class="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 space-y-2" v-if="$page.props.flash?.success || $page.props.flash?.error">
+            <div
+                v-if="$page.props.flash?.success"
+                class="rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-200"
+            >
+                {{ $page.props.flash.success }}
+            </div>
+            <div
+                v-if="$page.props.flash?.error"
+                class="rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200"
+            >
+                {{ $page.props.flash.error }}
+            </div>
+        </div>
+
         <div class="flex min-h-screen">
             <!-- Desktop sidebar -->
             <aside
