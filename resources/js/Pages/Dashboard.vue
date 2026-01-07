@@ -1,6 +1,21 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
+
+const props = defineProps({
+    stats: {
+        type: Object,
+        required: true,
+    },
+});
+
+const formatNumber = (value) => new Intl.NumberFormat().format(value ?? 0);
+const formatCurrency = (value) =>
+    new Intl.NumberFormat("en-GB", {
+        style: "currency",
+        currency: "GBP",
+        maximumFractionDigits: 0,
+    }).format(value ?? 0);
 </script>
 
 <template>
@@ -21,7 +36,9 @@ import { Head } from "@inertiajs/vue3";
                     >
                         Students
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">0</p>
+                    <p class="mt-2 text-2xl font-semibold text-slate-900">
+                        {{ formatNumber(props.stats.students) }}
+                    </p>
                     <p class="mt-1 text-xs text-slate-500">
                         Total registered students
                     </p>
@@ -33,7 +50,9 @@ import { Head } from "@inertiajs/vue3";
                     >
                         Courses
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">0</p>
+                    <p class="mt-2 text-2xl font-semibold text-slate-900">
+                        {{ formatNumber(props.stats.courses) }}
+                    </p>
                     <p class="mt-1 text-xs text-slate-500">
                         Active course offerings
                     </p>
@@ -45,7 +64,9 @@ import { Head } from "@inertiajs/vue3";
                     >
                         Fees
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">£0</p>
+                    <p class="mt-2 text-2xl font-semibold text-slate-900">
+                        {{ formatCurrency(props.stats.feeTotal) }}
+                    </p>
                     <p class="mt-1 text-xs text-slate-500">
                         Fees recorded in the system
                     </p>
@@ -57,7 +78,9 @@ import { Head } from "@inertiajs/vue3";
                     >
                         Attendance
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">0%</p>
+                    <p class="mt-2 text-2xl font-semibold text-slate-900">
+                        {{ props.stats.attendanceRate ?? 0 }}%
+                    </p>
                     <p class="mt-1 text-xs text-slate-500">
                         Overall attendance (sample)
                     </p>
