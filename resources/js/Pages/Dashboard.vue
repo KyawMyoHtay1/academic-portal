@@ -1,8 +1,13 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
+import { computed } from "vue";
 
 const props = defineProps({
+    role: {
+        type: String,
+        default: "student",
+    },
     stats: {
         type: Object,
         required: true,
@@ -16,6 +21,91 @@ const formatCurrency = (value) =>
         currency: "GBP",
         maximumFractionDigits: 0,
     }).format(value ?? 0);
+
+const cards = computed(() => {
+    const list = [];
+    const s = props.stats || {};
+
+    // Staff cards
+    if (props.role === "staff") {
+        list.push(
+            {
+                title: "Students",
+                value: formatNumber(s.students),
+                helper: "Total registered students",
+            },
+            {
+                title: "Courses",
+                value: formatNumber(s.courses),
+                helper: "Active course offerings",
+            },
+            {
+                title: "Fees",
+                value: formatCurrency(s.feeTotal),
+                helper: "Fees recorded in the system",
+            },
+            {
+                title: "Attendance",
+                value: `${s.attendanceRate ?? 0}%`,
+                helper: "Overall attendance",
+            }
+        );
+    }
+
+    // Teacher cards
+    if (props.role === "teacher") {
+        list.push(
+            {
+                title: "My Courses",
+                value: formatNumber(s.teachingCourses),
+                helper: "Courses you are teaching",
+            },
+            {
+                title: "Students Taught",
+                value: formatNumber(s.studentsTaught),
+                helper: "Unique students across your courses",
+            },
+            {
+                title: "Grades Recorded",
+                value: formatNumber(s.gradesRecorded),
+                helper: "Grades entered for your courses",
+            },
+            {
+                title: "Attendance",
+                value: `${s.attendanceRate ?? 0}%`,
+                helper: "Attendance across your courses",
+            }
+        );
+    }
+
+    // Student cards
+    if (props.role === "student") {
+        list.push(
+            {
+                title: "My Courses",
+                value: formatNumber(s.myCourses),
+                helper: "Courses you are enrolled in",
+            },
+            {
+                title: "Outstanding Fees",
+                value: formatCurrency(s.outstandingFees),
+                helper: "Pending fees for your account",
+            },
+            {
+                title: "Grades",
+                value: formatNumber(s.myGrades),
+                helper: "Grades available for you",
+            },
+            {
+                title: "Attendance",
+                value: `${s.attendanceRate ?? 0}%`,
+                helper: "Your attendance rate",
+            }
+        );
+    }
+
+    return list;
+});
 </script>
 
 <template>
@@ -30,59 +120,21 @@ const formatCurrency = (value) =>
 
         <div class="space-y-6">
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                <div class="portal-card p-5">
+                <div
+                    v-for="card in cards"
+                    :key="card.title"
+                    class="portal-card p-5"
+                >
                     <p
                         class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                     >
-                        Students
+                        {{ card.title }}
                     </p>
                     <p class="mt-2 text-2xl font-semibold text-slate-900">
-                        {{ formatNumber(props.stats.students) }}
+                        {{ card.value }}
                     </p>
                     <p class="mt-1 text-xs text-slate-500">
-                        Total registered students
-                    </p>
-                </div>
-
-                <div class="portal-card p-5">
-                    <p
-                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >
-                        Courses
-                    </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">
-                        {{ formatNumber(props.stats.courses) }}
-                    </p>
-                    <p class="mt-1 text-xs text-slate-500">
-                        Active course offerings
-                    </p>
-                </div>
-
-                <div class="portal-card p-5">
-                    <p
-                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >
-                        Fees
-                    </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">
-                        {{ formatCurrency(props.stats.feeTotal) }}
-                    </p>
-                    <p class="mt-1 text-xs text-slate-500">
-                        Fees recorded in the system
-                    </p>
-                </div>
-
-                <div class="portal-card p-5">
-                    <p
-                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >
-                        Attendance
-                    </p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">
-                        {{ props.stats.attendanceRate ?? 0 }}%
-                    </p>
-                    <p class="mt-1 text-xs text-slate-500">
-                        Overall attendance (sample)
+                        {{ card.helper }}
                     </p>
                 </div>
             </div>
