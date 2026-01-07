@@ -53,8 +53,15 @@ const submit = () => {
                         <select
                             v-model="form.user_id"
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            :disabled="props.users.length === 0"
                         >
-                            <option value="">Select user</option>
+                            <option value="">
+                                {{
+                                    props.users.length === 0
+                                        ? "No users available (all have student records)"
+                                        : "Select user"
+                                }}
+                            </option>
                             <option
                                 v-for="user in props.users"
                                 :key="user.id"
@@ -63,6 +70,13 @@ const submit = () => {
                                 {{ user.name }} ({{ user.email }})
                             </option>
                         </select>
+                        <p
+                            v-if="props.users.length === 0"
+                            class="mt-1 text-xs text-amber-600"
+                        >
+                            All registered users already have student records. New
+                            users will appear here after they register.
+                        </p>
                         <p
                             v-if="form.errors.user_id"
                             class="mt-1 text-xs text-red-600"

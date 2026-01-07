@@ -33,7 +33,10 @@ class StudentController extends Controller
 
     public function create(): Response
     {
-        $users = User::orderBy('name')
+        // Get users who don't have a student record yet and have role 'student'
+        $users = User::where('role', 'student')
+            ->whereDoesntHave('student')
+            ->orderBy('name')
             ->get(['id', 'name', 'email']);
 
         return Inertia::render('Students/Create', [

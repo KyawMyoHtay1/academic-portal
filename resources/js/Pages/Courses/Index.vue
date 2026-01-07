@@ -56,10 +56,15 @@ const enroll = (courseId) => {
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-amber-700">
-                                You need a student record to enroll in courses.
-                                Please contact administration to create your
-                                student profile.
+                            <h3 class="text-sm font-medium text-amber-800">
+                                Student Profile Required
+                            </h3>
+                            <p class="mt-1 text-sm text-amber-700">
+                                Your account is registered, but a student profile
+                                needs to be created by administration before you
+                                can enroll in courses. Please contact the
+                                administration office to complete your student
+                                profile setup.
                             </p>
                         </div>
                     </div>
