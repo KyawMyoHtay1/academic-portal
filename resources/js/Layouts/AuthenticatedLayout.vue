@@ -145,11 +145,6 @@ const navigation = computed(() => {
         );
     }
 
-    // Placeholders for future modules
-    items.push(
-        { name: "Communication", href: "/communication", active: false }
-    );
-
     return items;
 });
 </script>
