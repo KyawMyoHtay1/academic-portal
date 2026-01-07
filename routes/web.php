@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CourseController;
+use App\Models\Course;
+use App\Models\Announcement;
 use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyCoursesController;
@@ -33,6 +35,12 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'publicCourses' => Course::orderBy('course_code')
+            ->take(6)
+            ->get(['id', 'course_code', 'title', 'credits', 'semester']),
+        'publicAnnouncements' => Announcement::orderBy('created_at', 'desc')
+            ->take(5)
+            ->get(['id', 'title', 'body', 'created_at']),
     ]);
 });
 
