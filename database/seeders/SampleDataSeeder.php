@@ -196,7 +196,9 @@ class SampleDataSeeder extends Seeder
         foreach ($recipientUsers as $i => $receiver) {
             Message::create([
                 'sender_id' => $staffAuthor?->id ?? $staffUsers->first()->id,
+                'sender_role' => $staffAuthor?->role ?? $staffUsers->first()->role,
                 'receiver_id' => $receiver->id,
+                'receiver_role' => $receiver->role,
                 'body' => $i === 0
                     ? 'Welcome to the portal. Please review your timetable.'
                     : 'Your fee status has been updated. Check the Fees page.',

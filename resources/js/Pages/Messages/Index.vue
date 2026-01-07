@@ -29,7 +29,6 @@ const statusBadgeClass = (read) =>
                     Messages
                 </h2>
                 <a
-                    v-if="$page.props.auth?.user?.role === 'staff'"
                     :href="route('messages.create')"
                     class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                 >
@@ -59,7 +58,13 @@ const statusBadgeClass = (read) =>
                     >
                         <div>
                             <p class="text-xs text-slate-500 flex items-center gap-2">
-                                <span>From: <span class="font-medium">{{ message.sender }}</span></span>
+                                <span>
+                                    From:
+                                    <span class="font-medium">{{ message.sender }}</span>
+                                </span>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-700">
+                                    {{ message.sender_role }}
+                                </span>
                                 <span>·</span>
                                 <span>{{ message.created_at }}</span>
                                 <span :class="statusBadgeClass(message.read)">

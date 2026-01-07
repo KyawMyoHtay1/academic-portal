@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
-    students: {
+    recipients: {
         type: Array,
         required: true,
     },
@@ -48,7 +48,7 @@ const submit = () => {
                                     for="receiver_id"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    To (Student) <span class="text-red-500">*</span>
+                                    To <span class="text-red-500">*</span>
                                 </label>
                                 <select
                                     id="receiver_id"
@@ -60,13 +60,13 @@ const submit = () => {
                                             form.errors.receiver_id,
                                     }"
                                 >
-                                    <option value="">Select student</option>
+                                    <option value="">Select recipient</option>
                                     <option
-                                        v-for="student in students"
-                                        :key="student.id"
-                                        :value="student.id"
+                                        v-for="recipient in recipients"
+                                        :key="recipient.id"
+                                        :value="recipient.id"
                                     >
-                                        {{ student.name }} ({{ student.email }})
+                                        {{ recipient.name }} ({{ recipient.email }}) — {{ recipient.role }}
                                     </option>
                                 </select>
                                 <p

@@ -74,14 +74,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
-    // Messaging
+    // Messaging (all roles can send)
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    Route::get('/messages/create', [MessageController::class, 'create'])
-        ->middleware('role:staff') // staff can send; teachers also checked in controller
-        ->name('messages.create');
-    Route::post('/messages', [MessageController::class, 'store'])
-        ->middleware('role:staff')
-        ->name('messages.store');
+    Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
 
     // Timebox 2: Staff Admin Features (staff only)

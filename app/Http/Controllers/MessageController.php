@@ -28,6 +28,8 @@ class MessageController extends Controller
                     'id' => $m->id,
                     'body' => $m->body,
                     'sender' => $m->sender?->name ?? 'Unknown',
+                    'sender_role' => $m->sender?->role ?? 'unknown',
+                    'receiver_role' => $m->receiver_role ?? $m->receiver?->role,
                     'read' => $m->read,
                     'created_at' => $m->created_at->format('Y-m-d H:i'),
                 ];
@@ -39,17 +41,19 @@ class MessageController extends Controller
     }
 
     /**
-     * Show the form for composing a new message (staff/teacher only).
+     * Show the form for composing a new message (all roles).
      */
     public function create(): Response
     {
-        // For simplicity, allow sending only to students
-        $students = User::where('role', 'student')
+        $user = Auth::user();
+
+        $recipients = User::where('id', '!=', $user->id)
+            ->orderBy('role')
             ->orderBy('name')
-            ->get(['id', 'name', 'email']);
+            ->get(['id', 'name', 'email', 'role']);
 
         return Inertia::render('Messages/Create', [
-            'students' => $students,
+            'recipients' => $recipients,
         ]);
     }
 
@@ -60,19 +64,25 @@ class MessageController extends Controller
     {
         $user = Auth::user();
 
-        // Only staff or teacher can send
-        if (! $user->isStaff() && ! $user->isTeacher()) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $data = $request->validate([
             'receiver_id' => ['required', 'exists:users,id'],
             'body' => ['required', 'string'],
         ]);
 
+        // Prevent sending to self
+        if ((int) $data['receiver_id'] === $user->id) {
+            return redirect()
+                ->back()
+                ->withErrors(['receiver_id' => 'You cannot send a message to yourself.']);
+        }
+
+        $receiver = User::find($data['receiver_id']);
+
         Message::create([
             'sender_id' => $user->id,
+            'sender_role' => $user->role,
             'receiver_id' => $data['receiver_id'],
+            'receiver_role' => $receiver?->role,
             'body' => $data['body'],
             'read' => false,
         ]);
