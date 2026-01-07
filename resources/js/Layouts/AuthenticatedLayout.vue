@@ -49,6 +49,11 @@ const navigation = computed(() => {
                 name: "Fees",
                 href: route("student.fees.index"),
                 active: route().current("student.fees.*"),
+            },
+            {
+                name: "Timetable",
+                href: route("student.timetable.index"),
+                active: route().current("student.timetable.*"),
             }
         );
     }
@@ -70,6 +75,11 @@ const navigation = computed(() => {
                 name: "Grades",
                 href: route("teacher.grades.index"),
                 active: route().current("teacher.grades.*"),
+            },
+            {
+                name: "Timetable",
+                href: route("teacher.timetable.index"),
+                active: route().current("teacher.timetable.*"),
             }
         );
     }
@@ -96,6 +106,11 @@ const navigation = computed(() => {
                 name: "Manage Fees",
                 href: route("admin.fees.index"),
                 active: route().current("admin.fees.*"),
+            },
+            {
+                name: "Manage Timetable",
+                href: route("admin.timetables.index"),
+                active: route().current("admin.timetables.*"),
             }
         );
     }

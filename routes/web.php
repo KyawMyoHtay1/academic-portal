@@ -9,12 +9,14 @@ use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffFeeController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\StudentFeeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
+use App\Http\Controllers\TeacherTimetableController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,6 +58,8 @@ Route::middleware('auth')->group(function () {
 
     // Student Fees (view only; payment status managed by staff)
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
+    // Student Timetable (read-only)
+    Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
 
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {
@@ -92,6 +96,16 @@ Route::middleware('auth')->group(function () {
             'update' => 'admin.fees.update',
             'destroy' => 'admin.fees.destroy',
         ]);
+
+        // Timetable Management (staff only)
+        Route::resource('admin/timetables', StaffTimetableController::class)->names([
+            'index' => 'admin.timetables.index',
+            'create' => 'admin.timetables.create',
+            'store' => 'admin.timetables.store',
+            'edit' => 'admin.timetables.edit',
+            'update' => 'admin.timetables.update',
+            'destroy' => 'admin.timetables.destroy',
+        ]);
     });
 
     // Timebox 3: Teacher Features (teacher only)
@@ -107,6 +121,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/teacher/grades', [TeacherGradesController::class, 'index'])->name('teacher.grades.index');
         Route::get('/teacher/grades/{course}', [TeacherGradesController::class, 'show'])->name('teacher.grades.show');
         Route::post('/teacher/grades/{course}', [TeacherGradesController::class, 'store'])->name('teacher.grades.store');
+
+        // Timetable View
+        Route::get('/teacher/timetable', [TeacherTimetableController::class, 'index'])->name('teacher.timetable.index');
     });
 });
 

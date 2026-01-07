@@ -49,6 +49,14 @@ class Course extends Model
     {
         return $this->hasMany(Grade::class);
     }
+
+    /**
+     * The timetable entries for this course.
+     */
+    public function timetables()
+    {
+        return $this->hasMany(Timetable::class);
+    }
 }
 
 
