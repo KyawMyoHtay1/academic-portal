@@ -21,6 +21,9 @@ const navigation = computed(() => {
         },
     ];
 
+    // Helper: badge for unread messages
+    const unreadMessages = page.props.unread?.messages ?? 0;
+
     // Student features (show for students only)
     if (user?.role === "student") {
         items.push(
@@ -64,6 +67,7 @@ const navigation = computed(() => {
                 name: "Messages",
                 href: route("messages.index"),
                 active: route().current("messages.*"),
+                badge: unreadMessages,
             }
         );
     }
@@ -100,6 +104,7 @@ const navigation = computed(() => {
                 name: "Messages",
                 href: route("messages.index"),
                 active: route().current("messages.*"),
+                badge: unreadMessages,
             }
         );
     }
@@ -141,6 +146,7 @@ const navigation = computed(() => {
                 name: "Messages",
                 href: route("messages.index"),
                 active: route().current("messages.*"),
+                badge: unreadMessages,
             }
         );
     }
@@ -195,17 +201,25 @@ const navigation = computed(() => {
                     <template v-for="item in navigation" :key="item.name">
                         <Link
                             :href="item.href"
-                            class="group flex items-center gap-2 rounded-lg px-3 py-2 font-medium transition"
+                            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
                             :class="[
                                 item.active
                                     ? 'bg-white/10 text-portal-gold'
                                     : 'text-slate-200 hover:bg-white/5 hover:text-white',
                             ]"
                         >
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="h-1.5 w-1.5 rounded-full bg-portal-gold/70"
+                                />
+                                <span>{{ item.name }}</span>
+                            </div>
                             <span
-                                class="h-1.5 w-1.5 rounded-full bg-portal-gold/70"
-                            />
-                            <span>{{ item.name }}</span>
+                                v-if="item.badge && item.badge > 0"
+                                class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                            >
+                                {{ item.badge }}
+                            </span>
                         </Link>
                     </template>
                 </nav>
