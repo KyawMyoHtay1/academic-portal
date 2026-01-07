@@ -53,41 +53,4 @@ class StudentFeeController extends Controller
             'fees' => $fees,
         ]);
     }
-
-    /**
-     * Mark a fee as paid (simplified payment flow).
-     */
-    public function pay(Request $request, Fee $fee): RedirectResponse
-    {
-        $user = Auth::user();
-        $student = $user->student;
-
-        if (!$student) {
-            return redirect()
-                ->route('student.fees.index')
-                ->with('error', 'Student record not found.');
-        }
-
-        // Verify fee belongs to this student
-        if ($fee->student_id !== $student->id) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        // Check if already paid
-        if ($fee->status === 'paid') {
-            return redirect()
-                ->route('student.fees.index')
-                ->with('error', 'This fee has already been paid.');
-        }
-
-        // Mark as paid
-        $fee->update([
-            'status' => 'paid',
-            'paid_date' => now()->format('Y-m-d'),
-        ]);
-
-        return redirect()
-            ->route('student.fees.index')
-            ->with('success', 'Fee marked as paid successfully.');
-    }
 }

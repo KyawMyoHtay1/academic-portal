@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 
 const props = defineProps({
     fees: {
@@ -12,20 +12,6 @@ const props = defineProps({
         default: null,
     },
 });
-
-const payFee = (feeId) => {
-    if (
-        !confirm(
-            "Are you sure you want to mark this fee as paid? This action cannot be undone."
-        )
-    ) {
-        return;
-    }
-
-    router.post(route("student.fees.pay", feeId), {
-        preserveScroll: true,
-    });
-};
 
 const getStatusBadgeClass = (status) => {
     return status === "paid"
@@ -86,7 +72,8 @@ const getStatusBadgeClass = (status) => {
                             Fee Records
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            View and manage your fee payments
+                            View your fee records. Payment status is updated by
+                            the finance office after confirmation.
                         </p>
                     </div>
 
@@ -125,12 +112,7 @@ const getStatusBadgeClass = (status) => {
                                     >
                                         Paid Date
                                     </th>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Action
-                                    </th>
+                                    <!-- No action column: students cannot change payment status -->
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -169,23 +151,7 @@ const getStatusBadgeClass = (status) => {
                                     >
                                         {{ fee.paid_date || "-" }}
                                     </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-right text-sm"
-                                    >
-                                        <button
-                                            v-if="fee.status === 'pending'"
-                                            @click="payFee(fee.id)"
-                                            class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                        >
-                                            Mark as Paid
-                                        </button>
-                                        <span
-                                            v-else
-                                            class="text-xs text-slate-500"
-                                        >
-                                            Paid
-                                        </span>
-                                    </td>
+                                    <!-- No action cell: read-only for students -->
                                 </tr>
                             </tbody>
                         </table>

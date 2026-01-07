@@ -54,9 +54,8 @@ Route::middleware('auth')->group(function () {
     // Student Grades (read-only)
     Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
 
-    // Student Fees (view and pay)
+    // Student Fees (view only; payment status managed by staff)
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
-    Route::post('/student/fees/{fee}/pay', [StudentFeeController::class, 'pay'])->name('student.fees.pay');
 
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {
