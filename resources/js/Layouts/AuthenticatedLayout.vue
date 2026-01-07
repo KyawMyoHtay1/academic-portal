@@ -54,6 +54,11 @@ const navigation = computed(() => {
                 name: "Timetable",
                 href: route("student.timetable.index"),
                 active: route().current("student.timetable.*"),
+            },
+            {
+                name: "Announcements",
+                href: route("announcements.index"),
+                active: route().current("announcements.*"),
             }
         );
     }
@@ -80,6 +85,11 @@ const navigation = computed(() => {
                 name: "Timetable",
                 href: route("teacher.timetable.index"),
                 active: route().current("teacher.timetable.*"),
+            },
+            {
+                name: "Announcements",
+                href: route("announcements.index"),
+                active: route().current("announcements.*"),
             }
         );
     }
@@ -111,13 +121,17 @@ const navigation = computed(() => {
                 name: "Manage Timetable",
                 href: route("admin.timetables.index"),
                 active: route().current("admin.timetables.*"),
+            },
+            {
+                name: "Announcements",
+                href: route("admin.announcements.index"),
+                active: route().current("admin.announcements.*"),
             }
         );
     }
 
     // Placeholders for future modules
     items.push(
-        { name: "Timetable", href: "/timetable", active: false },
         { name: "Communication", href: "/communication", active: false }
     );
 

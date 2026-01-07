@@ -14,6 +14,8 @@ use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\StudentFeeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\StaffAnnouncementController;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
@@ -61,6 +63,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
     // Student Timetable (read-only)
     Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
+
+    // Announcements (all authenticated users)
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {
@@ -113,6 +118,16 @@ Route::middleware('auth')->group(function () {
             'update' => 'admin.timetables.update',
             'destroy' => 'admin.timetables.destroy',
         ]);
+
+        // Announcements (staff only)
+        Route::resource('admin/announcements', StaffAnnouncementController::class)->names([
+            'index' => 'admin.announcements.index',
+            'create' => 'admin.announcements.create',
+            'store' => 'admin.announcements.store',
+            'edit' => 'admin.announcements.edit',
+            'update' => 'admin.announcements.update',
+            'destroy' => 'admin.announcements.destroy',
+        ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     });
 
     // Timebox 3: Teacher Features (teacher only)
