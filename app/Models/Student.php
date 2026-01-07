@@ -33,6 +33,14 @@ class Student extends Model
         return $this->belongsToMany(Course::class, 'course_student')
             ->withTimestamps();
     }
+
+    /**
+     * The attendance records for this student.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }
 
 

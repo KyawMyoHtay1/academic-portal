@@ -9,6 +9,7 @@ use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -76,6 +77,11 @@ Route::middleware('auth')->group(function () {
     // Timebox 3: Teacher Features (teacher only)
     Route::middleware('role:teacher')->group(function () {
         Route::get('/teacher/courses', [TeacherCoursesController::class, 'index'])->name('teacher.courses.index');
+        
+        // Attendance Management
+        Route::get('/teacher/attendance', [TeacherAttendanceController::class, 'index'])->name('teacher.attendance.index');
+        Route::get('/teacher/attendance/{course}', [TeacherAttendanceController::class, 'show'])->name('teacher.attendance.show');
+        Route::post('/teacher/attendance/{course}', [TeacherAttendanceController::class, 'store'])->name('teacher.attendance.store');
     });
 });
 

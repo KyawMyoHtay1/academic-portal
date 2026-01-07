@@ -33,6 +33,14 @@ class Course extends Model
         return $this->belongsToMany(User::class, 'course_teacher', 'course_id', 'user_id')
             ->withTimestamps();
     }
+
+    /**
+     * The attendance records for this course.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }
 
 

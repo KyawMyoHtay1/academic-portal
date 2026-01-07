@@ -45,11 +45,18 @@ const navigation = computed(() => {
 
     // Teacher features
     if (isTeacher) {
-        items.push({
-            name: "My Teaching Courses",
-            href: route("teacher.courses.index"),
-            active: route().current("teacher.courses.*"),
-        });
+        items.push(
+            {
+                name: "My Teaching Courses",
+                href: route("teacher.courses.index"),
+                active: route().current("teacher.courses.*"),
+            },
+            {
+                name: "Mark Attendance",
+                href: route("teacher.attendance.index"),
+                active: route().current("teacher.attendance.*"),
+            }
+        );
     }
 
     // Staff admin features
@@ -73,7 +80,6 @@ const navigation = computed(() => {
         { name: "Grades", href: "/grades", active: false },
         { name: "Fees", href: "/fees", active: false },
         { name: "Timetable", href: "/timetable", active: false },
-        { name: "Attendance", href: "/attendance", active: false },
         { name: "Communication", href: "/communication", active: false }
     );
 
