@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register role-based access control middleware
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'nocache' => \App\Http\Middleware\NoCache::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
