@@ -34,7 +34,10 @@ const submit = () => {
             <div class="mb-4">
                 <Breadcrumb
                     :items="[
-                        { label: 'Announcements', href: route('admin.announcements.index') },
+                        {
+                            label: 'Announcements',
+                            href: route('admin.announcements.index'),
+                        },
                         { label: 'Edit Announcement' },
                     ]"
                 />
@@ -47,7 +50,9 @@ const submit = () => {
                     <form @submit.prevent="submit">
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">
+                                <label
+                                    class="block text-sm font-medium text-slate-700"
+                                >
                                     Title <span class="text-red-500">*</span>
                                 </label>
                                 <input
@@ -69,7 +74,9 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">
+                                <label
+                                    class="block text-sm font-medium text-slate-700"
+                                >
                                     Body <span class="text-red-500">*</span>
                                 </label>
                                 <textarea
@@ -90,7 +97,9 @@ const submit = () => {
                                 </p>
                             </div>
 
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <Link
                                     :href="route('admin.announcements.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
@@ -102,7 +111,9 @@ const submit = () => {
                                     :disabled="form.processing"
                                     class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 disabled:opacity-50"
                                 >
-                                    <span v-if="form.processing">Updating...</span>
+                                    <span v-if="form.processing"
+                                        >Updating...</span
+                                    >
                                     <span v-else>Update</span>
                                 </button>
                             </div>
@@ -113,5 +124,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

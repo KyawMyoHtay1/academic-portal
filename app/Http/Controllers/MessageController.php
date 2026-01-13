@@ -41,7 +41,7 @@ class MessageController extends Controller
                     'receiver_role' => $m->receiver_role ?? $m->receiver?->role ?? 'unknown',
                     'read' => $m->read,
                     'is_sent' => $isSent, // Flag to identify sent messages
-                    'created_at' => $m->created_at->format('Y-m-d H:i'),
+                    'created_at' => $m->created_at->timestamp * 1000, // Unix timestamp in milliseconds (timezone-agnostic)
                 ];
             });
 

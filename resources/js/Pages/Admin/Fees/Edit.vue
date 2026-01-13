@@ -42,7 +42,10 @@ const submit = () => {
             <div class="mb-4">
                 <Breadcrumb
                     :items="[
-                        { label: 'Fee Management', href: route('admin.fees.index') },
+                        {
+                            label: 'Fee Management',
+                            href: route('admin.fees.index'),
+                        },
                         { label: 'Edit Fee' },
                     ]"
                 />
@@ -96,7 +99,8 @@ const submit = () => {
                                     for="amount"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    Amount (£) <span class="text-red-500">*</span>
+                                    Amount (£)
+                                    <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     id="amount"
@@ -228,7 +232,9 @@ const submit = () => {
                             </div>
 
                             <!-- Form Actions -->
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <Link
                                     :href="route('admin.fees.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
@@ -253,5 +259,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

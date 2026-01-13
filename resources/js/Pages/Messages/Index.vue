@@ -49,25 +49,81 @@ const stats = computed(() => {
 });
 
 // Format date to relative time
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
+const formatDate = (dateValue) => {
+    if (!dateValue) return "Unknown";
+
+    // Parse the date - handle Unix timestamp (milliseconds), ISO string, or date string
+    let date;
+    if (typeof dateValue === "number") {
+        // Unix timestamp in milliseconds
+        date = new Date(dateValue);
+    } else if (dateValue.includes("T")) {
+        // ISO format (e.g., "2026-01-13T12:00:00.000000Z" or "2026-01-13T12:00:00")
+        date = new Date(dateValue);
+    } else if (dateValue.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?/)) {
+        // Y-m-d H:i:s or Y-m-d H:i format (e.g., "2026-01-13 12:00:00" or "2026-01-13 12:00")
+        // Parse as local time (server timezone)
+        date = new Date(
+            dateValue.replace(" ", "T") +
+                (dateValue.includes(":") && dateValue.split(":").length === 2
+                    ? ":00"
+                    : "")
+        );
+    } else {
+        date = new Date(dateValue);
+    }
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+        console.warn("Invalid date:", dateValue);
+        return "Invalid date";
+    }
+
     const now = new Date();
-    const diffMs = now - date;
+    const diffMs = now.getTime() - date.getTime();
+
+    // Handle negative differences (future dates)
+    if (diffMs < 0) {
+        return "Just now";
+    }
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
+    const diffWeeks = Math.floor(diffDays / 7);
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
 
+    // Less than a minute
     if (diffMins < 1) return "Just now";
+
+    // Less than an hour
     if (diffMins < 60) return `${diffMins}m ago`;
+
+    // Less than 24 hours
     if (diffHours < 24) return `${diffHours}h ago`;
+
+    // Yesterday
     if (diffDays === 1) return "Yesterday";
+
+    // Less than a week
     if (diffDays < 7) return `${diffDays}d ago`;
 
-    return date.toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
-    });
+    // Less than a month
+    if (diffDays < 30) {
+        if (diffWeeks === 1) return "1 week ago";
+        return `${diffWeeks} weeks ago`;
+    }
+
+    // Less than a year
+    if (diffDays < 365) {
+        if (diffMonths === 1) return "1 month ago";
+        return `${diffMonths} months ago`;
+    }
+
+    // More than a year
+    if (diffYears === 1) return "1 year ago";
+    return `${diffYears} years ago`;
 };
 
 // Truncate message body
