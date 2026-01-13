@@ -46,7 +46,7 @@ class StaffFeeController extends Controller
     public function create(): Response
     {
         $students = Student::orderBy('full_name')
-            ->get(['id', 'student_no', 'full_name']);
+            ->get(['id', 'student_no', 'full_name', 'photo']);
 
         return Inertia::render('Admin/Fees/Create', [
             'students' => $students,

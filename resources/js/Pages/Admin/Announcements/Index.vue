@@ -65,16 +65,35 @@ const deleteAnnouncement = (id) => {
                         <div
                             v-for="announcement in announcements"
                             :key="announcement.id"
-                            class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                            class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
                         >
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3 class="text-base font-semibold text-slate-900">
-                                        {{ announcement.title }}
-                                    </h3>
-                                    <p class="mt-1 text-xs text-slate-500">
-                                        By {{ announcement.author }} · {{ announcement.created_at }}
-                                    </p>
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex items-start gap-3 flex-1">
+                                    <!-- Author Avatar -->
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                            <img
+                                                v-if="announcement.author_photo"
+                                                :src="`/storage/${announcement.author_photo}`"
+                                                :alt="`Photo of ${announcement.author}`"
+                                                class="h-full w-full object-cover"
+                                            />
+                                            <span
+                                                v-else
+                                                class="text-xs font-semibold text-slate-500"
+                                            >
+                                                {{ announcement.author.charAt(0).toUpperCase() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-slate-900">
+                                            {{ announcement.title }}
+                                        </h3>
+                                        <p class="mt-1 text-xs text-slate-500">
+                                            By {{ announcement.author }} · {{ announcement.created_at }}
+                                        </p>
+                                    </div>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <Link

@@ -12,6 +12,10 @@ defineProps({
     status: {
         type: String,
     },
+    photo_url: {
+        type: String,
+        default: null,
+    },
 });
 </script>
 
@@ -35,6 +39,7 @@ defineProps({
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
+                        :photo-url="photo_url"
                         class="max-w-xl"
                     />
                 </div>

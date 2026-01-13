@@ -5,12 +5,16 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     mustVerifyEmail: {
         type: Boolean,
     },
     status: {
         type: String,
+    },
+    photo_url: {
+        type: String,
+        default: null,
     },
 });
 
@@ -19,6 +23,7 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    photo: null,
 });
 </script>
 
@@ -35,9 +40,40 @@ const form = useForm({
         </header>
 
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
+            @submit.prevent="form.transform((data) => ({ ...data, _method: 'patch' })).post(route('profile.update'), { forceFormData: true, onFinish: () => form.reset('photo') })"
             class="mt-6 space-y-6"
         >
+            <!-- Profile Photo -->
+            <div>
+                <InputLabel value="Profile Photo" />
+                <div class="mt-2 flex items-center gap-6">
+                    <div v-if="photo_url" class="flex-shrink-0">
+                        <img
+                            :src="photo_url"
+                            :alt="`Photo for ${form.name}`"
+                            class="h-20 w-20 rounded-full border-2 border-slate-200 object-cover"
+                        />
+                    </div>
+                    <div v-else class="flex h-20 w-20 items-center justify-center rounded-full border-2 border-slate-200 bg-slate-100">
+                        <span class="text-xl font-semibold text-slate-500">
+                            {{ form.name.charAt(0).toUpperCase() }}
+                        </span>
+                    </div>
+                    <div class="flex-1">
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png"
+                            @change="(e) => (form.photo = e.target.files[0])"
+                            class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                        />
+                        <p class="mt-1 text-xs text-slate-500">
+                            JPEG or PNG, max 2MB. Leave empty to keep current photo.
+                        </p>
+                        <InputError class="mt-2" :message="form.errors.photo" />
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <InputLabel for="name" value="Name" />
 

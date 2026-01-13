@@ -22,6 +22,7 @@ class StaffAnnouncementController extends Controller
                     'title' => $a->title,
                     'body' => $a->body,
                     'author' => $a->author?->name ?? 'Staff',
+                    'author_photo' => $a->author?->photo,
                     'created_at' => $a->created_at->format('Y-m-d'),
                 ];
             });

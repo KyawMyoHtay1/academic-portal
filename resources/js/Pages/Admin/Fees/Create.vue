@@ -70,6 +70,34 @@ const submit = () => {
                                 >
                                     {{ form.errors.student_id }}
                                 </p>
+                                <!-- Student Preview -->
+                                <div
+                                    v-if="form.student_id"
+                                    class="mt-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
+                                >
+                                    <div class="h-12 w-12 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                        <img
+                                            v-if="students.find(s => s.id == form.student_id)?.photo"
+                                            :src="`/storage/${students.find(s => s.id == form.student_id).photo}`"
+                                            :alt="`Photo of ${students.find(s => s.id == form.student_id)?.full_name}`"
+                                            class="h-full w-full object-cover"
+                                        />
+                                        <span
+                                            v-else
+                                            class="text-sm font-semibold text-slate-500"
+                                        >
+                                            {{ students.find(s => s.id == form.student_id)?.full_name?.charAt(0).toUpperCase() }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {{ students.find(s => s.id == form.student_id)?.full_name }}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ students.find(s => s.id == form.student_id)?.student_no }}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Amount -->
