@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Timetable;
 use App\Notifications\TimetableUpdated;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -89,13 +90,17 @@ class StaffTimetableController extends Controller
         $courses = Course::orderBy('course_code')
             ->get(['id', 'course_code', 'title']);
 
+        // Format times to H:i format (remove seconds) for HTML time input
+        $startTime = $timetable->start_time ? Carbon::parse($timetable->start_time)->format('H:i') : null;
+        $endTime = $timetable->end_time ? Carbon::parse($timetable->end_time)->format('H:i') : null;
+
         return Inertia::render('Admin/Timetables/Edit', [
             'timetable' => [
                 'id' => $timetable->id,
                 'course_id' => $timetable->course_id,
                 'day_of_week' => $timetable->day_of_week,
-                'start_time' => $timetable->start_time,
-                'end_time' => $timetable->end_time,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
                 'location' => $timetable->location,
             ],
             'courses' => $courses,
