@@ -176,20 +176,46 @@ const navigation = computed(() => {
     <div class="min-h-screen bg-portal-background">
         <!-- Flash messages -->
         <div
-            class="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 space-y-2"
+            class="fixed top-4 right-4 z-50 max-w-md space-y-2"
             v-if="$page.props.flash?.success || $page.props.flash?.error"
         >
             <div
                 v-if="$page.props.flash?.success"
-                class="rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-200"
+                class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200 shadow-lg"
             >
-                {{ $page.props.flash.success }}
+                <div class="flex items-center gap-2">
+                    <svg
+                        class="h-5 w-5 text-emerald-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                    <span>{{ $page.props.flash.success }}</span>
+                </div>
             </div>
             <div
                 v-if="$page.props.flash?.error"
-                class="rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200"
+                class="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-800 ring-1 ring-red-200 shadow-lg"
             >
-                {{ $page.props.flash.error }}
+                <div class="flex items-center gap-2">
+                    <svg
+                        class="h-5 w-5 text-red-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                    <span>{{ $page.props.flash.error }}</span>
+                </div>
             </div>
         </div>
 

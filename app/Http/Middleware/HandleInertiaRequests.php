@@ -36,6 +36,10 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
             ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
             'unread' => [
                 'messages' => $user
                     ? $user->receivedMessages()->where('read', false)->count()

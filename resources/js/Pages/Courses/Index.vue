@@ -20,9 +20,9 @@ const enroll = (courseId) => {
         route("courses.enroll", courseId),
         {},
         {
-            preserveScroll: true,
+            preserveScroll: false, // Allow page refresh to show flash messages
             onSuccess: () => {
-                // Page will refresh automatically with updated enrollment status
+                // Page will refresh automatically with updated enrollment status and flash messages
             },
         }
     );
