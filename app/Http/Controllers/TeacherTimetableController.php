@@ -9,29 +9,32 @@ use Inertia\Response;
 class TeacherTimetableController extends Controller
 {
     /**
-     * Display the timetables for courses assigned to the teacher.
+     * Display the timetables for subjects assigned to the teacher.
      */
     public function index(): Response
     {
         $user = Auth::user();
 
-        // Get timetables for subjects in assigned courses
-        $courses = $user->teachingCourses()
-            ->with(['subjects.timetables' => function ($query) {
+        // Get timetables for subjects assigned to this teacher
+        $subjects = $user->teachingSubjects()
+            ->with(['timetables' => function ($query) {
                 $query->orderBy('day_of_week')->orderBy('start_time');
-            }])
-            ->orderBy('course_code')
+            }, 'course'])
+            ->orderBy('subject_code')
             ->get([
-                'courses.id',
-                'courses.course_code',
-                'courses.title',
+                'subjects.id',
+                'subjects.subject_code',
+                'subjects.title',
+                'subjects.course_id',
             ]);
 
-        $data = $courses->map(function ($course) {
-            $timetables = collect();
+        // Group by course for display
+        $courses = $subjects->groupBy('course_id')->map(function ($courseSubjects, $courseId) {
+            $firstSubject = $courseSubjects->first();
+            $course = $firstSubject->course;
             
-            // Collect all timetables from all subjects in this course
-            foreach ($course->subjects as $subject) {
+            $timetables = collect();
+            foreach ($courseSubjects as $subject) {
                 foreach ($subject->timetables as $entry) {
                     $timetables->push([
                         'id' => $entry->id,
@@ -57,10 +60,10 @@ class TeacherTimetableController extends Controller
                 'title' => $course->title,
                 'timetables' => $timetables,
             ];
-        });
+        })->values();
 
         return Inertia::render('Teacher/Timetable/Index', [
-            'courses' => $data,
+            'courses' => $courses,
         ]);
     }
 }

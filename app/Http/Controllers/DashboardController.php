@@ -42,17 +42,18 @@ class DashboardController extends Controller
 
         // Teacher view: teaching-focused stats
         if ($user?->isTeacher()) {
-            $courseIds = $user->teachingCourses()->pluck('courses.id');
-            $teachingCourses = $courseIds->count();
+            $subjectIds = $user->teachingSubjects()->pluck('subjects.id');
+            $teachingSubjects = $subjectIds->count();
 
-            $studentsTaught = Student::whereHas('courses', function ($q) use ($courseIds) {
-                $q->whereIn('courses.id', $courseIds);
+            // Get unique students from courses that contain the assigned subjects
+            $studentsTaught = Student::whereHas('courses.subjects', function ($q) use ($subjectIds) {
+                $q->whereIn('subjects.id', $subjectIds);
             })->distinct('students.id')->count();
 
-            $gradesRecorded = Grade::whereIn('course_id', $courseIds)->count();
+            $gradesRecorded = Grade::whereIn('subject_id', $subjectIds)->count();
 
-            $attendanceTotal = Attendance::whereIn('course_id', $courseIds)->count();
-            $attendancePresent = Attendance::whereIn('course_id', $courseIds)
+            $attendanceTotal = Attendance::whereIn('subject_id', $subjectIds)->count();
+            $attendancePresent = Attendance::whereIn('subject_id', $subjectIds)
                 ->where('status', 'present')
                 ->count();
             $attendanceRate = $attendanceTotal > 0
@@ -62,7 +63,7 @@ class DashboardController extends Controller
             return Inertia::render('Dashboard', [
                 'role' => 'teacher',
                 'stats' => [
-                    'teachingCourses' => $teachingCourses,
+                    'teachingSubjects' => $teachingSubjects,
                     'studentsTaught' => $studentsTaught,
                     'gradesRecorded' => $gradesRecorded,
                     'attendanceRate' => $attendanceRate,

@@ -56,9 +56,9 @@ const cards = computed(() => {
     if (props.role === "teacher") {
         list.push(
             {
-                title: "My Courses",
-                value: formatNumber(s.teachingCourses),
-                helper: "Courses you are teaching",
+                title: "My Subjects",
+                value: formatNumber(s.teachingSubjects),
+                helper: "Subjects you are teaching",
             },
             {
                 title: "Students Taught",

@@ -22,12 +22,8 @@ class TeacherGradesController extends Controller
     {
         $user = Auth::user();
 
-        // Get subjects from courses assigned to this teacher
-        $subjects = Subject::whereHas('course', function ($query) use ($user) {
-            $query->whereHas('teachers', function ($q) use ($user) {
-                $q->where('users.id', $user->id);
-            });
-        })
+        // Get subjects assigned to this teacher
+        $subjects = $user->teachingSubjects()
             ->with('course')
             ->orderBy('subject_code')
             ->get()
@@ -53,8 +49,8 @@ class TeacherGradesController extends Controller
     {
         $user = Auth::user();
 
-        // Ensure the teacher is assigned to the subject's course
-        if (!$user->teachingCourses()->where('courses.id', $subject->course_id)->exists()) {
+        // Ensure the teacher is assigned to this subject
+        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -100,8 +96,8 @@ class TeacherGradesController extends Controller
     {
         $user = Auth::user();
 
-        // Ensure the teacher is assigned to the subject's course
-        if (!$user->teachingCourses()->where('courses.id', $subject->course_id)->exists()) {
+        // Ensure the teacher is assigned to this subject
+        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
