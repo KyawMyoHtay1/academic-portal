@@ -9,6 +9,7 @@ use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Message;
 use App\Models\Student;
+use App\Models\Subject;
 use App\Models\Timetable;
 use App\Models\User;
 use Carbon\Carbon;
@@ -96,6 +97,51 @@ class SampleDataSeeder extends Seeder
         foreach ($courses as $index => $course) {
             $teacherId = $teacherIds[$index % count($teacherIds)];
             $course->teachers()->syncWithoutDetaching([$teacherId]);
+        }
+
+        // Subjects for each course
+        $subjectsData = [
+            'COMP101' => [
+                ['subject_code' => 'COMP101-01', 'title' => 'Computer Fundamentals', 'credits' => 1, 'description' => 'Introduction to computer hardware and software basics.'],
+                ['subject_code' => 'COMP101-02', 'title' => 'Operating Systems', 'credits' => 1, 'description' => 'Understanding operating system concepts and functions.'],
+                ['subject_code' => 'COMP101-03', 'title' => 'Networking Basics', 'credits' => 1, 'description' => 'Introduction to computer networks and internet protocols.'],
+            ],
+            'COMP102' => [
+                ['subject_code' => 'COMP102-01', 'title' => 'SQL Fundamentals', 'credits' => 2, 'description' => 'Learning SQL queries, joins, and database operations.'],
+                ['subject_code' => 'COMP102-02', 'title' => 'Database Design', 'credits' => 1, 'description' => 'ER modeling, normalization, and database schema design.'],
+                ['subject_code' => 'COMP102-03', 'title' => 'Database Administration', 'credits' => 1, 'description' => 'Database management, security, and optimization.'],
+            ],
+            'COMP201' => [
+                ['subject_code' => 'COMP201-01', 'title' => 'HTML & CSS', 'credits' => 1, 'description' => 'Web page structure and styling fundamentals.'],
+                ['subject_code' => 'COMP201-02', 'title' => 'JavaScript Programming', 'credits' => 2, 'description' => 'Client-side scripting and interactive web development.'],
+                ['subject_code' => 'COMP201-03', 'title' => 'Backend Development', 'credits' => 1, 'description' => 'Server-side programming and API development.'],
+            ],
+            'COMP202' => [
+                ['subject_code' => 'COMP202-01', 'title' => 'Arrays and Linked Lists', 'credits' => 1, 'description' => 'Fundamental linear data structures.'],
+                ['subject_code' => 'COMP202-02', 'title' => 'Trees and Graphs', 'credits' => 1, 'description' => 'Non-linear data structures and their applications.'],
+                ['subject_code' => 'COMP202-03', 'title' => 'Algorithm Analysis', 'credits' => 1, 'description' => 'Time and space complexity, sorting and searching algorithms.'],
+            ],
+            'COMP203' => [
+                ['subject_code' => 'COMP203-01', 'title' => 'Software Design Patterns', 'credits' => 1, 'description' => 'Common design patterns in software development.'],
+                ['subject_code' => 'COMP203-02', 'title' => 'Software Testing', 'credits' => 1, 'description' => 'Unit testing, integration testing, and test-driven development.'],
+                ['subject_code' => 'COMP203-03', 'title' => 'Project Management', 'credits' => 2, 'description' => 'Agile methodologies, project planning, and team collaboration.'],
+            ],
+        ];
+
+        foreach ($courses as $course) {
+            if (isset($subjectsData[$course->course_code])) {
+                foreach ($subjectsData[$course->course_code] as $subjectData) {
+                    Subject::firstOrCreate(
+                        ['subject_code' => $subjectData['subject_code']],
+                        [
+                            'course_id' => $course->id,
+                            'title' => $subjectData['title'],
+                            'credits' => $subjectData['credits'],
+                            'description' => $subjectData['description'],
+                        ]
+                    );
+                }
+            }
         }
 
         // Enroll students to courses (simple distribution)
