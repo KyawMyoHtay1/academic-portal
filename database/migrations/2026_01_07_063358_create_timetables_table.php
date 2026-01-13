@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('timetables', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
-            $table->string('day_of_week'); // e.g., Monday, Tuesday
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
+            $table->string('day_of_week');
             $table->time('start_time');
             $table->time('end_time');
             $table->string('location')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**

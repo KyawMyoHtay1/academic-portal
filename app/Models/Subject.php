@@ -24,4 +24,20 @@ class Subject extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    /**
+     * The grades recorded for this subject.
+     */
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+
+    /**
+     * The timetable entries for this subject.
+     */
+    public function timetables()
+    {
+        return $this->hasMany(Timetable::class);
+    }
 }
