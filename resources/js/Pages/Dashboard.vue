@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -12,6 +12,18 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+});
+
+const page = usePage();
+const user = computed(() => page.props.auth?.user ?? null);
+const userRoleLabel = computed(() => {
+    if (!user.value?.role) {
+        return "";
+    }
+    return (
+        user.value.role.charAt(0).toUpperCase() +
+        user.value.role.slice(1)
+    );
 });
 
 const formatNumber = (value) => new Intl.NumberFormat().format(value ?? 0);
@@ -119,6 +131,49 @@ const cards = computed(() => {
         </template>
 
         <div class="space-y-6">
+            <!-- Logged-in user summary with photo -->
+            <div
+                v-if="user"
+                class="portal-card flex items-center gap-4 p-5"
+            >
+                <div
+                    class="h-14 w-14 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
+                >
+                    <img
+                        v-if="user.photo"
+                        :src="`/storage/${user.photo}`"
+                        :alt="`Photo for ${user.name}`"
+                        class="h-full w-full object-cover"
+                    />
+                    <span
+                        v-else
+                        class="text-base font-semibold text-slate-500"
+                    >
+                        {{ user.name.charAt(0).toUpperCase() }}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900">
+                        {{ user.name }}
+                    </p>
+                    <p class="text-xs text-slate-500">
+                        {{ userRoleLabel || 'User' }} &bull;
+                        <span v-if="role === 'student'">
+                            Student dashboard overview
+                        </span>
+                        <span v-else-if="role === 'teacher'">
+                            Teacher dashboard overview
+                        </span>
+                        <span v-else-if="role === 'staff'">
+                            Staff dashboard overview
+                        </span>
+                        <span v-else>
+                            Academic portal overview
+                        </span>
+                    </p>
+                </div>
+            </div>
+
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                 <div
                     v-for="card in cards"

@@ -25,7 +25,9 @@ class StudentTimetableController extends Controller
 
         // Get timetables for subjects in enrolled courses
         $courses = $student->courses()
-            ->with(['subjects.timetables' => function ($query) {
+            ->with(['subjects' => function ($query) {
+                $query->select('subjects.id', 'subjects.course_id', 'subjects.subject_code', 'subjects.title', 'subjects.photo');
+            }, 'subjects.timetables' => function ($query) {
                 $query->orderBy('day_of_week')->orderBy('start_time');
             }])
             ->orderBy('course_code')
@@ -33,6 +35,7 @@ class StudentTimetableController extends Controller
                 'courses.id',
                 'courses.course_code',
                 'courses.title',
+                'courses.photo',
             ]);
 
         $data = $courses->map(function ($course) {
@@ -45,6 +48,7 @@ class StudentTimetableController extends Controller
                         'id' => $entry->id,
                         'subject_code' => $subject->subject_code,
                         'subject_title' => $subject->title,
+                        'subject_photo' => $subject->photo,
                         'day_of_week' => $entry->day_of_week,
                         'start_time' => $entry->start_time,
                         'end_time' => $entry->end_time,
@@ -63,6 +67,7 @@ class StudentTimetableController extends Controller
                 'id' => $course->id,
                 'course_code' => $course->course_code,
                 'title' => $course->title,
+                'photo' => $course->photo,
                 'timetables' => $timetables,
             ];
         });

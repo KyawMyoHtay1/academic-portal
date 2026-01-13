@@ -25,6 +25,7 @@ class StaffFeeController extends Controller
                     'id' => $fee->id,
                     'student_no' => $fee->student->student_no,
                     'student_name' => $fee->student->full_name,
+                    'student_photo' => $fee->student->photo,
                     'amount' => $fee->amount,
                     'description' => $fee->description,
                     'status' => $fee->status,

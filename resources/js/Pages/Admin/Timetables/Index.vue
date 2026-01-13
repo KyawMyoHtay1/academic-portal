@@ -110,23 +110,60 @@ const deleteEntry = (id) => {
                                     <td
                                         class="px-4 py-4 text-sm font-medium text-slate-900"
                                     >
-                                        <div class="flex flex-col">
-                                            <span>{{
-                                                entry.subject_code || "N/A"
-                                            }}</span>
-                                            <span
-                                                class="text-xs text-slate-500"
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                            >
+                                                <img
+                                                    v-if="entry.subject_photo"
+                                                    :src="`/storage/${entry.subject_photo}`"
+                                                    :alt="`Photo for ${entry.subject_title || 'N/A'}`"
+                                                    class="h-full w-full object-cover"
+                                                />
+                                                <span
+                                                    v-else
+                                                    class="text-xs font-semibold text-slate-500"
+                                                >
+                                                    {{ (entry.subject_title || entry.subject_code || 'N')[0].toUpperCase() }}
+                                                </span>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span>{{
+                                                    entry.subject_code || "N/A"
+                                                }}</span>
+                                                <span
+                                                    class="text-xs text-slate-500"
                                                 >{{
                                                     entry.subject_title || ""
-                                                }}</span
-                                            >
+                                                }}</span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td
                                         class="px-4 py-4 text-sm text-slate-700"
                                     >
-                                        {{ entry.course_code }} -
-                                        {{ entry.course_title }}
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                            >
+                                                <img
+                                                    v-if="entry.course_photo"
+                                                    :src="`/storage/${entry.course_photo}`"
+                                                    :alt="`Photo for ${entry.course_title}`"
+                                                    class="h-full w-full object-cover"
+                                                />
+                                                <span
+                                                    v-else
+                                                    class="text-xs font-semibold text-slate-500"
+                                                >
+                                                    {{ entry.course_title.charAt(0).toUpperCase() }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                {{ entry.course_code }} -
+                                                {{ entry.course_title }}
+                                            </div>
+                                        </div>
                                     </td>
                                     <td
                                         class="px-4 py-4 text-sm text-slate-700"

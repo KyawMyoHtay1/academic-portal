@@ -175,7 +175,25 @@ const rejectPayment = (feeId) => {
                                     <td
                                         class="px-4 py-4 text-sm text-slate-700"
                                     >
-                                        {{ fee.student_name }}
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                            >
+                                                <img
+                                                    v-if="fee.student_photo"
+                                                    :src="`/storage/${fee.student_photo}`"
+                                                    :alt="`Photo for ${fee.student_name}`"
+                                                    class="h-full w-full object-cover"
+                                                />
+                                                <span
+                                                    v-else
+                                                    class="text-xs font-semibold text-slate-500"
+                                                >
+                                                    {{ fee.student_name.charAt(0).toUpperCase() }}
+                                                </span>
+                                            </div>
+                                            <span>{{ fee.student_name }}</span>
+                                        </div>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"

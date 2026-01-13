@@ -30,11 +30,13 @@ class StaffEnrollmentController extends Controller
                 'courses.title as course_title',
                 'courses.credits',
                 'courses.semester',
+                'courses.photo as course_photo',
                 'students.id as student_id',
                 'students.student_no',
                 'students.full_name as student_name',
                 'students.email as student_email',
-                'students.programme'
+                'students.programme',
+                'students.photo as student_photo'
             )
             ->orderBy('course_student.created_at', 'desc')
             ->get();
@@ -52,11 +54,13 @@ class StaffEnrollmentController extends Controller
                 'courses.title as course_title',
                 'courses.credits',
                 'courses.semester',
+                'courses.photo as course_photo',
                 'students.id as student_id',
                 'students.student_no',
                 'students.full_name as student_name',
                 'students.email as student_email',
-                'students.programme'
+                'students.programme',
+                'students.photo as student_photo'
             )
             ->orderBy('course_student.updated_at', 'desc')
             ->get();
