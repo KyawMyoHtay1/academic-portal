@@ -102,3 +102,4 @@ const deleteAnnouncement = (id) => {
     </AuthenticatedLayout>
 </template>
 
+

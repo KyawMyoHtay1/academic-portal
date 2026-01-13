@@ -149,3 +149,4 @@ const deleteEntry = (id) => {
     </AuthenticatedLayout>
 </template>
 
+
