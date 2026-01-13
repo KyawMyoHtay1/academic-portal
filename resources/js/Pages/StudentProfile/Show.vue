@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import { computed } from "vue";
 
@@ -41,6 +42,12 @@ const submit = () => {
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 My Student Profile
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'My Profile' }]" />
+            </div>
         </template>
 
         <div class="py-12">

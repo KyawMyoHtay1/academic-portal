@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -23,15 +24,13 @@ const form = useForm({
 });
 
 const submit = () => {
-    form
-        .transform((data) => ({
-            ...data,
-            _method: "put",
-        }))
-        .post(route("admin.subjects.update", props.subject.id), {
-            forceFormData: true,
-            onFinish: () => form.reset("photo"),
-        });
+    form.transform((data) => ({
+        ...data,
+        _method: "put",
+    })).post(route("admin.subjects.update", props.subject.id), {
+        forceFormData: true,
+        onFinish: () => form.reset("photo"),
+    });
 };
 </script>
 
@@ -43,6 +42,20 @@ const submit = () => {
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 Edit Subject
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        {
+                            label: 'Subject Management',
+                            href: route('admin.subjects.index'),
+                        },
+                        { label: 'Edit Subject' },
+                    ]"
+                />
+            </div>
         </template>
 
         <div class="py-12">
@@ -74,7 +87,8 @@ const submit = () => {
                                         :key="course.id"
                                         :value="course.id"
                                     >
-                                        {{ course.course_code }} - {{ course.title }}
+                                        {{ course.course_code }} -
+                                        {{ course.title }}
                                     </option>
                                 </select>
                                 <p
@@ -225,7 +239,9 @@ const submit = () => {
                                     type="file"
                                     accept="image/jpeg,image/jpg,image/png"
                                     class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
-                                    @change="(e) => (form.photo = e.target.files[0])"
+                                    @change="
+                                        (e) => (form.photo = e.target.files[0])
+                                    "
                                 />
                                 <p
                                     v-if="form.errors.photo"
@@ -236,7 +252,9 @@ const submit = () => {
                             </div>
 
                             <!-- Form Actions -->
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <Link
                                     :href="route('admin.subjects.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"

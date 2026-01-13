@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 defineProps({
@@ -39,6 +40,12 @@ const deleteEntry = (id) => {
                 >
                     Create Entry
                 </Link>
+            </div>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Timetable Management' }]" />
             </div>
         </template>
 
@@ -117,14 +124,21 @@ const deleteEntry = (id) => {
                                                 <img
                                                     v-if="entry.subject_photo"
                                                     :src="`/storage/${entry.subject_photo}`"
-                                                    :alt="`Photo for ${entry.subject_title || 'N/A'}`"
+                                                    :alt="`Photo for ${
+                                                        entry.subject_title ||
+                                                        'N/A'
+                                                    }`"
                                                     class="h-full w-full object-cover"
                                                 />
                                                 <span
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ (entry.subject_title || entry.subject_code || 'N')[0].toUpperCase() }}
+                                                    {{
+                                                        (entry.subject_title ||
+                                                            entry.subject_code ||
+                                                            "N")[0].toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <div class="flex flex-col">
@@ -133,9 +147,11 @@ const deleteEntry = (id) => {
                                                 }}</span>
                                                 <span
                                                     class="text-xs text-slate-500"
-                                                >{{
-                                                    entry.subject_title || ""
-                                                }}</span>
+                                                    >{{
+                                                        entry.subject_title ||
+                                                        ""
+                                                    }}</span
+                                                >
                                             </div>
                                         </div>
                                     </td>
@@ -156,7 +172,11 @@ const deleteEntry = (id) => {
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ entry.course_title.charAt(0).toUpperCase() }}
+                                                    {{
+                                                        entry.course_title
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <div>

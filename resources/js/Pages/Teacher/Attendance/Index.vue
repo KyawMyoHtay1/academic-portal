@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link } from "@inertiajs/vue3";
 
 defineProps({
@@ -18,6 +19,12 @@ defineProps({
             <h2 class="text-xl font-semibold leading-tight text-slate-900">
                 Mark Attendance
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Mark Attendance' }]" />
+            </div>
         </template>
 
         <div class="py-12">

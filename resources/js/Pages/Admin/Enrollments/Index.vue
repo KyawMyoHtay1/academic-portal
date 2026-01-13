@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
 
 defineProps({
@@ -14,17 +15,17 @@ defineProps({
 });
 
 const approveEnrollment = (enrollmentId) => {
-    if (
-        !confirm(
-            "Are you sure you want to approve this enrollment?"
-        )
-    ) {
+    if (!confirm("Are you sure you want to approve this enrollment?")) {
         return;
     }
 
-    router.post(route("admin.enrollments.approve", enrollmentId), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        route("admin.enrollments.approve", enrollmentId),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
 };
 
 const rejectEnrollment = (enrollmentId) => {
@@ -36,9 +37,13 @@ const rejectEnrollment = (enrollmentId) => {
         return;
     }
 
-    router.post(route("admin.enrollments.reject", enrollmentId), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        route("admin.enrollments.reject", enrollmentId),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
 };
 
 const approveWithdrawal = (enrollmentId) => {
@@ -50,9 +55,13 @@ const approveWithdrawal = (enrollmentId) => {
         return;
     }
 
-    router.post(route("admin.enrollments.approve-withdrawal", enrollmentId), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        route("admin.enrollments.approve-withdrawal", enrollmentId),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
 };
 
 const rejectWithdrawal = (enrollmentId) => {
@@ -64,18 +73,22 @@ const rejectWithdrawal = (enrollmentId) => {
         return;
     }
 
-    router.post(route("admin.enrollments.reject-withdrawal", enrollmentId), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        route("admin.enrollments.reject-withdrawal", enrollmentId),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
 };
 
 const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
     });
 };
 </script>
@@ -90,6 +103,12 @@ const formatDate = (dateString) => {
             </h2>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Enrollment Management' }]" />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
                 <!-- Pending Enrollments Section -->
@@ -101,7 +120,8 @@ const formatDate = (dateString) => {
                             Pending Enrollment Requests
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Review and approve or reject student course enrollment requests
+                            Review and approve or reject student course
+                            enrollment requests
                         </p>
                     </div>
 
@@ -151,7 +171,8 @@ const formatDate = (dateString) => {
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No pending enrollment requests. All enrollment requests have been processed.
+                                        No pending enrollment requests. All
+                                        enrollment requests have been processed.
                                     </td>
                                 </tr>
                                 <tr
@@ -165,7 +186,9 @@ const formatDate = (dateString) => {
                                                 class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                             >
                                                 <img
-                                                    v-if="enrollment.student_photo"
+                                                    v-if="
+                                                        enrollment.student_photo
+                                                    "
                                                     :src="`/storage/${enrollment.student_photo}`"
                                                     :alt="`Photo for ${enrollment.student_name}`"
                                                     class="h-full w-full object-cover"
@@ -174,18 +197,32 @@ const formatDate = (dateString) => {
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ enrollment.student_name.charAt(0).toUpperCase() }}
+                                                    {{
+                                                        enrollment.student_name
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class="text-sm font-medium text-slate-900">
-                                                    {{ enrollment.student_name }}
+                                                <div
+                                                    class="text-sm font-medium text-slate-900"
+                                                >
+                                                    {{
+                                                        enrollment.student_name
+                                                    }}
                                                 </div>
-                                                <div class="text-sm text-slate-500">
+                                                <div
+                                                    class="text-sm text-slate-500"
+                                                >
                                                     {{ enrollment.student_no }}
                                                 </div>
-                                                <div class="text-xs text-slate-400">
-                                                    {{ enrollment.student_email }}
+                                                <div
+                                                    class="text-xs text-slate-400"
+                                                >
+                                                    {{
+                                                        enrollment.student_email
+                                                    }}
                                                 </div>
                                             </div>
                                         </div>
@@ -196,7 +233,9 @@ const formatDate = (dateString) => {
                                                 class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                             >
                                                 <img
-                                                    v-if="enrollment.course_photo"
+                                                    v-if="
+                                                        enrollment.course_photo
+                                                    "
                                                     :src="`/storage/${enrollment.course_photo}`"
                                                     :alt="`Photo for ${enrollment.course_title}`"
                                                     class="h-full w-full object-cover"
@@ -205,18 +244,34 @@ const formatDate = (dateString) => {
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ enrollment.course_title.charAt(0).toUpperCase() }}
+                                                    {{
+                                                        enrollment.course_title
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class="text-sm font-medium text-slate-900">
+                                                <div
+                                                    class="text-sm font-medium text-slate-900"
+                                                >
                                                     {{ enrollment.course_code }}
                                                 </div>
-                                                <div class="text-sm text-slate-600">
-                                                    {{ enrollment.course_title }}
+                                                <div
+                                                    class="text-sm text-slate-600"
+                                                >
+                                                    {{
+                                                        enrollment.course_title
+                                                    }}
                                                 </div>
-                                                <div class="text-xs text-slate-500">
-                                                    {{ enrollment.credits }} credits · {{ enrollment.semester }}
+                                                <div
+                                                    class="text-xs text-slate-500"
+                                                >
+                                                    {{
+                                                        enrollment.credits
+                                                    }}
+                                                    credits ·
+                                                    {{ enrollment.semester }}
                                                 </div>
                                             </div>
                                         </div>
@@ -229,20 +284,32 @@ const formatDate = (dateString) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
                                     >
-                                        {{ formatDate(enrollment.requested_at) }}
+                                        {{
+                                            formatDate(enrollment.requested_at)
+                                        }}
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div
+                                            class="flex items-center justify-end gap-2"
+                                        >
                                             <button
-                                                @click="approveEnrollment(enrollment.enrollment_id)"
+                                                @click="
+                                                    approveEnrollment(
+                                                        enrollment.enrollment_id
+                                                    )
+                                                "
                                                 class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                             >
                                                 Approve
                                             </button>
                                             <button
-                                                @click="rejectEnrollment(enrollment.enrollment_id)"
+                                                @click="
+                                                    rejectEnrollment(
+                                                        enrollment.enrollment_id
+                                                    )
+                                                "
                                                 class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                             >
                                                 Reject
@@ -264,7 +331,8 @@ const formatDate = (dateString) => {
                             Pending Withdrawal Requests
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Review and approve or reject student course withdrawal requests
+                            Review and approve or reject student course
+                            withdrawal requests
                         </p>
                     </div>
 
@@ -314,7 +382,8 @@ const formatDate = (dateString) => {
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No pending withdrawal requests. All withdrawal requests have been processed.
+                                        No pending withdrawal requests. All
+                                        withdrawal requests have been processed.
                                     </td>
                                 </tr>
                                 <tr
@@ -328,7 +397,9 @@ const formatDate = (dateString) => {
                                                 class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                             >
                                                 <img
-                                                    v-if="withdrawal.student_photo"
+                                                    v-if="
+                                                        withdrawal.student_photo
+                                                    "
                                                     :src="`/storage/${withdrawal.student_photo}`"
                                                     :alt="`Photo for ${withdrawal.student_name}`"
                                                     class="h-full w-full object-cover"
@@ -337,18 +408,32 @@ const formatDate = (dateString) => {
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ withdrawal.student_name.charAt(0).toUpperCase() }}
+                                                    {{
+                                                        withdrawal.student_name
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class="text-sm font-medium text-slate-900">
-                                                    {{ withdrawal.student_name }}
+                                                <div
+                                                    class="text-sm font-medium text-slate-900"
+                                                >
+                                                    {{
+                                                        withdrawal.student_name
+                                                    }}
                                                 </div>
-                                                <div class="text-sm text-slate-500">
+                                                <div
+                                                    class="text-sm text-slate-500"
+                                                >
                                                     {{ withdrawal.student_no }}
                                                 </div>
-                                                <div class="text-xs text-slate-400">
-                                                    {{ withdrawal.student_email }}
+                                                <div
+                                                    class="text-xs text-slate-400"
+                                                >
+                                                    {{
+                                                        withdrawal.student_email
+                                                    }}
                                                 </div>
                                             </div>
                                         </div>
@@ -359,7 +444,9 @@ const formatDate = (dateString) => {
                                                 class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                             >
                                                 <img
-                                                    v-if="withdrawal.course_photo"
+                                                    v-if="
+                                                        withdrawal.course_photo
+                                                    "
                                                     :src="`/storage/${withdrawal.course_photo}`"
                                                     :alt="`Photo for ${withdrawal.course_title}`"
                                                     class="h-full w-full object-cover"
@@ -368,18 +455,34 @@ const formatDate = (dateString) => {
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ withdrawal.course_title.charAt(0).toUpperCase() }}
+                                                    {{
+                                                        withdrawal.course_title
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class="text-sm font-medium text-slate-900">
+                                                <div
+                                                    class="text-sm font-medium text-slate-900"
+                                                >
                                                     {{ withdrawal.course_code }}
                                                 </div>
-                                                <div class="text-sm text-slate-600">
-                                                    {{ withdrawal.course_title }}
+                                                <div
+                                                    class="text-sm text-slate-600"
+                                                >
+                                                    {{
+                                                        withdrawal.course_title
+                                                    }}
                                                 </div>
-                                                <div class="text-xs text-slate-500">
-                                                    {{ withdrawal.credits }} credits · {{ withdrawal.semester }}
+                                                <div
+                                                    class="text-xs text-slate-500"
+                                                >
+                                                    {{
+                                                        withdrawal.credits
+                                                    }}
+                                                    credits ·
+                                                    {{ withdrawal.semester }}
                                                 </div>
                                             </div>
                                         </div>
@@ -392,20 +495,32 @@ const formatDate = (dateString) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
                                     >
-                                        {{ formatDate(withdrawal.requested_at) }}
+                                        {{
+                                            formatDate(withdrawal.requested_at)
+                                        }}
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div
+                                            class="flex items-center justify-end gap-2"
+                                        >
                                             <button
-                                                @click="approveWithdrawal(withdrawal.enrollment_id)"
+                                                @click="
+                                                    approveWithdrawal(
+                                                        withdrawal.enrollment_id
+                                                    )
+                                                "
                                                 class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                             >
                                                 Approve
                                             </button>
                                             <button
-                                                @click="rejectWithdrawal(withdrawal.enrollment_id)"
+                                                @click="
+                                                    rejectWithdrawal(
+                                                        withdrawal.enrollment_id
+                                                    )
+                                                "
                                                 class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                             >
                                                 Reject

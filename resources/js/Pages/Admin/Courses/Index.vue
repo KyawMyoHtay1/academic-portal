@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 defineProps({
@@ -39,6 +40,12 @@ const deleteCourse = (courseId) => {
                 >
                     Create Course
                 </Link>
+            </div>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Course Management' }]" />
             </div>
         </template>
 
@@ -124,12 +131,8 @@ const deleteCourse = (courseId) => {
                                             >
                                                 <img
                                                     v-if="course.photo"
-                                                    :src="
-                                                        `/storage/${course.photo}`
-                                                    "
-                                                    :alt="
-                                                        `Photo for ${course.title}`
-                                                    "
+                                                    :src="`/storage/${course.photo}`"
+                                                    :alt="`Photo for ${course.title}`"
                                                     class="h-full w-full object-cover"
                                                 />
                                                 <span
@@ -164,9 +167,16 @@ const deleteCourse = (courseId) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div
+                                            class="flex items-center justify-end gap-2"
+                                        >
                                             <Link
-                                                :href="route('admin.courses.edit', course.id)"
+                                                :href="
+                                                    route(
+                                                        'admin.courses.edit',
+                                                        course.id
+                                                    )
+                                                "
                                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                             >
                                                 Edit
@@ -188,4 +198,3 @@ const deleteCourse = (courseId) => {
         </div>
     </AuthenticatedLayout>
 </template>
-

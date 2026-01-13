@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -46,6 +47,16 @@ const submitPayment = (feeId) => {
             <h2 class="text-xl font-semibold leading-tight text-slate-900">
                 My Fees
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        { label: 'Fees' },
+                    ]"
+                />
+            </div>
         </template>
 
         <div class="py-12">

@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, usePage } from "@inertiajs/vue3";
 
 defineProps({
@@ -21,6 +22,12 @@ const user = page.props.auth.user;
             <h2 class="text-xl font-semibold leading-tight text-slate-900">
                 My Teaching Subjects
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'My Teaching Subjects' }]" />
+            </div>
         </template>
 
         <div class="py-12">
@@ -61,7 +68,8 @@ const user = page.props.auth.user;
                             Assigned Subjects
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Subjects you are assigned to teach, grouped by course
+                            Subjects you are assigned to teach, grouped by
+                            course
                         </p>
                     </div>
 
@@ -75,7 +83,9 @@ const user = page.props.auth.user;
                             <div
                                 class="border-b border-slate-200 bg-slate-50 px-4 py-3"
                             >
-                                <div class="flex items-center justify-between gap-3">
+                                <div
+                                    class="flex items-center justify-between gap-3"
+                                >
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
@@ -168,13 +178,23 @@ const user = page.props.auth.user;
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <Link
-                                            :href="route('teacher.attendance.show', subject.id)"
+                                            :href="
+                                                route(
+                                                    'teacher.attendance.show',
+                                                    subject.id
+                                                )
+                                            "
                                             class="rounded-md bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                         >
                                             Attendance
                                         </Link>
                                         <Link
-                                            :href="route('teacher.grades.show', subject.id)"
+                                            :href="
+                                                route(
+                                                    'teacher.grades.show',
+                                                    subject.id
+                                                )
+                                            "
                                             class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                         >
                                             Grades
@@ -186,10 +206,7 @@ const user = page.props.auth.user;
                     </div>
 
                     <!-- Empty State -->
-                    <div
-                        v-else
-                        class="rounded-lg bg-slate-50 p-8 text-center"
-                    >
+                    <div v-else class="rounded-lg bg-slate-50 p-8 text-center">
                         <svg
                             class="mx-auto h-12 w-12 text-slate-400"
                             fill="none"
@@ -203,9 +220,7 @@ const user = page.props.auth.user;
                                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                             />
                         </svg>
-                        <h3
-                            class="mt-2 text-sm font-medium text-slate-900"
-                        >
+                        <h3 class="mt-2 text-sm font-medium text-slate-900">
                             No subjects assigned
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">

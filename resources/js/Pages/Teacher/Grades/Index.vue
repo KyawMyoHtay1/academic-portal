@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link } from "@inertiajs/vue3";
 
 defineProps({
@@ -20,6 +21,12 @@ defineProps({
             </h2>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Grades' }]" />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="portal-card overflow-hidden p-6">
@@ -30,12 +37,15 @@ defineProps({
                             Select Subject
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Choose a subject to enter or update grades for enrolled
-                            students.
+                            Choose a subject to enter or update grades for
+                            enrolled students.
                         </p>
                     </div>
 
-                    <div v-if="subjects.length === 0" class="rounded-lg bg-slate-50 p-8 text-center">
+                    <div
+                        v-if="subjects.length === 0"
+                        class="rounded-lg bg-slate-50 p-8 text-center"
+                    >
                         <svg
                             class="mx-auto h-12 w-12 text-slate-400"
                             fill="none"
@@ -53,11 +63,15 @@ defineProps({
                             No subjects assigned
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">
-                            You need to be assigned to courses with subjects before you can enter grades.
+                            You need to be assigned to courses with subjects
+                            before you can enter grades.
                         </p>
                     </div>
 
-                    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div
+                        v-else
+                        class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    >
                         <Link
                             v-for="subject in subjects"
                             :key="subject.id"
@@ -92,7 +106,8 @@ defineProps({
                                             {{ subject.title }}
                                         </p>
                                         <p class="mt-1 text-xs text-slate-500">
-                                            {{ subject.course_code }} - {{ subject.course_title }}
+                                            {{ subject.course_code }} -
+                                            {{ subject.course_title }}
                                         </p>
                                     </div>
                                 </div>
@@ -117,5 +132,3 @@ defineProps({
         </div>
     </AuthenticatedLayout>
 </template>
-
-

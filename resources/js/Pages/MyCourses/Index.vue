@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -38,11 +39,19 @@ const unenroll = (courseId) => {
             </h2>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'My Courses' }]" />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <!-- No Student Record Message -->
                 <div v-if="message" class="portal-card p-6">
-                    <div class="rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200">
+                    <div
+                        class="rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200"
+                    >
                         <div class="flex">
                             <div class="flex-shrink-0">
                                 <svg
@@ -58,9 +67,7 @@ const unenroll = (courseId) => {
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <h3
-                                    class="text-sm font-medium text-amber-800"
-                                >
+                                <h3 class="text-sm font-medium text-amber-800">
                                     Student Record Not Found
                                 </h3>
                                 <div class="mt-2 text-sm text-amber-700">
@@ -155,7 +162,11 @@ const unenroll = (courseId) => {
                                                 v-else
                                                 class="text-xs font-semibold text-slate-500"
                                             >
-                                                {{ course.title.charAt(0).toUpperCase() }}
+                                                {{
+                                                    course.title
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                }}
                                             </span>
                                         </div>
                                     </td>
@@ -192,7 +203,10 @@ const unenroll = (courseId) => {
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
                                         <span
-                                            v-if="course.enrollment_status === 'withdrawal_pending'"
+                                            v-if="
+                                                course.enrollment_status ===
+                                                'withdrawal_pending'
+                                            "
                                             class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
                                         >
                                             Withdrawal Pending
@@ -211,10 +225,7 @@ const unenroll = (courseId) => {
                     </div>
 
                     <!-- Empty State -->
-                    <div
-                        v-else
-                        class="rounded-lg bg-slate-50 p-8 text-center"
-                    >
+                    <div v-else class="rounded-lg bg-slate-50 p-8 text-center">
                         <svg
                             class="mx-auto h-12 w-12 text-slate-400"
                             fill="none"
@@ -228,9 +239,7 @@ const unenroll = (courseId) => {
                                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                             />
                         </svg>
-                        <h3
-                            class="mt-2 text-sm font-medium text-slate-900"
-                        >
+                        <h3 class="mt-2 text-sm font-medium text-slate-900">
                             No enrolled courses
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">
@@ -251,4 +260,3 @@ const unenroll = (courseId) => {
         </div>
     </AuthenticatedLayout>
 </template>
-

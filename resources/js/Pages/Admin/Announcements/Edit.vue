@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -27,6 +28,17 @@ const submit = () => {
             <h2 class="text-xl font-semibold leading-tight text-slate-900">
                 Edit Announcement
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        { label: 'Announcements', href: route('admin.announcements.index') },
+                        { label: 'Edit Announcement' },
+                    ]"
+                />
+            </div>
         </template>
 
         <div class="py-12">

@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 
 const form = useForm({
@@ -27,6 +28,20 @@ const submit = () => {
             </h2>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        {
+                            label: 'Course Management',
+                            href: route('admin.courses.index'),
+                        },
+                        { label: 'Create Course' },
+                    ]"
+                />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="portal-card p-6">
@@ -38,7 +53,8 @@ const submit = () => {
                                     for="course_code"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    Course Code <span class="text-red-500">*</span>
+                                    Course Code
+                                    <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     id="course_code"
@@ -66,7 +82,8 @@ const submit = () => {
                                     for="title"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    Course Title <span class="text-red-500">*</span>
+                                    Course Title
+                                    <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     id="title"
@@ -162,7 +179,9 @@ const submit = () => {
                                     type="file"
                                     accept="image/jpeg,image/jpg,image/png"
                                     class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
-                                    @change="(e) => (form.photo = e.target.files[0])"
+                                    @change="
+                                        (e) => (form.photo = e.target.files[0])
+                                    "
                                 />
                                 <p
                                     v-if="form.errors.photo"
@@ -173,7 +192,9 @@ const submit = () => {
                             </div>
 
                             <!-- Form Actions -->
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <a
                                     :href="route('admin.courses.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
@@ -198,4 +219,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-

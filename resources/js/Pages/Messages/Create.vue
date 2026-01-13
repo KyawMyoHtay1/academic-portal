@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -37,6 +38,17 @@ const submit = () => {
             </div>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        { label: 'Messages', href: route('messages.index') },
+                        { label: 'New Message' },
+                    ]"
+                />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="portal-card p-6">
@@ -66,7 +78,9 @@ const submit = () => {
                                         :key="recipient.id"
                                         :value="recipient.id"
                                     >
-                                        {{ recipient.name }} ({{ recipient.email }}) — {{ recipient.role }}
+                                        {{ recipient.name }} ({{
+                                            recipient.email
+                                        }}) — {{ recipient.role }}
                                     </option>
                                 </select>
                                 <!-- Recipient Preview -->
@@ -74,26 +88,71 @@ const submit = () => {
                                     v-if="form.receiver_id"
                                     class="mt-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
                                 >
-                                    <div class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                    <div
+                                        class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                    >
                                         <img
-                                            v-if="recipients.find(r => r.id == form.receiver_id)?.photo"
-                                            :src="`/storage/${recipients.find(r => r.id == form.receiver_id).photo}`"
-                                            :alt="`Photo of ${recipients.find(r => r.id == form.receiver_id)?.name}`"
+                                            v-if="
+                                                recipients.find(
+                                                    (r) =>
+                                                        r.id == form.receiver_id
+                                                )?.photo
+                                            "
+                                            :src="`/storage/${
+                                                recipients.find(
+                                                    (r) =>
+                                                        r.id == form.receiver_id
+                                                ).photo
+                                            }`"
+                                            :alt="`Photo of ${
+                                                recipients.find(
+                                                    (r) =>
+                                                        r.id == form.receiver_id
+                                                )?.name
+                                            }`"
                                             class="h-full w-full object-cover"
                                         />
                                         <span
                                             v-else
                                             class="text-xs font-semibold text-slate-500"
                                         >
-                                            {{ recipients.find(r => r.id == form.receiver_id)?.name?.charAt(0).toUpperCase() }}
+                                            {{
+                                                recipients
+                                                    .find(
+                                                        (r) =>
+                                                            r.id ==
+                                                            form.receiver_id
+                                                    )
+                                                    ?.name?.charAt(0)
+                                                    .toUpperCase()
+                                            }}
                                         </span>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-slate-900">
-                                            {{ recipients.find(r => r.id == form.receiver_id)?.name }}
+                                        <p
+                                            class="text-sm font-medium text-slate-900"
+                                        >
+                                            {{
+                                                recipients.find(
+                                                    (r) =>
+                                                        r.id == form.receiver_id
+                                                )?.name
+                                            }}
                                         </p>
                                         <p class="text-xs text-slate-500">
-                                            {{ recipients.find(r => r.id == form.receiver_id)?.email }} · {{ recipients.find(r => r.id == form.receiver_id)?.role }}
+                                            {{
+                                                recipients.find(
+                                                    (r) =>
+                                                        r.id == form.receiver_id
+                                                )?.email
+                                            }}
+                                            ·
+                                            {{
+                                                recipients.find(
+                                                    (r) =>
+                                                        r.id == form.receiver_id
+                                                )?.role
+                                            }}
                                         </p>
                                     </div>
                                 </div>
@@ -133,7 +192,9 @@ const submit = () => {
                             </div>
 
                             <!-- Form Actions -->
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <Link
                                     :href="route('messages.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
@@ -145,7 +206,9 @@ const submit = () => {
                                     :disabled="form.processing"
                                     class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 disabled:opacity-50"
                                 >
-                                    <span v-if="form.processing">Sending...</span>
+                                    <span v-if="form.processing"
+                                        >Sending...</span
+                                    >
                                     <span v-else>Send</span>
                                 </button>
                             </div>
@@ -156,5 +219,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

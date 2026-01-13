@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 defineProps({
@@ -42,11 +43,19 @@ const deleteAnnouncement = (id) => {
             </div>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Announcements' }]" />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
                             All Announcements
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
@@ -71,7 +80,9 @@ const deleteAnnouncement = (id) => {
                                 <div class="flex items-start gap-3 flex-1">
                                     <!-- Author Avatar -->
                                     <div class="flex-shrink-0">
-                                        <div class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                        <div
+                                            class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                        >
                                             <img
                                                 v-if="announcement.author_photo"
                                                 :src="`/storage/${announcement.author_photo}`"
@@ -82,35 +93,51 @@ const deleteAnnouncement = (id) => {
                                                 v-else
                                                 class="text-xs font-semibold text-slate-500"
                                             >
-                                                {{ announcement.author.charAt(0).toUpperCase() }}
+                                                {{
+                                                    announcement.author
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                }}
                                             </span>
                                         </div>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="text-base font-semibold text-slate-900">
+                                        <h3
+                                            class="text-base font-semibold text-slate-900"
+                                        >
                                             {{ announcement.title }}
                                         </h3>
                                         <p class="mt-1 text-xs text-slate-500">
-                                            By {{ announcement.author }} · {{ announcement.created_at }}
+                                            By {{ announcement.author }} ·
+                                            {{ announcement.created_at }}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <Link
-                                        :href="route('admin.announcements.edit', announcement.id)"
+                                        :href="
+                                            route(
+                                                'admin.announcements.edit',
+                                                announcement.id
+                                            )
+                                        "
                                         class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                     >
                                         Edit
                                     </Link>
                                     <button
-                                        @click="deleteAnnouncement(announcement.id)"
+                                        @click="
+                                            deleteAnnouncement(announcement.id)
+                                        "
                                         class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                     >
                                         Delete
                                     </button>
                                 </div>
                             </div>
-                            <p class="mt-3 text-sm text-slate-700 whitespace-pre-line">
+                            <p
+                                class="mt-3 text-sm text-slate-700 whitespace-pre-line"
+                            >
                                 {{ announcement.body }}
                             </p>
                         </div>
@@ -120,5 +147,3 @@ const deleteAnnouncement = (id) => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

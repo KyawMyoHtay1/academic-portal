@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -29,6 +30,20 @@ const submit = () => {
             <h2 class="text-xl font-semibold leading-tight text-slate-900">
                 Create Fee
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        {
+                            label: 'Fee Management',
+                            href: route('admin.fees.index'),
+                        },
+                        { label: 'Create Fee' },
+                    ]"
+                />
+            </div>
         </template>
 
         <div class="py-12">
@@ -75,26 +90,64 @@ const submit = () => {
                                     v-if="form.student_id"
                                     class="mt-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
                                 >
-                                    <div class="h-12 w-12 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                    <div
+                                        class="h-12 w-12 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                    >
                                         <img
-                                            v-if="students.find(s => s.id == form.student_id)?.photo"
-                                            :src="`/storage/${students.find(s => s.id == form.student_id).photo}`"
-                                            :alt="`Photo of ${students.find(s => s.id == form.student_id)?.full_name}`"
+                                            v-if="
+                                                students.find(
+                                                    (s) =>
+                                                        s.id == form.student_id
+                                                )?.photo
+                                            "
+                                            :src="`/storage/${
+                                                students.find(
+                                                    (s) =>
+                                                        s.id == form.student_id
+                                                ).photo
+                                            }`"
+                                            :alt="`Photo of ${
+                                                students.find(
+                                                    (s) =>
+                                                        s.id == form.student_id
+                                                )?.full_name
+                                            }`"
                                             class="h-full w-full object-cover"
                                         />
                                         <span
                                             v-else
                                             class="text-sm font-semibold text-slate-500"
                                         >
-                                            {{ students.find(s => s.id == form.student_id)?.full_name?.charAt(0).toUpperCase() }}
+                                            {{
+                                                students
+                                                    .find(
+                                                        (s) =>
+                                                            s.id ==
+                                                            form.student_id
+                                                    )
+                                                    ?.full_name?.charAt(0)
+                                                    .toUpperCase()
+                                            }}
                                         </span>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-slate-900">
-                                            {{ students.find(s => s.id == form.student_id)?.full_name }}
+                                        <p
+                                            class="text-sm font-medium text-slate-900"
+                                        >
+                                            {{
+                                                students.find(
+                                                    (s) =>
+                                                        s.id == form.student_id
+                                                )?.full_name
+                                            }}
                                         </p>
                                         <p class="text-xs text-slate-500">
-                                            {{ students.find(s => s.id == form.student_id)?.student_no }}
+                                            {{
+                                                students.find(
+                                                    (s) =>
+                                                        s.id == form.student_id
+                                                )?.student_no
+                                            }}
                                         </p>
                                     </div>
                                 </div>
@@ -106,7 +159,8 @@ const submit = () => {
                                     for="amount"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    Amount (£) <span class="text-red-500">*</span>
+                                    Amount (£)
+                                    <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     id="amount"
@@ -184,7 +238,9 @@ const submit = () => {
                             </div>
 
                             <!-- Form Actions -->
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <Link
                                     :href="route('admin.fees.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
@@ -209,5 +265,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

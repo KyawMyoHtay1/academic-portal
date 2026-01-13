@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed } from "vue";
 
@@ -15,12 +16,16 @@ const props = defineProps({
 });
 
 const enroll = (courseId) => {
-    router.post(route("courses.enroll", courseId), {}, {
-        preserveScroll: true,
-        onSuccess: () => {
-            // Page will refresh automatically with updated enrollment status
-        },
-    });
+    router.post(
+        route("courses.enroll", courseId),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Page will refresh automatically with updated enrollment status
+            },
+        }
+    );
 };
 </script>
 
@@ -32,6 +37,12 @@ const enroll = (courseId) => {
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 Available Courses
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Courses' }]" />
+            </div>
         </template>
 
         <div class="py-12">
@@ -60,11 +71,11 @@ const enroll = (courseId) => {
                                 Student Profile Required
                             </h3>
                             <p class="mt-1 text-sm text-amber-700">
-                                Your account is registered, but a student profile
-                                needs to be created by administration before you
-                                can enroll in courses. Please contact the
-                                administration office to complete your student
-                                profile setup.
+                                Your account is registered, but a student
+                                profile needs to be created by administration
+                                before you can enroll in courses. Please contact
+                                the administration office to complete your
+                                student profile setup.
                             </p>
                         </div>
                     </div>
@@ -159,7 +170,11 @@ const enroll = (courseId) => {
                                                 v-else
                                                 class="text-xs font-semibold text-slate-500"
                                             >
-                                                {{ course.title.charAt(0).toUpperCase() }}
+                                                {{
+                                                    course.title
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                }}
                                             </span>
                                         </div>
                                     </td>
@@ -188,19 +203,28 @@ const enroll = (courseId) => {
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
                                         <span
-                                            v-if="course.enrollment_status === 'approved'"
+                                            v-if="
+                                                course.enrollment_status ===
+                                                'approved'
+                                            "
                                             class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800"
                                         >
                                             Enrolled
                                         </span>
                                         <span
-                                            v-else-if="course.enrollment_status === 'pending'"
+                                            v-else-if="
+                                                course.enrollment_status ===
+                                                'pending'
+                                            "
                                             class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
                                         >
                                             Pending Approval
                                         </span>
                                         <span
-                                            v-else-if="course.enrollment_status === 'rejected'"
+                                            v-else-if="
+                                                course.enrollment_status ===
+                                                'rejected'
+                                            "
                                             class="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800"
                                         >
                                             Rejected
@@ -213,7 +237,10 @@ const enroll = (courseId) => {
                                             Register
                                         </button>
                                         <button
-                                            v-if="course.enrollment_status === 'rejected'"
+                                            v-if="
+                                                course.enrollment_status ===
+                                                'rejected'
+                                            "
                                             @click="enroll(course.id)"
                                             class="ml-2 rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                         >

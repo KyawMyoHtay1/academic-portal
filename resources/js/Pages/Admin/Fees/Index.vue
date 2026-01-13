@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 defineProps({
@@ -35,16 +36,18 @@ const getStatusBadgeClass = (status) => {
 
 const approvePayment = (feeId) => {
     if (
-        !confirm(
-            "Are you sure you want to approve this payment confirmation?"
-        )
+        !confirm("Are you sure you want to approve this payment confirmation?")
     ) {
         return;
     }
 
-    router.post(route("admin.fees.approve-payment", feeId), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        route("admin.fees.approve-payment", feeId),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
 };
 
 const rejectPayment = (feeId) => {
@@ -56,9 +59,13 @@ const rejectPayment = (feeId) => {
         return;
     }
 
-    router.post(route("admin.fees.reject-payment", feeId), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        route("admin.fees.reject-payment", feeId),
+        {},
+        {
+            preserveScroll: true,
+        }
+    );
 };
 </script>
 
@@ -77,6 +84,12 @@ const rejectPayment = (feeId) => {
                 >
                     Create Fee
                 </Link>
+            </div>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Fee Management' }]" />
             </div>
         </template>
 
@@ -189,7 +202,11 @@ const rejectPayment = (feeId) => {
                                                     v-else
                                                     class="text-xs font-semibold text-slate-500"
                                                 >
-                                                    {{ fee.student_name.charAt(0).toUpperCase() }}
+                                                    {{
+                                                        fee.student_name
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
                                                 </span>
                                             </div>
                                             <span>{{ fee.student_name }}</span>
@@ -209,10 +226,12 @@ const rejectPayment = (feeId) => {
                                         class="whitespace-nowrap px-4 py-4 text-sm"
                                     >
                                         <span
-                                            :class="getStatusBadgeClass(fee.status)"
+                                            :class="
+                                                getStatusBadgeClass(fee.status)
+                                            "
                                             class="inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize"
                                         >
-                                            {{ fee.status.replace('_', ' ') }}
+                                            {{ fee.status.replace("_", " ") }}
                                         </span>
                                     </td>
                                     <td
@@ -228,16 +247,27 @@ const rejectPayment = (feeId) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <div class="flex items-center justify-end gap-2">
-                                            <template v-if="fee.status === 'payment_pending'">
+                                        <div
+                                            class="flex items-center justify-end gap-2"
+                                        >
+                                            <template
+                                                v-if="
+                                                    fee.status ===
+                                                    'payment_pending'
+                                                "
+                                            >
                                                 <button
-                                                    @click="approvePayment(fee.id)"
+                                                    @click="
+                                                        approvePayment(fee.id)
+                                                    "
                                                     class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                                 >
                                                     Approve Payment
                                                 </button>
                                                 <button
-                                                    @click="rejectPayment(fee.id)"
+                                                    @click="
+                                                        rejectPayment(fee.id)
+                                                    "
                                                     class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                                 >
                                                     Reject
@@ -245,7 +275,12 @@ const rejectPayment = (feeId) => {
                                             </template>
                                             <template v-else>
                                                 <Link
-                                                    :href="route('admin.fees.edit', fee.id)"
+                                                    :href="
+                                                        route(
+                                                            'admin.fees.edit',
+                                                            fee.id
+                                                        )
+                                                    "
                                                     class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                                 >
                                                     Edit
@@ -291,5 +326,3 @@ const rejectPayment = (feeId) => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

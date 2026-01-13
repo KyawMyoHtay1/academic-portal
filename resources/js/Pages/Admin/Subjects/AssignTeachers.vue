@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
@@ -35,6 +36,17 @@ const submit = () => {
             <h2 class="text-xl font-semibold leading-tight text-slate-900">
                 Assign Teachers to Subject
             </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        { label: 'Subject Management', href: route('admin.subjects.index') },
+                        { label: 'Assign Teachers' },
+                    ]"
+                />
+            </div>
         </template>
 
         <div class="py-12">

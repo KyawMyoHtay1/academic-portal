@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -43,14 +44,27 @@ const submit = () => {
             </div>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb
+                    :items="[
+                        {
+                            label: 'Student Management',
+                            href: route('students.index'),
+                        },
+                        { label: 'Add Student' },
+                    ]"
+                />
+            </div>
+        </template>
+
         <div class="portal-card p-6">
-            <form
-                class="space-y-6"
-                @submit.prevent="submit"
-            >
+            <form class="space-y-6" @submit.prevent="submit">
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Linked User (login account)
                         </label>
                         <select
@@ -77,8 +91,8 @@ const submit = () => {
                             v-if="props.users.length === 0"
                             class="mt-1 text-xs text-amber-600"
                         >
-                            All registered users already have student records. New
-                            users will appear here after they register.
+                            All registered users already have student records.
+                            New users will appear here after they register.
                         </p>
                         <p
                             v-if="form.errors.user_id"
@@ -89,7 +103,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Student Number
                         </label>
                         <input
@@ -108,7 +124,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Full Name
                         </label>
                         <input
@@ -125,7 +143,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Date of Birth
                         </label>
                         <input
@@ -144,7 +164,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Email
                         </label>
                         <input
@@ -161,7 +183,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Phone
                         </label>
                         <input
@@ -180,7 +204,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Programme
                         </label>
                         <input
@@ -198,7 +224,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Intake Year
                         </label>
                         <input
@@ -218,9 +246,13 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Photo (optional)
-                            <span class="text-[11px] text-slate-500">(JPEG/PNG, max 2MB)</span>
+                            <span class="text-[11px] text-slate-500"
+                                >(JPEG/PNG, max 2MB)</span
+                            >
                         </label>
                         <input
                             type="file"
@@ -250,5 +282,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -37,19 +38,42 @@ const statusBadgeClass = (read) =>
             </div>
         </template>
 
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Messages' }]" />
+            </div>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
                 <!-- Header Banner -->
-                <div class="mb-6 overflow-hidden rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 p-8 text-white shadow-lg">
+                <div
+                    class="mb-6 overflow-hidden rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 p-8 text-white shadow-lg"
+                >
                     <div class="flex items-center gap-4">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <div
+                            class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm"
+                        >
+                            <svg
+                                class="h-8 w-8"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                />
                             </svg>
                         </div>
                         <div>
                             <h3 class="text-xl font-bold">Messages</h3>
-                            <p class="mt-1 text-sm text-white/90">Communicate with students, teachers, and staff members</p>
+                            <p class="mt-1 text-sm text-white/90">
+                                Communicate with students, teachers, and staff
+                                members
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -59,11 +83,25 @@ const statusBadgeClass = (read) =>
                         v-if="messages.length === 0"
                         class="portal-card p-12 text-center"
                     >
-                        <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <svg
+                            class="mx-auto h-12 w-12 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
                         </svg>
-                        <h3 class="mt-4 text-sm font-medium text-slate-900">No messages in your inbox</h3>
-                        <p class="mt-1 text-sm text-slate-500">Start a conversation by sending a new message</p>
+                        <h3 class="mt-4 text-sm font-medium text-slate-900">
+                            No messages in your inbox
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-500">
+                            Start a conversation by sending a new message
+                        </p>
                     </div>
 
                     <div
@@ -72,13 +110,15 @@ const statusBadgeClass = (read) =>
                         class="portal-card overflow-hidden p-5 transition-shadow"
                         :class="{
                             'bg-slate-50 hover:bg-slate-100': message.read,
-                            'bg-white hover:shadow-md border-l-4 border-portal-navy': !message.read,
+                            'bg-white hover:shadow-md border-l-4 border-portal-navy':
+                                !message.read,
                         }"
                     >
                         <div class="flex items-start gap-4">
                             <!-- Sender Avatar -->
                             <div class="flex-shrink-0">
-                                <div class="h-12 w-12 overflow-hidden rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center"
+                                <div
+                                    class="h-12 w-12 overflow-hidden rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center"
                                     :class="{
                                         'border-emerald-300': !message.read,
                                         'border-slate-300': message.read,
@@ -94,17 +134,27 @@ const statusBadgeClass = (read) =>
                                         v-else
                                         class="text-sm font-semibold text-slate-500"
                                     >
-                                        {{ message.sender.charAt(0).toUpperCase() }}
+                                        {{
+                                            message.sender
+                                                .charAt(0)
+                                                .toUpperCase()
+                                        }}
                                     </span>
                                 </div>
                             </div>
-                            
+
                             <!-- Message Content -->
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-start justify-between gap-4">
+                                <div
+                                    class="flex items-start justify-between gap-4"
+                                >
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <span class="text-sm font-semibold text-slate-900">
+                                        <div
+                                            class="flex items-center gap-2 flex-wrap"
+                                        >
+                                            <span
+                                                class="text-sm font-semibold text-slate-900"
+                                            >
                                                 {{ message.sender }}
                                             </span>
                                             <span
@@ -124,7 +174,9 @@ const statusBadgeClass = (read) =>
                                         </p>
                                         <p
                                             class="mt-3 text-sm leading-relaxed text-slate-800 whitespace-pre-line"
-                                            :class="{ 'font-medium': !message.read }"
+                                            :class="{
+                                                'font-medium': !message.read,
+                                            }"
                                         >
                                             {{ message.body }}
                                         </p>
@@ -153,5 +205,3 @@ const statusBadgeClass = (read) =>
         </div>
     </AuthenticatedLayout>
 </template>
-
-

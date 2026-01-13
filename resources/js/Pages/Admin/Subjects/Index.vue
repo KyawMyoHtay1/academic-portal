@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 defineProps({
@@ -39,6 +40,12 @@ const deleteSubject = (subjectId) => {
                 >
                     Create Subject
                 </Link>
+            </div>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Subject Management' }]" />
             </div>
         </template>
 
@@ -160,9 +167,12 @@ const deleteSubject = (subjectId) => {
                                             <span class="font-medium">{{
                                                 subject.course_code
                                             }}</span>
-                                            <span class="text-xs text-slate-500">{{
-                                                subject.course_title
-                                            }}</span>
+                                            <span
+                                                class="text-xs text-slate-500"
+                                                >{{
+                                                    subject.course_title
+                                                }}</span
+                                            >
                                         </div>
                                     </td>
                                     <td
@@ -174,35 +184,53 @@ const deleteSubject = (subjectId) => {
                                         class="px-4 py-4 text-sm text-slate-600"
                                     >
                                         <span
-                                            v-if="subject.teachers && subject.teachers.length > 0"
+                                            v-if="
+                                                subject.teachers &&
+                                                subject.teachers.length > 0
+                                            "
                                         >
-                                            {{ subject.teachers.map(t => t.name).join(', ') }}
+                                            {{
+                                                subject.teachers
+                                                    .map((t) => t.name)
+                                                    .join(", ")
+                                            }}
                                         </span>
-                                        <span
-                                            v-else
-                                            class="text-slate-400"
-                                        >
+                                        <span v-else class="text-slate-400">
                                             Not Assigned
                                         </span>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div
+                                            class="flex items-center justify-end gap-2"
+                                        >
                                             <Link
-                                                :href="route('admin.subjects.assign-teachers', subject.id)"
+                                                :href="
+                                                    route(
+                                                        'admin.subjects.assign-teachers',
+                                                        subject.id
+                                                    )
+                                                "
                                                 class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
                                             >
                                                 Assign Teachers
                                             </Link>
                                             <Link
-                                                :href="route('admin.subjects.edit', subject.id)"
+                                                :href="
+                                                    route(
+                                                        'admin.subjects.edit',
+                                                        subject.id
+                                                    )
+                                                "
                                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                             >
                                                 Edit
                                             </Link>
                                             <button
-                                                @click="deleteSubject(subject.id)"
+                                                @click="
+                                                    deleteSubject(subject.id)
+                                                "
                                                 class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                             >
                                                 Delete
