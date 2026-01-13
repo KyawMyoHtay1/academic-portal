@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffFeeController;
+use App\Http\Controllers\StaffSubjectController;
 use App\Http\Controllers\StaffTimetableController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
@@ -134,6 +135,16 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         // Teacher Assignment to Courses (staff only)
         Route::get('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'edit'])->name('admin.courses.assign-teachers');
         Route::put('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'update'])->name('admin.courses.assign-teachers.update');
+
+        // Subject Management
+        Route::resource('admin/subjects', StaffSubjectController::class)->names([
+            'index' => 'admin.subjects.index',
+            'create' => 'admin.subjects.create',
+            'store' => 'admin.subjects.store',
+            'edit' => 'admin.subjects.edit',
+            'update' => 'admin.subjects.update',
+            'destroy' => 'admin.subjects.destroy',
+        ]);
 
         // User Management (role assignment)
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');

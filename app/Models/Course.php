@@ -57,6 +57,14 @@ class Course extends Model
     {
         return $this->hasMany(Timetable::class);
     }
+
+    /**
+     * The subjects that belong to this course.
+     */
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
 }
 
 
