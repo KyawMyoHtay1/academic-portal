@@ -16,13 +16,19 @@ const props = defineProps({
 
 const form = useForm({
     phone: props.student?.phone || "",
+    photo: null,
 });
 
 const hasStudentRecord = computed(() => props.student !== null);
 
 const submit = () => {
-    form.patch(route("student.profile.update"), {
+    form.transform((data) => ({
+        ...data,
+        _method: "patch",
+    })).post(route("student.profile.update"), {
+        forceFormData: true,
         preserveScroll: true,
+        onFinish: () => form.reset("photo"),
     });
 };
 </script>
@@ -41,7 +47,9 @@ const submit = () => {
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <!-- No Student Record Message -->
                 <div v-if="!hasStudentRecord" class="portal-card p-6">
-                    <div class="rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200">
+                    <div
+                        class="rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200"
+                    >
                         <div class="flex">
                             <div class="flex-shrink-0">
                                 <svg
@@ -57,9 +65,7 @@ const submit = () => {
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <h3
-                                    class="text-sm font-medium text-amber-800"
-                                >
+                                <h3 class="text-sm font-medium text-amber-800">
                                     Student Record Not Found
                                 </h3>
                                 <div class="mt-2 text-sm text-amber-700">
@@ -102,16 +108,12 @@ const submit = () => {
                     </div>
                     <!-- Academic Information (Read-only) -->
                     <div class="portal-card p-6">
-                        <h3
-                            class="mb-4 text-lg font-semibold text-slate-900"
-                        >
+                        <h3 class="mb-4 text-lg font-semibold text-slate-900">
                             Academic Information
                         </h3>
-                        <p
-                            class="mb-4 text-xs text-slate-500"
-                        >
-                            Core academic details cannot be modified by students.
-                            Contact administration for changes.
+                        <p class="mb-4 text-xs text-slate-500">
+                            Core academic details cannot be modified by
+                            students. Contact administration for changes.
                         </p>
 
                         <dl class="grid gap-4 sm:grid-cols-2">
@@ -191,19 +193,75 @@ const submit = () => {
 
                     <!-- Contact Information (Editable) -->
                     <div class="portal-card p-6">
-                        <h3
-                            class="mb-4 text-lg font-semibold text-slate-900"
-                        >
+                        <h3 class="mb-4 text-lg font-semibold text-slate-900">
                             Contact Information
                         </h3>
-                        <p
-                            class="mb-4 text-xs text-slate-500"
-                        >
-                            You can update your contact details below.
+                        <p class="mb-4 text-xs text-slate-500">
+                            You can update your contact details and profile
+                            photo below.
                         </p>
 
                         <form @submit.prevent="submit">
                             <div class="space-y-4">
+                                <!-- Profile Photo Update -->
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-slate-700"
+                                    >
+                                        Profile Photo
+                                    </label>
+                                    <div class="mt-2 flex items-center gap-6">
+                                        <div
+                                            v-if="student.photo_url"
+                                            class="flex-shrink-0"
+                                        >
+                                            <img
+                                                :src="student.photo_url"
+                                                :alt="`Photo of ${student.full_name}`"
+                                                class="h-20 w-20 rounded-full border-2 border-slate-200 object-cover"
+                                            />
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="flex h-20 w-20 items-center justify-center rounded-full border-2 border-slate-200 bg-slate-100"
+                                        >
+                                            <span
+                                                class="text-xl font-semibold text-slate-500"
+                                            >
+                                                {{
+                                                    student.full_name
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <input
+                                                type="file"
+                                                accept="image/jpeg,image/jpg,image/png"
+                                                @change="
+                                                    (e) =>
+                                                        (form.photo =
+                                                            e.target.files[0])
+                                                "
+                                                class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                                            />
+                                            <p
+                                                class="mt-1 text-xs text-slate-500"
+                                            >
+                                                JPEG or PNG, max 2MB. Leave
+                                                empty to keep current photo.
+                                            </p>
+                                            <p
+                                                v-if="form.errors.photo"
+                                                class="mt-1 text-sm text-red-600"
+                                            >
+                                                {{ form.errors.photo }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label
                                         for="phone"
@@ -229,7 +287,9 @@ const submit = () => {
                                     </p>
                                 </div>
 
-                                <div class="flex items-center justify-end gap-3">
+                                <div
+                                    class="flex items-center justify-end gap-3"
+                                >
                                     <button
                                         type="button"
                                         @click="form.reset()"
@@ -256,4 +316,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-

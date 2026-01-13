@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,7 +18,8 @@ class StudentProfileController extends Controller
     public function show(): Response
     {
         $user = Auth::user();
-        $student = $user->student;
+        // Refresh the student relationship to get latest data
+        $student = $user->student()->first();
 
         // If student record doesn't exist yet, show a message
         if (!$student) {
@@ -26,6 +28,9 @@ class StudentProfileController extends Controller
                 'message' => 'No student record found. Please contact administration to create your student profile.',
             ]);
         }
+
+        // Refresh the student model to ensure we have latest data
+        $student->refresh();
 
         return Inertia::render('StudentProfile/Show', [
             'student' => [
@@ -61,9 +66,22 @@ class StudentProfileController extends Controller
 
         $data = $request->validate([
             'phone' => ['nullable', 'string', 'max:50'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             // Add more editable fields here as needed (e.g., address)
             // Core fields like student_no, programme, intake_year are NOT editable by student
         ]);
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($student->photo && Storage::disk('public')->exists($student->photo)) {
+                Storage::disk('public')->delete($student->photo);
+            }
+            
+            // Store new photo
+            $path = $request->file('photo')->store('students', 'public');
+            $data['photo'] = $path;
+        }
 
         $student->update($data);
 
