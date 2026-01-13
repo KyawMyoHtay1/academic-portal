@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, usePage } from "@inertiajs/vue3";
 
 defineProps({
     courses: {
@@ -8,6 +8,9 @@ defineProps({
         required: true,
     },
 });
+
+const page = usePage();
+const user = page.props.auth.user;
 </script>
 
 <template>
@@ -22,6 +25,34 @@ defineProps({
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Teacher profile summary -->
+                <div class="mb-4 portal-card flex items-center gap-4 p-6">
+                    <div
+                        class="h-14 w-14 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
+                    >
+                        <img
+                            v-if="user.photo"
+                            :src="`/storage/${user.photo}`"
+                            :alt="`Photo of ${user.name}`"
+                            class="h-full w-full object-cover"
+                        />
+                        <span
+                            v-else
+                            class="text-base font-semibold text-slate-500"
+                        >
+                            {{ user.name.charAt(0).toUpperCase() }}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-900">
+                            {{ user.name }}
+                        </h3>
+                        <p class="text-xs text-slate-600">
+                            Teacher &bull; My assigned teaching subjects
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
