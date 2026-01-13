@@ -35,7 +35,7 @@ defineProps({
                         </p>
                     </div>
 
-                    <div v-if="courses.length === 0" class="rounded-lg bg-slate-50 p-8 text-center">
+                    <div v-if="subjects.length === 0" class="rounded-lg bg-slate-50 p-8 text-center">
                         <svg
                             class="mx-auto h-12 w-12 text-slate-400"
                             fill="none"
