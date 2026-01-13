@@ -75,14 +75,32 @@ const user = page.props.auth.user;
                             <div
                                 class="border-b border-slate-200 bg-slate-50 px-4 py-3"
                             >
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h3
-                                            class="text-sm font-semibold text-slate-900"
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                         >
-                                            {{ course.course_code }} -
-                                            {{ course.course_title }}
-                                        </h3>
+                                            <img
+                                                v-if="course.course_photo"
+                                                :src="`/storage/${course.course_photo}`"
+                                                :alt="`Photo for ${course.course_title}`"
+                                                class="h-full w-full object-cover"
+                                            />
+                                            <span
+                                                v-else
+                                                class="text-xs font-semibold text-slate-500"
+                                            >
+                                                {{ course.course_title[0] }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="text-sm font-semibold text-slate-900"
+                                            >
+                                                {{ course.course_code }} -
+                                                {{ course.course_title }}
+                                            </h3>
+                                        </div>
                                     </div>
                                     <span
                                         class="inline-flex items-center rounded-full bg-portal-navy/10 px-2.5 py-0.5 text-xs font-medium text-portal-navy"
@@ -103,31 +121,49 @@ const user = page.props.auth.user;
                                     :key="subject.id"
                                     class="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
                                 >
-                                    <div class="flex-1">
+                                    <div class="flex items-center gap-3 flex-1">
                                         <div
-                                            class="flex items-center gap-3"
+                                            class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                         >
+                                            <img
+                                                v-if="subject.photo"
+                                                :src="`/storage/${subject.photo}`"
+                                                :alt="`Photo for ${subject.title}`"
+                                                class="h-full w-full object-cover"
+                                            />
                                             <span
-                                                class="text-sm font-medium text-slate-900"
+                                                v-else
+                                                class="text-xs font-semibold text-slate-500"
                                             >
-                                                {{ subject.subject_code }}
-                                            </span>
-                                            <span
-                                                class="text-sm text-slate-600"
-                                            >
-                                                {{ subject.title }}
+                                                {{ subject.title[0] }}
                                             </span>
                                         </div>
-                                        <div
-                                            v-if="subject.credits"
-                                            class="mt-1 text-xs text-slate-500"
-                                        >
-                                            {{ subject.credits }}
-                                            {{
-                                                subject.credits === 1
-                                                    ? "credit"
-                                                    : "credits"
-                                            }}
+                                        <div>
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <span
+                                                    class="text-sm font-medium text-slate-900"
+                                                >
+                                                    {{ subject.subject_code }}
+                                                </span>
+                                                <span
+                                                    class="text-sm text-slate-600"
+                                                >
+                                                    {{ subject.title }}
+                                                </span>
+                                            </div>
+                                            <div
+                                                v-if="subject.credits"
+                                                class="mt-1 text-xs text-slate-500"
+                                            >
+                                                {{ subject.credits }}
+                                                {{
+                                                    subject.credits === 1
+                                                        ? "credit"
+                                                        : "credits"
+                                                }}
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">

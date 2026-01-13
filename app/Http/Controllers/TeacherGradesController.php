@@ -26,12 +26,19 @@ class TeacherGradesController extends Controller
         $subjects = $user->teachingSubjects()
             ->with('course')
             ->orderBy('subject_code')
-            ->get()
+            ->get([
+                'subjects.id',
+                'subjects.subject_code',
+                'subjects.title',
+                'subjects.course_id',
+                'subjects.photo',
+            ])
             ->map(function ($subject) {
                 return [
                     'id' => $subject->id,
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
+                    'photo' => $subject->photo,
                     'course_code' => $subject->course->course_code,
                     'course_title' => $subject->course->title,
                 ];

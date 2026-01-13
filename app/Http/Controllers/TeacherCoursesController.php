@@ -25,6 +25,7 @@ class TeacherCoursesController extends Controller
                 'subjects.title',
                 'subjects.credits',
                 'subjects.course_id',
+                'subjects.photo',
             ]);
 
         // Group subjects by course
@@ -36,12 +37,14 @@ class TeacherCoursesController extends Controller
                 'id' => $course->id,
                 'course_code' => $course->course_code,
                 'course_title' => $course->title,
+                'course_photo' => $course->photo,
                 'subjects' => $courseSubjects->map(function ($subject) {
                     return [
                         'id' => $subject->id,
                         'subject_code' => $subject->subject_code,
                         'title' => $subject->title,
                         'credits' => $subject->credits,
+                        'photo' => $subject->photo,
                     ];
                 })->values(),
             ];

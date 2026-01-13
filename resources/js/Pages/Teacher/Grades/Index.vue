@@ -65,18 +65,36 @@ defineProps({
                             class="group rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-portal-navy hover:shadow-md"
                         >
                             <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <h3
-                                        class="text-lg font-semibold text-slate-900 group-hover:text-portal-navy"
+                                <div class="flex items-start gap-3 flex-1">
+                                    <div
+                                        class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                     >
-                                        {{ subject.subject_code }}
-                                    </h3>
-                                    <p class="mt-1 text-sm text-slate-600">
-                                        {{ subject.title }}
-                                    </p>
-                                    <p class="mt-1 text-xs text-slate-500">
-                                        {{ subject.course_code }} - {{ subject.course_title }}
-                                    </p>
+                                        <img
+                                            v-if="subject.photo"
+                                            :src="`/storage/${subject.photo}`"
+                                            :alt="`Photo for ${subject.title}`"
+                                            class="h-full w-full object-cover"
+                                        />
+                                        <span
+                                            v-else
+                                            class="text-xs font-semibold text-slate-500"
+                                        >
+                                            {{ subject.title[0] }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h3
+                                            class="text-lg font-semibold text-slate-900 group-hover:text-portal-navy"
+                                        >
+                                            {{ subject.subject_code }}
+                                        </h3>
+                                        <p class="mt-1 text-sm text-slate-600">
+                                            {{ subject.title }}
+                                        </p>
+                                        <p class="mt-1 text-xs text-slate-500">
+                                            {{ subject.course_code }} - {{ subject.course_title }}
+                                        </p>
+                                    </div>
                                 </div>
                                 <svg
                                     class="h-5 w-5 text-slate-400 group-hover:text-portal-navy"

@@ -26,6 +26,7 @@ class TeacherTimetableController extends Controller
                 'subjects.subject_code',
                 'subjects.title',
                 'subjects.course_id',
+                'subjects.photo',
             ]);
 
         // Group by course for display
@@ -38,6 +39,7 @@ class TeacherTimetableController extends Controller
                 foreach ($subject->timetables as $entry) {
                     $timetables->push([
                         'id' => $entry->id,
+                        'subject_photo' => $subject->photo,
                         'subject_code' => $subject->subject_code,
                         'subject_title' => $subject->title,
                         'day_of_week' => $entry->day_of_week,

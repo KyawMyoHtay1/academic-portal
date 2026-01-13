@@ -80,9 +80,27 @@ defineProps({
                                             class="bg-white"
                                         >
                                             <td class="px-4 py-3 text-sm text-slate-700">
-                                                <div class="flex flex-col">
-                                                    <span class="font-medium">{{ entry.subject_code || 'N/A' }}</span>
-                                                    <span class="text-xs text-slate-500">{{ entry.subject_title || '' }}</span>
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                                    >
+                                                        <img
+                                                            v-if="entry.subject_photo"
+                                                            :src="`/storage/${entry.subject_photo}`"
+                                                            :alt="`Photo for ${entry.subject_title}`"
+                                                            class="h-full w-full object-cover"
+                                                        />
+                                                        <span
+                                                            v-else
+                                                            class="text-xs font-semibold text-slate-500"
+                                                        >
+                                                            {{ (entry.subject_title || 'N/A')[0] }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="flex flex-col">
+                                                        <span class="font-medium">{{ entry.subject_code || 'N/A' }}</span>
+                                                        <span class="text-xs text-slate-500">{{ entry.subject_title || '' }}</span>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3 text-sm text-slate-700">
