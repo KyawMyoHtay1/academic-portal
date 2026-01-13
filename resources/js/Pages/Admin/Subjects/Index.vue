@@ -87,6 +87,12 @@ const deleteSubject = (subjectId) => {
                                     </th>
                                     <th
                                         scope="col"
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Assigned Teacher(s)
+                                    </th>
+                                    <th
+                                        scope="col"
                                         class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
                                         Actions
@@ -99,7 +105,7 @@ const deleteSubject = (subjectId) => {
                                     class="bg-white"
                                 >
                                     <td
-                                        colspan="5"
+                                        colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No subjects found. Create your first
@@ -137,6 +143,21 @@ const deleteSubject = (subjectId) => {
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
                                     >
                                         {{ subject.credits || "-" }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-600"
+                                    >
+                                        <span
+                                            v-if="subject.teachers && subject.teachers.length > 0"
+                                        >
+                                            {{ subject.teachers.map(t => t.name).join(', ') }}
+                                        </span>
+                                        <span
+                                            v-else
+                                            class="text-slate-400"
+                                        >
+                                            Not Assigned
+                                        </span>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"

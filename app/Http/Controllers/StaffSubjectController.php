@@ -16,7 +16,7 @@ class StaffSubjectController extends Controller
      */
     public function index(): Response
     {
-        $subjects = Subject::with('course')
+        $subjects = Subject::with(['course', 'teachers'])
             ->orderBy('subject_code')
             ->get([
                 'id',
@@ -38,6 +38,12 @@ class StaffSubjectController extends Controller
                     'title' => $subject->title,
                     'credits' => $subject->credits,
                     'description' => $subject->description,
+                    'teachers' => $subject->teachers->map(function ($teacher) {
+                        return [
+                            'id' => $teacher->id,
+                            'name' => $teacher->name,
+                        ];
+                    }),
                     'created_at' => $subject->created_at,
                     'updated_at' => $subject->updated_at,
                 ];
