@@ -15,10 +15,13 @@ const form = useForm({
     phone: "",
     programme: "",
     intake_year: "",
+    photo: null,
 });
 
 const submit = () => {
-    form.post(route("students.store"));
+    form.post(route("students.store"), {
+        forceFormData: true,
+    });
 };
 </script>
 
@@ -209,6 +212,27 @@ const submit = () => {
                             class="mt-1 text-xs text-red-600"
                         >
                             {{ form.errors.intake_year }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            Photo (optional)
+                            <span class="text-[11px] text-slate-500">(JPEG/PNG, max 2MB)</span>
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
+                            @change="(e) => (form.photo = e.target.files[0])"
+                        />
+                        <p
+                            v-if="form.errors.photo"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.photo }}
                         </p>
                     </div>
                 </div>

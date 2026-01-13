@@ -18,6 +18,7 @@ class Student extends Model
         'phone',
         'programme',
         'intake_year',
+        'photo',
     ];
 
     public function user()

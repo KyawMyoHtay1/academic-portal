@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,6 +25,7 @@ class StudentController extends Controller
                     'email' => $student->email,
                     'programme' => $student->programme,
                     'intake_year' => $student->intake_year,
+                    'photo' => $student->photo,
                 ];
             });
 
@@ -56,7 +58,12 @@ class StudentController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'programme' => ['required', 'string', 'max:255'],
             'intake_year' => ['required', 'string', 'max:10'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
 
         Student::create($data);
 
@@ -77,6 +84,9 @@ class StudentController extends Controller
                 'phone' => $student->phone,
                 'programme' => $student->programme,
                 'intake_year' => $student->intake_year,
+                'photo_url' => $student->photo
+                    ? asset('storage/' . $student->photo)
+                    : null,
             ],
         ]);
     }
@@ -91,7 +101,16 @@ class StudentController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'programme' => ['required', 'string', 'max:255'],
             'intake_year' => ['required', 'string', 'max:10'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            if ($student->photo && Storage::disk('public')->exists($student->photo)) {
+                Storage::disk('public')->delete($student->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
 
         $student->update($data);
 
