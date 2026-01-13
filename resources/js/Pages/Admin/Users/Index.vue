@@ -75,6 +75,12 @@ const deleteUser = (id) => {
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
+                                        Photo
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Name
                                     </th>
                                     <th
@@ -120,6 +126,26 @@ const deleteUser = (id) => {
                                     :key="user.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
+                                    <td class="whitespace-nowrap px-4 py-4">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                            >
+                                                <img
+                                                    v-if="user.photo"
+                                                    :src="`/storage/${user.photo}`"
+                                                    :alt="`Photo for ${user.name}`"
+                                                    class="h-full w-full object-cover"
+                                                />
+                                                <span
+                                                    v-else
+                                                    class="text-xs font-semibold text-slate-500"
+                                                >
+                                                    {{ user.name[0] }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900"
                                     >

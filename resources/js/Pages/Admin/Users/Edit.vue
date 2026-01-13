@@ -17,10 +17,19 @@ const form = useForm({
     name: props.user.name,
     email: props.user.email,
     role: props.user.role,
+    photo: null,
 });
 
 const submit = () => {
-    form.put(route("admin.users.update", props.user.id));
+    form
+        .transform((data) => ({
+            ...data,
+            _method: "put",
+        }))
+        .post(route("admin.users.update", props.user.id), {
+            forceFormData: true,
+            onFinish: () => form.reset("photo"),
+        });
 };
 </script>
 
@@ -128,6 +137,46 @@ const submit = () => {
                                 <p class="mt-1 text-xs text-slate-500">
                                     Changing a user's role will affect their
                                     access permissions immediately.
+                                </p>
+                            </div>
+
+                            <!-- Existing Photo Preview -->
+                            <div v-if="user.photo_url" class="space-y-2">
+                                <span
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Current Profile Photo
+                                </span>
+                                <img
+                                    :src="user.photo_url"
+                                    :alt="`Current photo for ${form.name}`"
+                                    class="h-16 w-16 rounded-full object-cover border border-slate-200"
+                                />
+                            </div>
+
+                            <!-- Photo (optional) -->
+                            <div>
+                                <label
+                                    for="photo"
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Replace Profile Photo
+                                    <span class="text-xs text-slate-500">
+                                        (JPEG/PNG, max 2MB)
+                                    </span>
+                                </label>
+                                <input
+                                    id="photo"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                                    @change="(e) => (form.photo = e.target.files[0])"
+                                />
+                                <p
+                                    v-if="form.errors.photo"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.photo }}
                                 </p>
                             </div>
 
