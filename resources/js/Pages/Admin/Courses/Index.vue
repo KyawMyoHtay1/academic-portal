@@ -141,12 +141,6 @@ const deleteCourse = (courseId) => {
                                             >
                                                 Edit
                                             </Link>
-                                            <Link
-                                                :href="route('admin.courses.assign-teachers', course.id)"
-                                                class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
-                                            >
-                                                Assign Teachers
-                                            </Link>
                                             <button
                                                 @click="deleteCourse(course.id)"
                                                 class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"

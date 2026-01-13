@@ -9,22 +9,43 @@ use Inertia\Response;
 class TeacherCoursesController extends Controller
 {
     /**
-     * Display the courses assigned to the current teacher.
+     * Display the subjects assigned to the current teacher, grouped by course.
      */
     public function index(): Response
     {
         $user = Auth::user();
 
-        // Get courses assigned to this teacher
-        $courses = $user->teachingCourses()
-            ->orderBy('courses.course_code')
+        // Get subjects assigned to this teacher
+        $subjects = $user->teachingSubjects()
+            ->with('course')
+            ->orderBy('subject_code')
             ->get([
-                'courses.id',
-                'courses.course_code',
-                'courses.title',
-                'courses.credits',
-                'courses.semester',
+                'subjects.id',
+                'subjects.subject_code',
+                'subjects.title',
+                'subjects.credits',
+                'subjects.course_id',
             ]);
+
+        // Group subjects by course
+        $courses = $subjects->groupBy('course_id')->map(function ($courseSubjects, $courseId) {
+            $firstSubject = $courseSubjects->first();
+            $course = $firstSubject->course;
+            
+            return [
+                'id' => $course->id,
+                'course_code' => $course->course_code,
+                'course_title' => $course->title,
+                'subjects' => $courseSubjects->map(function ($subject) {
+                    return [
+                        'id' => $subject->id,
+                        'subject_code' => $subject->subject_code,
+                        'title' => $subject->title,
+                        'credits' => $subject->credits,
+                    ];
+                })->values(),
+            ];
+        })->values();
 
         return Inertia::render('Teacher/MyCourses', [
             'courses' => $courses,

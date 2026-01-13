@@ -83,7 +83,7 @@ const navigation = computed(() => {
     if (isTeacher) {
         items.push(
             {
-                name: "My Teaching Courses",
+                name: "My Teaching Subjects",
                 href: route("teacher.courses.index"),
                 active: route().current("teacher.courses.*"),
             },
