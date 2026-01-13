@@ -16,7 +16,7 @@ const props = defineProps({
 const unenroll = (courseId) => {
     if (
         !confirm(
-            "Are you sure you want to unenroll from this course? This action cannot be undone."
+            "Are you sure you want to request withdrawal from this course? This request requires admin approval."
         )
     ) {
         return;
@@ -167,11 +167,18 @@ const unenroll = (courseId) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
+                                        <span
+                                            v-if="course.enrollment_status === 'withdrawal_pending'"
+                                            class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
+                                        >
+                                            Withdrawal Pending
+                                        </span>
                                         <button
+                                            v-else
                                             @click="unenroll(course.id)"
                                             class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                         >
-                                            Unenroll
+                                            Request Withdrawal
                                         </button>
                                     </td>
                                 </tr>

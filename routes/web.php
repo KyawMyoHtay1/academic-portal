@@ -141,6 +141,8 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/admin/enrollments', [StaffEnrollmentController::class, 'index'])->name('admin.enrollments.index');
         Route::post('/admin/enrollments/{enrollment}/approve', [StaffEnrollmentController::class, 'approve'])->name('admin.enrollments.approve');
         Route::post('/admin/enrollments/{enrollment}/reject', [StaffEnrollmentController::class, 'reject'])->name('admin.enrollments.reject');
+        Route::post('/admin/enrollments/{enrollment}/approve-withdrawal', [StaffEnrollmentController::class, 'approveWithdrawal'])->name('admin.enrollments.approve-withdrawal');
+        Route::post('/admin/enrollments/{enrollment}/reject-withdrawal', [StaffEnrollmentController::class, 'rejectWithdrawal'])->name('admin.enrollments.reject-withdrawal');
 
         // Subject Management
         Route::resource('admin/subjects', StaffSubjectController::class)->names([

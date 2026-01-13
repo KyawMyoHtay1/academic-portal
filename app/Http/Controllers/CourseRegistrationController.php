@@ -52,7 +52,8 @@ class CourseRegistrationController extends Controller
     }
 
     /**
-     * Unenrol the authenticated student from a course.
+     * Request withdrawal from a course (creates withdrawal request).
+     * Withdrawal requires admin approval.
      */
     public function unenroll(Request $request, Course $course)
     {
@@ -69,16 +70,27 @@ class CourseRegistrationController extends Controller
             ->where('course_id', $course->id)
             ->first();
         
-        if (!$enrollment || $enrollment->pivot->status !== 'approved') {
+        if (!$enrollment) {
             return Redirect::route('my-courses.index')
                 ->with('error', 'You are not enrolled in this course.');
         }
 
-        // Unenrol the student
-        $student->courses()->detach($course->id);
+        $status = $enrollment->pivot->status;
+        
+        if ($status !== 'approved') {
+            if ($status === 'withdrawal_pending') {
+                return Redirect::route('my-courses.index')
+                    ->with('error', 'You already have a pending withdrawal request for this course.');
+            }
+            return Redirect::route('my-courses.index')
+                ->with('error', 'You are not enrolled in this course.');
+        }
+
+        // Create withdrawal request
+        $student->courses()->updateExistingPivot($course->id, ['status' => 'withdrawal_pending']);
 
         return Redirect::route('my-courses.index')
-            ->with('success', "Successfully unenrolled from {$course->course_code} - {$course->title}.");
+            ->with('success', "Withdrawal request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
     }
 }
 
