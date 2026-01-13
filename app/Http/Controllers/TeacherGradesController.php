@@ -67,6 +67,7 @@ class TeacherGradesController extends Controller
                 'students.id',
                 'students.student_no',
                 'students.full_name',
+                'students.photo',
             ]);
 
         // Fetch existing grades keyed by student_id
@@ -80,6 +81,7 @@ class TeacherGradesController extends Controller
                 'id' => $student->id,
                 'student_no' => $student->student_no,
                 'full_name' => $student->full_name,
+                'photo' => $student->photo,
                 'score' => $grades[$student->id]->score ?? null,
             ];
         });

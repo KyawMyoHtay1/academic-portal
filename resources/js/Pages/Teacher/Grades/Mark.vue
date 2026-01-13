@@ -77,26 +77,20 @@ const submit = () => {
                                 >
                                     <table class="min-w-full divide-y divide-slate-200">
                                         <thead class="bg-slate-50">
-                                            <tr>
-                                                <th
-                                                    scope="col"
-                                                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                                >
-                                                    Student No.
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                                >
-                                                    Name
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                                >
-                                                    Score (0 - 100)
-                                                </th>
-                                            </tr>
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                            >
+                                                Student
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                            >
+                                                Score (0 - 100)
+                                            </th>
+                                        </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-200 bg-white">
                                             <tr
@@ -105,26 +99,34 @@ const submit = () => {
                                                 class="bg-white"
                                             >
                                                 <td
-                                                    class="whitespace-nowrap px-4 py-4 text-sm text-slate-900"
-                                                >
-                                                    {{
-                                                        students.find(
-                                                            (s) =>
-                                                                s.id ===
-                                                                record.student_id
-                                                        )?.student_no
-                                                    }}
-                                                </td>
-                                                <td
                                                     class="px-4 py-4 text-sm text-slate-700"
                                                 >
-                                                    {{
-                                                        students.find(
-                                                            (s) =>
-                                                                s.id ===
-                                                                record.student_id
-                                                        )?.full_name
-                                                    }}
+                                                    <div class="flex items-center gap-3">
+                                                        <div
+                                                            class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                                        >
+                                                            <img
+                                                                v-if="students[index]?.photo"
+                                                                :src="`/storage/${students[index].photo}`"
+                                                                :alt="`Photo for ${students[index].full_name}`"
+                                                                class="h-full w-full object-cover"
+                                                            />
+                                                            <span
+                                                                v-else
+                                                                class="text-xs font-semibold text-slate-500"
+                                                            >
+                                                                {{ students[index]?.full_name.charAt(0).toUpperCase() }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="text-sm font-medium text-slate-900">
+                                                                {{ students[index]?.full_name }}
+                                                            </span>
+                                                            <span class="text-xs text-slate-500">
+                                                                {{ students[index]?.student_no }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td
                                                     class="whitespace-nowrap px-4 py-4 text-center"

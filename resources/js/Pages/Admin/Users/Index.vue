@@ -110,7 +110,10 @@ const deleteUser = (id) => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr v-if="users.length === 0" class="bg-white">
+                                <tr
+                                    v-if="users.length === 0"
+                                    class="bg-white"
+                                >
                                     <td
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
@@ -157,9 +160,7 @@ const deleteUser = (id) => {
                                         class="whitespace-nowrap px-4 py-4 text-sm"
                                     >
                                         <span
-                                            :class="
-                                                getRoleBadgeClass(user.role)
-                                            "
+                                            :class="getRoleBadgeClass(user.role)"
                                             class="inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize"
                                         >
                                             {{ user.role }}
@@ -181,12 +182,7 @@ const deleteUser = (id) => {
                                             class="flex items-center justify-end gap-2"
                                         >
                                             <Link
-                                                :href="
-                                                    route(
-                                                        'admin.users.edit',
-                                                        user.id
-                                                    )
-                                                "
+                                                :href="route('admin.users.edit', user.id)"
                                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                             >
                                                 Edit
@@ -208,3 +204,4 @@ const deleteUser = (id) => {
         </div>
     </AuthenticatedLayout>
 </template>
+

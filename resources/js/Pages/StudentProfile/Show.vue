@@ -41,9 +41,7 @@ const submit = () => {
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <!-- No Student Record Message -->
                 <div v-if="!hasStudentRecord" class="portal-card p-6">
-                    <div
-                        class="rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200"
-                    >
+                    <div class="rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200">
                         <div class="flex">
                             <div class="flex-shrink-0">
                                 <svg
@@ -59,7 +57,9 @@ const submit = () => {
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <h3 class="text-sm font-medium text-amber-800">
+                                <h3
+                                    class="text-sm font-medium text-amber-800"
+                                >
                                     Student Record Not Found
                                 </h3>
                                 <div class="mt-2 text-sm text-amber-700">
@@ -102,12 +102,16 @@ const submit = () => {
                     </div>
                     <!-- Academic Information (Read-only) -->
                     <div class="portal-card p-6">
-                        <h3 class="mb-4 text-lg font-semibold text-slate-900">
+                        <h3
+                            class="mb-4 text-lg font-semibold text-slate-900"
+                        >
                             Academic Information
                         </h3>
-                        <p class="mb-4 text-xs text-slate-500">
-                            Core academic details cannot be modified by
-                            students. Contact administration for changes.
+                        <p
+                            class="mb-4 text-xs text-slate-500"
+                        >
+                            Core academic details cannot be modified by students.
+                            Contact administration for changes.
                         </p>
 
                         <dl class="grid gap-4 sm:grid-cols-2">
@@ -187,10 +191,14 @@ const submit = () => {
 
                     <!-- Contact Information (Editable) -->
                     <div class="portal-card p-6">
-                        <h3 class="mb-4 text-lg font-semibold text-slate-900">
+                        <h3
+                            class="mb-4 text-lg font-semibold text-slate-900"
+                        >
                             Contact Information
                         </h3>
-                        <p class="mb-4 text-xs text-slate-500">
+                        <p
+                            class="mb-4 text-xs text-slate-500"
+                        >
                             You can update your contact details below.
                         </p>
 
@@ -221,9 +229,7 @@ const submit = () => {
                                     </p>
                                 </div>
 
-                                <div
-                                    class="flex items-center justify-end gap-3"
-                                >
+                                <div class="flex items-center justify-end gap-3">
                                     <button
                                         type="button"
                                         @click="form.reset()"
@@ -250,3 +256,4 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
+

@@ -175,10 +175,7 @@ const navigation = computed(() => {
 <template>
     <div class="min-h-screen bg-portal-background">
         <!-- Flash messages -->
-        <div
-            class="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 space-y-2"
-            v-if="$page.props.flash?.success || $page.props.flash?.error"
-        >
+        <div class="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 space-y-2" v-if="$page.props.flash?.success || $page.props.flash?.error">
             <div
                 v-if="$page.props.flash?.success"
                 class="rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-200"
@@ -397,9 +394,7 @@ const navigation = computed(() => {
                                             class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-portal-navy text-xs font-semibold text-white overflow-hidden"
                                         >
                                             <img
-                                                v-if="
-                                                    $page.props.auth.user.photo
-                                                "
+                                                v-if="$page.props.auth.user.photo"
                                                 :src="`/storage/${$page.props.auth.user.photo}`"
                                                 :alt="`Photo for ${$page.props.auth.user.name}`"
                                                 class="h-full w-full object-cover"
