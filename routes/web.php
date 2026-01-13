@@ -52,6 +52,7 @@ Route::get('/guest/courses', function () {
             'title',
             'credits',
             'semester',
+            'photo',
         ]),
     ]);
 })->name('guest.courses');

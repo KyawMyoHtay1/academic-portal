@@ -14,10 +14,19 @@ const form = useForm({
     title: props.course.title,
     credits: props.course.credits,
     semester: props.course.semester,
+    photo: null,
 });
 
 const submit = () => {
-    form.put(route("admin.courses.update", props.course.id));
+    form
+        .transform((data) => ({
+            ...data,
+            _method: "put",
+        }))
+        .post(route("admin.courses.update", props.course.id), {
+            forceFormData: true,
+            onFinish: () => form.reset("photo"),
+        });
 };
 </script>
 
@@ -143,6 +152,46 @@ const submit = () => {
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.semester }}
+                                </p>
+                            </div>
+
+                            <!-- Existing Photo Preview -->
+                            <div v-if="course.photo_url" class="space-y-2">
+                                <span
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Current Course Photo
+                                </span>
+                                <img
+                                    :src="course.photo_url"
+                                    :alt="`Current photo for ${form.title}`"
+                                    class="h-24 w-32 rounded-md object-cover border border-slate-200"
+                                />
+                            </div>
+
+                            <!-- Course Photo (optional) -->
+                            <div>
+                                <label
+                                    for="photo"
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Replace Course Photo
+                                    <span class="text-xs text-slate-500">
+                                        (JPEG/PNG, max 2MB)
+                                    </span>
+                                </label>
+                                <input
+                                    id="photo"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                                    @change="(e) => (form.photo = e.target.files[0])"
+                                />
+                                <p
+                                    v-if="form.errors.photo"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.photo }}
                                 </p>
                             </div>
 

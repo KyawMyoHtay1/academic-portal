@@ -14,6 +14,7 @@ class Course extends Model
         'title',
         'credits',
         'semester',
+        'photo',
     ];
 
     /**

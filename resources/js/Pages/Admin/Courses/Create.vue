@@ -7,10 +7,13 @@ const form = useForm({
     title: "",
     credits: "",
     semester: "",
+    photo: null,
 });
 
 const submit = () => {
-    form.post(route("admin.courses.store"));
+    form.post(route("admin.courses.store"), {
+        forceFormData: true,
+    });
 };
 </script>
 
@@ -140,6 +143,32 @@ const submit = () => {
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.semester }}
+                                </p>
+                            </div>
+
+                            <!-- Course Photo (optional) -->
+                            <div>
+                                <label
+                                    for="photo"
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Course Photo
+                                    <span class="text-xs text-slate-500">
+                                        (JPEG/PNG, max 2MB)
+                                    </span>
+                                </label>
+                                <input
+                                    id="photo"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                                    @change="(e) => (form.photo = e.target.files[0])"
+                                />
+                                <p
+                                    v-if="form.errors.photo"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.photo }}
                                 </p>
                             </div>
 

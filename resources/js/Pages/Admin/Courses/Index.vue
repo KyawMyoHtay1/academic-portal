@@ -65,6 +65,12 @@ const deleteCourse = (courseId) => {
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
+                                        Photo
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Course Code
                                     </th>
                                     <th
@@ -99,7 +105,7 @@ const deleteCourse = (courseId) => {
                                     class="bg-white"
                                 >
                                     <td
-                                        colspan="5"
+                                        colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No courses found. Create your first
@@ -111,6 +117,30 @@ const deleteCourse = (courseId) => {
                                     :key="course.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
+                                    <td class="whitespace-nowrap px-4 py-4">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                            >
+                                                <img
+                                                    v-if="course.photo"
+                                                    :src="
+                                                        `/storage/${course.photo}`
+                                                    "
+                                                    :alt="
+                                                        `Photo for ${course.title}`
+                                                    "
+                                                    class="h-full w-full object-cover"
+                                                />
+                                                <span
+                                                    v-else
+                                                    class="text-xs font-semibold text-slate-500"
+                                                >
+                                                    {{ course.title[0] }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900"
                                     >

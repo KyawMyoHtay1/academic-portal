@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +23,7 @@ class StaffCourseController extends Controller
                 'title',
                 'credits',
                 'semester',
+                'photo',
                 'created_at',
                 'updated_at',
             ]);
@@ -49,7 +51,12 @@ class StaffCourseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['required', 'integer', 'min:1', 'max:10'],
             'semester' => ['required', 'string', 'max:50'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('courses', 'public');
+        }
 
         Course::create($data);
 
@@ -70,6 +77,9 @@ class StaffCourseController extends Controller
                 'title' => $course->title,
                 'credits' => $course->credits,
                 'semester' => $course->semester,
+                'photo_url' => $course->photo
+                    ? asset('storage/' . $course->photo)
+                    : null,
             ],
         ]);
     }
@@ -84,7 +94,17 @@ class StaffCourseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['required', 'integer', 'min:1', 'max:10'],
             'semester' => ['required', 'string', 'max:50'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            // Delete old photo if it exists
+            if ($course->photo && Storage::disk('public')->exists($course->photo)) {
+                Storage::disk('public')->delete($course->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('courses', 'public');
+        }
 
         $course->update($data);
 
