@@ -143,6 +143,12 @@ const deleteSubject = (subjectId) => {
                                     >
                                         <div class="flex items-center justify-end gap-2">
                                             <Link
+                                                :href="route('admin.subjects.assign-teachers', subject.id)"
+                                                class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
+                                            >
+                                                Assign Teachers
+                                            </Link>
+                                            <Link
                                                 :href="route('admin.subjects.edit', subject.id)"
                                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                             >

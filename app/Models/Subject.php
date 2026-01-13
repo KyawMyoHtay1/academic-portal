@@ -40,4 +40,13 @@ class Subject extends Model
     {
         return $this->hasMany(Timetable::class);
     }
+
+    /**
+     * The teachers assigned to this subject.
+     */
+    public function teachers()
+    {
+        return $this->belongsToMany(User::class, 'subject_teacher', 'subject_id', 'user_id')
+            ->withTimestamps();
+    }
 }

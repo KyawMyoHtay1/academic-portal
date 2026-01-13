@@ -12,6 +12,7 @@ use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffEnrollmentController;
 use App\Http\Controllers\StaffFeeController;
 use App\Http\Controllers\StaffSubjectController;
+use App\Http\Controllers\StaffSubjectTeacherController;
 use App\Http\Controllers\StaffTimetableController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
@@ -154,6 +155,10 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'admin.subjects.update',
             'destroy' => 'admin.subjects.destroy',
         ]);
+
+        // Teacher Assignment to Subjects (staff only)
+        Route::get('/admin/subjects/{subject}/assign-teachers', [StaffSubjectTeacherController::class, 'edit'])->name('admin.subjects.assign-teachers');
+        Route::put('/admin/subjects/{subject}/assign-teachers', [StaffSubjectTeacherController::class, 'update'])->name('admin.subjects.assign-teachers.update');
 
         // User Management (role assignment)
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');
