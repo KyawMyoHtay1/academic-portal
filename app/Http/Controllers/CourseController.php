@@ -26,6 +26,7 @@ class CourseController extends Controller
                 'title',
                 'credits',
                 'semester',
+                'photo',
             ]);
 
         // Get enrollment status for each course
@@ -46,6 +47,7 @@ class CourseController extends Controller
                 'title' => $course->title,
                 'credits' => $course->credits,
                 'semester' => $course->semester,
+                'photo' => $course->photo,
                 'enrollment_status' => $status,
                 'is_enrolled' => $status === 'approved',
             ];

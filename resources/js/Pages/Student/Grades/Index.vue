@@ -79,13 +79,31 @@ defineProps({
                             :key="course.id"
                             class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                         >
-                            <div class="mb-3">
-                                <h3 class="text-sm font-semibold text-slate-900">
-                                    {{ course.course_code }} - {{ course.title }}
-                                </h3>
-                                <p class="mt-1 text-xs text-slate-500">
-                                    {{ course.credits }} credits • {{ course.semester }}
-                                </p>
+                            <div class="mb-3 flex items-center gap-3">
+                                <div
+                                    class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                >
+                                    <img
+                                        v-if="course.photo"
+                                        :src="`/storage/${course.photo}`"
+                                        :alt="`Photo for ${course.title}`"
+                                        class="h-full w-full object-cover"
+                                    />
+                                    <span
+                                        v-else
+                                        class="text-xs font-semibold text-slate-500"
+                                    >
+                                        {{ course.title.charAt(0).toUpperCase() }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-900">
+                                        {{ course.course_code }} - {{ course.title }}
+                                    </h3>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ course.credits }} credits • {{ course.semester }}
+                                    </p>
+                                </div>
                             </div>
                             
                             <div v-if="course.subjects && course.subjects.length > 0" class="overflow-x-auto">
@@ -93,10 +111,7 @@ defineProps({
                                     <thead class="bg-slate-50">
                                         <tr>
                                             <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
-                                                Subject Code
-                                            </th>
-                                            <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
-                                                Subject Title
+                                                Subject
                                             </th>
                                             <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
                                                 Score
@@ -109,11 +124,33 @@ defineProps({
                                             :key="subject.id"
                                             class="bg-white hover:bg-slate-50 transition-colors"
                                         >
-                                            <td class="px-4 py-3 text-sm font-medium text-slate-900">
-                                                {{ subject.subject_code }}
-                                            </td>
                                             <td class="px-4 py-3 text-sm text-slate-700">
-                                                {{ subject.title }}
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                                    >
+                                                        <img
+                                                            v-if="subject.photo"
+                                                            :src="`/storage/${subject.photo}`"
+                                                            :alt="`Photo for ${subject.title}`"
+                                                            class="h-full w-full object-cover"
+                                                        />
+                                                        <span
+                                                            v-else
+                                                            class="text-xs font-semibold text-slate-500"
+                                                        >
+                                                            {{ subject.title.charAt(0).toUpperCase() }}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-sm font-medium text-slate-900">
+                                                            {{ subject.subject_code }}
+                                                        </div>
+                                                        <div class="text-xs text-slate-500">
+                                                            {{ subject.title }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="px-4 py-3 text-sm">
                                                 <span

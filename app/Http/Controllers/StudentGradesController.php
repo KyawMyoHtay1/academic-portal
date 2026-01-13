@@ -25,7 +25,9 @@ class StudentGradesController extends Controller
 
         // Get courses with subjects and their grades
         $courses = $student->courses()
-            ->with(['subjects.grades' => function ($query) use ($student) {
+            ->with(['subjects' => function ($query) {
+                $query->select('subjects.id', 'subjects.course_id', 'subjects.subject_code', 'subjects.title', 'subjects.photo');
+            }, 'subjects.grades' => function ($query) use ($student) {
                 $query->where('student_id', $student->id);
             }])
             ->orderBy('course_code')
@@ -35,6 +37,7 @@ class StudentGradesController extends Controller
                 'courses.title',
                 'courses.credits',
                 'courses.semester',
+                'courses.photo',
             ])
             ->map(function ($course) {
                 $subjectsWithGrades = $course->subjects->map(function ($subject) {
@@ -43,6 +46,7 @@ class StudentGradesController extends Controller
                         'id' => $subject->id,
                         'subject_code' => $subject->subject_code,
                         'title' => $subject->title,
+                        'photo' => $subject->photo,
                         'score' => $grade?->score,
                     ];
                 });
@@ -53,6 +57,7 @@ class StudentGradesController extends Controller
                     'title' => $course->title,
                     'credits' => $course->credits,
                     'semester' => $course->semester,
+                    'photo' => $course->photo,
                     'subjects' => $subjectsWithGrades,
                 ];
             });
