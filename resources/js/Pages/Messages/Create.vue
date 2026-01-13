@@ -69,6 +69,34 @@ const submit = () => {
                                         {{ recipient.name }} ({{ recipient.email }}) — {{ recipient.role }}
                                     </option>
                                 </select>
+                                <!-- Recipient Preview -->
+                                <div
+                                    v-if="form.receiver_id"
+                                    class="mt-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
+                                >
+                                    <div class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                        <img
+                                            v-if="recipients.find(r => r.id == form.receiver_id)?.photo"
+                                            :src="`/storage/${recipients.find(r => r.id == form.receiver_id).photo}`"
+                                            :alt="`Photo of ${recipients.find(r => r.id == form.receiver_id)?.name}`"
+                                            class="h-full w-full object-cover"
+                                        />
+                                        <span
+                                            v-else
+                                            class="text-xs font-semibold text-slate-500"
+                                        >
+                                            {{ recipients.find(r => r.id == form.receiver_id)?.name?.charAt(0).toUpperCase() }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {{ recipients.find(r => r.id == form.receiver_id)?.name }}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ recipients.find(r => r.id == form.receiver_id)?.email }} · {{ recipients.find(r => r.id == form.receiver_id)?.role }}
+                                        </p>
+                                    </div>
+                                </div>
                                 <p
                                     v-if="form.errors.receiver_id"
                                     class="mt-1 text-sm text-red-600"

@@ -28,6 +28,7 @@ class MessageController extends Controller
                     'id' => $m->id,
                     'body' => $m->body,
                     'sender' => $m->sender?->name ?? 'Unknown',
+                    'sender_photo' => $m->sender?->photo,
                     'sender_role' => $m->sender?->role ?? 'unknown',
                     'receiver_role' => $m->receiver_role ?? $m->receiver?->role,
                     'read' => $m->read,
@@ -50,7 +51,7 @@ class MessageController extends Controller
         $recipients = User::where('id', '!=', $user->id)
             ->orderBy('role')
             ->orderBy('name')
-            ->get(['id', 'name', 'email', 'role']);
+            ->get(['id', 'name', 'email', 'role', 'photo']);
 
         return Inertia::render('Messages/Create', [
             'recipients' => $recipients,
