@@ -97,7 +97,7 @@ const statusBadgeClass = (read) =>
                             />
                         </svg>
                         <h3 class="mt-4 text-sm font-medium text-slate-900">
-                            No messages in your inbox
+                            No messages
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">
                             Start a conversation by sending a new message
@@ -109,25 +109,43 @@ const statusBadgeClass = (read) =>
                         :key="message.id"
                         class="portal-card overflow-hidden p-5 transition-shadow"
                         :class="{
-                            'bg-slate-50 hover:bg-slate-100': message.read,
+                            'bg-slate-50 hover:bg-slate-100':
+                                message.read && !message.is_sent,
                             'bg-white hover:shadow-md border-l-4 border-portal-navy':
-                                !message.read,
+                                !message.read && !message.is_sent,
+                            'bg-blue-50 hover:bg-blue-100 border-l-4 border-blue-400':
+                                message.is_sent,
                         }"
                     >
                         <div class="flex items-start gap-4">
-                            <!-- Sender Avatar -->
+                            <!-- Avatar (Sender for received, Receiver for sent) -->
                             <div class="flex-shrink-0">
                                 <div
-                                    class="h-12 w-12 overflow-hidden rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center"
+                                    class="h-12 w-12 overflow-hidden rounded-full border-2 bg-slate-100 flex items-center justify-center"
                                     :class="{
-                                        'border-emerald-300': !message.read,
-                                        'border-slate-300': message.read,
+                                        'border-emerald-300':
+                                            !message.read && !message.is_sent,
+                                        'border-slate-300':
+                                            message.read && !message.is_sent,
+                                        'border-blue-300': message.is_sent,
                                     }"
                                 >
                                     <img
-                                        v-if="message.sender_photo"
-                                        :src="`/storage/${message.sender_photo}`"
-                                        :alt="`Photo of ${message.sender}`"
+                                        v-if="
+                                            message.is_sent
+                                                ? message.receiver_photo
+                                                : message.sender_photo
+                                        "
+                                        :src="`/storage/${
+                                            message.is_sent
+                                                ? message.receiver_photo
+                                                : message.sender_photo
+                                        }`"
+                                        :alt="`Photo of ${
+                                            message.is_sent
+                                                ? message.receiver
+                                                : message.sender
+                                        }`"
                                         class="h-full w-full object-cover"
                                     />
                                     <span
@@ -135,7 +153,10 @@ const statusBadgeClass = (read) =>
                                         class="text-sm font-semibold text-slate-500"
                                     >
                                         {{
-                                            message.sender
+                                            (message.is_sent
+                                                ? message.receiver
+                                                : message.sender
+                                            )
                                                 .charAt(0)
                                                 .toUpperCase()
                                         }}
@@ -153,17 +174,34 @@ const statusBadgeClass = (read) =>
                                             class="flex items-center gap-2 flex-wrap"
                                         >
                                             <span
+                                                v-if="message.is_sent"
+                                                class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700"
+                                            >
+                                                Sent
+                                            </span>
+                                            <span
                                                 class="text-sm font-semibold text-slate-900"
                                             >
-                                                {{ message.sender }}
+                                                {{
+                                                    message.is_sent
+                                                        ? `To: ${message.receiver}`
+                                                        : message.sender
+                                                }}
                                             </span>
                                             <span
                                                 class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-700"
                                             >
-                                                {{ message.sender_role }}
+                                                {{
+                                                    message.is_sent
+                                                        ? message.receiver_role
+                                                        : message.sender_role
+                                                }}
                                             </span>
                                             <span
-                                                v-if="!message.read"
+                                                v-if="
+                                                    !message.read &&
+                                                    !message.is_sent
+                                                "
                                                 class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
                                             >
                                                 New
@@ -175,7 +213,9 @@ const statusBadgeClass = (read) =>
                                         <p
                                             class="mt-3 text-sm leading-relaxed text-slate-800 whitespace-pre-line"
                                             :class="{
-                                                'font-medium': !message.read,
+                                                'font-medium':
+                                                    !message.read &&
+                                                    !message.is_sent,
                                             }"
                                         >
                                             {{ message.body }}
@@ -183,12 +223,21 @@ const statusBadgeClass = (read) =>
                                     </div>
                                     <div class="flex-shrink-0">
                                         <button
-                                            v-if="!message.read"
+                                            v-if="
+                                                !message.read &&
+                                                !message.is_sent
+                                            "
                                             @click="markAsRead(message.id)"
                                             class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 transition-colors"
                                         >
                                             Mark as read
                                         </button>
+                                        <span
+                                            v-else-if="message.is_sent"
+                                            class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700"
+                                        >
+                                            Sent
+                                        </span>
                                         <span
                                             v-else
                                             class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"

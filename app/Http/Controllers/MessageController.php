@@ -13,25 +13,34 @@ use Inertia\Response;
 class MessageController extends Controller
 {
     /**
-     * Display the current user's inbox.
+     * Display the current user's inbox (both received and sent messages).
      */
     public function index(): Response
     {
         $user = Auth::user();
 
-        $messages = Message::with('sender')
-            ->where('receiver_id', $user->id)
+        // Get both received and sent messages
+        $messages = Message::with(['sender', 'receiver'])
+            ->where(function ($query) use ($user) {
+                $query->where('receiver_id', $user->id)
+                    ->orWhere('sender_id', $user->id);
+            })
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($m) {
+            ->map(function ($m) use ($user) {
+                $isSent = $m->sender_id === $user->id;
+                
                 return [
                     'id' => $m->id,
                     'body' => $m->body,
                     'sender' => $m->sender?->name ?? 'Unknown',
                     'sender_photo' => $m->sender?->photo,
                     'sender_role' => $m->sender?->role ?? 'unknown',
-                    'receiver_role' => $m->receiver_role ?? $m->receiver?->role,
+                    'receiver' => $m->receiver?->name ?? 'Unknown',
+                    'receiver_photo' => $m->receiver?->photo,
+                    'receiver_role' => $m->receiver_role ?? $m->receiver?->role ?? 'unknown',
                     'read' => $m->read,
+                    'is_sent' => $isSent, // Flag to identify sent messages
                     'created_at' => $m->created_at->format('Y-m-d H:i'),
                 ];
             });
