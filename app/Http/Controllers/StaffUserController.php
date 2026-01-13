@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -92,7 +93,7 @@ class StaffUserController extends Controller
         ];
 
         if ($request->hasFile('photo')) {
-            $userData['photo'] = $request->file('photo')->store('users', 'public');
+            $userData['photo'] = ImageService::store($request->file('photo'), 'users');
         }
 
         User::create($userData);
@@ -115,11 +116,10 @@ class StaffUserController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-                Storage::disk('public')->delete($user->photo);
-            }
+            // Delete old photo if it exists
+            ImageService::delete($user->photo);
 
-            $data['photo'] = $request->file('photo')->store('users', 'public');
+            $data['photo'] = ImageService::store($request->file('photo'), 'users');
         }
 
         $user->update($data);
@@ -135,9 +135,7 @@ class StaffUserController extends Controller
     public function removePhoto(User $user): RedirectResponse
     {
         // Delete photo file if exists
-        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-            Storage::disk('public')->delete($user->photo);
-        }
+        ImageService::delete($user->photo);
 
         // Remove photo reference from database
         $user->update(['photo' => null]);

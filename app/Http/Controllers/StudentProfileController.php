@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -74,13 +75,10 @@ class StudentProfileController extends Controller
         // Handle photo upload
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
-            if ($student->photo && Storage::disk('public')->exists($student->photo)) {
-                Storage::disk('public')->delete($student->photo);
-            }
+            ImageService::delete($student->photo);
             
-            // Store new photo
-            $path = $request->file('photo')->store('students', 'public');
-            $data['photo'] = $path;
+            // Store new optimized photo
+            $data['photo'] = ImageService::store($request->file('photo'), 'students');
         }
 
         $student->update($data);
@@ -105,9 +103,7 @@ class StudentProfileController extends Controller
         }
 
         // Delete photo file if exists
-        if ($student->photo && Storage::disk('public')->exists($student->photo)) {
-            Storage::disk('public')->delete($student->photo);
-        }
+        ImageService::delete($student->photo);
 
         // Remove photo reference from database
         $student->update(['photo' => null]);

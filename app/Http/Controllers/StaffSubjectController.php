@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Subject;
+use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -85,7 +86,7 @@ class StaffSubjectController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('subjects', 'public');
+            $data['photo'] = ImageService::store($request->file('photo'), 'subjects');
         }
 
         Subject::create($data);
@@ -134,11 +135,10 @@ class StaffSubjectController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            if ($subject->photo && Storage::disk('public')->exists($subject->photo)) {
-                Storage::disk('public')->delete($subject->photo);
-            }
+            // Delete old photo if it exists
+            ImageService::delete($subject->photo);
 
-            $data['photo'] = $request->file('photo')->store('subjects', 'public');
+            $data['photo'] = ImageService::store($request->file('photo'), 'subjects');
         }
 
         $subject->update($data);
@@ -154,9 +154,7 @@ class StaffSubjectController extends Controller
     public function removePhoto(Subject $subject): RedirectResponse
     {
         // Delete photo file if exists
-        if ($subject->photo && Storage::disk('public')->exists($subject->photo)) {
-            Storage::disk('public')->delete($subject->photo);
-        }
+        ImageService::delete($subject->photo);
 
         // Remove photo reference from database
         $subject->update(['photo' => null]);
