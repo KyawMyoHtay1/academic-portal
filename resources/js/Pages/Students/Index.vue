@@ -42,7 +42,8 @@ const deleteStudent = (id) => {
         <div class="portal-card">
             <div class="border-b border-slate-200 px-6 py-4">
                 <p class="text-sm text-slate-600">
-                    Manage student academic records created for your University Academic Portal project.
+                    Manage student academic records created for your University
+                    Academic Portal project.
                 </p>
             </div>
 
@@ -89,33 +90,30 @@ const deleteStudent = (id) => {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
-                                <tr
-                                    v-for="student in students.data"
-                                    :key="student.id"
-                                >
-                                    <td class="px-3 py-2">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
-                                            >
-                                                <img
-                                                    v-if="student.photo"
-                                                    :src="`/storage/${student.photo}`"
-                                                    :alt="`Photo for ${student.full_name}`"
-                                                    class="h-full w-full object-cover"
-                                                />
-                                                <span
-                                                    v-else
-                                                    class="text-xs font-semibold text-slate-500"
-                                                >
-                                                    {{ student.full_name[0] }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-3 py-2 font-medium text-slate-900">
-                                        {{ student.student_no }}
-                                    </td>
+                        <tr v-for="student in students.data" :key="student.id">
+                            <td class="px-3 py-2">
+                                <div class="flex items-center">
+                                    <div
+                                        class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                    >
+                                        <img
+                                            v-if="student.photo"
+                                            :src="`/storage/${student.photo}`"
+                                            :alt="`Photo for ${student.full_name}`"
+                                            class="h-full w-full object-cover"
+                                        />
+                                        <span
+                                            v-else
+                                            class="text-xs font-semibold text-slate-500"
+                                        >
+                                            {{ student.full_name[0] }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-2 font-medium text-slate-900">
+                                {{ student.student_no }}
+                            </td>
                             <td class="px-3 py-2 text-slate-700">
                                 {{ student.full_name }}
                             </td>
@@ -129,9 +127,13 @@ const deleteStudent = (id) => {
                                 {{ student.intake_year }}
                             </td>
                             <td class="px-3 py-2 text-right text-slate-700">
-                                <div class="flex items-center justify-end gap-2">
+                                <div
+                                    class="flex items-center justify-end gap-2"
+                                >
                                     <Link
-                                        :href="route('students.edit', student.id)"
+                                        :href="
+                                            route('students.edit', student.id)
+                                        "
                                         class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                     >
                                         Edit
@@ -150,7 +152,8 @@ const deleteStudent = (id) => {
                                 colspan="6"
                                 class="px-3 py-6 text-center text-sm text-slate-500"
                             >
-                                No students found yet. Use "Add student" to create your first record.
+                                No students found yet. Use "Add student" to
+                                create your first record.
                             </td>
                         </tr>
                     </tbody>
@@ -159,5 +162,3 @@ const deleteStudent = (id) => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

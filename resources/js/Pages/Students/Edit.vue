@@ -21,15 +21,13 @@ const form = useForm({
 });
 
 const submit = () => {
-    form
-        .transform((data) => ({
-            ...data,
-            _method: "put",
-        }))
-        .post(route("students.update", props.student.id), {
-            forceFormData: true,
-            onFinish: () => form.reset("photo"),
-        });
+    form.transform((data) => ({
+        ...data,
+        _method: "put",
+    })).post(route("students.update", props.student.id), {
+        forceFormData: true,
+        onFinish: () => form.reset("photo"),
+    });
 };
 </script>
 
@@ -55,7 +53,9 @@ const submit = () => {
             <form class="space-y-6" @submit.prevent="submit">
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Student Number
                         </label>
                         <input
@@ -72,7 +72,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Full Name
                         </label>
                         <input
@@ -91,7 +93,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Date of Birth
                         </label>
                         <input
@@ -108,7 +112,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Email
                         </label>
                         <input
@@ -127,7 +133,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Phone
                         </label>
                         <input
@@ -144,7 +152,9 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Programme
                         </label>
                         <input
@@ -163,7 +173,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Intake Year
                         </label>
                         <input
@@ -182,7 +194,9 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div v-if="student.photo_url" class="space-y-2">
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Current Photo
                         </label>
                         <img
@@ -193,9 +207,13 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Replace Photo (optional)
-                            <span class="text-[11px] text-slate-500">(JPEG/PNG, max 2MB)</span>
+                            <span class="text-[11px] text-slate-500"
+                                >(JPEG/PNG, max 2MB)</span
+                            >
                         </label>
                         <input
                             type="file"
@@ -225,5 +243,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-
