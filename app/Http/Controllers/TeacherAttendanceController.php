@@ -68,6 +68,7 @@ class TeacherAttendanceController extends Controller
                 'students.id',
                 'students.student_no',
                 'students.full_name',
+                'students.photo',
             ]);
 
         return Inertia::render('Teacher/Attendance/Mark', [
