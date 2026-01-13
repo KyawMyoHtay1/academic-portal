@@ -60,27 +60,46 @@ const deleteEntry = (id) => {
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Subject
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Course
                                     </th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Day
                                     </th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Time
                                     </th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Location
                                     </th>
-                                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                    <th
+                                        class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="timetables.data.length === 0">
-                                    <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
-                                        No timetable entries found. Create your first entry.
+                                    <td
+                                        colspan="6"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No timetable entries found. Create your
+                                        first entry.
                                     </td>
                                 </tr>
                                 <tr
@@ -88,22 +107,54 @@ const deleteEntry = (id) => {
                                     :key="entry.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
-                                    <td class="px-4 py-4 text-sm font-medium text-slate-900">
-                                        {{ entry.course_code }} - {{ entry.course_title }}
+                                    <td
+                                        class="px-4 py-4 text-sm font-medium text-slate-900"
+                                    >
+                                        <div class="flex flex-col">
+                                            <span>{{
+                                                entry.subject_code || "N/A"
+                                            }}</span>
+                                            <span
+                                                class="text-xs text-slate-500"
+                                                >{{
+                                                    entry.subject_title || ""
+                                                }}</span
+                                            >
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-700"
+                                    >
+                                        {{ entry.course_code }} -
+                                        {{ entry.course_title }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-700"
+                                    >
                                         {{ entry.day_of_week }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-slate-700">
-                                        {{ entry.start_time }} - {{ entry.end_time }}
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-700"
+                                    >
+                                        {{ entry.start_time }} -
+                                        {{ entry.end_time }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-700"
+                                    >
                                         {{ entry.location || "-" }}
                                     </td>
                                     <td class="px-4 py-4 text-right text-sm">
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div
+                                            class="flex items-center justify-end gap-2"
+                                        >
                                             <Link
-                                                :href="route('admin.timetables.edit', entry.id)"
+                                                :href="
+                                                    route(
+                                                        'admin.timetables.edit',
+                                                        entry.id
+                                                    )
+                                                "
                                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                             >
                                                 Edit
@@ -148,5 +199,3 @@ const deleteEntry = (id) => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

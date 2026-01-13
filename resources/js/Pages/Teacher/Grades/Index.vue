@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 
 defineProps({
-    courses: {
+    subjects: {
         type: Array,
         required: true,
     },
@@ -27,10 +27,10 @@ defineProps({
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                         >
-                            Select Course
+                            Select Subject
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Choose a course to enter or update grades for enrolled
+                            Choose a subject to enter or update grades for enrolled
                             students.
                         </p>
                     </div>
@@ -50,18 +50,18 @@ defineProps({
                             />
                         </svg>
                         <h3 class="mt-2 text-sm font-medium text-slate-900">
-                            No courses assigned
+                            No subjects assigned
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">
-                            You need to be assigned to courses before you can enter grades.
+                            You need to be assigned to courses with subjects before you can enter grades.
                         </p>
                     </div>
 
                     <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <Link
-                            v-for="course in courses"
-                            :key="course.id"
-                            :href="route('teacher.grades.show', course.id)"
+                            v-for="subject in subjects"
+                            :key="subject.id"
+                            :href="route('teacher.grades.show', subject.id)"
                             class="group rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-portal-navy hover:shadow-md"
                         >
                             <div class="flex items-start justify-between">
@@ -69,10 +69,13 @@ defineProps({
                                     <h3
                                         class="text-lg font-semibold text-slate-900 group-hover:text-portal-navy"
                                     >
-                                        {{ course.course_code }}
+                                        {{ subject.subject_code }}
                                     </h3>
                                     <p class="mt-1 text-sm text-slate-600">
-                                        {{ course.title }}
+                                        {{ subject.title }}
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ subject.course_code }} - {{ subject.course_title }}
                                     </p>
                                 </div>
                                 <svg

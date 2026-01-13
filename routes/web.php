@@ -191,13 +191,13 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         
         // Attendance Management
         Route::get('/teacher/attendance', [TeacherAttendanceController::class, 'index'])->name('teacher.attendance.index');
-        Route::get('/teacher/attendance/{course}', [TeacherAttendanceController::class, 'show'])->name('teacher.attendance.show');
-        Route::post('/teacher/attendance/{course}', [TeacherAttendanceController::class, 'store'])->name('teacher.attendance.store');
+        Route::get('/teacher/attendance/{subject}', [TeacherAttendanceController::class, 'show'])->name('teacher.attendance.show');
+        Route::post('/teacher/attendance/{subject}', [TeacherAttendanceController::class, 'store'])->name('teacher.attendance.store');
 
         // Grades Management
         Route::get('/teacher/grades', [TeacherGradesController::class, 'index'])->name('teacher.grades.index');
-        Route::get('/teacher/grades/{course}', [TeacherGradesController::class, 'show'])->name('teacher.grades.show');
-        Route::post('/teacher/grades/{course}', [TeacherGradesController::class, 'store'])->name('teacher.grades.store');
+        Route::get('/teacher/grades/{subject}', [TeacherGradesController::class, 'show'])->name('teacher.grades.show');
+        Route::post('/teacher/grades/{subject}', [TeacherGradesController::class, 'store'])->name('teacher.grades.store');
 
         // Timetable View
         Route::get('/teacher/timetable', [TeacherTimetableController::class, 'index'])->name('teacher.timetable.index');

@@ -4,7 +4,7 @@ import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 const props = defineProps({
-    course: {
+    subject: {
         type: Object,
         required: true,
     },
@@ -23,7 +23,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route("teacher.attendance.store", props.course.id));
+    form.post(route("teacher.attendance.store", props.subject.id));
 };
 </script>
 
@@ -40,7 +40,7 @@ const submit = () => {
                     :href="route('teacher.attendance.index')"
                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
                 >
-                    Back to Courses
+                    Back to Subjects
                 </Link>
             </div>
         </template>
@@ -50,8 +50,11 @@ const submit = () => {
                 <div class="portal-card p-6">
                     <div class="mb-6">
                         <p class="text-sm text-slate-600">
-                            <span class="font-medium">Course:</span>
-                            {{ course.course_code }} - {{ course.title }}
+                            <span class="font-medium">Subject:</span>
+                            {{ subject.subject_code }} - {{ subject.title }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-500">
+                            Course: {{ subject.course_code }} - {{ subject.course_title }}
                         </p>
                     </div>
 

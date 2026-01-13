@@ -64,96 +64,79 @@ defineProps({
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Course Grades
+                                Subject Grades
                             </p>
                             <p class="mt-1 text-sm text-slate-600">
-                                View grades for your enrolled courses
+                                View grades for subjects in your enrolled courses
                             </p>
                         </div>
                     </div>
 
-                    <!-- Grades Table -->
-                    <div v-if="courses.length > 0" class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-slate-50">
-                                <tr>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Course Code
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Title
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Credits
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Semester
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                    >
-                                        Score
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr
-                                    v-for="course in courses"
-                                    :key="course.id"
-                                    class="bg-white hover:bg-slate-50 transition-colors"
-                                >
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900"
-                                    >
-                                        {{ course.course_code }}
-                                    </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-slate-700"
-                                    >
-                                        {{ course.title }}
-                                    </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
-                                    >
-                                        {{ course.credits }}
-                                    </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
-                                    >
-                                        {{ course.semester }}
-                                    </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm"
-                                    >
-                                        <span
-                                            v-if="course.score !== null && course.score !== undefined"
-                                            class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700"
+                    <!-- Grades by Course -->
+                    <div v-if="courses.length > 0" class="space-y-6">
+                        <div
+                            v-for="course in courses"
+                            :key="course.id"
+                            class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                        >
+                            <div class="mb-3">
+                                <h3 class="text-sm font-semibold text-slate-900">
+                                    {{ course.course_code }} - {{ course.title }}
+                                </h3>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    {{ course.credits }} credits • {{ course.semester }}
+                                </p>
+                            </div>
+                            
+                            <div v-if="course.subjects && course.subjects.length > 0" class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Subject Code
+                                            </th>
+                                            <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Subject Title
+                                            </th>
+                                            <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Score
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 bg-white">
+                                        <tr
+                                            v-for="subject in course.subjects"
+                                            :key="subject.id"
+                                            class="bg-white hover:bg-slate-50 transition-colors"
                                         >
-                                            {{ Number(course.score).toFixed(2) }}
-                                        </span>
-                                        <span
-                                            v-else
-                                            class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
-                                        >
-                                            Not graded yet
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            <td class="px-4 py-3 text-sm font-medium text-slate-900">
+                                                {{ subject.subject_code }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-slate-700">
+                                                {{ subject.title }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <span
+                                                    v-if="subject.score !== null && subject.score !== undefined"
+                                                    class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700"
+                                                >
+                                                    {{ Number(subject.score).toFixed(2) }}
+                                                </span>
+                                                <span
+                                                    v-else
+                                                    class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
+                                                >
+                                                    Not graded yet
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div v-else class="text-sm text-slate-500 py-2">
+                                No subjects with grades yet.
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Empty State -->

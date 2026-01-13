@@ -7,14 +7,14 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    courses: {
+    subjects: {
         type: Array,
         required: true,
     },
 });
 
 const form = useForm({
-    course_id: props.timetable.course_id,
+    subject_id: props.timetable.subject_id,
     day_of_week: props.timetable.day_of_week,
     start_time: props.timetable.start_time,
     end_time: props.timetable.end_time,
@@ -41,38 +41,41 @@ const submit = () => {
                 <div class="portal-card p-6">
                     <form @submit.prevent="submit">
                         <div class="space-y-6">
-                            <!-- Course -->
+                            <!-- Subject -->
                             <div>
                                 <label
-                                    for="course_id"
+                                    for="subject_id"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    Course <span class="text-red-500">*</span>
+                                    Subject <span class="text-red-500">*</span>
                                 </label>
                                 <select
-                                    id="course_id"
-                                    v-model="form.course_id"
+                                    id="subject_id"
+                                    v-model="form.subject_id"
                                     required
                                     class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
                                     :class="{
                                         'border-red-300 focus:border-red-500 focus:ring-red-500':
-                                            form.errors.course_id,
+                                            form.errors.subject_id,
                                     }"
                                 >
-                                    <option value="">Select course</option>
+                                    <option value="">Select subject</option>
                                     <option
-                                        v-for="course in courses"
-                                        :key="course.id"
-                                        :value="course.id"
+                                        v-for="subject in subjects"
+                                        :key="subject.id"
+                                        :value="subject.id"
                                     >
-                                        {{ course.course_code }} - {{ course.title }}
+                                        {{ subject.subject_code }} -
+                                        {{ subject.title }} ({{
+                                            subject.course_code
+                                        }})
                                     </option>
                                 </select>
                                 <p
-                                    v-if="form.errors.course_id"
+                                    v-if="form.errors.subject_id"
                                     class="mt-1 text-sm text-red-600"
                                 >
-                                    {{ form.errors.course_id }}
+                                    {{ form.errors.subject_id }}
                                 </p>
                             </div>
 
@@ -82,7 +85,8 @@ const submit = () => {
                                     for="day_of_week"
                                     class="block text-sm font-medium text-slate-700"
                                 >
-                                    Day of Week <span class="text-red-500">*</span>
+                                    Day of Week
+                                    <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     id="day_of_week"
@@ -111,7 +115,8 @@ const submit = () => {
                                         for="start_time"
                                         class="block text-sm font-medium text-slate-700"
                                     >
-                                        Start Time <span class="text-red-500">*</span>
+                                        Start Time
+                                        <span class="text-red-500">*</span>
                                     </label>
                                     <input
                                         id="start_time"
@@ -137,7 +142,8 @@ const submit = () => {
                                         for="end_time"
                                         class="block text-sm font-medium text-slate-700"
                                     >
-                                        End Time <span class="text-red-500">*</span>
+                                        End Time
+                                        <span class="text-red-500">*</span>
                                     </label>
                                     <input
                                         id="end_time"
@@ -187,7 +193,9 @@ const submit = () => {
                             </div>
 
                             <!-- Form Actions -->
-                            <div class="flex items-center justify-end gap-3 pt-4">
+                            <div
+                                class="flex items-center justify-end gap-3 pt-4"
+                            >
                                 <Link
                                     :href="route('admin.timetables.index')"
                                     class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
@@ -199,7 +207,9 @@ const submit = () => {
                                     :disabled="form.processing"
                                     class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 disabled:opacity-50"
                                 >
-                                    <span v-if="form.processing">Updating...</span>
+                                    <span v-if="form.processing"
+                                        >Updating...</span
+                                    >
                                     <span v-else>Update Entry</span>
                                 </button>
                             </div>
@@ -210,5 +220,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

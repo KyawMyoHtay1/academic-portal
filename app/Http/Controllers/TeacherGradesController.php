@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Grade;
 use App\Models\Student;
+use App\Models\Subject;
 use App\Notifications\GradePublished;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,38 +16,49 @@ use Inertia\Response;
 class TeacherGradesController extends Controller
 {
     /**
-     * List courses the teacher can grade.
+     * List subjects the teacher can grade.
      */
     public function index(): Response
     {
         $user = Auth::user();
 
-        $courses = $user->teachingCourses()
-            ->orderBy('courses.course_code')
-            ->get([
-                'courses.id',
-                'courses.course_code',
-                'courses.title',
-            ]);
+        // Get subjects from courses assigned to this teacher
+        $subjects = Subject::whereHas('course', function ($query) use ($user) {
+            $query->whereHas('teachers', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
+        })
+            ->with('course')
+            ->orderBy('subject_code')
+            ->get()
+            ->map(function ($subject) {
+                return [
+                    'id' => $subject->id,
+                    'subject_code' => $subject->subject_code,
+                    'title' => $subject->title,
+                    'course_code' => $subject->course->course_code,
+                    'course_title' => $subject->course->title,
+                ];
+            });
 
         return Inertia::render('Teacher/Grades/Index', [
-            'courses' => $courses,
+            'subjects' => $subjects,
         ]);
     }
 
     /**
-     * Show enrolled students and existing grades for a course.
+     * Show enrolled students and existing grades for a subject.
      */
-    public function show(Course $course): Response
+    public function show(Subject $subject): Response
     {
         $user = Auth::user();
 
-        // Ensure the teacher is assigned to this course
-        if (!$user->teachingCourses()->where('courses.id', $course->id)->exists()) {
-            abort(403, 'You are not assigned to this course.');
+        // Ensure the teacher is assigned to the subject's course
+        if (!$user->teachingCourses()->where('courses.id', $subject->course_id)->exists()) {
+            abort(403, 'You are not assigned to this subject.');
         }
 
-        $students = $course->students()
+        $students = $subject->course->students()
             ->orderBy('students.full_name')
             ->get([
                 'students.id',
@@ -55,7 +67,7 @@ class TeacherGradesController extends Controller
             ]);
 
         // Fetch existing grades keyed by student_id
-        $grades = Grade::where('course_id', $course->id)
+        $grades = Grade::where('subject_id', $subject->id)
             ->whereIn('student_id', $students->pluck('id'))
             ->get()
             ->keyBy('student_id');
@@ -70,25 +82,27 @@ class TeacherGradesController extends Controller
         });
 
         return Inertia::render('Teacher/Grades/Mark', [
-            'course' => [
-                'id' => $course->id,
-                'course_code' => $course->course_code,
-                'title' => $course->title,
+            'subject' => [
+                'id' => $subject->id,
+                'subject_code' => $subject->subject_code,
+                'title' => $subject->title,
+                'course_code' => $subject->course->course_code,
+                'course_title' => $subject->course->title,
             ],
             'students' => $studentData,
         ]);
     }
 
     /**
-     * Store or update grades for students in a course.
+     * Store or update grades for students in a subject.
      */
-    public function store(Request $request, Course $course): RedirectResponse
+    public function store(Request $request, Subject $subject): RedirectResponse
     {
         $user = Auth::user();
 
-        // Ensure the teacher is assigned to this course
-        if (!$user->teachingCourses()->where('courses.id', $course->id)->exists()) {
-            abort(403, 'You are not assigned to this course.');
+        // Ensure the teacher is assigned to the subject's course
+        if (!$user->teachingCourses()->where('courses.id', $subject->course_id)->exists()) {
+            abort(403, 'You are not assigned to this subject.');
         }
 
         $data = $request->validate([
@@ -97,8 +111,8 @@ class TeacherGradesController extends Controller
             'grades.*.score' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
 
-        // Verify all students are enrolled in the course
-        $enrolledStudentIds = $course->students()->pluck('students.id')->toArray();
+        // Verify all students are enrolled in the subject's course
+        $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
         foreach ($data['grades'] as $record) {
             if (!in_array($record['student_id'], $enrolledStudentIds)) {
                 return redirect()
@@ -111,10 +125,11 @@ class TeacherGradesController extends Controller
         foreach ($data['grades'] as $record) {
             $grade = Grade::updateOrCreate(
                 [
-                    'course_id' => $course->id,
+                    'subject_id' => $subject->id,
                     'student_id' => $record['student_id'],
                 ],
                 [
+                    'course_id' => $subject->course_id,
                     'graded_by' => $user->id,
                     'score' => $record['score'],
                 ]
@@ -127,7 +142,7 @@ class TeacherGradesController extends Controller
         }
 
         return redirect()
-            ->route('teacher.grades.show', $course->id)
+            ->route('teacher.grades.show', $subject->id)
             ->with('success', 'Grades saved successfully.');
     }
 }

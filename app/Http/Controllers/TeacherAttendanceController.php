@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
+use App\Models\Subject;
 use App\Notifications\AttendanceAlert;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,40 +16,50 @@ use Inertia\Response;
 class TeacherAttendanceController extends Controller
 {
     /**
-     * Display a list of courses the teacher can mark attendance for.
+     * Display a list of subjects the teacher can mark attendance for.
      */
     public function index(): Response
     {
         $user = Auth::user();
 
-        // Get courses assigned to this teacher
-        $courses = $user->teachingCourses()
-            ->orderBy('courses.course_code')
-            ->get([
-                'courses.id',
-                'courses.course_code',
-                'courses.title',
-            ]);
+        // Get subjects from courses assigned to this teacher
+        $subjects = Subject::whereHas('course', function ($query) use ($user) {
+            $query->whereHas('teachers', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
+        })
+            ->with('course')
+            ->orderBy('subject_code')
+            ->get()
+            ->map(function ($subject) {
+                return [
+                    'id' => $subject->id,
+                    'subject_code' => $subject->subject_code,
+                    'title' => $subject->title,
+                    'course_code' => $subject->course->course_code,
+                    'course_title' => $subject->course->title,
+                ];
+            });
 
         return Inertia::render('Teacher/Attendance/Index', [
-            'courses' => $courses,
+            'subjects' => $subjects,
         ]);
     }
 
     /**
-     * Show the form for marking attendance for a specific course.
+     * Show the form for marking attendance for a specific subject.
      */
-    public function show(Course $course): Response
+    public function show(Subject $subject): Response
     {
         $user = Auth::user();
 
-        // Verify teacher is assigned to this course
-        if (!$user->teachingCourses()->where('courses.id', $course->id)->exists()) {
-            abort(403, 'You are not assigned to this course.');
+        // Verify teacher is assigned to the subject's course
+        if (!$user->teachingCourses()->where('courses.id', $subject->course_id)->exists()) {
+            abort(403, 'You are not assigned to this subject.');
         }
 
-        // Get enrolled students for this course
-        $students = $course->students()
+        // Get enrolled students for the subject's course
+        $students = $subject->course->students()
             ->orderBy('students.full_name')
             ->get([
                 'students.id',
@@ -57,25 +68,27 @@ class TeacherAttendanceController extends Controller
             ]);
 
         return Inertia::render('Teacher/Attendance/Mark', [
-            'course' => [
-                'id' => $course->id,
-                'course_code' => $course->course_code,
-                'title' => $course->title,
+            'subject' => [
+                'id' => $subject->id,
+                'subject_code' => $subject->subject_code,
+                'title' => $subject->title,
+                'course_code' => $subject->course->course_code,
+                'course_title' => $subject->course->title,
             ],
             'students' => $students,
         ]);
     }
 
     /**
-     * Store attendance records for a course.
+     * Store attendance records for a subject.
      */
-    public function store(Request $request, Course $course): RedirectResponse
+    public function store(Request $request, Subject $subject): RedirectResponse
     {
         $user = Auth::user();
 
-        // Verify teacher is assigned to this course
-        if (!$user->teachingCourses()->where('courses.id', $course->id)->exists()) {
-            abort(403, 'You are not assigned to this course.');
+        // Verify teacher is assigned to the subject's course
+        if (!$user->teachingCourses()->where('courses.id', $subject->course_id)->exists()) {
+            abort(403, 'You are not assigned to this subject.');
         }
 
         $data = $request->validate([
@@ -85,8 +98,8 @@ class TeacherAttendanceController extends Controller
             'attendance.*.status' => ['required', 'in:present,absent'],
         ]);
 
-        // Verify all students are enrolled in the course
-        $enrolledStudentIds = $course->students()->pluck('students.id')->toArray();
+        // Verify all students are enrolled in the subject's course
+        $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
         foreach ($data['attendance'] as $record) {
             if (!in_array($record['student_id'], $enrolledStudentIds)) {
                 return redirect()
@@ -99,11 +112,12 @@ class TeacherAttendanceController extends Controller
         foreach ($data['attendance'] as $record) {
             $attendance = Attendance::updateOrCreate(
                 [
-                    'course_id' => $course->id,
+                    'subject_id' => $subject->id,
                     'student_id' => $record['student_id'],
                     'date' => $data['date'],
                 ],
                 [
+                    'course_id' => $subject->course_id,
                     'status' => $record['status'],
                 ]
             );
@@ -115,7 +129,7 @@ class TeacherAttendanceController extends Controller
         }
 
         return redirect()
-            ->route('teacher.attendance.show', $course->id)
+            ->route('teacher.attendance.show', $subject->id)
             ->with('success', 'Attendance marked successfully.');
     }
 }

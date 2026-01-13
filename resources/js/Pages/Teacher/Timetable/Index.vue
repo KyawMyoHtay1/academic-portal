@@ -60,6 +60,9 @@ defineProps({
                                     <thead class="bg-slate-50">
                                         <tr>
                                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Subject
+                                            </th>
+                                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
                                                 Day
                                             </th>
                                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
@@ -76,6 +79,12 @@ defineProps({
                                             :key="entry.id"
                                             class="bg-white"
                                         >
+                                            <td class="px-4 py-3 text-sm text-slate-700">
+                                                <div class="flex flex-col">
+                                                    <span class="font-medium">{{ entry.subject_code || 'N/A' }}</span>
+                                                    <span class="text-xs text-slate-500">{{ entry.subject_title || '' }}</span>
+                                                </div>
+                                            </td>
                                             <td class="px-4 py-3 text-sm text-slate-700">
                                                 {{ entry.day_of_week }}
                                             </td>

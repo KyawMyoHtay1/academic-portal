@@ -23,8 +23,9 @@ class StudentTimetableController extends Controller
             ]);
         }
 
+        // Get timetables for subjects in enrolled courses
         $courses = $student->courses()
-            ->with(['timetables' => function ($query) {
+            ->with(['subjects.timetables' => function ($query) {
                 $query->orderBy('day_of_week')->orderBy('start_time');
             }])
             ->orderBy('course_code')
@@ -35,19 +36,34 @@ class StudentTimetableController extends Controller
             ]);
 
         $data = $courses->map(function ($course) {
-            return [
-                'id' => $course->id,
-                'course_code' => $course->course_code,
-                'title' => $course->title,
-                'timetables' => $course->timetables->map(function ($entry) {
-                    return [
+            $timetables = collect();
+            
+            // Collect all timetables from all subjects in this course
+            foreach ($course->subjects as $subject) {
+                foreach ($subject->timetables as $entry) {
+                    $timetables->push([
                         'id' => $entry->id,
+                        'subject_code' => $subject->subject_code,
+                        'subject_title' => $subject->title,
                         'day_of_week' => $entry->day_of_week,
                         'start_time' => $entry->start_time,
                         'end_time' => $entry->end_time,
                         'location' => $entry->location,
-                    ];
-                }),
+                    ]);
+                }
+            }
+            
+            // Sort by day and time
+            $timetables = $timetables->sortBy([
+                ['day_of_week', 'asc'],
+                ['start_time', 'asc'],
+            ])->values();
+            
+            return [
+                'id' => $course->id,
+                'course_code' => $course->course_code,
+                'title' => $course->title,
+                'timetables' => $timetables,
             ];
         });
 

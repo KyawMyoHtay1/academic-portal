@@ -23,8 +23,9 @@ class StudentGradesController extends Controller
             ]);
         }
 
+        // Get courses with subjects and their grades
         $courses = $student->courses()
-            ->with(['grades' => function ($query) use ($student) {
+            ->with(['subjects.grades' => function ($query) use ($student) {
                 $query->where('student_id', $student->id);
             }])
             ->orderBy('course_code')
@@ -36,14 +37,23 @@ class StudentGradesController extends Controller
                 'courses.semester',
             ])
             ->map(function ($course) {
-                $grade = $course->grades->first();
+                $subjectsWithGrades = $course->subjects->map(function ($subject) {
+                    $grade = $subject->grades->first();
+                    return [
+                        'id' => $subject->id,
+                        'subject_code' => $subject->subject_code,
+                        'title' => $subject->title,
+                        'score' => $grade?->score,
+                    ];
+                });
+                
                 return [
                     'id' => $course->id,
                     'course_code' => $course->course_code,
                     'title' => $course->title,
                     'credits' => $course->credits,
                     'semester' => $course->semester,
-                    'score' => $grade?->score,
+                    'subjects' => $subjectsWithGrades,
                 ];
             });
 
