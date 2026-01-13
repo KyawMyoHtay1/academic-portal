@@ -60,6 +60,7 @@ class TeacherTimetableController extends Controller
                 'id' => $course->id,
                 'course_code' => $course->course_code,
                 'title' => $course->title,
+                'photo' => $course->photo,
                 'timetables' => $timetables,
             ];
         })->values();
