@@ -104,21 +104,29 @@ class TeacherGradesController extends Controller
         $data = $request->validate([
             'grades' => ['required', 'array'],
             'grades.*.student_id' => ['required', 'exists:students,id'],
-            'grades.*.score' => ['required', 'numeric', 'min:0', 'max:100'],
+            'grades.*.score' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
         // Verify all students are enrolled in the subject's course
         $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
+        
+        // Filter and save only grades with scores (skip empty ones)
+        $savedCount = 0;
         foreach ($data['grades'] as $record) {
+            // Skip if student is not enrolled
             if (!in_array($record['student_id'], $enrolledStudentIds)) {
                 return redirect()
                     ->back()
                     ->withErrors(['grades' => 'One or more students are not enrolled in this course.']);
             }
-        }
 
-        // Save grades (idempotent via updateOrCreate) and notify students
-        foreach ($data['grades'] as $record) {
+            // Skip if score is empty or null (but allow 0.0 as a valid grade)
+            $score = $record['score'] ?? null;
+            if ($score === null || $score === '') {
+                continue;
+            }
+
+            // Save grade (idempotent via updateOrCreate) and notify student
             $grade = Grade::updateOrCreate(
                 [
                     'subject_id' => $subject->id,
@@ -127,7 +135,7 @@ class TeacherGradesController extends Controller
                 [
                     'course_id' => $subject->course_id,
                     'graded_by' => $user->id,
-                    'score' => $record['score'],
+                    'score' => $score,
                 ]
             );
 
@@ -135,10 +143,18 @@ class TeacherGradesController extends Controller
             if ($student && $student->user) {
                 $student->user->notify(new GradePublished($grade));
             }
+            
+            $savedCount++;
+        }
+
+        if ($savedCount > 0) {
+            return redirect()
+                ->route('teacher.grades.show', $subject->id)
+                ->with('success', "Successfully saved {$savedCount} grade(s).");
         }
 
         return redirect()
             ->route('teacher.grades.show', $subject->id)
-            ->with('success', 'Grades saved successfully.');
+            ->with('info', 'No grades were saved. Please enter at least one score.');
     }
 }

@@ -10,6 +10,7 @@ class Grade extends Model
     use HasFactory;
 
     protected $fillable = [
+        'subject_id',
         'course_id',
         'student_id',
         'graded_by',
