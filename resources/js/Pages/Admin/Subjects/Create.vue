@@ -15,10 +15,13 @@ const form = useForm({
     title: "",
     credits: "",
     description: "",
+    photo: null,
 });
 
 const submit = () => {
-    form.post(route("admin.subjects.store"));
+    form.post(route("admin.subjects.store"), {
+        forceFormData: true,
+    });
 };
 </script>
 
@@ -183,6 +186,32 @@ const submit = () => {
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.description }}
+                                </p>
+                            </div>
+
+                            <!-- Subject Photo (optional) -->
+                            <div>
+                                <label
+                                    for="photo"
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Subject Photo
+                                    <span class="text-xs text-slate-500">
+                                        (JPEG/PNG, max 2MB)
+                                    </span>
+                                </label>
+                                <input
+                                    id="photo"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                                    @change="(e) => (form.photo = e.target.files[0])"
+                                />
+                                <p
+                                    v-if="form.errors.photo"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.photo }}
                                 </p>
                             </div>
 

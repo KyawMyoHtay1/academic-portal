@@ -19,10 +19,19 @@ const form = useForm({
     title: props.subject.title,
     credits: props.subject.credits || "",
     description: props.subject.description || "",
+    photo: null,
 });
 
 const submit = () => {
-    form.put(route("admin.subjects.update", props.subject.id));
+    form
+        .transform((data) => ({
+            ...data,
+            _method: "put",
+        }))
+        .post(route("admin.subjects.update", props.subject.id), {
+            forceFormData: true,
+            onFinish: () => form.reset("photo"),
+        });
 };
 </script>
 
@@ -183,6 +192,46 @@ const submit = () => {
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.description }}
+                                </p>
+                            </div>
+
+                            <!-- Existing Photo Preview -->
+                            <div v-if="subject.photo_url" class="space-y-2">
+                                <span
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Current Subject Photo
+                                </span>
+                                <img
+                                    :src="subject.photo_url"
+                                    :alt="`Current photo for ${form.title}`"
+                                    class="h-24 w-32 rounded-md object-cover border border-slate-200"
+                                />
+                            </div>
+
+                            <!-- Subject Photo (optional) -->
+                            <div>
+                                <label
+                                    for="photo"
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Replace Subject Photo
+                                    <span class="text-xs text-slate-500">
+                                        (JPEG/PNG, max 2MB)
+                                    </span>
+                                </label>
+                                <input
+                                    id="photo"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
+                                    @change="(e) => (form.photo = e.target.files[0])"
+                                />
+                                <p
+                                    v-if="form.errors.photo"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.photo }}
                                 </p>
                             </div>
 

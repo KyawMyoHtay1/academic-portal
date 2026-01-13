@@ -15,6 +15,7 @@ class Subject extends Model
         'title',
         'credits',
         'description',
+        'photo',
     ];
 
     /**

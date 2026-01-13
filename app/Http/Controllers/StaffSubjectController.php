@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,6 +26,7 @@ class StaffSubjectController extends Controller
                 'title',
                 'credits',
                 'description',
+                'photo',
                 'created_at',
                 'updated_at',
             ])
@@ -38,6 +40,7 @@ class StaffSubjectController extends Controller
                     'title' => $subject->title,
                     'credits' => $subject->credits,
                     'description' => $subject->description,
+                    'photo' => $subject->photo,
                     'teachers' => $subject->teachers->map(function ($teacher) {
                         return [
                             'id' => $teacher->id,
@@ -78,7 +81,12 @@ class StaffSubjectController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['nullable', 'integer', 'min:1', 'max:10'],
             'description' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('subjects', 'public');
+        }
 
         Subject::create($data);
 
@@ -103,6 +111,9 @@ class StaffSubjectController extends Controller
                 'title' => $subject->title,
                 'credits' => $subject->credits,
                 'description' => $subject->description,
+                'photo_url' => $subject->photo
+                    ? asset('storage/' . $subject->photo)
+                    : null,
             ],
             'courses' => $courses,
         ]);
@@ -119,7 +130,16 @@ class StaffSubjectController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['nullable', 'integer', 'min:1', 'max:10'],
             'description' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            if ($subject->photo && Storage::disk('public')->exists($subject->photo)) {
+                Storage::disk('public')->delete($subject->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('subjects', 'public');
+        }
 
         $subject->update($data);
 
