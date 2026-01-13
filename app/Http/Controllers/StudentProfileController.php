@@ -89,5 +89,32 @@ class StudentProfileController extends Controller
             ->route('student.profile.show')
             ->with('success', 'Profile updated successfully.');
     }
+
+    /**
+     * Remove the authenticated student's profile photo.
+     */
+    public function removePhoto()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return redirect()
+                ->route('student.profile.show')
+                ->with('error', 'Student record not found.');
+        }
+
+        // Delete photo file if exists
+        if ($student->photo && Storage::disk('public')->exists($student->photo)) {
+            Storage::disk('public')->delete($student->photo);
+        }
+
+        // Remove photo reference from database
+        $student->update(['photo' => null]);
+
+        return redirect()
+            ->route('student.profile.show')
+            ->with('success', 'Profile photo removed successfully.');
+    }
 }
 

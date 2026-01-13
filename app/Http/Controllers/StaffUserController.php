@@ -130,6 +130,24 @@ class StaffUserController extends Controller
     }
 
     /**
+     * Remove the photo from the specified user.
+     */
+    public function removePhoto(User $user): RedirectResponse
+    {
+        // Delete photo file if exists
+        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        // Remove photo reference from database
+        $user->update(['photo' => null]);
+
+        return redirect()
+            ->route('admin.users.edit', $user)
+            ->with('success', 'User photo removed successfully.');
+    }
+
+    /**
      * Remove the specified user.
      */
     public function destroy(User $user): RedirectResponse

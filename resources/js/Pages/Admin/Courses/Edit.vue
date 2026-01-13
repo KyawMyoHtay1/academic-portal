@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, router } from "@inertiajs/vue3";
 
 const props = defineProps({
     course: {
@@ -26,6 +26,14 @@ const submit = () => {
         forceFormData: true,
         onFinish: () => form.reset("photo"),
     });
+};
+
+const removePhoto = () => {
+    if (confirm("Are you sure you want to remove this course photo?")) {
+        router.delete(route("admin.courses.remove-photo", props.course.id), {
+            preserveScroll: true,
+        });
+    }
 };
 </script>
 
@@ -172,11 +180,20 @@ const submit = () => {
 
                             <!-- Existing Photo Preview -->
                             <div v-if="course.photo_url" class="space-y-2">
-                                <span
-                                    class="block text-sm font-medium text-slate-700"
-                                >
-                                    Current Course Photo
-                                </span>
+                                <div class="flex items-center justify-between">
+                                    <span
+                                        class="block text-sm font-medium text-slate-700"
+                                    >
+                                        Current Course Photo
+                                    </span>
+                                    <button
+                                        type="button"
+                                        @click="removePhoto"
+                                        class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                    >
+                                        Remove Photo
+                                    </button>
+                                </div>
                                 <img
                                     :src="course.photo_url"
                                     :alt="`Current photo for ${form.title}`"

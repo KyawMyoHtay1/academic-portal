@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, router } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -31,6 +31,14 @@ const submit = () => {
         preserveScroll: true,
         onFinish: () => form.reset("photo"),
     });
+};
+
+const removePhoto = () => {
+    if (confirm("Are you sure you want to remove your profile photo?")) {
+        router.delete(route("student.profile.remove-photo"), {
+            preserveScroll: true,
+        });
+    }
 };
 </script>
 
@@ -242,7 +250,7 @@ const submit = () => {
                                                 }}
                                             </span>
                                         </div>
-                                        <div class="flex-1">
+                                        <div class="flex-1 space-y-2">
                                             <input
                                                 type="file"
                                                 accept="image/jpeg,image/jpg,image/png"
@@ -253,15 +261,25 @@ const submit = () => {
                                                 "
                                                 class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
                                             />
-                                            <p
-                                                class="mt-1 text-xs text-slate-500"
+                                            <div
+                                                v-if="student.photo_url"
+                                                class="flex items-center gap-2"
                                             >
+                                                <button
+                                                    type="button"
+                                                    @click="removePhoto"
+                                                    class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                >
+                                                    Remove Photo
+                                                </button>
+                                            </div>
+                                            <p class="text-xs text-slate-500">
                                                 JPEG or PNG, max 2MB. Leave
                                                 empty to keep current photo.
                                             </p>
                                             <p
                                                 v-if="form.errors.photo"
-                                                class="mt-1 text-sm text-red-600"
+                                                class="text-sm text-red-600"
                                             >
                                                 {{ form.errors.photo }}
                                             </p>

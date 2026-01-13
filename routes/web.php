@@ -83,6 +83,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     // Timebox 1: Student Profile (student self-view)
     Route::get('/student/profile', [StudentProfileController::class, 'show'])->name('student.profile.show');
     Route::patch('/student/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
+    Route::delete('/student/profile/photo', [StudentProfileController::class, 'removePhoto'])->name('student.profile.remove-photo');
 
     // Timebox 1: Courses (with enrollment)
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
@@ -125,6 +126,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
         Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
         Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
+        Route::delete('/students/{student}/photo', [StudentController::class, 'removePhoto'])->name('students.remove-photo');
 
         // Course Management
         Route::resource('admin/courses', StaffCourseController::class)->names([
@@ -135,6 +137,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'admin.courses.update',
             'destroy' => 'admin.courses.destroy',
         ]);
+        Route::delete('/admin/courses/{course}/photo', [StaffCourseController::class, 'removePhoto'])->name('admin.courses.remove-photo');
 
         // Teacher Assignment to Courses (staff only)
         Route::get('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'edit'])->name('admin.courses.assign-teachers');
@@ -156,6 +159,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'admin.subjects.update',
             'destroy' => 'admin.subjects.destroy',
         ]);
+        Route::delete('/admin/subjects/{subject}/photo', [StaffSubjectController::class, 'removePhoto'])->name('admin.subjects.remove-photo');
 
         // Teacher Assignment to Subjects (staff only)
         Route::get('/admin/subjects/{subject}/assign-teachers', [StaffSubjectTeacherController::class, 'edit'])->name('admin.subjects.assign-teachers');
@@ -168,6 +172,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/admin/users/{user}/edit', [StaffUserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/admin/users/{user}', [StaffUserController::class, 'update'])->name('admin.users.update');
         Route::delete('/admin/users/{user}', [StaffUserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::delete('/admin/users/{user}/photo', [StaffUserController::class, 'removePhoto'])->name('admin.users.remove-photo');
 
         // Fee Management (staff only)
         Route::resource('admin/fees', StaffFeeController::class)->names([

@@ -119,6 +119,24 @@ class StudentController extends Controller
             ->with('success', 'Student updated successfully.');
     }
 
+    /**
+     * Remove the photo from the specified student.
+     */
+    public function removePhoto(Student $student): RedirectResponse
+    {
+        // Delete photo file if exists
+        if ($student->photo && Storage::disk('public')->exists($student->photo)) {
+            Storage::disk('public')->delete($student->photo);
+        }
+
+        // Remove photo reference from database
+        $student->update(['photo' => null]);
+
+        return redirect()
+            ->route('students.edit', $student)
+            ->with('success', 'Student photo removed successfully.');
+    }
+
     public function destroy(Student $student): RedirectResponse
     {
         $student->delete();

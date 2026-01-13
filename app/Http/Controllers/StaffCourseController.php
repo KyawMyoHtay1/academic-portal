@@ -114,6 +114,24 @@ class StaffCourseController extends Controller
     }
 
     /**
+     * Remove the photo from the specified course.
+     */
+    public function removePhoto(Course $course): RedirectResponse
+    {
+        // Delete photo file if exists
+        if ($course->photo && Storage::disk('public')->exists($course->photo)) {
+            Storage::disk('public')->delete($course->photo);
+        }
+
+        // Remove photo reference from database
+        $course->update(['photo' => null]);
+
+        return redirect()
+            ->route('admin.courses.edit', $course)
+            ->with('success', 'Course photo removed successfully.');
+    }
+
+    /**
      * Remove the specified course.
      */
     public function destroy(Course $course): RedirectResponse

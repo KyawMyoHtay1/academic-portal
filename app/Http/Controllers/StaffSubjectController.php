@@ -149,6 +149,24 @@ class StaffSubjectController extends Controller
     }
 
     /**
+     * Remove the photo from the specified subject.
+     */
+    public function removePhoto(Subject $subject): RedirectResponse
+    {
+        // Delete photo file if exists
+        if ($subject->photo && Storage::disk('public')->exists($subject->photo)) {
+            Storage::disk('public')->delete($subject->photo);
+        }
+
+        // Remove photo reference from database
+        $subject->update(['photo' => null]);
+
+        return redirect()
+            ->route('admin.subjects.edit', $subject)
+            ->with('success', 'Subject photo removed successfully.');
+    }
+
+    /**
      * Remove the specified subject.
      */
     public function destroy(Subject $subject): RedirectResponse

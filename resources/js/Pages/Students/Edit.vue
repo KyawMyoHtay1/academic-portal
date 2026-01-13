@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm, router } from "@inertiajs/vue3";
 
 const props = defineProps({
     student: {
@@ -29,6 +29,14 @@ const submit = () => {
         forceFormData: true,
         onFinish: () => form.reset("photo"),
     });
+};
+
+const removePhoto = () => {
+    if (confirm("Are you sure you want to remove this student photo?")) {
+        router.delete(route("students.remove-photo", props.student.id), {
+            preserveScroll: true,
+        });
+    }
 };
 </script>
 
@@ -209,11 +217,20 @@ const submit = () => {
 
                 <div class="grid gap-4 md:grid-cols-2">
                     <div v-if="student.photo_url" class="space-y-2">
-                        <label
-                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
-                        >
-                            Current Photo
-                        </label>
+                        <div class="flex items-center justify-between">
+                            <label
+                                class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                            >
+                                Current Photo
+                            </label>
+                            <button
+                                type="button"
+                                @click="removePhoto"
+                                class="rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            >
+                                Remove
+                            </button>
+                        </div>
                         <img
                             :src="student.photo_url"
                             :alt="`Current photo for ${form.full_name}`"
