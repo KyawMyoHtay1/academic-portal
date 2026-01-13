@@ -28,20 +28,26 @@ class CourseController extends Controller
                 'semester',
             ]);
 
-        // Get enrolled course IDs for the current student
-        $enrolledCourseIds = $student
-            ? $student->courses()->pluck('courses.id')->toArray()
-            : [];
+        // Get enrollment status for each course
+        $enrollmentStatuses = [];
+        if ($student) {
+            $enrollments = $student->courses()->get();
+            foreach ($enrollments as $enrollment) {
+                $enrollmentStatuses[$enrollment->id] = $enrollment->pivot->status;
+            }
+        }
 
         // Add enrollment status to each course
-        $courses = $courses->map(function ($course) use ($enrolledCourseIds) {
+        $courses = $courses->map(function ($course) use ($enrollmentStatuses) {
+            $status = $enrollmentStatuses[$course->id] ?? null;
             return [
                 'id' => $course->id,
                 'course_code' => $course->course_code,
                 'title' => $course->title,
                 'credits' => $course->credits,
                 'semester' => $course->semester,
-                'is_enrolled' => in_array($course->id, $enrolledCourseIds),
+                'enrollment_status' => $status,
+                'is_enrolled' => $status === 'approved',
             ];
         });
 

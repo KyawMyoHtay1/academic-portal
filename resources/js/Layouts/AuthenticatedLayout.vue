@@ -125,6 +125,11 @@ const navigation = computed(() => {
                 active: route().current("admin.courses.*"),
             },
             {
+                name: "Enrollment Requests",
+                href: route("admin.enrollments.index"),
+                active: route().current("admin.enrollments.*"),
+            },
+            {
                 name: "Manage Subjects",
                 href: route("admin.subjects.index"),
                 active: route().current("admin.subjects.*"),

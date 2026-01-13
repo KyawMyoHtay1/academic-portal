@@ -164,10 +164,22 @@ const enroll = (courseId) => {
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
                                         <span
-                                            v-if="course.is_enrolled"
+                                            v-if="course.enrollment_status === 'approved'"
                                             class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800"
                                         >
                                             Enrolled
+                                        </span>
+                                        <span
+                                            v-else-if="course.enrollment_status === 'pending'"
+                                            class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
+                                        >
+                                            Pending Approval
+                                        </span>
+                                        <span
+                                            v-else-if="course.enrollment_status === 'rejected'"
+                                            class="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800"
+                                        >
+                                            Rejected
                                         </span>
                                         <button
                                             v-else
@@ -175,6 +187,13 @@ const enroll = (courseId) => {
                                             class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                                         >
                                             Register
+                                        </button>
+                                        <button
+                                            v-if="course.enrollment_status === 'rejected'"
+                                            @click="enroll(course.id)"
+                                            class="ml-2 rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                        >
+                                            Reapply
                                         </button>
                                     </td>
                                 </tr>

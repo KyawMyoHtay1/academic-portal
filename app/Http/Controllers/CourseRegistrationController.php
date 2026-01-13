@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Redirect;
 class CourseRegistrationController extends Controller
 {
     /**
-     * Enrol the authenticated student in a course.
-     * Timebox 1: Student self-enrollment only.
+     * Request enrollment in a course (creates pending enrollment).
+     * Enrollment requires admin approval.
      */
     public function enroll(Request $request, Course $course)
     {
@@ -23,17 +23,32 @@ class CourseRegistrationController extends Controller
                 ->with('error', 'Student record not found. Please contact administration.');
         }
 
-        // Check if already enrolled
-        if ($student->courses()->where('course_id', $course->id)->exists()) {
-            return Redirect::route('courses.index')
-                ->with('error', 'You are already enrolled in this course.');
+        // Check if already enrolled or has pending enrollment
+        $existingEnrollment = $student->courses()
+            ->where('course_id', $course->id)
+            ->first();
+        
+        if ($existingEnrollment) {
+            $status = $existingEnrollment->pivot->status;
+            if ($status === 'approved') {
+                return Redirect::route('courses.index')
+                    ->with('error', 'You are already enrolled in this course.');
+            } elseif ($status === 'pending') {
+                return Redirect::route('courses.index')
+                    ->with('error', 'You already have a pending enrollment request for this course.');
+            } elseif ($status === 'rejected') {
+                // Allow re-application after rejection
+                $student->courses()->updateExistingPivot($course->id, ['status' => 'pending']);
+                return Redirect::route('courses.index')
+                    ->with('success', "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
+            }
         }
 
-        // Enrol the student
-        $student->courses()->attach($course->id);
+        // Create pending enrollment
+        $student->courses()->attach($course->id, ['status' => 'pending']);
 
         return Redirect::route('courses.index')
-            ->with('success', "Successfully enrolled in {$course->course_code} - {$course->title}.");
+            ->with('success', "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
     }
 
     /**
@@ -49,8 +64,12 @@ class CourseRegistrationController extends Controller
                 ->with('error', 'Student record not found.');
         }
 
-        // Check if enrolled
-        if (!$student->courses()->where('course_id', $course->id)->exists()) {
+        // Check if enrolled and approved
+        $enrollment = $student->courses()
+            ->where('course_id', $course->id)
+            ->first();
+        
+        if (!$enrollment || $enrollment->pivot->status !== 'approved') {
             return Redirect::route('my-courses.index')
                 ->with('error', 'You are not enrolled in this course.');
         }

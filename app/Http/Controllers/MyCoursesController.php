@@ -25,6 +25,7 @@ class MyCoursesController extends Controller
         }
 
         $courses = $student->courses()
+            ->wherePivot('status', 'approved')
             ->orderBy('course_code')
             ->get([
                 'courses.id',
@@ -32,7 +33,7 @@ class MyCoursesController extends Controller
                 'courses.title',
                 'courses.credits',
                 'courses.semester',
-                'course_student.created_at as enrolled_at',
+                'course_student.updated_at as enrolled_at',
             ]);
 
         return Inertia::render('MyCourses/Index', [

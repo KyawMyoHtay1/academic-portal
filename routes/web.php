@@ -9,6 +9,7 @@ use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
+use App\Http\Controllers\StaffEnrollmentController;
 use App\Http\Controllers\StaffFeeController;
 use App\Http\Controllers\StaffSubjectController;
 use App\Http\Controllers\StaffTimetableController;
@@ -135,6 +136,11 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         // Teacher Assignment to Courses (staff only)
         Route::get('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'edit'])->name('admin.courses.assign-teachers');
         Route::put('/admin/courses/{course}/assign-teachers', [StaffCourseTeacherController::class, 'update'])->name('admin.courses.assign-teachers.update');
+
+        // Enrollment Management (staff only)
+        Route::get('/admin/enrollments', [StaffEnrollmentController::class, 'index'])->name('admin.enrollments.index');
+        Route::post('/admin/enrollments/{enrollment}/approve', [StaffEnrollmentController::class, 'approve'])->name('admin.enrollments.approve');
+        Route::post('/admin/enrollments/{enrollment}/reject', [StaffEnrollmentController::class, 'reject'])->name('admin.enrollments.reject');
 
         // Subject Management
         Route::resource('admin/subjects', StaffSubjectController::class)->names([
