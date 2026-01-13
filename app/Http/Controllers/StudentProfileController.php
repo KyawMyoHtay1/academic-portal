@@ -37,6 +37,9 @@ class StudentProfileController extends Controller
                 'phone' => $student->phone,
                 'programme' => $student->programme,
                 'intake_year' => $student->intake_year,
+                'photo_url' => $student->photo
+                    ? asset('storage/' . $student->photo)
+                    : null,
             ],
         ]);
     }

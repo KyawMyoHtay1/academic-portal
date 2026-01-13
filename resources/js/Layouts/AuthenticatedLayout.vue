@@ -391,13 +391,21 @@ const navigation = computed(() => {
                                         class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50"
                                     >
                                         <span
-                                            class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-portal-navy text-xs font-semibold text-white"
+                                            class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-portal-navy text-xs font-semibold text-white overflow-hidden"
                                         >
-                                            {{
-                                                $page.props.auth.user.name
-                                                    .charAt(0)
-                                                    .toUpperCase()
-                                            }}
+                                            <img
+                                                v-if="$page.props.auth.user.photo"
+                                                :src="`/storage/${$page.props.auth.user.photo}`"
+                                                :alt="`Photo for ${$page.props.auth.user.name}`"
+                                                class="h-full w-full object-cover"
+                                            />
+                                            <span v-else>
+                                                {{
+                                                    $page.props.auth.user.name
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                }}
+                                            </span>
                                         </span>
                                         <span class="hidden sm:inline">
                                             {{ $page.props.auth.user.name }}
