@@ -112,7 +112,7 @@ class StaffFeeController extends Controller
             'amount' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'description' => ['nullable', 'string', 'max:255'],
             'due_date' => ['required', 'date'],
-            'status' => ['required', 'in:pending,paid'],
+            'status' => ['required', 'in:pending,payment_pending,paid'],
             'paid_date' => ['nullable', 'date', 'required_if:status,paid'],
         ]);
 
@@ -153,5 +153,59 @@ class StaffFeeController extends Controller
         return redirect()
             ->route('admin.fees.index')
             ->with('success', 'Fee deleted successfully.');
+    }
+
+    /**
+     * Approve a payment confirmation (marks fee as paid).
+     */
+    public function approvePayment(Request $request, Fee $fee): RedirectResponse
+    {
+        if ($fee->status !== 'payment_pending') {
+            return redirect()
+                ->route('admin.fees.index')
+                ->with('error', 'Fee payment confirmation not found or already processed.');
+        }
+
+        $fee->update([
+            'status' => 'paid',
+            'paid_date' => now()->format('Y-m-d'),
+        ]);
+
+        // Notify the student
+        $student = $fee->student;
+        if ($student && $student->user) {
+            $student->user->notify(new FeeStatusUpdated($fee));
+        }
+
+        return redirect()
+            ->route('admin.fees.index')
+            ->with('success', "Payment confirmed for fee of £{$fee->amount}.");
+    }
+
+    /**
+     * Reject a payment confirmation (reverts to pending).
+     */
+    public function rejectPayment(Request $request, Fee $fee): RedirectResponse
+    {
+        if ($fee->status !== 'payment_pending') {
+            return redirect()
+                ->route('admin.fees.index')
+                ->with('error', 'Fee payment confirmation not found or already processed.');
+        }
+
+        $fee->update([
+            'status' => 'pending',
+            'paid_date' => null,
+        ]);
+
+        // Notify the student
+        $student = $fee->student;
+        if ($student && $student->user) {
+            $student->user->notify(new FeeStatusUpdated($fee));
+        }
+
+        return redirect()
+            ->route('admin.fees.index')
+            ->with('success', "Payment confirmation rejected for fee of £{$fee->amount}.");
     }
 }

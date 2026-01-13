@@ -95,8 +95,9 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     // Student Grades (read-only)
     Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
 
-    // Student Fees (view only; payment status managed by staff)
+    // Student Fees
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
+    Route::post('/student/fees/{fee}/submit-payment', [StudentFeeController::class, 'submitPayment'])->name('student.fees.submit-payment');
     // Student Timetable (read-only)
     Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
 
@@ -171,6 +172,8 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'admin.fees.update',
             'destroy' => 'admin.fees.destroy',
         ]);
+        Route::post('/admin/fees/{fee}/approve-payment', [StaffFeeController::class, 'approvePayment'])->name('admin.fees.approve-payment');
+        Route::post('/admin/fees/{fee}/reject-payment', [StaffFeeController::class, 'rejectPayment'])->name('admin.fees.reject-payment');
 
         // Timetable Management (staff only)
         Route::resource('admin/timetables', StaffTimetableController::class)->names([

@@ -24,9 +24,41 @@ const deleteFee = (feeId) => {
 };
 
 const getStatusBadgeClass = (status) => {
-    return status === "paid"
-        ? "bg-green-100 text-green-800"
-        : "bg-amber-100 text-amber-800";
+    if (status === "paid") {
+        return "bg-green-100 text-green-800";
+    } else if (status === "payment_pending") {
+        return "bg-blue-100 text-blue-800";
+    } else {
+        return "bg-amber-100 text-amber-800";
+    }
+};
+
+const approvePayment = (feeId) => {
+    if (
+        !confirm(
+            "Are you sure you want to approve this payment confirmation?"
+        )
+    ) {
+        return;
+    }
+
+    router.post(route("admin.fees.approve-payment", feeId), {}, {
+        preserveScroll: true,
+    });
+};
+
+const rejectPayment = (feeId) => {
+    if (
+        !confirm(
+            "Are you sure you want to reject this payment confirmation? The fee status will revert to pending."
+        )
+    ) {
+        return;
+    }
+
+    router.post(route("admin.fees.reject-payment", feeId), {}, {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -162,7 +194,7 @@ const getStatusBadgeClass = (status) => {
                                             :class="getStatusBadgeClass(fee.status)"
                                             class="inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize"
                                         >
-                                            {{ fee.status }}
+                                            {{ fee.status.replace('_', ' ') }}
                                         </span>
                                     </td>
                                     <td
@@ -179,18 +211,34 @@ const getStatusBadgeClass = (status) => {
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
                                         <div class="flex items-center justify-end gap-2">
-                                            <Link
-                                                :href="route('admin.fees.edit', fee.id)"
-                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                @click="deleteFee(fee.id)"
-                                                class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                            >
-                                                Delete
-                                            </button>
+                                            <template v-if="fee.status === 'payment_pending'">
+                                                <button
+                                                    @click="approvePayment(fee.id)"
+                                                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                                >
+                                                    Approve Payment
+                                                </button>
+                                                <button
+                                                    @click="rejectPayment(fee.id)"
+                                                    class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                >
+                                                    Reject
+                                                </button>
+                                            </template>
+                                            <template v-else>
+                                                <Link
+                                                    :href="route('admin.fees.edit', fee.id)"
+                                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    @click="deleteFee(fee.id)"
+                                                    class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </template>
                                         </div>
                                     </td>
                                 </tr>

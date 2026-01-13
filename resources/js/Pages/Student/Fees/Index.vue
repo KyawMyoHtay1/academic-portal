@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 
 const props = defineProps({
     fees: {
@@ -14,9 +14,27 @@ const props = defineProps({
 });
 
 const getStatusBadgeClass = (status) => {
-    return status === "paid"
-        ? "bg-green-100 text-green-800"
-        : "bg-amber-100 text-amber-800";
+    if (status === "paid") {
+        return "bg-green-100 text-green-800";
+    } else if (status === "payment_pending") {
+        return "bg-blue-100 text-blue-800";
+    } else {
+        return "bg-amber-100 text-amber-800";
+    }
+};
+
+const submitPayment = (feeId) => {
+    if (
+        !confirm(
+            "Are you sure you want to submit payment confirmation for this fee? This will require admin approval."
+        )
+    ) {
+        return;
+    }
+
+    router.post(route("student.fees.submit-payment", feeId), {}, {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -71,9 +89,8 @@ const getStatusBadgeClass = (status) => {
                         >
                             Fee Records
                         </p>
-                        <p class="mt-1 text-sm text-slate-600">
-                            View your fee records. Payment status is updated by
-                            the finance office after confirmation.
+                            <p class="mt-1 text-sm text-slate-600">
+                            View your fee records and submit payment confirmations. Payment confirmations require admin approval.
                         </p>
                     </div>
 
@@ -112,7 +129,12 @@ const getStatusBadgeClass = (status) => {
                                     >
                                         Paid Date
                                     </th>
-                                    <!-- No action column: students cannot change payment status -->
+                                    <th
+                                        scope="col"
+                                        class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -151,7 +173,23 @@ const getStatusBadgeClass = (status) => {
                                     >
                                         {{ fee.paid_date || "-" }}
                                     </td>
-                                    <!-- No action cell: read-only for students -->
+                                    <td
+                                        class="whitespace-nowrap px-4 py-4 text-right text-sm"
+                                    >
+                                        <span
+                                            v-if="fee.status === 'payment_pending'"
+                                            class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+                                        >
+                                            Payment Pending
+                                        </span>
+                                        <button
+                                            v-else-if="fee.status === 'pending'"
+                                            @click="submitPayment(fee.id)"
+                                            class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                        >
+                                            Submit Payment
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
