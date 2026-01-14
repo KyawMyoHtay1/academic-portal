@@ -116,6 +116,40 @@ const cards = computed(() => {
 
     return list;
 });
+
+const quickActions = computed(() => {
+    const role = props.role;
+    if (role === "staff") {
+        return [
+            { label: "Enrollment Requests", href: route("admin.enrollments.index") },
+            { label: "Manage Courses", href: route("admin.courses.index") },
+            { label: "Manage Subjects", href: route("admin.subjects.index") },
+            { label: "Fee Management", href: route("admin.fees.index") },
+            { label: "Timetable Management", href: route("admin.timetables.index") },
+            { label: "User Management", href: route("admin.users.index") },
+            { label: "Announcements", href: route("admin.announcements.index") },
+        ];
+    }
+    if (role === "teacher") {
+        return [
+            { label: "My Timetable", href: route("teacher.timetable.index") },
+            { label: "My Teaching Subjects", href: route("teacher.courses.index") },
+            { label: "Mark Attendance", href: route("teacher.attendance.index") },
+            { label: "Grades", href: route("teacher.grades.index") },
+            { label: "Announcements", href: route("announcements.index") },
+            { label: "Messages", href: route("messages.index") },
+        ];
+    }
+    // student
+    return [
+        { label: "My Courses", href: route("my-courses.index") },
+        { label: "Timetable", href: route("student.timetable.index") },
+        { label: "Fees", href: route("student.fees.index") },
+        { label: "Grades", href: route("student.grades.index") },
+        { label: "Announcements", href: route("announcements.index") },
+        { label: "Messages", href: route("messages.index") },
+    ];
+});
 </script>
 
 <template>
@@ -360,116 +394,110 @@ const cards = computed(() => {
                     </div>
                 </div>
 
-                    <div class="space-y-4">
-                        <!-- Announcements widget (all roles) -->
-                        <div class="portal-card p-5">
-                            <div class="flex items-center justify-between gap-3">
-                                <div>
-                                    <p
-                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                    >
-                                        Announcements
-                                    </p>
-                                    <p class="mt-1 text-sm text-slate-700">
-                                        <span
-                                            v-if="
-                                                $page.props.announcementsWidget
-                                                    ?.unreadCount > 0
-                                            "
-                                            class="font-semibold"
-                                        >
-                                            {{
-                                                $page.props.announcementsWidget
-                                                    .unreadCount
-                                            }}
-                                            unread
-                                        </span>
-                                        <span v-else class="text-slate-500">
-                                            You’re all caught up
-                                        </span>
-                                    </p>
-                                </div>
-                                <Link
-                                    :href="route('announcements.index')"
-                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                <div class="space-y-4">
+                    <!-- Quick actions -->
+                    <div class="portal-card p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Quick actions
+                        </p>
+                        <div class="mt-3 grid gap-2">
+                            <Link
+                                v-for="a in quickActions"
+                                :key="a.href"
+                                :href="a.href"
+                                class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                <span>{{ a.label }}</span>
+                                <span class="text-slate-400">›</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- Announcements widget (all roles) -->
+                    <div class="portal-card p-5">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                                 >
-                                    View all
-                                </Link>
+                                    Announcements
+                                </p>
+                                <p class="mt-1 text-sm text-slate-700">
+                                    <span
+                                        v-if="
+                                            $page.props.announcementsWidget
+                                                ?.unreadCount > 0
+                                        "
+                                        class="font-semibold"
+                                    >
+                                        {{
+                                            $page.props.announcementsWidget
+                                                .unreadCount
+                                        }}
+                                        unread
+                                    </span>
+                                    <span v-else class="text-slate-500">
+                                        You’re all caught up
+                                    </span>
+                                </p>
+                            </div>
+                            <Link
+                                :href="route('announcements.index')"
+                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                            >
+                                View all
+                            </Link>
+                        </div>
+
+                        <div class="mt-4 space-y-2">
+                            <div
+                                v-if="
+                                    !$page.props.announcementsWidget?.latest
+                                        ?.length
+                                "
+                                class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500"
+                            >
+                                No announcements to show.
                             </div>
 
-                            <div class="mt-4 space-y-2">
+                            <div
+                                v-for="a in $page.props.announcementsWidget
+                                    ?.latest"
+                                :key="a.id"
+                                class="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3"
+                            >
                                 <div
-                                    v-if="
-                                        !$page.props.announcementsWidget
-                                            ?.latest?.length
-                                    "
-                                    class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500"
-                                >
-                                    No announcements to show.
-                                </div>
-
-                                <div
-                                    v-for="a in $page.props.announcementsWidget
-                                        ?.latest"
-                                    :key="a.id"
-                                    class="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3"
-                                >
-                                    <div
-                                        class="mt-0.5 h-2.5 w-2.5 rounded-full"
-                                        :class="{
-                                            'bg-red-500':
-                                                a.priority === 'urgent',
-                                            'bg-amber-500':
-                                                a.priority === 'important',
-                                            'bg-blue-500':
-                                                a.priority === 'info',
-                                        }"
-                                    />
-                                    <div class="min-w-0 flex-1">
-                                        <p
-                                            class="truncate text-sm font-medium text-slate-900"
-                                        >
-                                            <span v-if="a.pinned">📌 </span>
-                                            {{ a.title }}
-                                        </p>
-                                        <p class="mt-0.5 text-xs text-slate-500">
-                                            {{ a.author }} · {{ a.created_at }}
-                                        </p>
-                                    </div>
+                                    class="mt-0.5 h-2.5 w-2.5 rounded-full"
+                                    :class="{
+                                        'bg-red-500': a.priority === 'urgent',
+                                        'bg-amber-500':
+                                            a.priority === 'important',
+                                        'bg-blue-500': a.priority === 'info',
+                                    }"
+                                />
+                                <div class="min-w-0 flex-1">
+                                    <p
+                                        class="truncate text-sm font-medium text-slate-900"
+                                    >
+                                        <span v-if="a.pinned">📌 </span>
+                                        {{ a.title }}
+                                    </p>
+                                    <p class="mt-0.5 text-xs text-slate-500">
+                                        {{ a.author }} · {{ a.created_at }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
                     <div class="portal-card p-5">
-                        <p
-                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                        >
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                             Project context
                         </p>
                         <p class="mt-2 text-sm text-slate-700">
                             BSc (Hons) Computing final year project – University
                             Academic Portal using Vue.js and Laravel.
                         </p>
-                    </div>
-
-                    <div class="portal-card p-5">
-                        <p
-                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                        >
-                            Next steps
-                        </p>
-                        <ul
-                            class="mt-2 list-disc space-y-1 pl-5 text-xs text-slate-700"
-                        >
-                            <li>
-                                Implement Student Registration & Course
-                                Registration modules.
-                            </li>
-                            <li>
-                                Design database tables for students, courses and
-                                enrolments.
-                            </li>
-                            <li>Connect dashboard metrics to real data.</li>
-                        </ul>
                     </div>
                 </div>
             </div>

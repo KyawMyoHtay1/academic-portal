@@ -2,12 +2,71 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     subjects: {
         type: Array,
         required: true,
     },
+});
+
+const query = ref("");
+const courseFilter = ref("all");
+const teacherFilter = ref("all"); // teacher name contains
+
+const courses = computed(() => {
+    const set = new Set(
+        (props.subjects ?? []).map((s) => s.course_code).filter(Boolean)
+    );
+    return Array.from(set).sort();
+});
+
+const stats = computed(() => {
+    const list = props.subjects ?? [];
+    const unassigned = list.filter((s) => !s.teachers?.length).length;
+    return {
+        total: list.length,
+        courses: new Set(list.map((s) => s.course_code).filter(Boolean)).size,
+        unassigned,
+    };
+});
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    const tf = teacherFilter.value.trim().toLowerCase();
+    let list = props.subjects ?? [];
+
+    if (courseFilter.value !== "all") {
+        list = list.filter((s) => s.course_code === courseFilter.value);
+    }
+
+    if (tf && tf !== "all") {
+        list = list.filter((s) => {
+            const names = (s.teachers ?? []).map((t) => t.name).join(" ");
+            return names.toLowerCase().includes(tf);
+        });
+    }
+
+    if (q) {
+        list = list.filter((s) => {
+            const code = (s.subject_code ?? "").toLowerCase();
+            const title = (s.title ?? "").toLowerCase();
+            const course = `${s.course_code ?? ""} ${s.course_title ?? ""}`.toLowerCase();
+            const teachers = (s.teachers ?? [])
+                .map((t) => t.name)
+                .join(" ")
+                .toLowerCase();
+            return (
+                code.includes(q) ||
+                title.includes(q) ||
+                course.includes(q) ||
+                teachers.includes(q)
+            );
+        });
+    }
+
+    return list;
 });
 
 const deleteSubject = (subjectId) => {
@@ -51,6 +110,34 @@ const deleteSubject = (subjectId) => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Summary stats -->
+                <div class="mb-6 grid gap-4 md:grid-cols-3">
+                    <div class="portal-card p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Subjects
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.total }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                            Courses covered
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ stats.courses }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-amber-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                            Not assigned
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-amber-900">
+                            {{ stats.unassigned }}
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
@@ -61,6 +148,44 @@ const deleteSubject = (subjectId) => {
                         <p class="mt-1 text-sm text-slate-600">
                             Manage subjects for courses
                         </p>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <select
+                                v-model="courseFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-56"
+                            >
+                                <option value="all">All courses</option>
+                                <option v-for="c in courses" :key="c" :value="c">
+                                    {{ c }}
+                                </option>
+                            </select>
+
+                            <div class="relative w-full sm:w-80">
+                                <input
+                                    v-model="query"
+                                    type="text"
+                                    placeholder="Search code, title, course, teacher…"
+                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                                <button
+                                    v-if="query"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                    @click="query = ''"
+                                >
+                                    <span class="sr-only">Clear</span>
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-slate-500">
+                            Showing <span class="font-semibold text-slate-700">{{ filtered.length }}</span>
+                            of <span class="font-semibold text-slate-700">{{ subjects.length }}</span>
+                        </div>
                     </div>
 
                     <!-- Subjects Table -->
@@ -114,19 +239,22 @@ const deleteSubject = (subjectId) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="subjects.length === 0"
+                                    v-if="filtered.length === 0"
                                     class="bg-white"
                                 >
                                     <td
                                         colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No subjects found. Create your first
-                                        subject to get started.
+                                        {{
+                                            subjects.length === 0
+                                                ? "No subjects found. Create your first subject to get started."
+                                                : "No subjects match your filters."
+                                        }}
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="subject in subjects"
+                                    v-for="subject in filtered"
                                     :key="subject.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >

@@ -2,12 +2,51 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     courses: {
         type: Array,
         required: true,
     },
+});
+
+const query = ref("");
+const semesterFilter = ref("all");
+
+const semesters = computed(() => {
+    const set = new Set((props.courses ?? []).map((c) => c.semester).filter(Boolean));
+    return Array.from(set).sort();
+});
+
+const stats = computed(() => {
+    const list = props.courses ?? [];
+    const creditsTotal = list.reduce((sum, c) => sum + (parseInt(c.credits, 10) || 0), 0);
+    return {
+        total: list.length,
+        semesters: new Set(list.map((c) => c.semester).filter(Boolean)).size,
+        creditsTotal,
+    };
+});
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = props.courses ?? [];
+
+    if (semesterFilter.value !== "all") {
+        list = list.filter((c) => c.semester === semesterFilter.value);
+    }
+
+    if (q) {
+        list = list.filter((c) => {
+            const code = (c.course_code ?? "").toLowerCase();
+            const title = (c.title ?? "").toLowerCase();
+            const semester = (c.semester ?? "").toLowerCase();
+            return code.includes(q) || title.includes(q) || semester.includes(q);
+        });
+    }
+
+    return list;
 });
 
 const deleteCourse = (courseId) => {
@@ -51,6 +90,34 @@ const deleteCourse = (courseId) => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Summary stats -->
+                <div class="mb-6 grid gap-4 md:grid-cols-3">
+                    <div class="portal-card p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Courses
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.total }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                            Semesters
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ stats.semesters }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-amber-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                            Total credits (listed)
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-amber-900">
+                            {{ stats.creditsTotal }}
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
@@ -61,6 +128,44 @@ const deleteCourse = (courseId) => {
                         <p class="mt-1 text-sm text-slate-600">
                             Manage course offerings for the university
                         </p>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <select
+                                v-model="semesterFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-48"
+                            >
+                                <option value="all">All semesters</option>
+                                <option v-for="s in semesters" :key="s" :value="s">
+                                    {{ s }}
+                                </option>
+                            </select>
+
+                            <div class="relative w-full sm:w-80">
+                                <input
+                                    v-model="query"
+                                    type="text"
+                                    placeholder="Search course code, title…"
+                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                                <button
+                                    v-if="query"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                    @click="query = ''"
+                                >
+                                    <span class="sr-only">Clear</span>
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-slate-500">
+                            Showing <span class="font-semibold text-slate-700">{{ filtered.length }}</span>
+                            of <span class="font-semibold text-slate-700">{{ courses.length }}</span>
+                        </div>
                     </div>
 
                     <!-- Courses Table -->
@@ -108,19 +213,22 @@ const deleteCourse = (courseId) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="courses.length === 0"
+                                    v-if="filtered.length === 0"
                                     class="bg-white"
                                 >
                                     <td
                                         colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No courses found. Create your first
-                                        course to get started.
+                                        {{
+                                            courses.length === 0
+                                                ? "No courses found. Create your first course to get started."
+                                                : "No courses match your filters."
+                                        }}
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="course in courses"
+                                    v-for="course in filtered"
                                     :key="course.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >

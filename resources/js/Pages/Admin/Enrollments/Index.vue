@@ -2,8 +2,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     enrollments: {
         type: Array,
         required: true,
@@ -12,6 +13,38 @@ defineProps({
         type: Array,
         required: true,
     },
+});
+
+const activeTab = ref("enrollments"); // enrollments | withdrawals
+const query = ref("");
+
+const stats = computed(() => ({
+    enrollments: props.enrollments?.length ?? 0,
+    withdrawals: props.withdrawals?.length ?? 0,
+}));
+
+const filteredEnrollments = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = props.enrollments ?? [];
+    if (!q) return list;
+    return list.filter((e) => {
+        const student = `${e.student_name ?? ""} ${e.student_no ?? ""} ${e.student_email ?? ""}`.toLowerCase();
+        const course = `${e.course_code ?? ""} ${e.course_title ?? ""}`.toLowerCase();
+        const programme = (e.programme ?? "").toLowerCase();
+        return student.includes(q) || course.includes(q) || programme.includes(q);
+    });
+});
+
+const filteredWithdrawals = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = props.withdrawals ?? [];
+    if (!q) return list;
+    return list.filter((e) => {
+        const student = `${e.student_name ?? ""} ${e.student_no ?? ""} ${e.student_email ?? ""}`.toLowerCase();
+        const course = `${e.course_code ?? ""} ${e.course_title ?? ""}`.toLowerCase();
+        const programme = (e.programme ?? "").toLowerCase();
+        return student.includes(q) || course.includes(q) || programme.includes(q);
+    });
 });
 
 const approveEnrollment = (enrollmentId) => {
@@ -111,8 +144,66 @@ const formatDate = (dateString) => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
+                <!-- Summary + controls -->
+                <div class="portal-card p-5">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Requests overview
+                            </p>
+                            <p class="mt-1 text-sm text-slate-600">
+                                Pending enrollment and withdrawal approvals
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button
+                                type="button"
+                                class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                                :class="activeTab === 'enrollments' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                                @click="activeTab = 'enrollments'"
+                            >
+                                Enrollments
+                                <span class="ml-2 inline-flex items-center justify-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white">
+                                    {{ stats.enrollments }}
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                                :class="activeTab === 'withdrawals' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                                @click="activeTab = 'withdrawals'"
+                            >
+                                Withdrawals
+                                <span class="ml-2 inline-flex items-center justify-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white">
+                                    {{ stats.withdrawals }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="relative w-full sm:w-96">
+                            <input
+                                v-model="query"
+                                type="text"
+                                placeholder="Search student, course, programme…"
+                                class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <button
+                                v-if="query"
+                                type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                @click="query = ''"
+                            >
+                                <span class="sr-only">Clear</span>
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Pending Enrollments Section -->
-                <div class="portal-card overflow-hidden p-6">
+                <div v-if="activeTab === 'enrollments'" class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -164,19 +255,22 @@ const formatDate = (dateString) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="enrollments.length === 0"
+                                    v-if="filteredEnrollments.length === 0"
                                     class="bg-white"
                                 >
                                     <td
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No pending enrollment requests. All
-                                        enrollment requests have been processed.
+                                        {{
+                                            enrollments.length === 0
+                                                ? "No pending enrollment requests. All enrollment requests have been processed."
+                                                : "No enrollment requests match your search."
+                                        }}
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="enrollment in enrollments"
+                                    v-for="enrollment in filteredEnrollments"
                                     :key="enrollment.enrollment_id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
@@ -323,7 +417,7 @@ const formatDate = (dateString) => {
                 </div>
 
                 <!-- Pending Withdrawals Section -->
-                <div class="portal-card overflow-hidden p-6">
+                <div v-else class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -375,19 +469,22 @@ const formatDate = (dateString) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="withdrawals.length === 0"
+                                    v-if="filteredWithdrawals.length === 0"
                                     class="bg-white"
                                 >
                                     <td
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No pending withdrawal requests. All
-                                        withdrawal requests have been processed.
+                                        {{
+                                            withdrawals.length === 0
+                                                ? "No pending withdrawal requests. All withdrawal requests have been processed."
+                                                : "No withdrawal requests match your search."
+                                        }}
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="withdrawal in withdrawals"
+                                    v-for="withdrawal in filteredWithdrawals"
                                     :key="withdrawal.enrollment_id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >

@@ -2,9 +2,71 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     students: Object,
+});
+
+const query = ref("");
+const programmeFilter = ref("all");
+const intakeYearFilter = ref("all");
+
+const rows = computed(() => props.students?.data ?? []);
+
+const programmes = computed(() => {
+    const set = new Set(rows.value.map((s) => s.programme).filter(Boolean));
+    return Array.from(set).sort();
+});
+
+const intakeYears = computed(() => {
+    const set = new Set(rows.value.map((s) => s.intake_year).filter(Boolean));
+    return Array.from(set).sort();
+});
+
+const stats = computed(() => {
+    const list = rows.value;
+    const programmeCount = new Set(list.map((s) => s.programme).filter(Boolean))
+        .size;
+    const intakeCount = new Set(list.map((s) => s.intake_year).filter(Boolean))
+        .size;
+
+    return {
+        total: list.length,
+        programmeCount,
+        intakeCount,
+    };
+});
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = rows.value;
+
+    if (programmeFilter.value !== "all") {
+        list = list.filter((s) => s.programme === programmeFilter.value);
+    }
+    if (intakeYearFilter.value !== "all") {
+        list = list.filter((s) => s.intake_year === intakeYearFilter.value);
+    }
+
+    if (q) {
+        list = list.filter((s) => {
+            const no = (s.student_no ?? "").toLowerCase();
+            const name = (s.full_name ?? "").toLowerCase();
+            const email = (s.email ?? "").toLowerCase();
+            const programme = (s.programme ?? "").toLowerCase();
+            const intake = String(s.intake_year ?? "").toLowerCase();
+            return (
+                no.includes(q) ||
+                name.includes(q) ||
+                email.includes(q) ||
+                programme.includes(q) ||
+                intake.includes(q)
+            );
+        });
+    }
+
+    return list;
 });
 
 const deleteStudent = (id) => {
@@ -54,6 +116,97 @@ const deleteStudent = (id) => {
                 </p>
             </div>
 
+            <!-- Summary + filters -->
+            <div class="px-4 pt-4 sm:px-6">
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Students on this page
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.total }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            Paginated list
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-indigo-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                        >
+                            Programmes
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-indigo-900">
+                            {{ stats.programmeCount }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            Intake years
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ stats.intakeCount }}
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <select
+                            v-model="programmeFilter"
+                            class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-64"
+                        >
+                            <option value="all">All programmes</option>
+                            <option
+                                v-for="p in programmes"
+                                :key="p"
+                                :value="p"
+                            >
+                                {{ p }}
+                            </option>
+                        </select>
+
+                        <select
+                            v-model="intakeYearFilter"
+                            class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-40"
+                        >
+                            <option value="all">All intakes</option>
+                            <option
+                                v-for="y in intakeYears"
+                                :key="y"
+                                :value="y"
+                            >
+                                {{ y }}
+                            </option>
+                        </select>
+
+                        <div class="relative w-full sm:w-72">
+                            <input
+                                v-model="query"
+                                type="text"
+                                placeholder="Search student no, name, email…"
+                                class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <button
+                                v-if="query"
+                                type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                @click="query = ''"
+                            >
+                                <span class="sr-only">Clear</span>
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="overflow-x-auto px-4 py-4 sm:px-6">
                 <table class="min-w-full divide-y divide-slate-200 text-sm">
                     <thead class="bg-slate-50">
@@ -94,10 +247,16 @@ const deleteStudent = (id) => {
                             >
                                 Intake Year
                             </th>
+                            <th
+                                scope="col"
+                                class="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
-                        <tr v-for="student in students.data" :key="student.id">
+                        <tr v-for="student in filtered" :key="student.id">
                             <td class="px-3 py-2">
                                 <div class="flex items-center">
                                     <div
@@ -154,13 +313,16 @@ const deleteStudent = (id) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="students.data.length === 0">
+                        <tr v-if="filtered.length === 0">
                             <td
-                                colspan="6"
+                                colspan="7"
                                 class="px-3 py-6 text-center text-sm text-slate-500"
                             >
-                                No students found yet. Use "Add student" to
-                                create your first record.
+                                {{
+                                    rows.length === 0
+                                        ? 'No students found yet. Use "Add student" to create your first record.'
+                                        : "No students match your filters."
+                                }}
                             </td>
                         </tr>
                     </tbody>
