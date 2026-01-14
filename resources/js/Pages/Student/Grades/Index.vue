@@ -38,8 +38,7 @@ const filteredCourses = computed(() => {
                 (subject) => {
                     if (
                         showOnlyGraded.value &&
-                        (subject.score === null ||
-                            subject.score === undefined)
+                        (subject.score === null || subject.score === undefined)
                     ) {
                         return false;
                     }
@@ -175,9 +174,7 @@ const gradeSummary = computed(() => {
                             >
                                 Subjects
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-slate-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-slate-900">
                                 {{ gradeSummary.totalSubjects }}
                             </p>
                         </div>
@@ -187,9 +184,7 @@ const gradeSummary = computed(() => {
                             >
                                 Graded
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-emerald-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-emerald-900">
                                 {{ gradeSummary.gradedCount }}
                             </p>
                         </div>
@@ -199,9 +194,7 @@ const gradeSummary = computed(() => {
                             >
                                 Not graded yet
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-amber-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-amber-900">
                                 {{
                                     gradeSummary.totalSubjects -
                                     gradeSummary.gradedCount
@@ -210,7 +203,9 @@ const gradeSummary = computed(() => {
                         </div>
                     </div>
 
-                    <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div
+                        class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+                    >
                         <div>
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -243,9 +238,7 @@ const gradeSummary = computed(() => {
                             >
                                 Average score:
                                 <span class="font-semibold">
-                                    {{
-                                        gradeSummary.averageScore.toFixed(2)
-                                    }}
+                                    {{ gradeSummary.averageScore.toFixed(2) }}
                                 </span>
                             </p>
                         </div>
@@ -337,149 +330,157 @@ const gradeSummary = computed(() => {
                             v-if="filteredCourses.length > 0"
                             class="space-y-6"
                         >
-                        <div
-                            v-for="course in filteredCourses"
-                            :key="course.id"
-                            class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
-                        >
-                            <div class="mb-3 flex items-center gap-3">
-                                <div
-                                    class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
-                                >
-                                    <img
-                                        v-if="course.photo"
-                                        :src="`/storage/${course.photo}`"
-                                        :alt="`Photo for ${course.title}`"
-                                        class="h-full w-full object-cover"
-                                    />
-                                    <span
-                                        v-else
-                                        class="text-xs font-semibold text-slate-500"
-                                    >
-                                        {{
-                                            course.title.charAt(0).toUpperCase()
-                                        }}
-                                    </span>
-                                </div>
-                                <div>
-                                    <h3
-                                        class="text-sm font-semibold text-slate-900"
-                                    >
-                                        {{ course.course_code }} -
-                                        {{ course.title }}
-                                    </h3>
-                                    <p class="mt-1 text-xs text-slate-500">
-                                        {{ course.credits }} credits •
-                                        {{ course.semester }}
-                                    </p>
-                                </div>
-                            </div>
-
                             <div
-                                v-if="
-                                    course.subjects &&
-                                    course.subjects.length > 0
-                                "
-                                class="overflow-x-auto"
+                                v-for="course in filteredCourses"
+                                :key="course.id"
+                                class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                             >
-                                <table
-                                    class="min-w-full divide-y divide-slate-200"
-                                >
-                                    <thead class="bg-slate-50">
-                                        <tr>
-                                            <th
-                                                class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                            >
-                                                Subject
-                                            </th>
-                                            <th
-                                                class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
-                                            >
-                                                Score
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        class="divide-y divide-slate-200 bg-white"
+                                <div class="mb-3 flex items-center gap-3">
+                                    <div
+                                        class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                     >
-                                        <tr
-                                            v-for="subject in course.subjects"
-                                            :key="subject.id"
-                                            class="bg-white hover:bg-slate-50 transition-colors"
+                                        <img
+                                            v-if="course.photo"
+                                            :src="`/storage/${course.photo}`"
+                                            :alt="`Photo for ${course.title}`"
+                                            class="h-full w-full object-cover"
+                                        />
+                                        <span
+                                            v-else
+                                            class="text-xs font-semibold text-slate-500"
                                         >
-                                            <td
-                                                class="px-4 py-3 text-sm text-slate-700"
+                                            {{
+                                                course.title
+                                                    .charAt(0)
+                                                    .toUpperCase()
+                                            }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h3
+                                            class="text-sm font-semibold text-slate-900"
+                                        >
+                                            {{ course.course_code }} -
+                                            {{ course.title }}
+                                        </h3>
+                                        <p class="mt-1 text-xs text-slate-500">
+                                            {{ course.credits }} credits •
+                                            {{ course.semester }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div
+                                    v-if="
+                                        course.subjects &&
+                                        course.subjects.length > 0
+                                    "
+                                    class="overflow-x-auto"
+                                >
+                                    <table
+                                        class="min-w-full divide-y divide-slate-200"
+                                    >
+                                        <thead class="bg-slate-50">
+                                            <tr>
+                                                <th
+                                                    class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                                >
+                                                    Subject
+                                                </th>
+                                                <th
+                                                    class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                                >
+                                                    Score
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody
+                                            class="divide-y divide-slate-200 bg-white"
+                                        >
+                                            <tr
+                                                v-for="subject in course.subjects"
+                                                :key="subject.id"
+                                                class="bg-white hover:bg-slate-50 transition-colors"
                                             >
-                                                <div
-                                                    class="flex items-center gap-3"
+                                                <td
+                                                    class="px-4 py-3 text-sm text-slate-700"
                                                 >
                                                     <div
-                                                        class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                                        class="flex items-center gap-3"
                                                     >
-                                                        <img
-                                                            v-if="subject.photo"
-                                                            :src="`/storage/${subject.photo}`"
-                                                            :alt="`Photo for ${subject.title}`"
-                                                            class="h-full w-full object-cover"
-                                                        />
-                                                        <span
-                                                            v-else
-                                                            class="text-xs font-semibold text-slate-500"
-                                                        >
-                                                            {{
-                                                                subject.title
-                                                                    .charAt(0)
-                                                                    .toUpperCase()
-                                                            }}
-                                                        </span>
-                                                    </div>
-                                                    <div>
                                                         <div
-                                                            class="text-sm font-medium text-slate-900"
+                                                            class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                                         >
-                                                            {{
-                                                                subject.subject_code
-                                                            }}
+                                                            <img
+                                                                v-if="
+                                                                    subject.photo
+                                                                "
+                                                                :src="`/storage/${subject.photo}`"
+                                                                :alt="`Photo for ${subject.title}`"
+                                                                class="h-full w-full object-cover"
+                                                            />
+                                                            <span
+                                                                v-else
+                                                                class="text-xs font-semibold text-slate-500"
+                                                            >
+                                                                {{
+                                                                    subject.title
+                                                                        .charAt(
+                                                                            0
+                                                                        )
+                                                                        .toUpperCase()
+                                                                }}
+                                                            </span>
                                                         </div>
-                                                        <div
-                                                            class="text-xs text-slate-500"
-                                                        >
-                                                            {{ subject.title }}
+                                                        <div>
+                                                            <div
+                                                                class="text-sm font-medium text-slate-900"
+                                                            >
+                                                                {{
+                                                                    subject.subject_code
+                                                                }}
+                                                            </div>
+                                                            <div
+                                                                class="text-xs text-slate-500"
+                                                            >
+                                                                {{
+                                                                    subject.title
+                                                                }}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-4 py-3 text-sm">
-                                                <span
-                                                    v-if="
-                                                        subject.score !==
-                                                            null &&
-                                                        subject.score !==
-                                                            undefined
-                                                    "
-                                                    class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700"
-                                                >
-                                                    {{
-                                                        Number(
-                                                            subject.score
-                                                        ).toFixed(2)
-                                                    }}
-                                                </span>
-                                                <span
-                                                    v-else
-                                                    class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
-                                                >
-                                                    Not graded yet
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                </td>
+                                                <td class="px-4 py-3 text-sm">
+                                                    <span
+                                                        v-if="
+                                                            subject.score !==
+                                                                null &&
+                                                            subject.score !==
+                                                                undefined
+                                                        "
+                                                        class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700"
+                                                    >
+                                                        {{
+                                                            Number(
+                                                                subject.score
+                                                            ).toFixed(2)
+                                                        }}
+                                                    </span>
+                                                    <span
+                                                        v-else
+                                                        class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
+                                                    >
+                                                        Not graded yet
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div v-else class="text-sm text-slate-500 py-2">
+                                    No subjects with grades yet.
+                                </div>
                             </div>
-                            <div v-else class="text-sm text-slate-500 py-2">
-                                No subjects with grades yet.
-                            </div>
-                        </div>
                         </div>
                         <div
                             v-else

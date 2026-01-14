@@ -163,9 +163,7 @@ const enroll = (courseId) => {
                             >
                                 Courses
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-slate-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-slate-900">
                                 {{ stats.total }}
                             </p>
                         </div>
@@ -175,9 +173,7 @@ const enroll = (courseId) => {
                             >
                                 You're enrolled
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-emerald-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-emerald-900">
                                 {{ stats.enrolled }}
                             </p>
                         </div>
@@ -187,9 +183,7 @@ const enroll = (courseId) => {
                             >
                                 Still available
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-slate-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-slate-900">
                                 {{ stats.available }}
                             </p>
                         </div>

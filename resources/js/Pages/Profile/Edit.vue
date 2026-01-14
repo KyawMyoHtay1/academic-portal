@@ -45,6 +45,30 @@ const roleDescription = computed(() => {
     }
     return "Standard user profile.";
 });
+
+const formattedCreatedAt = computed(() => {
+    const value = page.props.auth?.user?.created_at;
+    if (!value) return null;
+    const d = new Date(value);
+    return d.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+});
+
+const formattedLastLogin = computed(() => {
+    const value = page.props.auth?.user?.last_login_at;
+    if (!value) return null;
+    const d = new Date(value);
+    return d.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+});
 </script>
 
 <template>
@@ -66,7 +90,9 @@ const roleDescription = computed(() => {
         <div class="py-12">
             <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                 <!-- Profile overview header -->
-                <div class="portal-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                    class="portal-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+                >
                     <div class="flex items-center gap-4">
                         <div
                             class="h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
@@ -95,7 +121,9 @@ const roleDescription = computed(() => {
                             <p class="text-sm text-slate-600">
                                 {{ $page.props.auth.user.email }}
                             </p>
-                            <p class="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                            <p
+                                class="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                            >
                                 <span
                                     class="h-1.5 w-1.5 rounded-full bg-emerald-500"
                                 ></span>
@@ -103,13 +131,114 @@ const roleDescription = computed(() => {
                             </p>
                         </div>
                     </div>
-                    <div class="text-xs text-slate-500 sm:text-right">
-                        <p class="font-semibold text-slate-600">
-                            Portal access
-                        </p>
-                        <p class="mt-1">
-                            {{ roleDescription }}
-                        </p>
+                    <div class="text-xs text-slate-500 sm:text-right space-y-2">
+                        <div>
+                            <p class="font-semibold text-slate-600">
+                                Portal access
+                            </p>
+                            <p class="mt-1">
+                                {{ roleDescription }}
+                            </p>
+                        </div>
+                        <div
+                            class="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3"
+                        >
+                            <div v-if="formattedCreatedAt">
+                                <p class="font-semibold text-slate-500">
+                                    Account created
+                                </p>
+                                <p class="mt-0.5 text-slate-800">
+                                    {{ formattedCreatedAt }}
+                                </p>
+                            </div>
+                            <div v-if="formattedLastLogin">
+                                <p class="font-semibold text-slate-500">
+                                    Last login
+                                </p>
+                                <p class="mt-0.5 text-slate-800">
+                                    {{ formattedLastLogin }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick links row -->
+                <div
+                    class="portal-card flex flex-wrap items-center gap-2 border border-slate-200 bg-slate-50/80 p-4 text-xs text-slate-700"
+                >
+                    <p class="mr-2 font-semibold uppercase tracking-wide">
+                        Quick links
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Student shortcuts -->
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'student'"
+                            :href="route('my-courses.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>My Courses</span>
+                        </Link>
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'student'"
+                            :href="route('student.grades.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>My Grades</span>
+                        </Link>
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'student'"
+                            :href="route('student.timetable.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>My Timetable</span>
+                        </Link>
+
+                        <!-- Teacher shortcuts -->
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'teacher'"
+                            :href="route('teacher.courses.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>Teaching Subjects</span>
+                        </Link>
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'teacher'"
+                            :href="route('teacher.timetable.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>My Timetable</span>
+                        </Link>
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'teacher'"
+                            :href="route('teacher.grades.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>Grades</span>
+                        </Link>
+
+                        <!-- Staff/admin shortcuts -->
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'staff'"
+                            :href="route('admin.courses.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>Manage Courses</span>
+                        </Link>
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'staff'"
+                            :href="route('admin.subjects.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>Manage Subjects</span>
+                        </Link>
+                        <Link
+                            v-if="$page.props.auth?.user?.role === 'staff'"
+                            :href="route('students.index')"
+                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-medium ring-1 ring-slate-200 hover:bg-slate-50"
+                        >
+                            <span>Student Records</span>
+                        </Link>
                     </div>
                 </div>
 

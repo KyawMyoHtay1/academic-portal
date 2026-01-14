@@ -155,9 +155,7 @@ const unenroll = (courseId) => {
                             >
                                 My Courses
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-slate-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-slate-900">
                                 {{ stats.total }}
                             </p>
                         </div>
@@ -167,9 +165,7 @@ const unenroll = (courseId) => {
                             >
                                 Active enrollments
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-emerald-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-emerald-900">
                                 {{ stats.enrolled }}
                             </p>
                         </div>
@@ -179,9 +175,7 @@ const unenroll = (courseId) => {
                             >
                                 Withdrawal pending
                             </p>
-                            <p
-                                class="mt-2 text-2xl font-bold text-amber-900"
-                            >
+                            <p class="mt-2 text-2xl font-bold text-amber-900">
                                 {{ stats.withdrawalPending }}
                             </p>
                         </div>
@@ -211,9 +205,7 @@ const unenroll = (courseId) => {
                                 >
                                     Search
                                 </label>
-                                <div
-                                    class="mt-1 relative rounded-md shadow-sm"
-                                >
+                                <div class="mt-1 relative rounded-md shadow-sm">
                                     <div
                                         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
                                     >
