@@ -2,13 +2,19 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import { computed } from "vue";
 
-defineProps({
+const props = defineProps({
     subjects: {
         type: Array,
         required: true,
     },
 });
+
+const stats = computed(() => ({
+    total: props.subjects?.length ?? 0,
+    courses: new Set((props.subjects ?? []).map((s) => s.course_code).filter(Boolean)).size,
+}));
 </script>
 
 <template>
@@ -29,6 +35,32 @@ defineProps({
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Summary stats -->
+                <div class="mb-6 grid gap-4 md:grid-cols-2">
+                    <div class="portal-card p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Subjects assigned
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.total }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            Subjects you can grade
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-indigo-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+                            Courses covered
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-indigo-900">
+                            {{ stats.courses }}
+                        </p>
+                        <p class="mt-1 text-xs text-indigo-700">
+                            Unique courses
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
