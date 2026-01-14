@@ -2,8 +2,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     courses: {
         type: Array,
         required: true,
@@ -12,6 +13,97 @@ defineProps({
         type: String,
         default: null,
     },
+});
+
+const searchTerm = ref("");
+const semesterFilter = ref("all");
+const showOnlyGraded = ref(false);
+
+const semesters = computed(() => {
+    const set = new Set();
+
+    props.courses.forEach((course) => {
+        if (course.semester) {
+            set.add(course.semester);
+        }
+    });
+
+    return Array.from(set).sort();
+});
+
+const filteredCourses = computed(() => {
+    return props.courses
+        .map((course) => {
+            const filteredSubjects = (course.subjects || []).filter(
+                (subject) => {
+                    if (
+                        showOnlyGraded.value &&
+                        (subject.score === null ||
+                            subject.score === undefined)
+                    ) {
+                        return false;
+                    }
+
+                    const term = searchTerm.value.trim().toLowerCase();
+
+                    if (term) {
+                        const haystack = (
+                            course.course_code +
+                            " " +
+                            course.title +
+                            " " +
+                            subject.subject_code +
+                            " " +
+                            subject.title
+                        ).toLowerCase();
+
+                        if (!haystack.includes(term)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            );
+
+            return {
+                ...course,
+                subjects: filteredSubjects,
+            };
+        })
+        .filter((course) => {
+            if (
+                semesterFilter.value !== "all" &&
+                course.semester !== semesterFilter.value
+            ) {
+                return false;
+            }
+
+            if (searchTerm.value || showOnlyGraded.value) {
+                return course.subjects && course.subjects.length > 0;
+            }
+
+            return true;
+        });
+});
+
+const gradeSummary = computed(() => {
+    let totalScore = 0;
+    let gradedCount = 0;
+
+    props.courses.forEach((course) => {
+        (course.subjects || []).forEach((subject) => {
+            if (subject.score !== null && subject.score !== undefined) {
+                totalScore += Number(subject.score);
+                gradedCount += 1;
+            }
+        });
+    });
+
+    return {
+        gradedCount,
+        averageScore: gradedCount ? totalScore / gradedCount : null,
+    };
 });
 </script>
 
@@ -66,7 +158,7 @@ defineProps({
 
                 <!-- Grades List -->
                 <div v-else class="portal-card overflow-hidden p-6">
-                    <div class="mb-4 flex items-center justify-between">
+                    <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -78,12 +170,123 @@ defineProps({
                                 courses
                             </p>
                         </div>
+                        <div
+                            v-if="gradeSummary.gradedCount > 0"
+                            class="rounded-lg bg-emerald-50 px-4 py-3 text-right shadow-sm"
+                        >
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            >
+                                Overview
+                            </p>
+                            <p class="mt-1 text-xs text-emerald-800">
+                                Graded subjects:
+                                <span class="font-semibold">{{
+                                    gradeSummary.gradedCount
+                                }}</span>
+                            </p>
+                            <p
+                                v-if="gradeSummary.averageScore !== null"
+                                class="mt-0.5 text-xs text-emerald-800"
+                            >
+                                Average score:
+                                <span class="font-semibold">
+                                    {{
+                                        gradeSummary.averageScore.toFixed(2)
+                                    }}
+                                </span>
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Grades by Course -->
                     <div v-if="courses.length > 0" class="space-y-6">
+                        <!-- Filters -->
                         <div
-                            v-for="course in courses"
+                            class="mb-2 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
+                        >
+                            <div class="flex-1">
+                                <label
+                                    for="grades-search"
+                                    class="block text-xs font-medium text-slate-600"
+                                >
+                                    Search
+                                </label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div
+                                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+                                    >
+                                        <svg
+                                            class="h-4 w-4 text-slate-400"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        id="grades-search"
+                                        v-model="searchTerm"
+                                        type="search"
+                                        class="block w-full rounded-md border-slate-300 pl-9 pr-3 py-2 text-sm placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder="Search by course or subject name / code"
+                                    />
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex flex-col gap-2 md:w-72 md:flex-row md:items-center md:justify-end"
+                            >
+                                <div class="md:w-40">
+                                    <label
+                                        for="semester-filter"
+                                        class="block text-xs font-medium text-slate-600"
+                                    >
+                                        Semester
+                                    </label>
+                                    <select
+                                        id="semester-filter"
+                                        v-model="semesterFilter"
+                                        class="mt-1 block w-full rounded-md border-slate-300 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                    >
+                                        <option value="all">
+                                            All semesters
+                                        </option>
+                                        <option
+                                            v-for="semester in semesters"
+                                            :key="semester"
+                                            :value="semester"
+                                        >
+                                            {{ semester }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <label
+                                    class="inline-flex items-center gap-2 text-xs font-medium text-slate-600"
+                                >
+                                    <input
+                                        v-model="showOnlyGraded"
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    Show only graded subjects
+                                </label>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="filteredCourses.length > 0"
+                            class="space-y-6"
+                        >
+                        <div
+                            v-for="course in filteredCourses"
                             :key="course.id"
                             class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                         >
@@ -224,6 +427,13 @@ defineProps({
                             <div v-else class="text-sm text-slate-500 py-2">
                                 No subjects with grades yet.
                             </div>
+                        </div>
+                        </div>
+                        <div
+                            v-else
+                            class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500"
+                        >
+                            No subjects match your current search or filters.
                         </div>
                     </div>
 
