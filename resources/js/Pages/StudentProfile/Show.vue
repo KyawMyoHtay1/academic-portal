@@ -22,6 +22,27 @@ const form = useForm({
 
 const hasStudentRecord = computed(() => props.student !== null);
 
+const academicSummary = computed(() => {
+    if (!props.student) {
+        return null;
+    }
+
+    return [
+        {
+            label: "Student Number",
+            value: props.student.student_no,
+        },
+        {
+            label: "Programme",
+            value: props.student.programme,
+        },
+        {
+            label: "Intake Year",
+            value: props.student.intake_year,
+        },
+    ];
+});
+
 const submit = () => {
     form.transform((data) => ({
         ...data,
@@ -93,32 +114,67 @@ const removePhoto = () => {
 
                 <!-- Student Profile Form -->
                 <div v-else class="space-y-6">
-                    <!-- Profile header with photo -->
-                    <div class="portal-card flex items-center gap-4 p-6">
-                        <div
-                            class="h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
-                        >
-                            <img
-                                v-if="student.photo_url"
-                                :src="student.photo_url"
-                                :alt="`Photo of ${student.full_name}`"
-                                class="h-full w-full object-cover"
-                            />
-                            <span
-                                v-else
-                                class="text-lg font-semibold text-slate-500"
+                    <!-- Profile header with academic summary -->
+                    <div
+                        class="portal-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
                             >
-                                {{ student.full_name.charAt(0).toUpperCase() }}
-                            </span>
+                                <img
+                                    v-if="student.photo_url"
+                                    :src="student.photo_url"
+                                    :alt="`Photo of ${student.full_name}`"
+                                    class="h-full w-full object-cover"
+                                />
+                                <span
+                                    v-else
+                                    class="text-lg font-semibold text-slate-500"
+                                >
+                                    {{
+                                        student.full_name
+                                            .charAt(0)
+                                            .toUpperCase()
+                                    }}
+                                </span>
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-lg font-semibold text-slate-900"
+                                >
+                                    {{ student.full_name }}
+                                </h3>
+                                <p class="text-sm text-slate-600">
+                                    {{ student.student_no }} •
+                                    {{ student.programme }}
+                                </p>
+                                <p
+                                    class="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                                >
+                                    <span
+                                        class="h-1.5 w-1.5 rounded-full bg-emerald-500"
+                                    ></span>
+                                    Active Student
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900">
-                                {{ student.full_name }}
-                            </h3>
-                            <p class="text-sm text-slate-600">
-                                {{ student.student_no }} •
-                                {{ student.programme }}
-                            </p>
+                        <div
+                            v-if="academicSummary"
+                            class="grid grid-cols-1 gap-3 text-xs text-slate-600 sm:grid-cols-3 sm:text-right"
+                        >
+                            <div
+                                v-for="item in academicSummary"
+                                :key="item.label"
+                                class="sm:ml-4"
+                            >
+                                <p class="font-semibold text-slate-500">
+                                    {{ item.label }}
+                                </p>
+                                <p class="mt-0.5 text-slate-900">
+                                    {{ item.value }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                     <!-- Academic Information (Read-only) -->
