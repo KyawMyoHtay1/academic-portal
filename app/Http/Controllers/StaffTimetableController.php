@@ -88,6 +88,28 @@ class StaffTimetableController extends Controller
         $subject = Subject::findOrFail($data['subject_id']);
         $data['course_id'] = $subject->course_id;
 
+        // Basic conflict detection (same course + same day + overlapping time)
+        $overlap = Timetable::query()
+            ->where('course_id', $data['course_id'])
+            ->where('day_of_week', $data['day_of_week'])
+            ->where(function ($q) use ($data) {
+                $q->whereBetween('start_time', [$data['start_time'], $data['end_time']])
+                    ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
+                    ->orWhere(function ($q2) use ($data) {
+                        $q2->where('start_time', '<=', $data['start_time'])
+                            ->where('end_time', '>=', $data['end_time']);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return back()
+                ->withErrors([
+                    'start_time' => 'This entry overlaps with an existing session for the same course/day.',
+                ])
+                ->withInput();
+        }
+
         $timetable = Timetable::create($data);
 
         // Notify enrolled students and assigned teachers
@@ -156,6 +178,28 @@ class StaffTimetableController extends Controller
         // Get subject and derive course_id
         $subject = Subject::findOrFail($data['subject_id']);
         $data['course_id'] = $subject->course_id;
+
+        $overlap = Timetable::query()
+            ->where('id', '!=', $timetable->id)
+            ->where('course_id', $data['course_id'])
+            ->where('day_of_week', $data['day_of_week'])
+            ->where(function ($q) use ($data) {
+                $q->whereBetween('start_time', [$data['start_time'], $data['end_time']])
+                    ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
+                    ->orWhere(function ($q2) use ($data) {
+                        $q2->where('start_time', '<=', $data['start_time'])
+                            ->where('end_time', '>=', $data['end_time']);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return back()
+                ->withErrors([
+                    'start_time' => 'This entry overlaps with an existing session for the same course/day.',
+                ])
+                ->withInput();
+        }
 
         $timetable->update($data);
 

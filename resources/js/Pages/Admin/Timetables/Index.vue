@@ -2,12 +2,40 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
+import TimetableWeekGrid from "@/Components/TimetableWeekGrid.vue";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     timetables: {
         type: Object,
         required: true,
     },
+});
+
+const viewMode = ref("table"); // table | week
+const query = ref("");
+const selectedDay = ref("all");
+
+const entries = computed(() => props.timetables?.data ?? []);
+
+const filteredEntries = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = entries.value;
+
+    if (selectedDay.value !== "all") {
+        list = list.filter((e) => e.day_of_week === selectedDay.value);
+    }
+
+    if (q) {
+        list = list.filter((e) => {
+            const subj = `${e.subject_code ?? ""} ${e.subject_title ?? ""}`.toLowerCase();
+            const course = `${e.course_code ?? ""} ${e.course_title ?? ""}`.toLowerCase();
+            const loc = (e.location ?? "").toLowerCase();
+            return subj.includes(q) || course.includes(q) || loc.includes(q);
+        });
+    }
+
+    return list;
 });
 
 const deleteEntry = (id) => {
@@ -63,7 +91,76 @@ const deleteEntry = (id) => {
                         </p>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <!-- Controls -->
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <div class="relative w-full sm:w-80">
+                                <input
+                                    v-model="query"
+                                    type="text"
+                                    placeholder="Search subject, course, location…"
+                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                                <button
+                                    v-if="query"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                    @click="query = ''"
+                                >
+                                    <span class="sr-only">Clear</span>
+                                    ✕
+                                </button>
+                            </div>
+                            <select
+                                v-model="selectedDay"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-48"
+                            >
+                                <option value="all">All days</option>
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                                <option>Saturday</option>
+                                <option>Sunday</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="inline-flex rounded-md bg-slate-100 p-1">
+                                <button
+                                    type="button"
+                                    class="rounded-md px-3 py-1.5 text-xs font-semibold"
+                                    :class="viewMode === 'table' ? 'bg-white text-slate-900 shadow' : 'text-slate-600 hover:text-slate-900'"
+                                    @click="viewMode = 'table'"
+                                >
+                                    Table
+                                </button>
+                                <button
+                                    type="button"
+                                    class="rounded-md px-3 py-1.5 text-xs font-semibold"
+                                    :class="viewMode === 'week' ? 'bg-white text-slate-900 shadow' : 'text-slate-600 hover:text-slate-900'"
+                                    @click="viewMode = 'week'"
+                                >
+                                    Week view
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="viewMode === 'week'">
+                        <div v-if="filteredEntries.length === 0" class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-600">
+                            No entries match your filters.
+                        </div>
+                        <TimetableWeekGrid
+                            v-else
+                            :entries="filteredEntries"
+                            :showCourse="true"
+                            :days="['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']"
+                        />
+                    </div>
+
+                    <div v-else class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
@@ -100,17 +197,16 @@ const deleteEntry = (id) => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr v-if="timetables.data.length === 0">
+                                <tr v-if="filteredEntries.length === 0">
                                     <td
                                         colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No timetable entries found. Create your
-                                        first entry.
+                                        No timetable entries match your filters.
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="entry in timetables.data"
+                                    v-for="entry in filteredEntries"
                                     :key="entry.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
@@ -231,7 +327,7 @@ const deleteEntry = (id) => {
 
                     <!-- Pagination -->
                     <div
-                        v-if="timetables.links && timetables.links.length > 3"
+                        v-if="viewMode === 'table' && timetables.links && timetables.links.length > 3"
                         class="mt-4 flex items-center justify-between border-t border-slate-200 px-4 py-3 sm:px-6"
                     >
                         <div class="flex flex-1 justify-between sm:hidden">
