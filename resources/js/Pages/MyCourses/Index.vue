@@ -30,6 +30,27 @@ const semesters = computed(() => {
     return Array.from(set).sort();
 });
 
+const stats = computed(() => {
+    const list = props.courses ?? [];
+    const enrolled = list.filter(
+        (c) => c.enrollment_status === "approved"
+    ).length;
+    const withdrawalPending = list.filter(
+        (c) => c.enrollment_status === "withdrawal_pending"
+    ).length;
+    const totalCredits = list.reduce(
+        (sum, c) => sum + (Number(c.credits) || 0),
+        0
+    );
+
+    return {
+        total: list.length,
+        enrolled,
+        withdrawalPending,
+        totalCredits,
+    };
+});
+
 const filteredCourses = computed(() => {
     const term = searchTerm.value.trim().toLowerCase();
 
@@ -123,6 +144,49 @@ const unenroll = (courseId) => {
 
                 <!-- Courses List -->
                 <div v-else class="portal-card overflow-hidden p-6">
+                    <!-- Summary stats -->
+                    <div
+                        v-if="courses.length > 0"
+                        class="mb-6 grid gap-4 md:grid-cols-3"
+                    >
+                        <div class="portal-card p-5">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                My Courses
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-slate-900"
+                            >
+                                {{ stats.total }}
+                            </p>
+                        </div>
+                        <div class="portal-card p-5 bg-emerald-50">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            >
+                                Active enrollments
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-emerald-900"
+                            >
+                                {{ stats.enrolled }}
+                            </p>
+                        </div>
+                        <div class="portal-card p-5 bg-amber-50">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-amber-700"
+                            >
+                                Withdrawal pending
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-amber-900"
+                            >
+                                {{ stats.withdrawalPending }}
+                            </p>
+                        </div>
+                    </div>
+
                     <div
                         class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
                     >

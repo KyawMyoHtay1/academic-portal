@@ -15,6 +15,23 @@ const props = defineProps({
     },
 });
 
+const stats = computed(() => {
+    const list = props.courses ?? [];
+    const total = list.length;
+    const available = list.filter(
+        (c) => c.enrollment_status !== "approved"
+    ).length;
+    const enrolled = list.filter(
+        (c) => c.enrollment_status === "approved"
+    ).length;
+
+    return {
+        total,
+        available,
+        enrolled,
+    };
+});
+
 const searchTerm = ref("");
 const semesterFilter = ref("all");
 const availabilityFilter = ref("all");
@@ -135,6 +152,49 @@ const enroll = (courseId) => {
                 </div>
 
                 <div class="portal-card overflow-hidden p-6">
+                    <!-- Summary stats -->
+                    <div
+                        v-if="courses.length > 0"
+                        class="mb-6 grid gap-4 md:grid-cols-3"
+                    >
+                        <div class="portal-card p-5">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Courses
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-slate-900"
+                            >
+                                {{ stats.total }}
+                            </p>
+                        </div>
+                        <div class="portal-card p-5 bg-emerald-50">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            >
+                                You're enrolled
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-emerald-900"
+                            >
+                                {{ stats.enrolled }}
+                            </p>
+                        </div>
+                        <div class="portal-card p-5 bg-slate-50">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-700"
+                            >
+                                Still available
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-slate-900"
+                            >
+                                {{ stats.available }}
+                            </p>
+                        </div>
+                    </div>
+
                     <div
                         class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
                     >

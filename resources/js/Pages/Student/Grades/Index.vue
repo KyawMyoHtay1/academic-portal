@@ -90,18 +90,24 @@ const filteredCourses = computed(() => {
 const gradeSummary = computed(() => {
     let totalScore = 0;
     let gradedCount = 0;
+    let totalSubjects = 0;
+    const coursesWithAnyGrade = new Set();
 
     props.courses.forEach((course) => {
         (course.subjects || []).forEach((subject) => {
+            totalSubjects += 1;
             if (subject.score !== null && subject.score !== undefined) {
                 totalScore += Number(subject.score);
                 gradedCount += 1;
+                coursesWithAnyGrade.add(course.id);
             }
         });
     });
 
     return {
+        totalSubjects,
         gradedCount,
+        coursesWithGrades: coursesWithAnyGrade.size,
         averageScore: gradedCount ? totalScore / gradedCount : null,
     };
 });
@@ -158,6 +164,52 @@ const gradeSummary = computed(() => {
 
                 <!-- Grades List -->
                 <div v-else class="portal-card overflow-hidden p-6">
+                    <!-- Summary stats -->
+                    <div
+                        v-if="courses.length > 0"
+                        class="mb-6 grid gap-4 md:grid-cols-3"
+                    >
+                        <div class="portal-card p-5">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Subjects
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-slate-900"
+                            >
+                                {{ gradeSummary.totalSubjects }}
+                            </p>
+                        </div>
+                        <div class="portal-card p-5 bg-emerald-50">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            >
+                                Graded
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-emerald-900"
+                            >
+                                {{ gradeSummary.gradedCount }}
+                            </p>
+                        </div>
+                        <div class="portal-card p-5 bg-amber-50">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-amber-700"
+                            >
+                                Not graded yet
+                            </p>
+                            <p
+                                class="mt-2 text-2xl font-bold text-amber-900"
+                            >
+                                {{
+                                    gradeSummary.totalSubjects -
+                                    gradeSummary.gradedCount
+                                }}
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
                             <p
