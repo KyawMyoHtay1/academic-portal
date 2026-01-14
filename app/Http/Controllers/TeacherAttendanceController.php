@@ -71,6 +71,36 @@ class TeacherAttendanceController extends Controller
                 'students.photo',
             ]);
 
+        // Attendance overview per student (for this subject)
+        $studentIds = $students->pluck('id');
+
+        $rawSummary = Attendance::query()
+            ->selectRaw('student_id, COUNT(*) as total, SUM(CASE WHEN status = "present" THEN 1 ELSE 0 END) as present')
+            ->where('subject_id', $subject->id)
+            ->whereIn('student_id', $studentIds)
+            ->groupBy('student_id')
+            ->get()
+            ->keyBy('student_id');
+
+        $summary = [];
+        foreach ($rawSummary as $studentId => $row) {
+            $total = (int) ($row->total ?? 0);
+            $present = (int) ($row->present ?? 0);
+            $percentage = $total > 0 ? round(($present / $total) * 100) : null;
+
+            $summary[$studentId] = [
+                'total' => $total,
+                'present' => $present,
+                'percentage' => $percentage,
+            ];
+        }
+
+        // Total distinct sessions (dates) held for this subject
+        $totalSessions = Attendance::query()
+            ->where('subject_id', $subject->id)
+            ->distinct('date')
+            ->count('date');
+
         return Inertia::render('Teacher/Attendance/Mark', [
             'subject' => [
                 'id' => $subject->id,
@@ -80,6 +110,8 @@ class TeacherAttendanceController extends Controller
                 'course_title' => $subject->course->title,
             ],
             'students' => $students,
+            'summary' => $summary,
+            'totalSessions' => $totalSessions,
         ]);
     }
 

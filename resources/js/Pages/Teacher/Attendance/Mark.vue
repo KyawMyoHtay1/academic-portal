@@ -13,6 +13,14 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    summary: {
+        type: Object,
+        default: () => ({}),
+    },
+    totalSessions: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const form = useForm({
@@ -114,6 +122,12 @@ const submit = () => {
                         </p>
                         <p class="mt-2 text-xs text-slate-500">
                             {{ subject.course_code }} - {{ subject.course_title }}
+                        </p>
+                        <p
+                            v-if="totalSessions > 0"
+                            class="mt-2 text-xs text-slate-500"
+                        >
+                            Sessions held: {{ totalSessions }}
                         </p>
                     </div>
                     <div class="portal-card p-5 bg-emerald-50">
@@ -305,10 +319,37 @@ const submit = () => {
                                                                 class="text-xs text-slate-500"
                                                             >
                                                                 {{
-                                                                    entry.student?.student_no ??
-                                                                    "-"
+                                                    entry.student?.student_no ??
+                                                    "-"
                                                                 }}
                                                             </span>
+                                            <span
+                                                v-if="
+                                                    summary[
+                                                        entry.record.student_id
+                                                    ]
+                                                "
+                                                class="mt-1 text-xs text-slate-500"
+                                            >
+                                                Overall:
+                                                {{
+                                                    summary[
+                                                        entry.record.student_id
+                                                    ].present
+                                                }}
+                                                /
+                                                {{
+                                                    summary[
+                                                        entry.record.student_id
+                                                    ].total
+                                                }}
+                                                (
+                                                {{
+                                                    summary[
+                                                        entry.record.student_id
+                                                    ].percentage
+                                                }}% )
+                                            </span>
                                                         </div>
                                                     </div>
                                                 </td>
