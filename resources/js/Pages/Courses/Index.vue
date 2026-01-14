@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     courses: {
@@ -13,6 +13,59 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+});
+
+const searchTerm = ref("");
+const semesterFilter = ref("all");
+const availabilityFilter = ref("all");
+
+const semesters = computed(() => {
+    const set = new Set();
+
+    props.courses.forEach((course) => {
+        if (course.semester) {
+            set.add(course.semester);
+        }
+    });
+
+    return Array.from(set).sort();
+});
+
+const filteredCourses = computed(() => {
+    const term = searchTerm.value.trim().toLowerCase();
+
+    return props.courses.filter((course) => {
+        if (
+            semesterFilter.value !== "all" &&
+            course.semester !== semesterFilter.value
+        ) {
+            return false;
+        }
+
+        if (availabilityFilter.value === "enrolled") {
+            if (course.enrollment_status !== "approved") {
+                return false;
+            }
+        } else if (availabilityFilter.value === "not-enrolled") {
+            if (course.enrollment_status === "approved") {
+                return false;
+            }
+        }
+
+        if (!term) {
+            return true;
+        }
+
+        const haystack = (
+            course.course_code +
+            " " +
+            course.title +
+            " " +
+            course.semester
+        ).toLowerCase();
+
+        return haystack.includes(term);
+    });
 });
 
 const enroll = (courseId) => {
@@ -82,7 +135,9 @@ const enroll = (courseId) => {
                 </div>
 
                 <div class="portal-card overflow-hidden p-6">
-                    <div class="mb-4 flex items-center justify-between">
+                    <div
+                        class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+                    >
                         <div>
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -92,6 +147,94 @@ const enroll = (courseId) => {
                             <p class="mt-1 text-sm text-slate-600">
                                 Browse available courses and enroll in courses
                             </p>
+                        </div>
+                        <div
+                            v-if="courses.length > 0"
+                            class="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-end md:justify-end"
+                        >
+                            <div class="md:w-56">
+                                <label
+                                    for="courses-search"
+                                    class="block text-xs font-medium text-slate-600"
+                                >
+                                    Search
+                                </label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div
+                                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+                                    >
+                                        <svg
+                                            class="h-4 w-4 text-slate-400"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        id="courses-search"
+                                        v-model="searchTerm"
+                                        type="search"
+                                        class="block w-full rounded-md border-slate-300 pl-9 pr-3 py-2 text-sm placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder="Search by course code, title or semester"
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                class="flex flex-col gap-2 md:flex-row md:items-end"
+                            >
+                                <div class="md:w-40">
+                                    <label
+                                        for="courses-semester-filter"
+                                        class="block text-xs font-medium text-slate-600"
+                                    >
+                                        Semester
+                                    </label>
+                                    <select
+                                        id="courses-semester-filter"
+                                        v-model="semesterFilter"
+                                        class="mt-1 block w-full rounded-md border-slate-300 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                    >
+                                        <option value="all">
+                                            All semesters
+                                        </option>
+                                        <option
+                                            v-for="semester in semesters"
+                                            :key="semester"
+                                            :value="semester"
+                                        >
+                                            {{ semester }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="md:w-40">
+                                    <label
+                                        for="courses-availability-filter"
+                                        class="block text-xs font-medium text-slate-600"
+                                    >
+                                        Enrollment
+                                    </label>
+                                    <select
+                                        id="courses-availability-filter"
+                                        v-model="availabilityFilter"
+                                        class="mt-1 block w-full rounded-md border-slate-300 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                    >
+                                        <option value="all">All courses</option>
+                                        <option value="enrolled">
+                                            Enrolled only
+                                        </option>
+                                        <option value="not-enrolled">
+                                            Not enrolled yet
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -152,7 +295,19 @@ const enroll = (courseId) => {
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="course in courses"
+                                    v-else-if="filteredCourses.length === 0"
+                                    class="bg-white"
+                                >
+                                    <td
+                                        :colspan="hasStudentRecord ? 6 : 5"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No courses match your current search or
+                                        filters.
+                                    </td>
+                                </tr>
+                                <tr
+                                    v-for="course in filteredCourses"
                                     :key="course.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
