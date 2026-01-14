@@ -121,20 +121,35 @@ const quickActions = computed(() => {
     const role = props.role;
     if (role === "staff") {
         return [
-            { label: "Enrollment Requests", href: route("admin.enrollments.index") },
+            {
+                label: "Enrollment Requests",
+                href: route("admin.enrollments.index"),
+            },
             { label: "Manage Courses", href: route("admin.courses.index") },
             { label: "Manage Subjects", href: route("admin.subjects.index") },
             { label: "Fee Management", href: route("admin.fees.index") },
-            { label: "Timetable Management", href: route("admin.timetables.index") },
+            {
+                label: "Timetable Management",
+                href: route("admin.timetables.index"),
+            },
             { label: "User Management", href: route("admin.users.index") },
-            { label: "Announcements", href: route("admin.announcements.index") },
+            {
+                label: "Announcements",
+                href: route("admin.announcements.index"),
+            },
         ];
     }
     if (role === "teacher") {
         return [
             { label: "My Timetable", href: route("teacher.timetable.index") },
-            { label: "My Teaching Subjects", href: route("teacher.courses.index") },
-            { label: "Mark Attendance", href: route("teacher.attendance.index") },
+            {
+                label: "My Teaching Subjects",
+                href: route("teacher.courses.index"),
+            },
+            {
+                label: "Mark Attendance",
+                href: route("teacher.attendance.index"),
+            },
             { label: "Grades", href: route("teacher.grades.index") },
             { label: "Announcements", href: route("announcements.index") },
             { label: "Messages", href: route("messages.index") },
@@ -397,7 +412,9 @@ const quickActions = computed(() => {
                 <div class="space-y-4">
                     <!-- Quick actions -->
                     <div class="portal-card p-5">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
                             Quick actions
                         </p>
                         <div class="mt-3 grid gap-2">
@@ -491,7 +508,9 @@ const quickActions = computed(() => {
                     </div>
 
                     <div class="portal-card p-5">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
                             Project context
                         </p>
                         <p class="mt-2 text-sm text-slate-700">
