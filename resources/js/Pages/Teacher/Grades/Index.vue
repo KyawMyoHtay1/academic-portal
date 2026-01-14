@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     subjects: {
@@ -13,8 +13,46 @@ const props = defineProps({
 
 const stats = computed(() => ({
     total: props.subjects?.length ?? 0,
-    courses: new Set((props.subjects ?? []).map((s) => s.course_code).filter(Boolean)).size,
+    courses: new Set(
+        (props.subjects ?? [])
+            .map((s) => s.course_code)
+            .filter(Boolean)
+    ).size,
 }));
+
+const query = ref("");
+const courseFilter = ref("all");
+
+const courses = computed(() => {
+    const set = new Set(
+        (props.subjects ?? []).map((s) => s.course_code).filter(Boolean)
+    );
+    return Array.from(set).sort();
+});
+
+const filteredSubjects = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = props.subjects ?? [];
+
+    if (courseFilter.value !== "all") {
+        list = list.filter((s) => s.course_code === courseFilter.value);
+    }
+
+    if (q) {
+        list = list.filter((s) => {
+            const code = (s.subject_code ?? "").toLowerCase();
+            const title = (s.title ?? "").toLowerCase();
+            const course = `${s.course_code ?? ""} ${
+                s.course_title ?? ""
+            }`.toLowerCase();
+            return (
+                code.includes(q) || title.includes(q) || course.includes(q)
+            );
+        });
+    }
+
+    return list;
+});
 </script>
 
 <template>
@@ -100,12 +138,74 @@ const stats = computed(() => ({
                         </p>
                     </div>
 
-                    <div
-                        v-else
-                        class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-                    >
+                    <div v-else class="space-y-4">
+                        <!-- Filters -->
+                        <div
+                            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div class="flex flex-col gap-2 sm:flex-row">
+                                <select
+                                    v-model="courseFilter"
+                                    class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-56"
+                                >
+                                    <option value="all">All courses</option>
+                                    <option
+                                        v-for="c in courses"
+                                        :key="c"
+                                        :value="c"
+                                    >
+                                        {{ c }}
+                                    </option>
+                                </select>
+
+                                <div class="relative w-full sm:w-72">
+                                    <input
+                                        v-model="query"
+                                        type="text"
+                                        placeholder="Search subject or course…"
+                                        class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                    />
+                                    <button
+                                        v-if="query"
+                                        type="button"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                        @click="query = ''"
+                                    >
+                                        <span class="sr-only">Clear</span>
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-slate-500">
+                                Showing
+                                <span
+                                    class="font-semibold text-slate-700"
+                                    >{{ filteredSubjects.length }}</span
+                                >
+                                of
+                                <span
+                                    class="font-semibold text-slate-700"
+                                    >{{ subjects.length }}</span
+                                >
+                                subjects.
+                            </p>
+                        </div>
+
+                        <!-- Subjects grid -->
+                        <div
+                            v-if="filteredSubjects.length === 0"
+                            class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500"
+                        >
+                            No subjects match your current search or filters.
+                        </div>
+
+                        <div
+                            v-else
+                            class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                        >
                         <Link
-                            v-for="subject in subjects"
+                            v-for="subject in filteredSubjects"
                             :key="subject.id"
                             :href="route('teacher.grades.show', subject.id)"
                             class="group rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-portal-navy hover:shadow-md"
@@ -158,6 +258,7 @@ const stats = computed(() => ({
                                 </svg>
                             </div>
                         </Link>
+                        </div>
                     </div>
                 </div>
             </div>
