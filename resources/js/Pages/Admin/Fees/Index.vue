@@ -2,12 +2,69 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     fees: {
         type: Object,
         required: true,
     },
+});
+
+const query = ref("");
+const statusFilter = ref("all");
+const studentFilter = ref("");
+
+const entries = computed(() => props.fees?.data ?? []);
+
+const stats = computed(() => {
+    const list = entries.value;
+    const total = list.reduce((sum, f) => sum + parseFloat(f.amount || 0), 0);
+    const paid = list
+        .filter((f) => f.status === "paid")
+        .reduce((sum, f) => sum + parseFloat(f.amount || 0), 0);
+    const pending = list
+        .filter((f) => f.status === "pending")
+        .reduce((sum, f) => sum + parseFloat(f.amount || 0), 0);
+    const paymentPending = list.filter((f) => f.status === "payment_pending").length;
+
+    return {
+        total: total.toFixed(2),
+        paid: paid.toFixed(2),
+        pending: pending.toFixed(2),
+        totalCount: list.length,
+        paidCount: list.filter((f) => f.status === "paid").length,
+        pendingCount: list.filter((f) => f.status === "pending").length,
+        paymentPendingCount: paymentPending,
+    };
+});
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    const s = studentFilter.value.trim().toLowerCase();
+    let list = entries.value;
+
+    if (statusFilter.value !== "all") {
+        list = list.filter((f) => f.status === statusFilter.value);
+    }
+
+    if (q) {
+        list = list.filter((f) => {
+            const desc = (f.description ?? "").toLowerCase();
+            const amount = String(f.amount ?? "").toLowerCase();
+            const student = `${f.student_name ?? ""} ${f.student_no ?? ""}`.toLowerCase();
+            return desc.includes(q) || amount.includes(q) || student.includes(q);
+        });
+    }
+
+    if (s) {
+        list = list.filter((f) => {
+            const student = `${f.student_name ?? ""} ${f.student_no ?? ""}`.toLowerCase();
+            return student.includes(s);
+        });
+    }
+
+    return list;
 });
 
 const deleteFee = (feeId) => {
@@ -26,7 +83,7 @@ const deleteFee = (feeId) => {
 
 const getStatusBadgeClass = (status) => {
     if (status === "paid") {
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-100 text-emerald-800";
     } else if (status === "payment_pending") {
         return "bg-blue-100 text-blue-800";
     } else {
@@ -95,6 +152,54 @@ const rejectPayment = (feeId) => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Summary Stats -->
+                <div class="mb-6 grid gap-4 md:grid-cols-4">
+                    <div class="portal-card p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Total Fees
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            £{{ stats.total }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            {{ stats.totalCount }} fee(s)
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                            Paid
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            £{{ stats.paid }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            {{ stats.paidCount }} paid
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-amber-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                            Pending
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-amber-900">
+                            £{{ stats.pending }}
+                        </p>
+                        <p class="mt-1 text-xs text-amber-700">
+                            {{ stats.pendingCount }} pending
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-blue-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+                            Awaiting Approval
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-blue-900">
+                            {{ stats.paymentPendingCount }}
+                        </p>
+                        <p class="mt-1 text-xs text-blue-700">
+                            Need review
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
@@ -105,6 +210,39 @@ const rejectPayment = (feeId) => {
                         <p class="mt-1 text-sm text-slate-600">
                             Manage student fees and payment records
                         </p>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <select
+                                v-model="statusFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-48"
+                            >
+                                <option value="all">All statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="payment_pending">Payment Pending</option>
+                                <option value="paid">Paid</option>
+                            </select>
+
+                            <div class="relative w-full sm:w-72">
+                                <input
+                                    v-model="query"
+                                    type="text"
+                                    placeholder="Search student, description, amount…"
+                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                                <button
+                                    v-if="query"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                    @click="query = ''"
+                                >
+                                    <span class="sr-only">Clear</span>
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Fees Table -->
@@ -164,21 +302,23 @@ const rejectPayment = (feeId) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="fees.data.length === 0"
+                                    v-if="filtered.length === 0"
                                     class="bg-white"
                                 >
                                     <td
                                         colspan="8"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No fees found. Create your first fee to
-                                        get started.
+                                        {{ entries.length === 0 ? 'No fees found. Create your first fee to get started.' : 'No fees match your filters.' }}
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="fee in fees.data"
+                                    v-for="fee in filtered"
                                     :key="fee.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
+                                    :class="{
+                                        'bg-blue-50/50': fee.status === 'payment_pending',
+                                    }"
                                 >
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900"
