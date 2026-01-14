@@ -826,88 +826,152 @@ const quickActions = computed(() => {
                 </div>
             </div>
 
-            <!-- Staff / teacher view: keep existing generic layout -->
-            <div v-else class="grid gap-6 lg:grid-cols-3">
-                <div class="portal-card p-6 lg:col-span-2">
-                    <div class="flex items-center justify-between gap-4">
-                        <div>
-                            <p class="portal-badge">
-                                In line with project proposal
-                            </p>
-                            <h3
-                                class="mt-3 text-lg font-semibold text-slate-900"
-                            >
-                                Welcome to the University Academic Portal
-                            </h3>
-                            <p class="mt-1 text-sm text-slate-600">
-                                This dashboard will eventually bring together
-                                Student Registration, Course Registration, Grade
-                                Submission, Fee Payment, Timetable, Attendance
-                                and Communication in one place.
-                            </p>
+            <!-- Staff view: admin-focused overview -->
+            <div v-else-if="role === 'staff'" class="space-y-6">
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div class="portal-card p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="portal-badge">Staff dashboard</p>
+                                <h3
+                                    class="mt-3 text-lg font-semibold text-slate-900"
+                                >
+                                    Manage students, courses and academic data
+                                </h3>
+                                <p class="mt-1 text-sm text-slate-600">
+                                    High-level view of registrations, fees and
+                                    attendance across the institution.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 grid gap-4 md:grid-cols-3">
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Student & Course Registration
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Approve enrollments and keep records
+                                    accurate and up to date.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Grades & Fees
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Monitor grade submissions and student fee
+                                    payments.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Timetable & Attendance
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Coordinate timetables and track overall
+                                    attendance.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 grid gap-4 md:grid-cols-3">
-                        <div class="rounded-lg bg-slate-50 p-3">
+                    <div class="space-y-4">
+                        <!-- Quick actions -->
+                        <div class="portal-card p-5">
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Student & Course Registration
+                                Quick actions
                             </p>
-                            <p class="mt-1 text-xs text-slate-600">
-                                Manage student records and course enrolments
-                                online instead of paper forms.
-                            </p>
+                            <div class="mt-3 grid gap-2">
+                                <Link
+                                    v-for="a in quickActions"
+                                    :key="a.href"
+                                    :href="a.href"
+                                    class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                    <span>{{ a.label }}</span>
+                                    <span class="text-slate-400">›</span>
+                                </Link>
+                            </div>
                         </div>
-                        <div class="rounded-lg bg-slate-50 p-3">
-                            <p
-                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+
+                        <!-- Staff notifications overview -->
+                        <div class="portal-card p-5">
+                            <div
+                                class="flex items-center justify-between gap-3"
                             >
-                                Grades & Fees
-                            </p>
-                            <p class="mt-1 text-xs text-slate-600">
-                                Record grades, publish results and track student
-                                fee payments digitally.
-                            </p>
-                        </div>
-                        <div class="rounded-lg bg-slate-50 p-3">
-                            <p
-                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                            >
-                                Timetable, Attendance & Communication
-                            </p>
-                            <p class="mt-1 text-xs text-slate-600">
-                                Provide online timetable access, attendance
-                                tracking and notifications.
-                            </p>
+                                <div>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Notifications
+                                    </p>
+                                    <p class="mt-1 text-sm text-slate-700">
+                                        Stay on top of approvals and system
+                                        alerts.
+                                    </p>
+                                </div>
+                                <Link
+                                    :href="route('notifications.index')"
+                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                >
+                                    Open inbox
+                                </Link>
+                            </div>
+
+                            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div class="rounded-lg bg-slate-50 p-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Portal alerts
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xl font-semibold text-slate-900"
+                                    >
+                                        {{ unread.notifications ?? 0 }}
+                                    </p>
+                                </div>
+                                <div class="rounded-lg bg-slate-50 p-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Messages
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xl font-semibold text-slate-900"
+                                    >
+                                        {{ unread.messages ?? 0 }}
+                                    </p>
+                                </div>
+                                <div class="rounded-lg bg-slate-50 p-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Announcements
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xl font-semibold text-slate-900"
+                                    >
+                                        {{ unread.announcements ?? 0 }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <!-- Quick actions -->
-                    <div class="portal-card p-5">
-                        <p
-                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                        >
-                            Quick actions
-                        </p>
-                        <div class="mt-3 grid gap-2">
-                            <Link
-                                v-for="a in quickActions"
-                                :key="a.href"
-                                :href="a.href"
-                                class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                            >
-                                <span>{{ a.label }}</span>
-                                <span class="text-slate-400">›</span>
-                            </Link>
-                        </div>
-                    </div>
-
-                    <!-- Announcements widget (all roles) -->
-                    <div class="portal-card p-5">
+                <!-- Staff announcements & context -->
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div class="portal-card p-5 lg:col-span-2">
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <p
@@ -983,21 +1047,197 @@ const quickActions = computed(() => {
                         </div>
                     </div>
 
-                    <!-- Notifications widget (all roles) -->
                     <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Project context
+                        </p>
+                        <p class="mt-2 text-sm text-slate-700">
+                            BSc (Hons) Computing final year project – University
+                            Academic Portal using Vue.js and Laravel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher view: teaching-focused overview -->
+            <div v-else class="space-y-6">
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div class="portal-card p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="portal-badge">Teaching dashboard</p>
+                                <h3
+                                    class="mt-3 text-lg font-semibold text-slate-900"
+                                >
+                                    Overview of your subjects and students
+                                </h3>
+                                <p class="mt-1 text-sm text-slate-600">
+                                    Track subjects taught, student coverage and
+                                    grades you have recorded.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 grid gap-4 md:grid-cols-3">
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    My Subjects
+                                </p>
+                                <p
+                                    class="mt-1 text-sm font-semibold text-slate-900"
+                                >
+                                    {{ stats.teachingSubjects ?? 0 }}
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Subjects assigned to you this period.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Students taught
+                                </p>
+                                <p
+                                    class="mt-1 text-sm font-semibold text-slate-900"
+                                >
+                                    {{ stats.studentsTaught ?? 0 }}
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Unique students across all your courses.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Grades recorded
+                                </p>
+                                <p
+                                    class="mt-1 text-sm font-semibold text-slate-900"
+                                >
+                                    {{ stats.gradesRecorded ?? 0 }}
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Grade entries you’ve submitted so far.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Quick actions -->
+                        <div class="portal-card p-5">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Quick actions
+                            </p>
+                            <div class="mt-3 grid gap-2">
+                                <Link
+                                    v-for="a in quickActions"
+                                    :key="a.href"
+                                    :href="a.href"
+                                    class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                    <span>{{ a.label }}</span>
+                                    <span class="text-slate-400">›</span>
+                                </Link>
+                            </div>
+                        </div>
+
+                        <!-- Teacher notifications overview -->
+                        <div class="portal-card p-5">
+                            <div
+                                class="flex items-center justify-between gap-3"
+                            >
+                                <div>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Notifications
+                                    </p>
+                                    <p class="mt-1 text-sm text-slate-700">
+                                        Stay informed about class changes and
+                                        messages.
+                                    </p>
+                                </div>
+                                <Link
+                                    :href="route('notifications.index')"
+                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                >
+                                    Open inbox
+                                </Link>
+                            </div>
+
+                            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div class="rounded-lg bg-slate-50 p-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Portal alerts
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xl font-semibold text-slate-900"
+                                    >
+                                        {{ unread.notifications ?? 0 }}
+                                    </p>
+                                </div>
+                                <div class="rounded-lg bg-slate-50 p-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Messages
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xl font-semibold text-slate-900"
+                                    >
+                                        {{ unread.messages ?? 0 }}
+                                    </p>
+                                </div>
+                                <div class="rounded-lg bg-slate-50 p-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Announcements
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xl font-semibold text-slate-900"
+                                    >
+                                        {{ unread.announcements ?? 0 }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher announcements & project context -->
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div class="portal-card p-5 lg:col-span-2">
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <p
                                     class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                                 >
-                                    Notifications
+                                    Announcements
                                 </p>
                                 <p class="mt-1 text-sm text-slate-700">
                                     <span
-                                        v-if="$page.props.unread?.notifications"
+                                        v-if="
+                                            $page.props.announcementsWidget
+                                                ?.unreadCount > 0
+                                        "
                                         class="font-semibold"
                                     >
-                                        {{ $page.props.unread.notifications }}
+                                        {{
+                                            $page.props.announcementsWidget
+                                                .unreadCount
+                                        }}
                                         unread
                                     </span>
                                     <span v-else class="text-slate-500">
@@ -1006,16 +1246,52 @@ const quickActions = computed(() => {
                                 </p>
                             </div>
                             <Link
-                                :href="route('notifications.index')"
+                                :href="route('announcements.index')"
                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                             >
-                                Open inbox
+                                View all
                             </Link>
                         </div>
-                        <p class="mt-3 text-xs text-slate-500">
-                            Includes updates about grades, fees, timetable and
-                            attendance.
-                        </p>
+
+                        <div class="mt-4 space-y-2">
+                            <div
+                                v-if="
+                                    !$page.props.announcementsWidget?.latest
+                                        ?.length
+                                "
+                                class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500"
+                            >
+                                No announcements to show.
+                            </div>
+
+                            <div
+                                v-for="a in $page.props.announcementsWidget
+                                    ?.latest"
+                                :key="a.id"
+                                class="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3"
+                            >
+                                <div
+                                    class="mt-0.5 h-2.5 w-2.5 rounded-full"
+                                    :class="{
+                                        'bg-red-500': a.priority === 'urgent',
+                                        'bg-amber-500':
+                                            a.priority === 'important',
+                                        'bg-blue-500': a.priority === 'info',
+                                    }"
+                                />
+                                <div class="min-w-0 flex-1">
+                                    <p
+                                        class="truncate text-sm font-medium text-slate-900"
+                                    >
+                                        <span v-if="a.pinned">📌 </span>
+                                        {{ a.title }}
+                                    </p>
+                                    <p class="mt-0.5 text-xs text-slate-500">
+                                        {{ a.author }} · {{ a.created_at }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="portal-card p-5">
