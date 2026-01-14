@@ -2,8 +2,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     courses: {
         type: Array,
         required: true,
@@ -12,6 +13,41 @@ defineProps({
 
 const page = usePage();
 const user = page.props.auth.user;
+
+const query = ref("");
+
+const stats = computed(() => {
+    const courses = props.courses ?? [];
+    const subjects = courses.flatMap((c) => c.subjects ?? []);
+    return {
+        courses: courses.length,
+        subjects: subjects.length,
+    };
+});
+
+const filteredCourses = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    if (!q) return props.courses ?? [];
+
+    return (props.courses ?? [])
+        .map((course) => {
+            const courseCode = (course.course_code ?? "").toLowerCase();
+            const courseTitle = (course.course_title ?? "").toLowerCase();
+
+            const matchingSubjects = (course.subjects ?? []).filter((s) => {
+                const code = (s.subject_code ?? "").toLowerCase();
+                const title = (s.title ?? "").toLowerCase();
+                return code.includes(q) || title.includes(q);
+            });
+
+            const matchesCourse = courseCode.includes(q) || courseTitle.includes(q);
+            if (matchesCourse) return course;
+
+            if (matchingSubjects.length === 0) return null;
+            return { ...course, subjects: matchingSubjects };
+        })
+        .filter(Boolean);
+});
 </script>
 
 <template>
@@ -60,6 +96,63 @@ const user = page.props.auth.user;
                     </div>
                 </div>
 
+                <!-- Summary + search -->
+                <div class="mb-6 grid gap-4 md:grid-cols-3">
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Courses
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.courses }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            Courses you teach in
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-indigo-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                        >
+                            Subjects
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-indigo-900">
+                            {{ stats.subjects }}
+                        </p>
+                        <p class="mt-1 text-xs text-indigo-700">
+                            Total assigned subjects
+                        </p>
+                    </div>
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Search
+                        </p>
+                        <div class="mt-2 relative">
+                            <input
+                                v-model="query"
+                                type="text"
+                                placeholder="Search courses or subjects…"
+                                class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <button
+                                v-if="query"
+                                type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                @click="query = ''"
+                            >
+                                <span class="sr-only">Clear</span>
+                                ✕
+                            </button>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-600">
+                            Code or title
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p
@@ -76,7 +169,7 @@ const user = page.props.auth.user;
                     <!-- Courses with Subjects -->
                     <div v-if="courses.length > 0" class="space-y-6">
                         <div
-                            v-for="course in courses"
+                            v-for="course in filteredCourses"
                             :key="course.id"
                             class="rounded-lg border border-slate-200 bg-white"
                         >
@@ -203,6 +296,18 @@ const user = page.props.auth.user;
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div
+                        v-if="courses.length > 0 && filteredCourses.length === 0"
+                        class="rounded-lg bg-slate-50 p-8 text-center"
+                    >
+                        <h3 class="text-sm font-medium text-slate-900">
+                            No matches
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-500">
+                            Try a different keyword for course or subject.
+                        </p>
                     </div>
 
                     <!-- Empty State -->

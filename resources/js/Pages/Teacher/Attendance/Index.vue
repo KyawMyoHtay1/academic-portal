@@ -2,13 +2,39 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
-defineProps({
+const props = defineProps({
     subjects: {
         type: Array,
         required: true,
     },
 });
+
+const query = ref("");
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    if (!q) return props.subjects ?? [];
+    return (props.subjects ?? []).filter((s) => {
+        const code = (s.subject_code ?? "").toLowerCase();
+        const title = (s.title ?? "").toLowerCase();
+        const courseCode = (s.course_code ?? "").toLowerCase();
+        const courseTitle = (s.course_title ?? "").toLowerCase();
+        return (
+            code.includes(q) ||
+            title.includes(q) ||
+            courseCode.includes(q) ||
+            courseTitle.includes(q)
+        );
+    });
+});
+
+const stats = computed(() => ({
+    subjects: props.subjects?.length ?? 0,
+    courses: new Set((props.subjects ?? []).map((s) => s.course_code).filter(Boolean))
+        .size,
+}));
 </script>
 
 <template>
@@ -29,18 +55,71 @@ defineProps({
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Summary stats -->
+                <div class="mb-6 grid gap-4 md:grid-cols-2">
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Subjects
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.subjects }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            Subjects you can mark attendance for
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            Courses
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ stats.courses }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Unique courses covered
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
-                    <div class="mb-4">
+                    <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                         >
                             Select Subject
                         </p>
-                        <p class="mt-1 text-sm text-slate-600">
-                            Choose a subject to mark attendance for enrolled
-                            students
-                        </p>
+                        <div class="w-full sm:max-w-sm">
+                            <label class="sr-only" for="subject-search"
+                                >Search subjects</label
+                            >
+                            <div class="relative">
+                                <input
+                                    id="subject-search"
+                                    v-model="query"
+                                    type="text"
+                                    placeholder="Search subjects or courses…"
+                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                                <button
+                                    v-if="query"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                    @click="query = ''"
+                                >
+                                    <span class="sr-only">Clear</span>
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    <p class="mt-1 text-sm text-slate-600">
+                        Choose a subject to mark attendance for enrolled
+                        students.
+                    </p>
 
                     <!-- Subjects List -->
                     <div
@@ -74,7 +153,7 @@ defineProps({
                         class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                     >
                         <Link
-                            v-for="subject in subjects"
+                            v-for="subject in filtered"
                             :key="subject.id"
                             :href="route('teacher.attendance.show', subject.id)"
                             class="group rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-portal-navy hover:shadow-md"
@@ -127,6 +206,19 @@ defineProps({
                                 </svg>
                             </div>
                         </Link>
+                    </div>
+
+                    <div
+                        v-if="subjects.length > 0 && filtered.length === 0"
+                        class="mt-4 rounded-lg bg-slate-50 p-6 text-center"
+                    >
+                        <p class="text-sm font-medium text-slate-900">
+                            No subjects match your search.
+                        </p>
+                        <p class="mt-1 text-sm text-slate-600">
+                            Try a different keyword (subject code, title, or
+                            course).
+                        </p>
                     </div>
                 </div>
             </div>
