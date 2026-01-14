@@ -117,6 +117,6 @@ class MessageController extends Controller
             $message->update(['read' => true]);
         }
 
-        return redirect()->route('messages.index');
+        return back();
     }
 }

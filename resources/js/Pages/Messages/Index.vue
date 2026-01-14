@@ -13,6 +13,8 @@ const props = defineProps({
 
 const activeTab = ref("all"); // 'all', 'inbox', 'sent'
 const expandedMessages = ref(new Set());
+const query = ref("");
+const unreadOnly = ref(false);
 
 const markAsRead = (id) => {
     router.post(route("messages.read", id), {}, { preserveScroll: true });
@@ -28,12 +30,36 @@ const toggleExpand = (id) => {
 
 // Filter messages based on active tab
 const filteredMessages = computed(() => {
-    if (activeTab.value === "inbox") {
-        return props.messages.filter((m) => !m.is_sent);
-    } else if (activeTab.value === "sent") {
-        return props.messages.filter((m) => m.is_sent);
+    const q = query.value.trim().toLowerCase();
+
+    let list = props.messages;
+    if (activeTab.value === "inbox") list = list.filter((m) => !m.is_sent);
+    if (activeTab.value === "sent") list = list.filter((m) => m.is_sent);
+
+    if (unreadOnly.value) {
+        // Unread only makes sense for inbox; for sent, ignore (sent messages don't become "read" for sender)
+        list = list.filter((m) => !m.is_sent && !m.read);
     }
-    return props.messages;
+
+    if (q) {
+        list = list.filter((m) => {
+            const body = (m.body ?? "").toLowerCase();
+            const sender = (m.sender ?? "").toLowerCase();
+            const receiver = (m.receiver ?? "").toLowerCase();
+            const senderRole = (m.sender_role ?? "").toLowerCase();
+            const receiverRole = (m.receiver_role ?? "").toLowerCase();
+
+            return (
+                body.includes(q) ||
+                sender.includes(q) ||
+                receiver.includes(q) ||
+                senderRole.includes(q) ||
+                receiverRole.includes(q)
+            );
+        });
+    }
+
+    return list;
 });
 
 // Statistics
@@ -231,6 +257,49 @@ const truncateMessage = (text, maxLength = 150) => {
                                 <div class="text-xs text-white/80">Unread</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Search + quick filters -->
+                <div class="portal-card mb-6 p-4">
+                    <div
+                        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                        <div class="relative w-full sm:w-96">
+                            <input
+                                v-model="query"
+                                type="text"
+                                placeholder="Search messages (name, role, body)…"
+                                class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <button
+                                v-if="query"
+                                type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                @click="query = ''"
+                            >
+                                <span class="sr-only">Clear</span>
+                                ✕
+                            </button>
+                        </div>
+
+                        <label
+                            class="inline-flex items-center gap-2 text-sm text-slate-700"
+                        >
+                            <input
+                                v-model="unreadOnly"
+                                type="checkbox"
+                                class="rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                :disabled="activeTab === 'sent'"
+                            />
+                            Unread only
+                            <span
+                                v-if="activeTab === 'sent'"
+                                class="text-xs text-slate-400"
+                            >
+                                (inbox only)
+                            </span>
+                        </label>
                     </div>
                 </div>
 
