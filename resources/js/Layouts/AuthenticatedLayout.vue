@@ -24,6 +24,7 @@ const navigation = computed(() => {
     // Helper: badges for unread counts
     const unreadMessages = page.props.unread?.messages ?? 0;
     const unreadNotifications = page.props.unread?.notifications ?? 0;
+    const unreadAnnouncements = page.props.unread?.announcements ?? 0;
 
     // Student features (show for students only)
     if (user?.role === "student") {
@@ -63,6 +64,7 @@ const navigation = computed(() => {
                 name: "Announcements",
                 href: route("announcements.index"),
                 active: route().current("announcements.*"),
+                badge: unreadAnnouncements,
             },
             {
                 name: "Notifications",
@@ -106,6 +108,7 @@ const navigation = computed(() => {
                 name: "Announcements",
                 href: route("announcements.index"),
                 active: route().current("announcements.*"),
+                badge: unreadAnnouncements,
             },
             {
                 name: "Messages",

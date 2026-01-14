@@ -38,7 +38,12 @@ Route::get('/', function () {
         'publicCourses' => Course::orderBy('course_code')
             ->take(6)
             ->get(['id', 'course_code', 'title', 'credits', 'semester']),
-        'publicAnnouncements' => Announcement::orderBy('created_at', 'desc')
+        'publicAnnouncements' => Announcement::query()
+            ->currentlyVisible()
+            ->visibleToUser(null)
+            ->orderByDesc('pinned')
+            ->orderByRaw("FIELD(priority,'urgent','important','info')")
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get(['id', 'title', 'body', 'created_at']),
     ]);
@@ -59,7 +64,13 @@ Route::get('/guest/courses', function () {
 
 Route::get('/guest/news', function () {
     return view('guest.news', [
-        'announcements' => Announcement::orderBy('created_at', 'desc')->get([
+        'announcements' => Announcement::query()
+            ->currentlyVisible()
+            ->visibleToUser(null)
+            ->orderByDesc('pinned')
+            ->orderByRaw("FIELD(priority,'urgent','important','info')")
+            ->orderBy('created_at', 'desc')
+            ->get([
             'id',
             'title',
             'body',
@@ -106,6 +117,8 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
     // Announcements (all authenticated users)
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('/announcements/{announcement}/read', [AnnouncementController::class, 'markAsRead'])->name('announcements.read');
+    Route::post('/announcements/{announcement}/ack', [AnnouncementController::class, 'acknowledge'])->name('announcements.ack');
         // Notifications (all authenticated users)
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');

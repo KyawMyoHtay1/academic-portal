@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head, Link, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -360,7 +360,85 @@ const cards = computed(() => {
                     </div>
                 </div>
 
-                <div class="space-y-4">
+                    <div class="space-y-4">
+                        <!-- Announcements widget (all roles) -->
+                        <div class="portal-card p-5">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >
+                                        Announcements
+                                    </p>
+                                    <p class="mt-1 text-sm text-slate-700">
+                                        <span
+                                            v-if="
+                                                $page.props.announcementsWidget
+                                                    ?.unreadCount > 0
+                                            "
+                                            class="font-semibold"
+                                        >
+                                            {{
+                                                $page.props.announcementsWidget
+                                                    .unreadCount
+                                            }}
+                                            unread
+                                        </span>
+                                        <span v-else class="text-slate-500">
+                                            You’re all caught up
+                                        </span>
+                                    </p>
+                                </div>
+                                <Link
+                                    :href="route('announcements.index')"
+                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                >
+                                    View all
+                                </Link>
+                            </div>
+
+                            <div class="mt-4 space-y-2">
+                                <div
+                                    v-if="
+                                        !$page.props.announcementsWidget
+                                            ?.latest?.length
+                                    "
+                                    class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500"
+                                >
+                                    No announcements to show.
+                                </div>
+
+                                <div
+                                    v-for="a in $page.props.announcementsWidget
+                                        ?.latest"
+                                    :key="a.id"
+                                    class="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3"
+                                >
+                                    <div
+                                        class="mt-0.5 h-2.5 w-2.5 rounded-full"
+                                        :class="{
+                                            'bg-red-500':
+                                                a.priority === 'urgent',
+                                            'bg-amber-500':
+                                                a.priority === 'important',
+                                            'bg-blue-500':
+                                                a.priority === 'info',
+                                        }"
+                                    />
+                                    <div class="min-w-0 flex-1">
+                                        <p
+                                            class="truncate text-sm font-medium text-slate-900"
+                                        >
+                                            <span v-if="a.pinned">📌 </span>
+                                            {{ a.title }}
+                                        </p>
+                                        <p class="mt-0.5 text-xs text-slate-500">
+                                            {{ a.author }} · {{ a.created_at }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     <div class="portal-card p-5">
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"

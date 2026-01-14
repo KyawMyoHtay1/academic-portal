@@ -14,13 +14,25 @@ class StaffAnnouncementController extends Controller
     public function index(): Response
     {
         $announcements = Announcement::with('author')
+            ->orderByDesc('pinned')
+            ->orderByRaw("FIELD(priority,'urgent','important','info')")
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($a) {
+                $roles = $a->audience['roles'] ?? ['all'];
+
                 return [
                     'id' => $a->id,
                     'title' => $a->title,
                     'body' => $a->body,
+                    'priority' => $a->priority ?? 'info',
+                    'pinned' => (bool) $a->pinned,
+                    'require_ack' => (bool) $a->require_ack,
+                    'audience' => [
+                        'roles' => $roles,
+                    ],
+                    'publish_at' => $a->publish_at?->toISOString(),
+                    'expires_at' => $a->expires_at?->toISOString(),
                     'author' => $a->author?->name ?? 'Staff',
                     'author_photo' => $a->author?->photo,
                     'created_at' => $a->created_at->format('Y-m-d'),
@@ -42,10 +54,21 @@ class StaffAnnouncementController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string'],
+            'priority' => ['required', 'in:info,important,urgent'],
+            'pinned' => ['nullable', 'boolean'],
+            'require_ack' => ['nullable', 'boolean'],
+            'audience' => ['nullable', 'array'],
+            'audience.roles' => ['nullable', 'array'],
+            'audience.roles.*' => ['in:all,student,teacher,staff'],
+            'publish_at' => ['nullable', 'date'],
+            'expires_at' => ['nullable', 'date', 'after:publish_at'],
         ]);
 
         Announcement::create([
             ...$data,
+            'pinned' => (bool) ($data['pinned'] ?? false),
+            'require_ack' => (bool) ($data['require_ack'] ?? false),
+            'audience' => $data['audience'] ?? ['roles' => ['all']],
             'user_id' => Auth::id(),
         ]);
 
@@ -61,6 +84,12 @@ class StaffAnnouncementController extends Controller
                 'id' => $announcement->id,
                 'title' => $announcement->title,
                 'body' => $announcement->body,
+                'priority' => $announcement->priority ?? 'info',
+                'pinned' => (bool) $announcement->pinned,
+                'require_ack' => (bool) $announcement->require_ack,
+                'audience' => $announcement->audience ?? ['roles' => ['all']],
+                'publish_at' => $announcement->publish_at?->format('Y-m-d\TH:i'),
+                'expires_at' => $announcement->expires_at?->format('Y-m-d\TH:i'),
             ],
         ]);
     }
@@ -70,9 +99,22 @@ class StaffAnnouncementController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string'],
+            'priority' => ['required', 'in:info,important,urgent'],
+            'pinned' => ['nullable', 'boolean'],
+            'require_ack' => ['nullable', 'boolean'],
+            'audience' => ['nullable', 'array'],
+            'audience.roles' => ['nullable', 'array'],
+            'audience.roles.*' => ['in:all,student,teacher,staff'],
+            'publish_at' => ['nullable', 'date'],
+            'expires_at' => ['nullable', 'date', 'after:publish_at'],
         ]);
 
-        $announcement->update($data);
+        $announcement->update([
+            ...$data,
+            'pinned' => (bool) ($data['pinned'] ?? false),
+            'require_ack' => (bool) ($data['require_ack'] ?? false),
+            'audience' => $data['audience'] ?? ['roles' => ['all']],
+        ]);
 
         return redirect()
             ->route('admin.announcements.index')
