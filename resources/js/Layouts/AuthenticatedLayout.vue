@@ -185,6 +185,24 @@ const navigation = computed(() => {
 
     return items;
 });
+
+const headerStatus = computed(() => {
+    const role = page.props.auth?.user?.role;
+
+    if (role === "student") {
+        return "Student academic year in progress";
+    }
+
+    if (role === "teacher") {
+        return "Teaching term in progress";
+    }
+
+    if (role === "staff" || role === "admin") {
+        return "Administration term in progress";
+    }
+
+    return "Academic year in progress";
+});
 </script>
 
 <template>
@@ -379,7 +397,7 @@ const navigation = computed(() => {
             <div class="flex min-h-screen flex-1 flex-col">
                 <!-- Top bar -->
                 <header
-                    class="flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-3 shadow-sm backdrop-blur-sm sm:px-6 lg:px-8"
+                    class="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-3 shadow-sm backdrop-blur-sm sm:px-6 lg:px-8"
                 >
                     <div class="flex items-center gap-3">
                         <button
@@ -425,7 +443,7 @@ const navigation = computed(() => {
                             class="hidden items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 sm:flex"
                         >
                             <span class="h-2 w-2 rounded-full bg-emerald-500" />
-                            Academic year in progress
+                            {{ headerStatus }}
                         </div>
 
                         <!-- Notification bell -->
