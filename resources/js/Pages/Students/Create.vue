@@ -5,7 +5,6 @@ import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     users: Array,
-    courses: Array,
 });
 
 const form = useForm({
@@ -287,21 +286,17 @@ const submit = () => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
-                            Programme / Course
+                            Programme
                         </label>
-                        <select
+                        <input
                             v-model="form.programme"
+                            type="text"
+                            placeholder="e.g. BSc (Hons) Computing, BBA, BEng Software"
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                        >
-                            <option value="">Select programme</option>
-                            <option
-                                v-for="course in props.courses"
-                                :key="course.id"
-                                :value="course.course_code"
-                            >
-                                {{ course.course_code }} — {{ course.title }}
-                            </option>
-                        </select>
+                        />
+                        <p class="mt-1 text-xs text-slate-500">
+                            Students will enroll in specific courses themselves through the dashboard
+                        </p>
                         <p
                             v-if="form.errors.programme"
                             class="mt-1 text-xs text-red-600"

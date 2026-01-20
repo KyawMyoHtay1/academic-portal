@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ImageService;
@@ -45,12 +44,8 @@ class StudentController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'email']);
 
-        $courses = Course::orderBy('course_code')
-            ->get(['id', 'course_code', 'title']);
-
         return Inertia::render('Students/Create', [
             'users' => $users,
-            'courses' => $courses,
         ]);
     }
 
@@ -68,7 +63,7 @@ class StudentController extends Controller
             'address' => ['nullable', 'string', 'max:2000'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'programme' => ['required', 'string', 'max:255', 'exists:courses,course_code'],
+            'programme' => ['required', 'string', 'max:255'],
             'intake_year' => ['required', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             'id_card' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
@@ -103,9 +98,6 @@ class StudentController extends Controller
 
     public function edit(Student $student): Response
     {
-        $courses = Course::orderBy('course_code')
-            ->get(['id', 'course_code', 'title']);
-
         return Inertia::render('Students/Edit', [
             'student' => [
                 'id' => $student->id,
@@ -136,7 +128,6 @@ class StudentController extends Controller
                     ? asset('storage/' . $student->transcript)
                     : null,
             ],
-            'courses' => $courses,
         ]);
     }
 
@@ -153,7 +144,7 @@ class StudentController extends Controller
             'address' => ['nullable', 'string', 'max:2000'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'programme' => ['required', 'string', 'max:255', 'exists:courses,course_code'],
+            'programme' => ['required', 'string', 'max:255'],
             'intake_year' => ['required', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             'id_card' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
