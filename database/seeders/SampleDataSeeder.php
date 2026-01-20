@@ -66,9 +66,19 @@ class SampleDataSeeder extends Seeder
             );
         });
 
+        // Courses
+        $courses = collect([
+            ['course_code' => 'COMP101', 'title' => 'Introduction to Computing', 'credits' => 3, 'semester' => 'Semester 1'],
+            ['course_code' => 'COMP102', 'title' => 'Database Systems', 'credits' => 4, 'semester' => 'Semester 1'],
+            ['course_code' => 'COMP201', 'title' => 'Web Development', 'credits' => 4, 'semester' => 'Semester 2'],
+            ['course_code' => 'COMP202', 'title' => 'Data Structures', 'credits' => 3, 'semester' => 'Semester 2'],
+            ['course_code' => 'COMP203', 'title' => 'Software Engineering', 'credits' => 4, 'semester' => 'Semester 2'],
+        ])->map(fn ($c) => Course::firstOrCreate(['course_code' => $c['course_code']], $c));
+
         // Create student profiles linked to users
         $programmes = ['BSc Computing', 'BBA', 'BEng Software'];
-        $students = $studentUsers->map(function (User $user, $idx) use ($programmes) {
+        $students = $studentUsers->map(function (User $user, $idx) use ($programmes, $courses) {
+            $course = $courses[$idx % $courses->count()] ?? $courses->first();
             return Student::firstOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -82,7 +92,7 @@ class SampleDataSeeder extends Seeder
                     'address' => 'Demo Address ' . ($idx + 1),
                     'emergency_contact_name' => 'Guardian ' . ($idx + 1),
                     'emergency_contact_phone' => '555-090' . ($idx + 1),
-                    'programme' => $programmes[$idx % count($programmes)],
+                    'programme' => $course?->course_code ?? $programmes[$idx % count($programmes)],
                     'intake_year' => 2024 - ($idx % 2),
                     'previous_institution' => 'Demo Secondary School',
                     'previous_qualification' => 'High School Diploma',
@@ -91,15 +101,6 @@ class SampleDataSeeder extends Seeder
                 ]
             );
         });
-
-        // Courses
-        $courses = collect([
-            ['course_code' => 'COMP101', 'title' => 'Introduction to Computing', 'credits' => 3, 'semester' => 'Semester 1'],
-            ['course_code' => 'COMP102', 'title' => 'Database Systems', 'credits' => 4, 'semester' => 'Semester 1'],
-            ['course_code' => 'COMP201', 'title' => 'Web Development', 'credits' => 4, 'semester' => 'Semester 2'],
-            ['course_code' => 'COMP202', 'title' => 'Data Structures', 'credits' => 3, 'semester' => 'Semester 2'],
-            ['course_code' => 'COMP203', 'title' => 'Software Engineering', 'credits' => 4, 'semester' => 'Semester 2'],
-        ])->map(fn ($c) => Course::firstOrCreate(['course_code' => $c['course_code']], $c));
 
         // Assign teachers to courses (round-robin)
         $teacherIds = $teacherUsers->pluck('id')->all();

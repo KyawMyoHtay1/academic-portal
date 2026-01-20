@@ -5,6 +5,7 @@ import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     users: Array,
+    courses: Array,
 });
 
 const form = useForm({
@@ -116,10 +117,14 @@ const submit = () => {
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
                             Student Number
+                            <span class="text-[11px] text-slate-500">
+                                (leave blank to auto-generate)
+                            </span>
                         </label>
                         <input
                             v-model="form.student_no"
                             type="text"
+                            placeholder="Auto if left blank"
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                         />
                         <p
@@ -280,14 +285,21 @@ const submit = () => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
-                            Programme
+                            Programme / Course
                         </label>
-                        <input
+                        <select
                             v-model="form.programme"
-                            type="text"
-                            placeholder="e.g. BSc (Hons) Computing"
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                        />
+                        >
+                            <option value="">Select programme</option>
+                            <option
+                                v-for="course in props.courses"
+                                :key="course.id"
+                                :value="course.course_code"
+                            >
+                                {{ course.course_code }} — {{ course.title }}
+                            </option>
+                        </select>
                         <p
                             v-if="form.errors.programme"
                             class="mt-1 text-xs text-red-600"

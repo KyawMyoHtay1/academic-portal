@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ImageService;
@@ -43,8 +44,12 @@ class StudentController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'email']);
 
+        $courses = Course::orderBy('course_code')
+            ->get(['id', 'course_code', 'title']);
+
         return Inertia::render('Students/Create', [
             'users' => $users,
+            'courses' => $courses,
         ]);
     }
 
@@ -52,7 +57,7 @@ class StudentController extends Controller
     {
         $data = $request->validate([
             'user_id' => ['required', 'exists:users,id', 'unique:students,user_id'],
-            'student_no' => ['required', 'string', 'max:50', 'unique:students,student_no'],
+            'student_no' => ['nullable', 'string', 'max:50', 'unique:students,student_no'],
             'full_name' => ['required', 'string', 'max:255'],
             'dob' => ['required', 'date', 'before:today'],
             'gender' => ['nullable', 'in:Male,Female,Other'],
@@ -62,7 +67,7 @@ class StudentController extends Controller
             'address' => ['nullable', 'string', 'max:2000'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'programme' => ['required', 'string', 'max:255'],
+            'programme' => ['required', 'string', 'max:255', 'exists:courses,course_code'],
             'intake_year' => ['required', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             'previous_institution' => ['required', 'string', 'max:255'],
@@ -70,6 +75,9 @@ class StudentController extends Controller
             'status' => ['required', 'in:active,suspended,graduated'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ]);
+
+        // Auto-generate student number if not provided
+        $data['student_no'] = $data['student_no'] ?? $this->generateStudentNo();
 
         if ($request->hasFile('photo')) {
             $data['photo'] = ImageService::store($request->file('photo'), 'students');
@@ -84,6 +92,9 @@ class StudentController extends Controller
 
     public function edit(Student $student): Response
     {
+        $courses = Course::orderBy('course_code')
+            ->get(['id', 'course_code', 'title']);
+
         return Inertia::render('Students/Edit', [
             'student' => [
                 'id' => $student->id,
@@ -108,6 +119,7 @@ class StudentController extends Controller
                     ? asset('storage/' . $student->photo)
                     : null,
             ],
+            'courses' => $courses,
         ]);
     }
 
@@ -124,7 +136,7 @@ class StudentController extends Controller
             'address' => ['nullable', 'string', 'max:2000'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'programme' => ['required', 'string', 'max:255'],
+            'programme' => ['required', 'string', 'max:255', 'exists:courses,course_code'],
             'intake_year' => ['required', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             'previous_institution' => ['required', 'string', 'max:255'],
@@ -170,6 +182,22 @@ class StudentController extends Controller
         return redirect()
             ->route('students.index')
             ->with('success', 'Student deleted successfully.');
+    }
+
+    /**
+     * Generate the next student number in the format STU0001, STU0002, ...
+     */
+    protected function generateStudentNo(): string
+    {
+        $latest = Student::orderByDesc('id')->value('student_no');
+
+        if ($latest && preg_match('/(\d+)$/', $latest, $matches)) {
+            $next = (int) $matches[1] + 1;
+        } else {
+            $next = 1;
+        }
+
+        return 'STU' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 }
 
