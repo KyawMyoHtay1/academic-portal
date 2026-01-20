@@ -11,6 +11,7 @@ const props = defineProps({
 const query = ref("");
 const programmeFilter = ref("all");
 const intakeYearFilter = ref("all");
+const statusFilter = ref("all");
 
 const rows = computed(() => props.students?.data ?? []);
 
@@ -23,6 +24,8 @@ const intakeYears = computed(() => {
     const set = new Set(rows.value.map((s) => s.intake_year).filter(Boolean));
     return Array.from(set).sort();
 });
+
+const statuses = ["active", "suspended", "graduated"];
 
 const stats = computed(() => {
     const list = rows.value;
@@ -48,6 +51,9 @@ const filtered = computed(() => {
     if (intakeYearFilter.value !== "all") {
         list = list.filter((s) => s.intake_year === intakeYearFilter.value);
     }
+    if (statusFilter.value !== "all") {
+        list = list.filter((s) => (s.status || "").toLowerCase() === statusFilter.value);
+    }
 
     if (q) {
         list = list.filter((s) => {
@@ -56,12 +62,14 @@ const filtered = computed(() => {
             const email = (s.email ?? "").toLowerCase();
             const programme = (s.programme ?? "").toLowerCase();
             const intake = String(s.intake_year ?? "").toLowerCase();
+            const status = (s.status ?? "").toLowerCase();
             return (
                 no.includes(q) ||
                 name.includes(q) ||
                 email.includes(q) ||
                 programme.includes(q) ||
-                intake.includes(q)
+                intake.includes(q) ||
+                status.includes(q)
             );
         });
     }
@@ -186,6 +194,20 @@ const deleteStudent = (id) => {
                             </option>
                         </select>
 
+                        <select
+                            v-model="statusFilter"
+                            class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-48"
+                        >
+                            <option value="all">All statuses</option>
+                            <option
+                                v-for="status in statuses"
+                                :key="status"
+                                :value="status"
+                            >
+                                {{ status.charAt(0).toUpperCase() + status.slice(1) }}
+                            </option>
+                        </select>
+
                         <div class="relative w-full sm:w-72">
                             <input
                                 v-model="query"
@@ -247,6 +269,12 @@ const deleteStudent = (id) => {
                             >
                                 Intake Year
                             </th>
+                        <th
+                            scope="col"
+                            class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Status
+                        </th>
                             <th
                                 scope="col"
                                 class="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -292,6 +320,22 @@ const deleteStudent = (id) => {
                             <td class="px-3 py-2 text-slate-700">
                                 {{ student.intake_year }}
                             </td>
+                        <td class="px-3 py-2 text-slate-700">
+                            <span
+                                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                                :class="{
+                                    'bg-emerald-100 text-emerald-800':
+                                        student.status === 'active',
+                                    'bg-amber-100 text-amber-800':
+                                        student.status === 'suspended',
+                                    'bg-indigo-100 text-indigo-800':
+                                        student.status === 'graduated',
+                                    'bg-slate-100 text-slate-700': !student.status,
+                                }"
+                            >
+                                {{ student.status || 'N/A' }}
+                            </span>
+                        </td>
                             <td class="px-3 py-2 text-right text-slate-700">
                                 <div
                                     class="flex items-center justify-end gap-2"

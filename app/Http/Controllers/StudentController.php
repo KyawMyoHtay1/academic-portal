@@ -27,6 +27,7 @@ class StudentController extends Controller
                     'email' => $student->email,
                     'programme' => $student->programme,
                     'intake_year' => $student->intake_year,
+                    'status' => $student->status,
                     'photo' => $student->photo,
                 ];
             });
