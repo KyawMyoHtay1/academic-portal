@@ -14,11 +14,26 @@ class Student extends Model
         'student_no',
         'full_name',
         'dob',
+        'gender',
+        'nationality',
         'email',
         'phone',
+        'address',
+        'emergency_contact_name',
+        'emergency_contact_phone',
         'programme',
         'intake_year',
         'photo',
+        'previous_institution',
+        'previous_qualification',
+        'status',
+        'notes',
+        'enrollment_date',
+    ];
+
+    protected $casts = [
+        'dob' => 'date',
+        'enrollment_date' => 'date',
     ];
 
     public function user()

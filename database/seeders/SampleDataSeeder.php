@@ -75,10 +75,19 @@ class SampleDataSeeder extends Seeder
                     'student_no' => sprintf('STU%03d', $idx + 1),
                     'full_name' => $user->name,
                     'dob' => Carbon::now()->subYears(18 + ($idx % 4))->subMonths($idx)->format('Y-m-d'),
+                    'gender' => ['Male', 'Female', 'Other'][$idx % 3],
+                    'nationality' => 'Nigerian',
                     'email' => $user->email,
                     'phone' => '555-010' . ($idx + 1),
+                    'address' => 'Demo Address ' . ($idx + 1),
+                    'emergency_contact_name' => 'Guardian ' . ($idx + 1),
+                    'emergency_contact_phone' => '555-090' . ($idx + 1),
                     'programme' => $programmes[$idx % count($programmes)],
                     'intake_year' => 2024 - ($idx % 2),
+                    'previous_institution' => 'Demo Secondary School',
+                    'previous_qualification' => 'High School Diploma',
+                    'status' => 'active',
+                    'notes' => null,
                 ]
             );
         });

@@ -41,6 +41,7 @@ class StudentProfileController extends Controller
                 'dob' => $student->dob,
                 'email' => $student->email,
                 'phone' => $student->phone,
+                'address' => $student->address,
                 'programme' => $student->programme,
                 'intake_year' => $student->intake_year,
                 'photo_url' => $student->photo
@@ -68,7 +69,8 @@ class StudentProfileController extends Controller
         $data = $request->validate([
             'phone' => ['nullable', 'string', 'max:50'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-            // Add more editable fields here as needed (e.g., address)
+            'address' => ['nullable', 'string', 'max:2000'],
+            // Add more editable fields here as needed (e.g., emergency contacts)
             // Core fields like student_no, programme, intake_year are NOT editable by student
         ]);
 

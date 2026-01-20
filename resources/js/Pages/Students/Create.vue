@@ -12,10 +12,19 @@ const form = useForm({
     student_no: "",
     full_name: "",
     dob: "",
+    gender: "",
+    nationality: "",
     email: "",
     phone: "",
+    address: "",
+    emergency_contact_name: "",
+    emergency_contact_phone: "",
     programme: "",
     intake_year: "",
+    previous_institution: "",
+    previous_qualification: "",
+    status: "active",
+    notes: "",
     photo: null,
 });
 
@@ -167,6 +176,51 @@ const submit = () => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
+                            Gender (optional)
+                        </label>
+                        <select
+                            v-model="form.gender"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        >
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <p
+                            v-if="form.errors.gender"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.gender }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
+                            Nationality (optional)
+                        </label>
+                        <input
+                            v-model="form.nationality"
+                            type="text"
+                            placeholder="e.g. Nigerian"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        />
+                        <p
+                            v-if="form.errors.nationality"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.nationality }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
                             Email
                         </label>
                         <input
@@ -200,6 +254,25 @@ const submit = () => {
                             {{ form.errors.phone }}
                         </p>
                     </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                    >
+                        Address (optional)
+                    </label>
+                    <textarea
+                        v-model="form.address"
+                        rows="3"
+                        class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                    ></textarea>
+                    <p
+                        v-if="form.errors.address"
+                        class="mt-1 text-xs text-red-600"
+                    >
+                        {{ form.errors.address }}
+                    </p>
                 </div>
 
                 <div class="grid gap-4 md:grid-cols-2">
@@ -242,6 +315,131 @@ const submit = () => {
                             {{ form.errors.intake_year }}
                         </p>
                     </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
+                            Previous Institution
+                        </label>
+                        <input
+                            v-model="form.previous_institution"
+                            type="text"
+                            placeholder="e.g. ABC Secondary School"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        />
+                        <p
+                            v-if="form.errors.previous_institution"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.previous_institution }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
+                            Previous Qualification
+                        </label>
+                        <input
+                            v-model="form.previous_qualification"
+                            type="text"
+                            placeholder="e.g. WAEC / High School Diploma"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        />
+                        <p
+                            v-if="form.errors.previous_qualification"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.previous_qualification }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
+                            Emergency Contact Name (optional)
+                        </label>
+                        <input
+                            v-model="form.emergency_contact_name"
+                            type="text"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        />
+                        <p
+                            v-if="form.errors.emergency_contact_name"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.emergency_contact_name }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
+                            Emergency Contact Phone (optional)
+                        </label>
+                        <input
+                            v-model="form.emergency_contact_phone"
+                            type="text"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        />
+                        <p
+                            v-if="form.errors.emergency_contact_phone"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.emergency_contact_phone }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                        >
+                            Student Status
+                        </label>
+                        <select
+                            v-model="form.status"
+                            class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                        >
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="graduated">Graduated</option>
+                        </select>
+                        <p
+                            v-if="form.errors.status"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ form.errors.status }}
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                    >
+                        Notes / Remarks (optional)
+                    </label>
+                    <textarea
+                        v-model="form.notes"
+                        rows="3"
+                        class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                    ></textarea>
+                    <p
+                        v-if="form.errors.notes"
+                        class="mt-1 text-xs text-red-600"
+                    >
+                        {{ form.errors.notes }}
+                    </p>
                 </div>
 
                 <div class="grid gap-4 md:grid-cols-2">

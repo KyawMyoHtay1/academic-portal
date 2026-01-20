@@ -17,6 +17,7 @@ const props = defineProps({
 
 const form = useForm({
     phone: props.student?.phone || "",
+    address: props.student?.address || "",
     photo: null,
 });
 
@@ -365,6 +366,31 @@ const removePhoto = () => {
                                         class="mt-1 text-sm text-red-600"
                                     >
                                         {{ form.errors.phone }}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label
+                                        for="address"
+                                        class="block text-sm font-medium text-slate-700"
+                                    >
+                                        Address (optional)
+                                    </label>
+                                    <textarea
+                                        id="address"
+                                        v-model="form.address"
+                                        rows="3"
+                                        class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
+                                        :class="{
+                                            'border-red-300 focus:border-red-500 focus:ring-red-500':
+                                                form.errors.address,
+                                        }"
+                                    ></textarea>
+                                    <p
+                                        v-if="form.errors.address"
+                                        class="mt-1 text-sm text-red-600"
+                                    >
+                                        {{ form.errors.address }}
                                     </p>
                                 </div>
 
