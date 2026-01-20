@@ -24,6 +24,8 @@ class Student extends Model
         'programme',
         'intake_year',
         'photo',
+        'id_card',
+        'transcript',
         'previous_institution',
         'previous_qualification',
         'status',

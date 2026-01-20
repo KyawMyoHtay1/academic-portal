@@ -71,6 +71,8 @@ class StudentController extends Controller
             'programme' => ['required', 'string', 'max:255', 'exists:courses,course_code'],
             'intake_year' => ['required', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'id_card' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
+            'transcript' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
             'previous_institution' => ['required', 'string', 'max:255'],
             'previous_qualification' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:active,suspended,graduated'],
@@ -82,6 +84,14 @@ class StudentController extends Controller
 
         if ($request->hasFile('photo')) {
             $data['photo'] = ImageService::store($request->file('photo'), 'students');
+        }
+
+        if ($request->hasFile('id_card')) {
+            $data['id_card'] = $this->storeDocument($request->file('id_card'), 'students/documents');
+        }
+
+        if ($request->hasFile('transcript')) {
+            $data['transcript'] = $this->storeDocument($request->file('transcript'), 'students/documents');
         }
 
         Student::create($data);
@@ -119,6 +129,12 @@ class StudentController extends Controller
                 'photo_url' => $student->photo
                     ? asset('storage/' . $student->photo)
                     : null,
+                'id_card_url' => $student->id_card
+                    ? asset('storage/' . $student->id_card)
+                    : null,
+                'transcript_url' => $student->transcript
+                    ? asset('storage/' . $student->transcript)
+                    : null,
             ],
             'courses' => $courses,
         ]);
@@ -140,6 +156,8 @@ class StudentController extends Controller
             'programme' => ['required', 'string', 'max:255', 'exists:courses,course_code'],
             'intake_year' => ['required', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'id_card' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
+            'transcript' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
             'previous_institution' => ['required', 'string', 'max:255'],
             'previous_qualification' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:active,suspended,graduated'],
@@ -151,6 +169,20 @@ class StudentController extends Controller
             ImageService::delete($student->photo);
 
             $data['photo'] = ImageService::store($request->file('photo'), 'students');
+        }
+
+        if ($request->hasFile('id_card')) {
+            // Delete old document if it exists
+            $this->deleteDocument($student->id_card);
+
+            $data['id_card'] = $this->storeDocument($request->file('id_card'), 'students/documents');
+        }
+
+        if ($request->hasFile('transcript')) {
+            // Delete old document if it exists
+            $this->deleteDocument($student->transcript);
+
+            $data['transcript'] = $this->storeDocument($request->file('transcript'), 'students/documents');
         }
 
         $student->update($data);
@@ -199,6 +231,41 @@ class StudentController extends Controller
         }
 
         return 'STU' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Store a document file (PDF or image) in storage
+     */
+    protected function storeDocument($file, string $folder): string
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = $folder . '/' . uniqid() . '.' . $extension;
+
+        // For PDFs, store directly without image processing
+        if ($extension === 'pdf') {
+            Storage::disk('public')->put($filename, file_get_contents($file->getRealPath()));
+        } else {
+            // For images, use ImageService for optimization
+            $filename = ImageService::store($file, $folder);
+        }
+
+        return $filename;
+    }
+
+    /**
+     * Delete a document file from storage
+     */
+    protected function deleteDocument(?string $path): bool
+    {
+        if (!$path) {
+            return false;
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return Storage::disk('public')->delete($path);
+        }
+
+        return false;
     }
 }
 

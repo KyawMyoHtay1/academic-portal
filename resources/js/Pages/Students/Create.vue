@@ -27,6 +27,8 @@ const form = useForm({
     status: "active",
     notes: "",
     photo: null,
+    id_card: null,
+    transcript: null,
 });
 
 const submit = () => {
@@ -476,6 +478,59 @@ const submit = () => {
                         >
                             {{ form.errors.photo }}
                         </p>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-6">
+                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-700">
+                        Required Documents
+                    </h3>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label
+                                class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                            >
+                                ID Card
+                                <span class="text-[11px] text-slate-500"
+                                    >(PDF/JPEG/PNG, max 5MB)</span
+                                >
+                            </label>
+                            <input
+                                type="file"
+                                accept=".pdf,image/jpeg,image/jpg,image/png"
+                                class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
+                                @change="(e) => (form.id_card = e.target.files[0])"
+                            />
+                            <p
+                                v-if="form.errors.id_card"
+                                class="mt-1 text-xs text-red-600"
+                            >
+                                {{ form.errors.id_card }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                            >
+                                Academic Transcript
+                                <span class="text-[11px] text-slate-500"
+                                    >(PDF/JPEG/PNG, max 5MB)</span
+                                >
+                            </label>
+                            <input
+                                type="file"
+                                accept=".pdf,image/jpeg,image/jpg,image/png"
+                                class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
+                                @change="(e) => (form.transcript = e.target.files[0])"
+                            />
+                            <p
+                                v-if="form.errors.transcript"
+                                class="mt-1 text-xs text-red-600"
+                            >
+                                {{ form.errors.transcript }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
