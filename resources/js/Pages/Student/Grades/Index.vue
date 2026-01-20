@@ -118,6 +118,19 @@ const gradeSummary = computed(() => {
         averageScore: gradedCount ? totalScore / gradedCount : null,
     };
 });
+
+// Convert numeric score to letter grade
+// Standard grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, F: 0-49
+const getLetterGrade = (score) => {
+    if (score === null || score === undefined) return null;
+    const s = parseFloat(score);
+    if (isNaN(s)) return null;
+    if (s >= 80) return { letter: "A", class: "bg-emerald-100 text-emerald-800" };
+    if (s >= 70) return { letter: "B", class: "bg-blue-100 text-blue-800" };
+    if (s >= 60) return { letter: "C", class: "bg-amber-100 text-amber-800" };
+    if (s >= 50) return { letter: "D", class: "bg-yellow-100 text-yellow-800" };
+    return { letter: "F", class: "bg-red-100 text-red-800" };
+};
 </script>
 
 <template>
@@ -426,7 +439,7 @@ const gradeSummary = computed(() => {
                                                 <th
                                                     class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                                 >
-                                                    Score
+                                                    Score & Grade
                                                 </th>
                                             </tr>
                                         </thead>
@@ -487,21 +500,37 @@ const gradeSummary = computed(() => {
                                                     </div>
                                                 </td>
                                                 <td class="px-4 py-3 text-sm">
-                                                    <span
+                                                    <div
                                                         v-if="
                                                             subject.score !==
                                                                 null &&
                                                             subject.score !==
                                                                 undefined
                                                         "
-                                                        class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700"
+                                                        class="flex items-center gap-2"
                                                     >
-                                                        {{
-                                                            Number(
-                                                                subject.score
-                                                            ).toFixed(2)
-                                                        }}
-                                                    </span>
+                                                        <span
+                                                            class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium"
+                                                            :class="getLetterGrade(subject.score)?.class || 'bg-slate-100 text-slate-700'"
+                                                        >
+                                                            {{
+                                                                Number(
+                                                                    subject.score
+                                                                ).toFixed(2)
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            v-if="getLetterGrade(subject.score)"
+                                                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                                                            :class="getLetterGrade(subject.score).class"
+                                                        >
+                                                            {{
+                                                                getLetterGrade(
+                                                                    subject.score
+                                                                ).letter
+                                                            }}
+                                                        </span>
+                                                    </div>
                                                     <span
                                                         v-else
                                                         class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"

@@ -44,4 +44,36 @@ class Grade extends Model
     {
         return $this->belongsTo(User::class, 'graded_by');
     }
+
+    /**
+     * Convert numeric score to letter grade.
+     * Standard grading scale:
+     * A: 80-100
+     * B: 70-79
+     * C: 60-69
+     * D: 50-59
+     * F: 0-49
+     * 
+     * @return string|null Letter grade or null if score is null
+     */
+    public function getLetterGradeAttribute(): ?string
+    {
+        if ($this->score === null) {
+            return null;
+        }
+
+        $score = (float) $this->score;
+
+        if ($score >= 80) {
+            return 'A';
+        } elseif ($score >= 70) {
+            return 'B';
+        } elseif ($score >= 60) {
+            return 'C';
+        } elseif ($score >= 50) {
+            return 'D';
+        } else {
+            return 'F';
+        }
+    }
 }

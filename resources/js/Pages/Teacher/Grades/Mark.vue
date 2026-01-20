@@ -63,9 +63,12 @@ const getGradeClass = (score) => {
     if (score == null || score === "") return "text-slate-400";
     const s = parseFloat(score);
     if (isNaN(s)) return "text-slate-400";
-    if (s >= 70) return "text-emerald-700 font-semibold";
-    if (s >= 60) return "text-blue-700 font-semibold";
-    if (s >= 50) return "text-amber-700 font-semibold";
+    // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 1-39
+    if (s >= 80) return "text-emerald-700 font-semibold";
+    if (s >= 70) return "text-blue-700 font-semibold";
+    if (s >= 60) return "text-amber-700 font-semibold";
+    if (s >= 50) return "text-yellow-700 font-semibold";
+    if (s >= 40) return "text-orange-700 font-semibold";
     return "text-red-700 font-semibold";
 };
 
@@ -73,10 +76,14 @@ const getGradeBadge = (score) => {
     if (score == null || score === "") return null;
     const s = parseFloat(score);
     if (isNaN(s)) return null;
-    if (s >= 70) return { label: "A", class: "bg-emerald-100 text-emerald-800" };
-    if (s >= 60) return { label: "B", class: "bg-blue-100 text-blue-800" };
-    if (s >= 50) return { label: "C", class: "bg-amber-100 text-amber-800" };
-    return { label: "F", class: "bg-red-100 text-red-800" };
+    // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 1-39
+    if (s >= 80) return { label: "A", class: "bg-emerald-100 text-emerald-800" };
+    if (s >= 70) return { label: "B", class: "bg-blue-100 text-blue-800" };
+    if (s >= 60) return { label: "C", class: "bg-amber-100 text-amber-800" };
+    if (s >= 50) return { label: "D", class: "bg-yellow-100 text-yellow-800" };
+    if (s >= 40) return { label: "E", class: "bg-orange-100 text-orange-800" };
+    if (s >= 1) return { label: "F", class: "bg-red-100 text-red-800" };
+    return null;
 };
 
 const submit = () => {
@@ -298,10 +305,12 @@ const submit = () => {
                                                             step="0.01"
                                                             class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                                             :class="{
-                                                                'border-emerald-300 bg-emerald-50': entry.record.score && parseFloat(entry.record.score) >= 70,
-                                                                'border-blue-300 bg-blue-50': entry.record.score && parseFloat(entry.record.score) >= 60 && parseFloat(entry.record.score) < 70,
-                                                                'border-amber-300 bg-amber-50': entry.record.score && parseFloat(entry.record.score) >= 50 && parseFloat(entry.record.score) < 60,
-                                                                'border-red-300 bg-red-50': entry.record.score && parseFloat(entry.record.score) < 50,
+                                                                'border-emerald-300 bg-emerald-50': entry.record.score && parseFloat(entry.record.score) >= 80,
+                                                                'border-blue-300 bg-blue-50': entry.record.score && parseFloat(entry.record.score) >= 70 && parseFloat(entry.record.score) < 80,
+                                                                'border-amber-300 bg-amber-50': entry.record.score && parseFloat(entry.record.score) >= 60 && parseFloat(entry.record.score) < 70,
+                                                                'border-yellow-300 bg-yellow-50': entry.record.score && parseFloat(entry.record.score) >= 50 && parseFloat(entry.record.score) < 60,
+                                                                'border-orange-300 bg-orange-50': entry.record.score && parseFloat(entry.record.score) >= 40 && parseFloat(entry.record.score) < 50,
+                                                                'border-red-300 bg-red-50': entry.record.score && parseFloat(entry.record.score) >= 1 && parseFloat(entry.record.score) < 40,
                                                             }"
                                                         />
                                                         <span
