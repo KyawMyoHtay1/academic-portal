@@ -16,12 +16,16 @@ class Fee extends Model
         'status',
         'due_date',
         'paid_date',
+        'payment_intent_id',
+        'payment_method',
+        'payment_processed_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'due_date' => 'date',
         'paid_date' => 'date',
+        'payment_processed_at' => 'datetime',
     ];
 
     /**

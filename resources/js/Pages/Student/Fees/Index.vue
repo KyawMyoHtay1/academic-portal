@@ -93,6 +93,20 @@ const submitPayment = (feeId) => {
         preserveScroll: true,
     });
 };
+
+const payNow = (feeId) => {
+    if (
+        !confirm(
+            "You will be redirected to Stripe to complete your payment securely. Continue?"
+        )
+    ) {
+        return;
+    }
+
+    router.post(route("payment.checkout", feeId), {}, {
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -377,20 +391,27 @@ const submitPayment = (feeId) => {
                                 </div>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 flex gap-2">
                                 <span
                                     v-if="fee.status === 'payment_pending'"
                                     class="inline-flex w-full items-center justify-center rounded-md bg-blue-100 px-3 py-2 text-xs font-semibold text-blue-800"
                                 >
                                     Payment Pending Approval
                                 </span>
-                                <button
-                                    v-else-if="fee.status === 'pending'"
-                                    @click="submitPayment(fee.id)"
-                                    class="w-full rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                >
-                                    Submit Payment
-                                </button>
+                                <template v-else-if="fee.status === 'pending'">
+                                    <button
+                                        @click="payNow(fee.id)"
+                                        class="flex-1 rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                    >
+                                        💳 Pay Now
+                                    </button>
+                                    <button
+                                        @click="submitPayment(fee.id)"
+                                        class="flex-1 rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                    >
+                                        Submit Proof
+                                    </button>
+                                </template>
                                 <span
                                     v-else
                                     class="inline-flex w-full items-center justify-center rounded-md bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800"
@@ -486,19 +507,28 @@ const submitPayment = (feeId) => {
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"
                                     >
-                                        <span
-                                            v-if="fee.status === 'payment_pending'"
-                                            class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
-                                        >
-                                            Payment Pending
-                                        </span>
-                                        <button
-                                            v-else-if="fee.status === 'pending'"
-                                            @click="submitPayment(fee.id)"
-                                            class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                        >
-                                            Submit Payment
-                                        </button>
+                                        <div class="flex items-center justify-end gap-2">
+                                            <span
+                                                v-if="fee.status === 'payment_pending'"
+                                                class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+                                            >
+                                                Payment Pending
+                                            </span>
+                                            <template v-else-if="fee.status === 'pending'">
+                                                <button
+                                                    @click="payNow(fee.id)"
+                                                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                                >
+                                                    💳 Pay Now
+                                                </button>
+                                                <button
+                                                    @click="submitPayment(fee.id)"
+                                                    class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                                >
+                                                    Submit Proof
+                                                </button>
+                                            </template>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

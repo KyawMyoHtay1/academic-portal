@@ -20,6 +20,7 @@ use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\StudentFeeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StaffAnnouncementController;
 use App\Http\Controllers\StaffAttendanceReportController;
@@ -113,6 +114,11 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     // Student Fees
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
     Route::post('/student/fees/{fee}/submit-payment', [StudentFeeController::class, 'submitPayment'])->name('student.fees.submit-payment');
+    
+    // Payment Gateway (Stripe)
+    Route::post('/payment/{fee}/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/{fee}/success', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/{fee}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
     // Student Timetable (read-only)
     Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
 
@@ -245,3 +251,6 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Stripe Webhook (must be outside auth middleware)
+Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])->name('stripe.webhook');
