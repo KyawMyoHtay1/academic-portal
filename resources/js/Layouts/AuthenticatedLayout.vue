@@ -163,6 +163,11 @@ const navigation = computed(() => {
                 active: route().current("admin.timetables.*"),
             },
             {
+                name: "Attendance Report",
+                href: route("admin.attendance.report"),
+                active: route().current("admin.attendance.*"),
+            },
+            {
                 name: "Announcements",
                 href: route("admin.announcements.index"),
                 active: route().current("admin.announcements.*"),

@@ -50,4 +50,12 @@ class Subject extends Model
         return $this->belongsToMany(User::class, 'subject_teacher', 'subject_id', 'user_id')
             ->withTimestamps();
     }
+
+    /**
+     * The attendance records for this subject.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }

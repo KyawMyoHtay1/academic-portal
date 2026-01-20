@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fee;
 use App\Models\Student;
 use App\Notifications\FeeStatusUpdated;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,10 +18,29 @@ class StaffFeeController extends Controller
      */
     public function index(): Response
     {
+        // Get late payments (due_date < today and status = pending)
+        $latePayments = Fee::with('student')
+            ->where('status', 'pending')
+            ->where('due_date', '<', now()->format('Y-m-d'))
+            ->orderBy('due_date', 'asc')
+            ->get()
+            ->map(function (Fee $fee) {
+                return [
+                    'id' => $fee->id,
+                    'student_no' => $fee->student->student_no,
+                    'student_name' => $fee->student->full_name,
+                    'amount' => $fee->amount,
+                    'description' => $fee->description,
+                    'due_date' => $fee->due_date->format('Y-m-d'),
+                    'days_overdue' => now()->diffInDays($fee->due_date),
+                ];
+            });
+
         $fees = Fee::with('student')
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->through(function (Fee $fee) {
+                $isLate = $fee->status === 'pending' && $fee->due_date < now();
                 return [
                     'id' => $fee->id,
                     'student_no' => $fee->student->student_no,
@@ -32,11 +52,15 @@ class StaffFeeController extends Controller
                     'due_date' => $fee->due_date->format('Y-m-d'),
                     'paid_date' => $fee->paid_date?->format('Y-m-d'),
                     'created_at' => $fee->created_at->format('Y-m-d'),
+                    'is_late' => $isLate,
+                    'days_overdue' => $isLate ? now()->diffInDays($fee->due_date) : null,
                 ];
             });
 
         return Inertia::render('Admin/Fees/Index', [
             'fees' => $fees,
+            'latePayments' => $latePayments,
+            'latePaymentsCount' => $latePayments->count(),
         ]);
     }
 
@@ -208,5 +232,31 @@ class StaffFeeController extends Controller
         return redirect()
             ->route('admin.fees.index')
             ->with('success', "Payment confirmation rejected for fee of £{$fee->amount}.");
+    }
+
+    /**
+     * Generate and download a receipt PDF for a paid fee.
+     */
+    public function receipt(Fee $fee)
+    {
+        // Only generate receipts for paid fees
+        if ($fee->status !== 'paid') {
+            return redirect()
+                ->route('admin.fees.index')
+                ->with('error', 'Receipt can only be generated for paid fees.');
+        }
+
+        $fee->load('student');
+
+        $pdf = Pdf::loadView('fees.receipt', [
+            'fee' => $fee,
+            'student' => $fee->student,
+            'receipt_number' => 'REC-' . str_pad((string) $fee->id, 6, '0', STR_PAD_LEFT),
+            'generated_at' => now()->format('F j, Y \a\t g:i A'),
+        ]);
+
+        $filename = 'receipt-' . $fee->student->student_no . '-' . $fee->id . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

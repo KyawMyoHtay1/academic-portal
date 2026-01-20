@@ -22,6 +22,7 @@ use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StaffAnnouncementController;
+use App\Http\Controllers\StaffAttendanceReportController;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
@@ -198,6 +199,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         ]);
         Route::post('/admin/fees/{fee}/approve-payment', [StaffFeeController::class, 'approvePayment'])->name('admin.fees.approve-payment');
         Route::post('/admin/fees/{fee}/reject-payment', [StaffFeeController::class, 'rejectPayment'])->name('admin.fees.reject-payment');
+        Route::get('/admin/fees/{fee}/receipt', [StaffFeeController::class, 'receipt'])->name('admin.fees.receipt');
 
         // Timetable Management (staff only)
         Route::resource('admin/timetables', StaffTimetableController::class)->names([
@@ -218,6 +220,9 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'admin.announcements.update',
             'destroy' => 'admin.announcements.destroy',
         ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+        // Attendance Reports (staff only)
+        Route::get('/admin/attendance/report', [StaffAttendanceReportController::class, 'index'])->name('admin.attendance.report');
     });
 
     // Timebox 3: Teacher Features (teacher only)

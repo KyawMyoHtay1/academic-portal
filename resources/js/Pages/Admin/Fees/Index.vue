@@ -9,6 +9,14 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    latePayments: {
+        type: Array,
+        default: () => [],
+    },
+    latePaymentsCount: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const query = ref("");
@@ -153,7 +161,7 @@ const rejectPayment = (feeId) => {
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <!-- Summary Stats -->
-                <div class="mb-6 grid gap-4 md:grid-cols-4">
+                <div class="mb-6 grid gap-4 md:grid-cols-5">
                     <div class="portal-card p-5">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                             Total Fees
@@ -197,6 +205,67 @@ const rejectPayment = (feeId) => {
                         <p class="mt-1 text-xs text-blue-700">
                             Need review
                         </p>
+                    </div>
+                    <div class="portal-card p-5 bg-red-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-red-700">
+                            Late Payments
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-red-900">
+                            {{ latePaymentsCount }}
+                        </p>
+                        <p class="mt-1 text-xs text-red-700">
+                            Overdue
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Late Payments Alert -->
+                <div
+                    v-if="latePaymentsCount > 0"
+                    class="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4"
+                >
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg
+                                class="h-5 w-5 text-red-400"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <h3 class="text-sm font-medium text-red-800">
+                                {{ latePaymentsCount }} Late Payment(s) Detected
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>
+                                    The following fees are overdue and require
+                                    attention:
+                                </p>
+                                <ul class="mt-2 list-disc list-inside space-y-1">
+                                    <li
+                                        v-for="late in latePayments.slice(0, 5)"
+                                        :key="late.id"
+                                    >
+                                        {{ late.student_name }} ({{ late.student_no }}) -
+                                        £{{ parseFloat(late.amount).toFixed(2) }} -
+                                        {{ late.days_overdue }} day(s) overdue
+                                    </li>
+                                    <li
+                                        v-if="latePayments.length > 5"
+                                        class="font-semibold"
+                                    >
+                                        ... and
+                                        {{ latePayments.length - 5 }} more
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -375,9 +444,19 @@ const rejectPayment = (feeId) => {
                                         </span>
                                     </td>
                                     <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
+                                        class="whitespace-nowrap px-4 py-4 text-sm"
+                                        :class="{
+                                            'text-red-600 font-semibold': fee.is_late,
+                                            'text-slate-600': !fee.is_late,
+                                        }"
                                     >
                                         {{ fee.due_date }}
+                                        <span
+                                            v-if="fee.is_late"
+                                            class="ml-2 text-xs text-red-600"
+                                        >
+                                            ({{ fee.days_overdue }}d late)
+                                        </span>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
@@ -414,6 +493,19 @@ const rejectPayment = (feeId) => {
                                                 </button>
                                             </template>
                                             <template v-else>
+                                                <a
+                                                    v-if="fee.status === 'paid'"
+                                                    :href="
+                                                        route(
+                                                            'admin.fees.receipt',
+                                                            fee.id
+                                                        )
+                                                    "
+                                                    target="_blank"
+                                                    class="rounded-md bg-indigo-100 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                >
+                                                    Receipt
+                                                </a>
                                                 <Link
                                                     :href="
                                                         route(

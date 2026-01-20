@@ -36,4 +36,12 @@ class Attendance extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    /**
+     * The subject this attendance record belongs to.
+     */
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
 }

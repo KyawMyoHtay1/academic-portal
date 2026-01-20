@@ -1,0 +1,457 @@
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { Head } from "@inertiajs/vue3";
+
+const props = defineProps({
+    overall: {
+        type: Object,
+        required: true,
+    },
+    byCourse: {
+        type: Array,
+        default: () => [],
+    },
+    bySubject: {
+        type: Array,
+        default: () => [],
+    },
+    lowAttendanceStudents: {
+        type: Array,
+        default: () => [],
+    },
+    recentRecords: {
+        type: Array,
+        default: () => [],
+    },
+});
+</script>
+
+<template>
+    <Head title="Attendance Report" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                    Attendance Report
+                </h2>
+            </div>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Attendance Report' }]" />
+            </div>
+        </template>
+
+        <div class="py-12">
+            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <!-- Overall Statistics -->
+                <div class="mb-6 grid gap-4 md:grid-cols-4">
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Total Records
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ overall.total }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            Present
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ overall.present }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-red-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-red-700"
+                        >
+                            Absent
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-red-900">
+                            {{ overall.absent }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-indigo-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                        >
+                            Attendance Rate
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-indigo-900">
+                            {{ overall.rate }}%
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Students with Low Attendance -->
+                <div
+                    v-if="lowAttendanceStudents.length > 0"
+                    class="mb-6 portal-card p-6"
+                >
+                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
+                        Students with Low Attendance (&lt; 75%)
+                    </h3>
+                    <p class="mb-4 text-sm text-slate-600">
+                        These students may require attention or intervention.
+                    </p>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Student No
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Name
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Programme
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Present
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Absent
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Rate
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <tr
+                                    v-for="student in lowAttendanceStudents"
+                                    :key="student.id"
+                                    class="hover:bg-slate-50"
+                                >
+                                    <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
+                                        {{ student.student_no }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ student.full_name }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ student.programme || "N/A" }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-emerald-600">
+                                        {{ student.present }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-red-600">
+                                        {{ student.absent }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm">
+                                        <span
+                                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                                            :class="{
+                                                'bg-red-100 text-red-800':
+                                                    student.rate < 50,
+                                                'bg-amber-100 text-amber-800':
+                                                    student.rate >= 50 &&
+                                                    student.rate < 75,
+                                            }"
+                                        >
+                                            {{ student.rate }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Attendance by Course -->
+                <div class="mb-6 portal-card p-6">
+                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
+                        Attendance by Course
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Course Code
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Title
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Total
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Present
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Absent
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Rate
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <tr
+                                    v-for="course in byCourse"
+                                    :key="course.id"
+                                    class="hover:bg-slate-50"
+                                >
+                                    <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
+                                        {{ course.course_code }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ course.title }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-slate-600">
+                                        {{ course.total }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-emerald-600">
+                                        {{ course.present }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-red-600">
+                                        {{ course.absent }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm">
+                                        <span
+                                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                                            :class="{
+                                                'bg-emerald-100 text-emerald-800':
+                                                    course.rate >= 80,
+                                                'bg-amber-100 text-amber-800':
+                                                    course.rate >= 60 &&
+                                                    course.rate < 80,
+                                                'bg-red-100 text-red-800':
+                                                    course.rate < 60,
+                                            }"
+                                        >
+                                            {{ course.rate }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="byCourse.length === 0">
+                                    <td
+                                        colspan="6"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No attendance records found for any courses.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Attendance by Subject -->
+                <div class="mb-6 portal-card p-6">
+                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
+                        Attendance by Subject
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Subject Code
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Title
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Course
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Total
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Present
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Absent
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Rate
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <tr
+                                    v-for="subject in bySubject"
+                                    :key="subject.id"
+                                    class="hover:bg-slate-50"
+                                >
+                                    <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
+                                        {{ subject.subject_code }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ subject.title }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
+                                        {{ subject.course_code }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-slate-600">
+                                        {{ subject.total }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-emerald-600">
+                                        {{ subject.present }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-red-600">
+                                        {{ subject.absent }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm">
+                                        <span
+                                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                                            :class="{
+                                                'bg-emerald-100 text-emerald-800':
+                                                    subject.rate >= 80,
+                                                'bg-amber-100 text-amber-800':
+                                                    subject.rate >= 60 &&
+                                                    subject.rate < 80,
+                                                'bg-red-100 text-red-800':
+                                                    subject.rate < 60,
+                                            }"
+                                        >
+                                            {{ subject.rate }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="bySubject.length === 0">
+                                    <td
+                                        colspan="7"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No attendance records found for any subjects.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Attendance Records -->
+                <div class="portal-card p-6">
+                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
+                        Recent Attendance Records (Last 30 Days)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Date
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Student
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Subject
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Course
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <tr
+                                    v-for="record in recentRecords"
+                                    :key="record.id"
+                                    class="hover:bg-slate-50"
+                                >
+                                    <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
+                                        {{ record.date }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ record.student_name }} ({{ record.student_no }})
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ record.subject_code }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        {{ record.course_code }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-center text-sm">
+                                        <span
+                                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold capitalize"
+                                            :class="{
+                                                'bg-emerald-100 text-emerald-800':
+                                                    record.status === 'present',
+                                                'bg-red-100 text-red-800':
+                                                    record.status === 'absent',
+                                            }"
+                                        >
+                                            {{ record.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="recentRecords.length === 0">
+                                    <td
+                                        colspan="5"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No recent attendance records found.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
