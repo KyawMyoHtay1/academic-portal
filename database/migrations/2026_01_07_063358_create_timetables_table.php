@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('timetables', function (Blueprint $table) {
             $table->id();
+            // Link to the owning course and subject
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
             $table->string('day_of_week');
             $table->time('start_time');

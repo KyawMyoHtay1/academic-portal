@@ -159,7 +159,9 @@ class SampleDataSeeder extends Seeder
         // Timetables (one per course)
         $dayMap = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         foreach ($courses as $idx => $course) {
-            Timetable::firstOrCreate(
+            $subject = $course->subjects()->orderBy('subject_code')->first();
+
+            Timetable::updateOrCreate(
                 [
                     'course_id' => $course->id,
                     'day_of_week' => $dayMap[$idx % count($dayMap)],
@@ -167,6 +169,7 @@ class SampleDataSeeder extends Seeder
                     'end_time' => '11:00',
                 ],
                 [
+                    'subject_id' => $subject?->id,
                     'location' => 'Room ' . chr(65 + $idx) . '10',
                 ]
             );

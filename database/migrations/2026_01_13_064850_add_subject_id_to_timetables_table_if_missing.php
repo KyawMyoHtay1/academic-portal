@@ -12,19 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('timetables', function (Blueprint $table) {
-            // Drop foreign key constraint first if it exists
-            if (Schema::hasColumn('timetables', 'course_id')) {
-                $table->dropForeign(['course_id']);
+            // Ensure course_id exists (older installs might miss it)
+            if (!Schema::hasColumn('timetables', 'course_id')) {
+                $table->foreignId('course_id')->constrained()->cascadeOnDelete();
             }
-            
-            // Make course_id nullable
-            $table->foreignId('course_id')->nullable()->change();
-            
-            // Re-add foreign key
-            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
-            
-            // Add subject_id column
-            $table->foreignId('subject_id')->nullable()->after('course_id')->constrained()->onDelete('cascade');
+
+            // Only add subject_id if it is missing
+            if (!Schema::hasColumn('timetables', 'subject_id')) {
+                $table->foreignId('subject_id')->nullable()->after('course_id')->constrained()->cascadeOnDelete();
+            }
         });
     }
 
@@ -34,14 +30,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('timetables', function (Blueprint $table) {
-            // Drop subject_id foreign key
-            $table->dropForeign(['subject_id']);
-            $table->dropColumn('subject_id');
-            
-            // Restore course_id to not nullable
-            $table->dropForeign(['course_id']);
-            $table->foreignId('course_id')->nullable(false)->change();
-            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
+            if (Schema::hasColumn('timetables', 'subject_id')) {
+                $table->dropForeign(['subject_id']);
+                $table->dropColumn('subject_id');
+            }
         });
     }
 };
