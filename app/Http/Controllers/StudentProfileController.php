@@ -33,6 +33,9 @@ class StudentProfileController extends Controller
         // Refresh the student model to ensure we have latest data
         $student->refresh();
 
+        // Calculate GPA
+        $gpa = $student->calculateGPA();
+
         return Inertia::render('StudentProfile/Show', [
             'student' => [
                 'id' => $student->id,
@@ -44,6 +47,7 @@ class StudentProfileController extends Controller
                 'address' => $student->address,
                 'programme' => $student->programme,
                 'intake_year' => $student->intake_year,
+                'gpa' => $gpa,
                 'photo_url' => $student->photo
                     ? asset('storage/' . $student->photo)
                     : null,

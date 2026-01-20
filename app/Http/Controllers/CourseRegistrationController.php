@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Timetable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +53,39 @@ class CourseRegistrationController extends Controller
                         ->update(['status' => 'pending', 'updated_at' => now()]);
                     return Redirect::route('courses.index')
                         ->with('success', "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
+                }
+            }
+
+            // Check for schedule conflicts with already enrolled courses
+            $enrolledCourseIds = $student->courses()
+                ->wherePivot('status', 'approved')
+                ->pluck('courses.id')
+                ->toArray();
+
+            if (!empty($enrolledCourseIds)) {
+                // Get timetables for the new course
+                $newCourseTimetables = Timetable::where('course_id', $course->id)->get();
+                
+                // Get timetables for already enrolled courses
+                $existingTimetables = Timetable::whereIn('course_id', $enrolledCourseIds)->get();
+
+                // Check for conflicts (same day + overlapping time)
+                foreach ($newCourseTimetables as $newTimetable) {
+                    foreach ($existingTimetables as $existingTimetable) {
+                        if ($newTimetable->day_of_week === $existingTimetable->day_of_week) {
+                            // Check if times overlap
+                            $newStart = strtotime($newTimetable->start_time);
+                            $newEnd = strtotime($newTimetable->end_time);
+                            $existingStart = strtotime($existingTimetable->start_time);
+                            $existingEnd = strtotime($existingTimetable->end_time);
+
+                            if (($newStart < $existingEnd && $newEnd > $existingStart)) {
+                                $conflictingCourse = Course::find($existingTimetable->course_id);
+                                return Redirect::route('courses.index')
+                                    ->with('error', "Schedule conflict detected! This course conflicts with {$conflictingCourse->course_code} on {$newTimetable->day_of_week} ({$newTimetable->start_time} - {$newTimetable->end_time}). Please choose a different course or contact administration.");
+                            }
+                        }
+                    }
                 }
             }
 

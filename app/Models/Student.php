@@ -76,6 +76,26 @@ class Student extends Model
     {
         return $this->hasMany(Fee::class);
     }
+
+    /**
+     * Calculate the student's GPA (Grade Point Average).
+     * GPA is calculated as the average of all grade scores.
+     * 
+     * @return float|null GPA value (0.00 - 100.00) or null if no grades
+     */
+    public function calculateGPA(): ?float
+    {
+        $grades = $this->grades()->whereNotNull('score')->get();
+        
+        if ($grades->isEmpty()) {
+            return null;
+        }
+
+        $totalScore = $grades->sum('score');
+        $count = $grades->count();
+
+        return $count > 0 ? round($totalScore / $count, 2) : null;
+    }
 }
 
 

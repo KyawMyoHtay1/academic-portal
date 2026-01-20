@@ -62,8 +62,13 @@ class StudentGradesController extends Controller
                 ];
             });
 
+        // Calculate overall GPA
+        $gpa = $student->calculateGPA();
+
         return Inertia::render('Student/Grades/Index', [
             'courses' => $courses,
+            'gpa' => $gpa,
+            'totalGrades' => $student->grades()->whereNotNull('score')->count(),
         ]);
     }
 }

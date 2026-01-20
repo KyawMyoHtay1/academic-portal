@@ -13,6 +13,14 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    gpa: {
+        type: Number,
+        default: null,
+    },
+    totalGrades: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const searchTerm = ref("");
@@ -166,7 +174,7 @@ const gradeSummary = computed(() => {
                     <!-- Summary stats -->
                     <div
                         v-if="courses.length > 0"
-                        class="mb-6 grid gap-4 md:grid-cols-3"
+                        class="mb-6 grid gap-4 md:grid-cols-4"
                     >
                         <div class="portal-card p-5">
                             <p
@@ -201,6 +209,22 @@ const gradeSummary = computed(() => {
                                 }}
                             </p>
                         </div>
+                        <div
+                            v-if="gpa !== null"
+                            class="portal-card p-5 bg-indigo-50"
+                        >
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                            >
+                                GPA (Grade Point Average)
+                            </p>
+                            <p class="mt-2 text-2xl font-bold text-indigo-900">
+                                {{ gpa.toFixed(2) }}
+                            </p>
+                            <p class="mt-1 text-xs text-indigo-700">
+                                Based on {{ totalGrades }} grade(s)
+                            </p>
+                        </div>
                     </div>
 
                     <div
@@ -218,22 +242,34 @@ const gradeSummary = computed(() => {
                             </p>
                         </div>
                         <div
-                            v-if="gradeSummary.gradedCount > 0"
+                            v-if="gradeSummary.gradedCount > 0 || gpa !== null"
                             class="rounded-lg bg-emerald-50 px-4 py-3 text-right shadow-sm"
                         >
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
                             >
-                                Overview
+                                Academic Summary
                             </p>
-                            <p class="mt-1 text-xs text-emerald-800">
+                            <p
+                                v-if="gradeSummary.gradedCount > 0"
+                                class="mt-1 text-xs text-emerald-800"
+                            >
                                 Graded subjects:
                                 <span class="font-semibold">{{
                                     gradeSummary.gradedCount
                                 }}</span>
                             </p>
                             <p
-                                v-if="gradeSummary.averageScore !== null"
+                                v-if="gpa !== null"
+                                class="mt-0.5 text-xs text-emerald-800"
+                            >
+                                Overall GPA:
+                                <span class="font-semibold text-base">
+                                    {{ gpa.toFixed(2) }}
+                                </span>
+                            </p>
+                            <p
+                                v-else-if="gradeSummary.averageScore !== null"
                                 class="mt-0.5 text-xs text-emerald-800"
                             >
                                 Average score:

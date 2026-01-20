@@ -28,7 +28,7 @@ const academicSummary = computed(() => {
         return null;
     }
 
-    return [
+    const summary = [
         {
             label: "Student Number",
             value: props.student.student_no,
@@ -42,6 +42,15 @@ const academicSummary = computed(() => {
             value: props.student.intake_year,
         },
     ];
+
+    if (props.student.gpa !== null && props.student.gpa !== undefined) {
+        summary.push({
+            label: "GPA",
+            value: props.student.gpa.toFixed(2),
+        });
+    }
+
+    return summary;
 });
 
 const submit = () => {
@@ -258,6 +267,21 @@ const removePhoto = () => {
                                 </dt>
                                 <dd class="mt-1 text-sm text-slate-900">
                                     {{ student.email }}
+                                </dd>
+                            </div>
+
+                            <div v-if="student.gpa !== null && student.gpa !== undefined">
+                                <dt
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    GPA (Grade Point Average)
+                                </dt>
+                                <dd class="mt-1 text-sm text-slate-900">
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-sm font-semibold text-indigo-800"
+                                    >
+                                        {{ student.gpa.toFixed(2) }}
+                                    </span>
                                 </dd>
                             </div>
                         </dl>
