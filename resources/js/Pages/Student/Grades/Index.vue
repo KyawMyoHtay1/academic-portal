@@ -120,7 +120,7 @@ const gradeSummary = computed(() => {
 });
 
 // Convert numeric score to letter grade
-// Standard grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, F: 0-49
+// Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 1-39
 const getLetterGrade = (score) => {
     if (score === null || score === undefined) return null;
     const s = parseFloat(score);
@@ -129,7 +129,9 @@ const getLetterGrade = (score) => {
     if (s >= 70) return { letter: "B", class: "bg-blue-100 text-blue-800" };
     if (s >= 60) return { letter: "C", class: "bg-amber-100 text-amber-800" };
     if (s >= 50) return { letter: "D", class: "bg-yellow-100 text-yellow-800" };
-    return { letter: "F", class: "bg-red-100 text-red-800" };
+    if (s >= 40) return { letter: "E", class: "bg-orange-100 text-orange-800" };
+    if (s >= 1) return { letter: "F", class: "bg-red-100 text-red-800" };
+    return null;
 };
 </script>
 

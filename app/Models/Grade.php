@@ -47,12 +47,13 @@ class Grade extends Model
 
     /**
      * Convert numeric score to letter grade.
-     * Standard grading scale:
+     * Grading scale:
      * A: 80-100
      * B: 70-79
      * C: 60-69
      * D: 50-59
-     * F: 0-49
+     * E: 40-49
+     * F: 1-39
      * 
      * @return string|null Letter grade or null if score is null
      */
@@ -72,8 +73,12 @@ class Grade extends Model
             return 'C';
         } elseif ($score >= 50) {
             return 'D';
-        } else {
+        } elseif ($score >= 40) {
+            return 'E';
+        } elseif ($score >= 1) {
             return 'F';
         }
+        
+        return null;
     }
 }
