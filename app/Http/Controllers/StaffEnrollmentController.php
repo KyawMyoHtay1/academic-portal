@@ -18,7 +18,7 @@ class StaffEnrollmentController extends Controller
     public function index(): Response
     {
         $pendingEnrollments = DB::table('course_student')
-            ->where('status', 'pending')
+            ->where('course_student.status', 'pending')
             ->join('courses', 'course_student.course_id', '=', 'courses.id')
             ->join('students', 'course_student.student_id', '=', 'students.id')
             ->select(
@@ -42,7 +42,7 @@ class StaffEnrollmentController extends Controller
             ->get();
 
         $pendingWithdrawals = DB::table('course_student')
-            ->where('status', 'withdrawal_pending')
+            ->where('course_student.status', 'withdrawal_pending')
             ->join('courses', 'course_student.course_id', '=', 'courses.id')
             ->join('students', 'course_student.student_id', '=', 'students.id')
             ->select(
@@ -78,7 +78,7 @@ class StaffEnrollmentController extends Controller
     {
         $enrollmentRecord = DB::table('course_student')
             ->where('id', $enrollment)
-            ->where('status', 'pending')
+            ->where('course_student.status', 'pending')
             ->first();
 
         if (!$enrollmentRecord) {
@@ -106,7 +106,7 @@ class StaffEnrollmentController extends Controller
     {
         $enrollmentRecord = DB::table('course_student')
             ->where('id', $enrollment)
-            ->where('status', 'pending')
+            ->where('course_student.status', 'pending')
             ->first();
 
         if (!$enrollmentRecord) {
@@ -134,7 +134,7 @@ class StaffEnrollmentController extends Controller
     {
         $enrollmentRecord = DB::table('course_student')
             ->where('id', $enrollment)
-            ->where('status', 'withdrawal_pending')
+            ->where('course_student.status', 'withdrawal_pending')
             ->first();
 
         if (!$enrollmentRecord) {
@@ -163,7 +163,7 @@ class StaffEnrollmentController extends Controller
     {
         $enrollmentRecord = DB::table('course_student')
             ->where('id', $enrollment)
-            ->where('status', 'withdrawal_pending')
+            ->where('course_student.status', 'withdrawal_pending')
             ->first();
 
         if (!$enrollmentRecord) {
