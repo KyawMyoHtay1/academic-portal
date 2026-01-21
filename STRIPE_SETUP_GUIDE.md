@@ -8,7 +8,7 @@ Stripe payment gateway integration has been successfully implemented. Students c
 
 ## 🔧 Setup Instructions
 
-### 1. Get Stripe API Keys
+
 
 1. Sign up for a Stripe account at https://stripe.com
 2. Go to **Developers** → **API keys**

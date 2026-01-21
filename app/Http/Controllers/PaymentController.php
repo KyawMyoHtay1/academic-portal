@@ -26,72 +26,65 @@ class PaymentController extends Controller
     /**
      * Create a Stripe checkout session for a fee payment.
      */
-    public function checkout(Request $request, Fee $fee): RedirectResponse
+    public function checkout(Request $request, Fee $fee)
     {
         $user = Auth::user();
         $student = $user->student;
-
-        if (!$student) {
+    
+        if (!$student || $fee->student_id !== $student->id) {
             return redirect()
                 ->route('student.fees.index')
-                ->with('error', 'Student record not found.');
+                ->with('error', 'Unauthorized access.');
         }
-
-        // Verify the fee belongs to the student
-        if ($fee->student_id !== $student->id) {
-            return redirect()
-                ->route('student.fees.index')
-                ->with('error', 'You are not authorized to access this fee.');
-        }
-
-        // Check if fee is already paid
+    
         if ($fee->status === 'paid') {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'This fee has already been paid.');
         }
-
+    
         try {
-            // Create a Stripe Checkout Session
             $checkoutSession = Session::create([
-                'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
                         'currency' => 'gbp',
                         'product_data' => [
-                            'name' => $fee->description ?? "Fee Payment",
-                            'description' => "Fee Payment for {$student->full_name}",
+                            'name' => $fee->description ?? 'Fee Payment',
                         ],
-                        'unit_amount' => (int)($fee->amount * 100), // Convert to cents
+                        'unit_amount' => (int) ($fee->amount * 100),
                     ],
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('payment.success', ['fee' => $fee->id]) . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('payment.cancel', ['fee' => $fee->id]),
-                'metadata' => [
-                    'fee_id' => $fee->id,
-                    'student_id' => $student->id,
+                'payment_intent_data' => [
+                    'metadata' => [
+                        'fee_id' => $fee->id,
+                        'student_id' => $student->id,
+                    ],
                 ],
+                'success_url' => route('payment.success', $fee) . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('payment.cancel', $fee),
                 'customer_email' => $student->email,
             ]);
-
-            // Store payment intent ID in fee (from session)
+    
             $fee->update([
                 'payment_intent_id' => $checkoutSession->payment_intent,
                 'status' => 'payment_pending',
             ]);
-
-            // Redirect to Stripe Checkout
-            return redirect()->away($checkoutSession->url);
-
+    
+            return Inertia::location($checkoutSession->url);
+    
         } catch (ApiErrorException $e) {
-            Log::error('Stripe Checkout Session creation failed: ' . $e->getMessage());
+            Log::error('Stripe Checkout Session creation failed', [
+                'error' => $e->getMessage(),
+            ]);
+    
             return redirect()
                 ->route('student.fees.index')
-                ->with('error', 'Payment initialization failed. Please try again later.');
+                ->with('error', 'Payment initialization failed.');
         }
     }
+    
 
 
     /**
