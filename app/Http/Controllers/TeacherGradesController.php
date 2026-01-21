@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Grade;
+use App\Models\GradeReviewLog;
 use App\Models\Student;
 use App\Models\Subject;
-use App\Notifications\GradePublished;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -145,13 +145,23 @@ class TeacherGradesController extends Controller
                     'course_id' => $subject->course_id,
                     'graded_by' => $user->id,
                     'score' => $score,
+                    // Submit for review; staff/admin will approve to publish.
+                    'status' => Grade::STATUS_PENDING,
+                    'reviewed_by' => null,
+                    'reviewed_at' => null,
+                    'rejection_reason' => null,
                 ]
             );
 
-            $student = Student::find($record['student_id']);
-            if ($student && $student->user) {
-                $student->user->notify(new GradePublished($grade));
-            }
+            GradeReviewLog::create([
+                'grade_id' => $grade->id,
+                'performed_by' => $user->id,
+                'action' => 'submitted',
+                'meta' => [
+                    'subject_id' => $subject->id,
+                    'course_id' => $subject->course_id,
+                ],
+            ]);
             
             $savedCount++;
         }
@@ -159,7 +169,7 @@ class TeacherGradesController extends Controller
         if ($savedCount > 0) {
             return redirect()
                 ->route('teacher.grades.show', $subject->id)
-                ->with('success', "Successfully saved {$savedCount} grade(s).");
+                ->with('success', "Successfully submitted {$savedCount} grade(s) for review.");
         }
 
         return redirect()

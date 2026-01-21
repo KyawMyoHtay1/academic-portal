@@ -11,6 +11,7 @@ use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffEnrollmentController;
 use App\Http\Controllers\StaffFeeController;
+use App\Http\Controllers\StaffGradesController;
 use App\Http\Controllers\StaffSubjectController;
 use App\Http\Controllers\StaffSubjectTeacherController;
 use App\Http\Controllers\StaffTimetableController;
@@ -206,6 +207,12 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::post('/admin/fees/{fee}/approve-payment', [StaffFeeController::class, 'approvePayment'])->name('admin.fees.approve-payment');
         Route::post('/admin/fees/{fee}/reject-payment', [StaffFeeController::class, 'rejectPayment'])->name('admin.fees.reject-payment');
         Route::get('/admin/fees/{fee}/receipt', [StaffFeeController::class, 'receipt'])->name('admin.fees.receipt');
+
+        // Grades Review & Approval (staff only)
+        Route::get('/admin/grades', [StaffGradesController::class, 'index'])->name('admin.grades.index');
+        Route::get('/admin/grades/{subject}', [StaffGradesController::class, 'show'])->name('admin.grades.show');
+        Route::post('/admin/grades/{grade}/approve', [StaffGradesController::class, 'approve'])->name('admin.grades.approve');
+        Route::post('/admin/grades/{grade}/reject', [StaffGradesController::class, 'reject'])->name('admin.grades.reject');
 
         // Timetable Management (staff only)
         Route::resource('admin/timetables', StaffTimetableController::class)->names([

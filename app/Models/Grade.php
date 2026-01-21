@@ -9,16 +9,25 @@ class Grade extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+
     protected $fillable = [
         'subject_id',
         'course_id',
         'student_id',
         'graded_by',
+        'reviewed_by',
         'score',
+        'status',
+        'reviewed_at',
+        'rejection_reason',
     ];
 
     protected $casts = [
         'score' => 'decimal:2',
+        'reviewed_at' => 'datetime',
     ];
 
     /**
@@ -43,6 +52,24 @@ class Grade extends Model
     public function grader()
     {
         return $this->belongsTo(User::class, 'graded_by');
+    }
+
+    /**
+     * The user (staff/admin) who reviewed/approved/rejected this grade.
+     */
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function reviewLogs()
+    {
+        return $this->hasMany(GradeReviewLog::class);
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === self::STATUS_APPROVED;
     }
 
     /**

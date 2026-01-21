@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Grade;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,7 +29,8 @@ class StudentGradesController extends Controller
             ->with(['subjects' => function ($query) {
                 $query->select('subjects.id', 'subjects.course_id', 'subjects.subject_code', 'subjects.title', 'subjects.photo');
             }, 'subjects.grades' => function ($query) use ($student) {
-                $query->where('student_id', $student->id);
+                $query->where('student_id', $student->id)
+                    ->where('status', Grade::STATUS_APPROVED);
             }])
             ->orderBy('course_code')
             ->get([
@@ -68,7 +70,10 @@ class StudentGradesController extends Controller
         return Inertia::render('Student/Grades/Index', [
             'courses' => $courses,
             'gpa' => $gpa,
-            'totalGrades' => $student->grades()->whereNotNull('score')->count(),
+            'totalGrades' => $student->grades()
+                ->where('status', Grade::STATUS_APPROVED)
+                ->whereNotNull('score')
+                ->count(),
         ]);
     }
 }

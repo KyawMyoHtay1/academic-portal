@@ -85,7 +85,11 @@ class Student extends Model
      */
     public function calculateGPA(): ?float
     {
-        $grades = $this->grades()->whereNotNull('score')->get();
+        // GPA should be calculated from finalized (approved) grades only.
+        $grades = $this->grades()
+            ->where('status', Grade::STATUS_APPROVED)
+            ->whereNotNull('score')
+            ->get();
         
         if ($grades->isEmpty()) {
             return null;
