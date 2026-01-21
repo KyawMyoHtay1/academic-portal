@@ -235,6 +235,24 @@ class TeacherAssignmentController extends Controller
     }
 
     /**
+     * Publish an assignment (make it visible to students).
+     */
+    public function publish(Assignment $assignment): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($assignment->created_by !== $user->id) {
+            abort(403, 'You can only publish your own assignments.');
+        }
+
+        $assignment->update([
+            'status' => Assignment::STATUS_PUBLISHED,
+        ]);
+
+        return back()->with('success', 'Assignment published successfully.');
+    }
+
+    /**
      * Delete an assignment.
      */
     public function destroy(Assignment $assignment): RedirectResponse

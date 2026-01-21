@@ -29,7 +29,10 @@ class StudentAssignmentController extends Controller
         }
 
         // Get assignments for courses the student is enrolled in
-        $enrolledCourseIds = $student->courses()->wherePivot('status', 'approved')->pluck('courses.id');
+        // Keep this consistent with "My Courses" (approved + withdrawal_pending)
+        $enrolledCourseIds = $student->courses()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->pluck('courses.id');
 
         $assignments = Assignment::whereIn('course_id', $enrolledCourseIds)
             ->where('status', Assignment::STATUS_PUBLISHED)
@@ -98,7 +101,7 @@ class StudentAssignmentController extends Controller
         // Check if student is enrolled in the assignment's course
         $isEnrolled = $student->courses()
             ->where('courses.id', $assignment->course_id)
-            ->wherePivot('status', 'approved')
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->exists();
 
         if (!$isEnrolled) {
@@ -163,7 +166,7 @@ class StudentAssignmentController extends Controller
         // Check if student is enrolled
         $isEnrolled = $student->courses()
             ->where('courses.id', $assignment->course_id)
-            ->wherePivot('status', 'approved')
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->exists();
 
         if (!$isEnrolled) {

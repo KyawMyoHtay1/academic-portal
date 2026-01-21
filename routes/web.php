@@ -272,6 +272,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::post('/teacher/assignments/{subject}', [TeacherAssignmentController::class, 'store'])->name('teacher.assignments.store');
         Route::get('/teacher/assignments/{assignment}/edit', [TeacherAssignmentController::class, 'edit'])->name('teacher.assignments.edit');
         Route::put('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'update'])->name('teacher.assignments.update');
+        Route::post('/teacher/assignments/{assignment}/publish', [TeacherAssignmentController::class, 'publish'])->name('teacher.assignments.publish');
         Route::delete('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('teacher.assignments.destroy');
         Route::get('/teacher/assignments/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])->name('teacher.assignments.submissions');
         Route::post('/teacher/assignments/submissions/{submission}/grade', [TeacherAssignmentController::class, 'grade'])->name('teacher.assignments.grade');

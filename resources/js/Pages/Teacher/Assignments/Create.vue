@@ -16,7 +16,8 @@ const form = useForm({
     due_date: "",
     due_time: "",
     max_score: 100,
-    status: "draft",
+    // Default to published so students can see it immediately (teacher can switch to draft if needed).
+    status: "published",
     allowed_file_types: ["pdf", "doc", "docx"],
     max_file_size: 5120, // 5MB in KB
 });

@@ -26,6 +26,10 @@ class MyCoursesController extends Controller
 
         $courses = $student->courses()
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->with(['subjects' => function ($q) {
+                $q->select('id', 'course_id', 'subject_code', 'title', 'photo')
+                    ->orderBy('subject_code');
+            }])
             ->orderBy('course_code')
             ->get([
                 'courses.id',

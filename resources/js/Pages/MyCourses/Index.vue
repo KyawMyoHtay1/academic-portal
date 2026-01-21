@@ -284,6 +284,12 @@ const unenroll = (courseId) => {
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
+                                        My Subjects
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
                                         Credits
                                     </th>
                                     <th
@@ -312,7 +318,7 @@ const unenroll = (courseId) => {
                                     class="bg-white"
                                 >
                                     <td
-                                        colspan="7"
+                                        colspan="8"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No courses match your current search or
@@ -355,6 +361,23 @@ const unenroll = (courseId) => {
                                         class="px-4 py-4 text-sm text-slate-700"
                                     >
                                         {{ course.title }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-700">
+                                        <div
+                                            v-if="(course.subjects ?? []).length > 0"
+                                            class="flex flex-wrap gap-1"
+                                        >
+                                            <span
+                                                v-for="s in course.subjects"
+                                                :key="s.id"
+                                                class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700"
+                                            >
+                                                {{ s.subject_code }}
+                                            </span>
+                                        </div>
+                                        <span v-else class="text-xs text-slate-500">
+                                            No subjects
+                                        </span>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"

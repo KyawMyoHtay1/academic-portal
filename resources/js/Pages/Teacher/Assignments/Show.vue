@@ -46,6 +46,13 @@ const deleteAssignment = (id) => {
     });
 };
 
+const publishAssignment = (id) => {
+    if (!confirm("Publish this assignment? Students will be able to see and submit it.")) {
+        return;
+    }
+    router.post(route("teacher.assignments.publish", id), {}, { preserveScroll: true });
+};
+
 const statusBadge = (status) => {
     if (status === "published") return "bg-emerald-100 text-emerald-800";
     if (status === "closed") return "bg-slate-100 text-slate-800";
@@ -170,6 +177,14 @@ const statusBadge = (status) => {
                                     >
                                         View Submissions
                                     </Link>
+                                    <button
+                                        v-if="assignment.status === 'draft'"
+                                        type="button"
+                                        @click="publishAssignment(assignment.id)"
+                                        class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                    >
+                                        Publish
+                                    </button>
                                     <Link
                                         :href="route('teacher.assignments.edit', assignment.id)"
                                         class="rounded-md bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-200"
