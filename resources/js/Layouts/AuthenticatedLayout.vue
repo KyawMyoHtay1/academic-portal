@@ -34,6 +34,8 @@ const getMenuIcon = (name) => {
         "Grade Reviews": "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
         "Manage Timetable": "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
         "Attendance Report": "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        "Student": "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+        "Teaching": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
         "Academics": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
         "People": "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
         "Finance": "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
@@ -75,139 +77,152 @@ const navigation = computed(() => {
     // Student features (show for students only)
     if (user?.role === "student") {
         items.push(
-            {
-                name: "My Profile",
-                href: route("student.profile.show"),
-                active: route().current("student.profile.*"),
-                icon: getMenuIcon("My Profile"),
-            },
-            {
-                name: "Courses",
-                href: route("courses.index"),
-                active:
-                    route().current("courses.*") && !route().current("admin.*"),
-                icon: getMenuIcon("Courses"),
-            },
-            {
-                name: "My Courses",
-                href: route("my-courses.index"),
-                active: route().current("my-courses.*"),
-                icon: getMenuIcon("My Courses"),
-            },
-            {
-                name: "Grades",
-                href: route("student.grades.index"),
-                active: route().current("student.grades.*"),
-                icon: getMenuIcon("Grades"),
-            },
-            {
-                name: "Attendance",
-                href: route("student.attendance.index"),
-                active: route().current("student.attendance.*"),
-                icon: getMenuIcon("Mark Attendance"),
-            },
-            {
-                name: "Assignments",
-                href: route("student.assignments.index"),
-                active: route().current("student.assignments.*"),
-                icon: getMenuIcon("Assignments"),
-            },
-            {
-                name: "Fees",
-                href: route("student.fees.index"),
-                active: route().current("student.fees.*"),
-                icon: getMenuIcon("Fees"),
-            },
-            {
-                name: "Timetable",
-                href: route("student.timetable.index"),
-                active: route().current("student.timetable.*"),
-                icon: getMenuIcon("Timetable"),
-            },
-            {
-                name: "Announcements",
-                href: route("announcements.index"),
-                active: route().current("announcements.*"),
-                badge: unreadAnnouncements,
-                icon: getMenuIcon("Announcements"),
-            },
-            {
-                name: "Notifications",
-                href: route("notifications.index"),
-                active: route().current("notifications.*"),
-                badge: unreadNotifications,
-                icon: getMenuIcon("Notifications"),
-            },
-            {
-                name: "Messages",
-                href: route("messages.index"),
-                active: route().current("messages.*"),
-                badge: unreadMessages,
-                icon: getMenuIcon("Messages"),
-            }
+            createGroup("Student", [
+                {
+                    name: "My Profile",
+                    href: route("student.profile.show"),
+                    active: route().current("student.profile.*"),
+                    icon: getMenuIcon("My Profile"),
+                },
+            ]),
+            createGroup("Academics", [
+                {
+                    name: "Courses",
+                    href: route("courses.index"),
+                    active:
+                        route().current("courses.*") &&
+                        !route().current("admin.*"),
+                    icon: getMenuIcon("Courses"),
+                },
+                {
+                    name: "My Courses",
+                    href: route("my-courses.index"),
+                    active: route().current("my-courses.*"),
+                    icon: getMenuIcon("My Courses"),
+                },
+                {
+                    name: "Grades",
+                    href: route("student.grades.index"),
+                    active: route().current("student.grades.*"),
+                    icon: getMenuIcon("Grades"),
+                },
+                {
+                    name: "Attendance",
+                    href: route("student.attendance.index"),
+                    active: route().current("student.attendance.*"),
+                    icon: getMenuIcon("Mark Attendance"),
+                },
+                {
+                    name: "Assignments",
+                    href: route("student.assignments.index"),
+                    active: route().current("student.assignments.*"),
+                    icon: getMenuIcon("Assignments"),
+                },
+                {
+                    name: "Timetable",
+                    href: route("student.timetable.index"),
+                    active: route().current("student.timetable.*"),
+                    icon: getMenuIcon("Timetable"),
+                },
+            ]),
+            createGroup("Finance", [
+                {
+                    name: "Fees",
+                    href: route("student.fees.index"),
+                    active: route().current("student.fees.*"),
+                    icon: getMenuIcon("Fees"),
+                },
+            ]),
+            createGroup("Communication", [
+                {
+                    name: "Announcements",
+                    href: route("announcements.index"),
+                    active: route().current("announcements.*"),
+                    badge: unreadAnnouncements,
+                    icon: getMenuIcon("Announcements"),
+                },
+                {
+                    name: "Notifications",
+                    href: route("notifications.index"),
+                    active: route().current("notifications.*"),
+                    badge: unreadNotifications,
+                    icon: getMenuIcon("Notifications"),
+                },
+                {
+                    name: "Messages",
+                    href: route("messages.index"),
+                    active: route().current("messages.*"),
+                    badge: unreadMessages,
+                    icon: getMenuIcon("Messages"),
+                },
+            ])
         );
     }
 
     // Teacher features
     if (isTeacher) {
         items.push(
-            {
-                name: "My Teaching Subjects",
-                href: route("teacher.courses.index"),
-                active: route().current("teacher.courses.*"),
-                icon: getMenuIcon("My Teaching Subjects"),
-            },
-            {
-                name: "Mark Attendance",
-                href: route("teacher.attendance.index"),
-                active: route().current("teacher.attendance.*"),
-                icon: getMenuIcon("Mark Attendance"),
-            },
-            {
-                name: "Grades",
-                href: route("teacher.grades.index"),
-                active: route().current("teacher.grades.*"),
-                icon: getMenuIcon("Grades"),
-            },
-            {
-                name: "Assignments",
-                href: route("teacher.assignments.index"),
-                active: route().current("teacher.assignments.*"),
-                icon: getMenuIcon("Assignments"),
-            },
-            {
-                name: "My Announcements",
-                href: route("teacher.announcements.index"),
-                active: route().current("teacher.announcements.*"),
-                icon: getMenuIcon("Announcements"),
-            },
-            {
-                name: "Timetable",
-                href: route("teacher.timetable.index"),
-                active: route().current("teacher.timetable.*"),
-                icon: getMenuIcon("Timetable"),
-            },
-            {
-                name: "Announcements",
-                href: route("announcements.index"),
-                active: route().current("announcements.*"),
-                badge: unreadAnnouncements,
-                icon: getMenuIcon("Announcements"),
-            },
-            {
-                name: "Notifications",
-                href: route("notifications.index"),
-                active: route().current("notifications.*"),
-                badge: unreadNotifications,
-                icon: getMenuIcon("Notifications"),
-            },
-            {
-                name: "Messages",
-                href: route("messages.index"),
-                active: route().current("messages.*"),
-                badge: unreadMessages,
-                icon: getMenuIcon("Messages"),
-            }
+            createGroup("Teaching", [
+                {
+                    name: "My Teaching Subjects",
+                    href: route("teacher.courses.index"),
+                    active: route().current("teacher.courses.*"),
+                    icon: getMenuIcon("My Teaching Subjects"),
+                },
+                {
+                    name: "Timetable",
+                    href: route("teacher.timetable.index"),
+                    active: route().current("teacher.timetable.*"),
+                    icon: getMenuIcon("Timetable"),
+                },
+                {
+                    name: "Mark Attendance",
+                    href: route("teacher.attendance.index"),
+                    active: route().current("teacher.attendance.*"),
+                    icon: getMenuIcon("Mark Attendance"),
+                },
+                {
+                    name: "Grades",
+                    href: route("teacher.grades.index"),
+                    active: route().current("teacher.grades.*"),
+                    icon: getMenuIcon("Grades"),
+                },
+                {
+                    name: "Assignments",
+                    href: route("teacher.assignments.index"),
+                    active: route().current("teacher.assignments.*"),
+                    icon: getMenuIcon("Assignments"),
+                },
+                {
+                    name: "My Announcements",
+                    href: route("teacher.announcements.index"),
+                    active: route().current("teacher.announcements.*"),
+                    icon: getMenuIcon("Announcements"),
+                },
+            ]),
+            createGroup("Communication", [
+                {
+                    name: "Announcements",
+                    href: route("announcements.index"),
+                    active: route().current("announcements.*"),
+                    badge: unreadAnnouncements,
+                    icon: getMenuIcon("Announcements"),
+                },
+                {
+                    name: "Notifications",
+                    href: route("notifications.index"),
+                    active: route().current("notifications.*"),
+                    badge: unreadNotifications,
+                    icon: getMenuIcon("Notifications"),
+                },
+                {
+                    name: "Messages",
+                    href: route("messages.index"),
+                    active: route().current("messages.*"),
+                    badge: unreadMessages,
+                    icon: getMenuIcon("Messages"),
+                },
+            ])
         );
     }
 
