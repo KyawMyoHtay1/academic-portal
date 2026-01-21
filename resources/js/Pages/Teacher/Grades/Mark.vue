@@ -59,6 +59,13 @@ const stats = computed(() => {
     };
 });
 
+const reviewBadge = (status) => {
+    if (status === "approved") return { label: "Approved", class: "bg-emerald-100 text-emerald-800" };
+    if (status === "rejected") return { label: "Rejected", class: "bg-red-100 text-red-800" };
+    if (status === "pending") return { label: "Pending review", class: "bg-amber-100 text-amber-800" };
+    return null;
+};
+
 const getGradeClass = (score) => {
     if (score == null || score === "") return "text-slate-400";
     const s = parseFloat(score);
@@ -243,6 +250,12 @@ const submit = () => {
                                                 >
                                                     Grade
                                                 </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                                >
+                                                    Review status
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody
@@ -334,9 +347,27 @@ const submit = () => {
                                                         -
                                                     </span>
                                                 </td>
+                                                <td class="whitespace-nowrap px-4 py-4 text-center">
+                                                    <div v-if="reviewBadge(entry.student?.status)" class="flex flex-col items-center gap-1">
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                                                            :class="reviewBadge(entry.student.status).class"
+                                                        >
+                                                            {{ reviewBadge(entry.student.status).label }}
+                                                        </span>
+                                                        <span
+                                                            v-if="entry.student?.status === 'rejected' && entry.student?.rejection_reason"
+                                                            class="max-w-[14rem] truncate text-[11px] text-red-700"
+                                                            :title="entry.student.rejection_reason"
+                                                        >
+                                                            {{ entry.student.rejection_reason }}
+                                                        </span>
+                                                    </div>
+                                                    <span v-else class="text-xs text-slate-400">—</span>
+                                                </td>
                                             </tr>
                                             <tr v-if="gradeEntries.length === 0">
-                                                <td colspan="3" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">
                                                     {{ query.trim() ? "No students match your search." : "No students found." }}
                                                 </td>
                                             </tr>

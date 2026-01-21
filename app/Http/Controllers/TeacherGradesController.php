@@ -83,6 +83,8 @@ class TeacherGradesController extends Controller
                 'full_name' => $student->full_name,
                 'photo' => $student->photo,
                 'score' => $grades[$student->id]->score ?? null,
+                'status' => $grades[$student->id]->status ?? null,
+                'rejection_reason' => $grades[$student->id]->rejection_reason ?? null,
             ];
         });
 
