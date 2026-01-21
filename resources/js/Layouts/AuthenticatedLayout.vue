@@ -7,6 +7,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 
 const showingMobileSidebar = ref(false);
 const page = usePage();
+const openNavGroups = ref({});
 
 // Icon mapping for menu items
 const getMenuIcon = (name) => {
@@ -33,6 +34,10 @@ const getMenuIcon = (name) => {
         "Grade Reviews": "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
         "Manage Timetable": "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
         "Attendance Report": "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        "Academics": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        "People": "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+        "Finance": "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
+        "Communication": "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
     };
     return iconMap[name] || "M4 6h16M4 12h16M4 18h16"; // Default icon (menu lines)
 };
@@ -45,6 +50,18 @@ const navigation = computed(() => {
     const unreadMessages = page.props.unread?.messages ?? 0;
     const unreadNotifications = page.props.unread?.notifications ?? 0;
     const unreadAnnouncements = page.props.unread?.announcements ?? 0;
+
+    // Helper function to create a navigation group
+    const createGroup = (name, children) => {
+        const groupActive = children.some((child) => child.active);
+        return {
+            name,
+            children,
+            active: groupActive,
+            icon: getMenuIcon(name),
+            isGroup: true,
+        };
+    };
 
     const items = [
         {
@@ -194,84 +211,92 @@ const navigation = computed(() => {
         );
     }
 
-    // Staff admin features
+    // Staff admin features - organized into groups
     if (isStaff) {
         items.push(
-            {
-                name: "Manage Courses",
-                href: route("admin.courses.index"),
-                active: route().current("admin.courses.*"),
-                icon: getMenuIcon("Manage Courses"),
-            },
-            {
-                name: "Enrollment Requests",
-                href: route("admin.enrollments.index"),
-                active: route().current("admin.enrollments.*"),
-                icon: getMenuIcon("Enrollment Requests"),
-            },
-            {
-                name: "Manage Subjects",
-                href: route("admin.subjects.index"),
-                active: route().current("admin.subjects.*"),
-                icon: getMenuIcon("Manage Subjects"),
-            },
-            {
-                name: "Student Records",
-                href: route("students.index"),
-                active: route().current("students.*"),
-                icon: getMenuIcon("Student Records"),
-            },
-            {
-                name: "Manage Users",
-                href: route("admin.users.index"),
-                active: route().current("admin.users.*"),
-                icon: getMenuIcon("Manage Users"),
-            },
-            {
-                name: "Manage Fees",
-                href: route("admin.fees.index"),
-                active: route().current("admin.fees.*"),
-                icon: getMenuIcon("Manage Fees"),
-            },
-            {
-                name: "Grade Reviews",
-                href: route("admin.grades.index"),
-                active: route().current("admin.grades.*"),
-                icon: getMenuIcon("Grade Reviews"),
-            },
-            {
-                name: "Manage Timetable",
-                href: route("admin.timetables.index"),
-                active: route().current("admin.timetables.*"),
-                icon: getMenuIcon("Manage Timetable"),
-            },
-            {
-                name: "Attendance Report",
-                href: route("admin.attendance.report"),
-                active: route().current("admin.attendance.*"),
-                icon: getMenuIcon("Attendance Report"),
-            },
-            {
-                name: "Announcements",
-                href: route("admin.announcements.index"),
-                active: route().current("admin.announcements.*"),
-                badge: unreadAnnouncements,
-                icon: getMenuIcon("Announcements"),
-            },
-            {
-                name: "Notifications",
-                href: route("notifications.index"),
-                active: route().current("notifications.*"),
-                badge: unreadNotifications,
-                icon: getMenuIcon("Notifications"),
-            },
-            {
-                name: "Messages",
-                href: route("messages.index"),
-                active: route().current("messages.*"),
-                badge: unreadMessages,
-                icon: getMenuIcon("Messages"),
-            }
+            createGroup("Academics", [
+                {
+                    name: "Manage Courses",
+                    href: route("admin.courses.index"),
+                    active: route().current("admin.courses.*"),
+                    icon: getMenuIcon("Manage Courses"),
+                },
+                {
+                    name: "Manage Subjects",
+                    href: route("admin.subjects.index"),
+                    active: route().current("admin.subjects.*"),
+                    icon: getMenuIcon("Manage Subjects"),
+                },
+                {
+                    name: "Manage Timetable",
+                    href: route("admin.timetables.index"),
+                    active: route().current("admin.timetables.*"),
+                    icon: getMenuIcon("Manage Timetable"),
+                },
+                {
+                    name: "Enrollment Requests",
+                    href: route("admin.enrollments.index"),
+                    active: route().current("admin.enrollments.*"),
+                    icon: getMenuIcon("Enrollment Requests"),
+                },
+                {
+                    name: "Grade Reviews",
+                    href: route("admin.grades.index"),
+                    active: route().current("admin.grades.*"),
+                    icon: getMenuIcon("Grade Reviews"),
+                },
+                {
+                    name: "Attendance Report",
+                    href: route("admin.attendance.report"),
+                    active: route().current("admin.attendance.*"),
+                    icon: getMenuIcon("Attendance Report"),
+                },
+            ]),
+            createGroup("People", [
+                {
+                    name: "Student Records",
+                    href: route("students.index"),
+                    active: route().current("students.*"),
+                    icon: getMenuIcon("Student Records"),
+                },
+                {
+                    name: "Manage Users",
+                    href: route("admin.users.index"),
+                    active: route().current("admin.users.*"),
+                    icon: getMenuIcon("Manage Users"),
+                },
+            ]),
+            createGroup("Finance", [
+                {
+                    name: "Manage Fees",
+                    href: route("admin.fees.index"),
+                    active: route().current("admin.fees.*"),
+                    icon: getMenuIcon("Manage Fees"),
+                },
+            ]),
+            createGroup("Communication", [
+                {
+                    name: "Announcements",
+                    href: route("admin.announcements.index"),
+                    active: route().current("admin.announcements.*"),
+                    badge: unreadAnnouncements,
+                    icon: getMenuIcon("Announcements"),
+                },
+                {
+                    name: "Notifications",
+                    href: route("notifications.index"),
+                    active: route().current("notifications.*"),
+                    badge: unreadNotifications,
+                    icon: getMenuIcon("Notifications"),
+                },
+                {
+                    name: "Messages",
+                    href: route("messages.index"),
+                    active: route().current("messages.*"),
+                    badge: unreadMessages,
+                    icon: getMenuIcon("Messages"),
+                },
+            ])
         );
     }
 
@@ -368,41 +393,151 @@ const headerStatus = computed(() => {
                     </Link>
                 </div>
 
-                <nav class="mt-4 flex-1 space-y-1 px-3 text-sm">
+                <nav class="mt-4 flex-1 space-y-1 px-3 text-sm overflow-y-auto">
                     <template v-for="item in navigation" :key="item.name">
-                        <Link
-                            :href="item.href"
-                            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
-                            :class="[
-                                item.active
-                                    ? 'bg-white/10 text-portal-gold'
-                                    : 'text-slate-200 hover:bg-white/5 hover:text-white',
-                            ]"
-                        >
-                            <div class="flex items-center gap-3">
-                                <svg
-                                    class="h-5 w-5 shrink-0"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        :d="item.icon"
-                                    />
-                                </svg>
-                                <span>{{ item.name }}</span>
-                            </div>
-                            <span
-                                v-if="item.badge && item.badge > 0"
-                                class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                        <!-- Regular menu item -->
+                        <template v-if="!item.isGroup">
+                            <Link
+                                :href="item.href"
+                                class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
+                                :class="[
+                                    item.active
+                                        ? 'bg-white/10 text-portal-gold'
+                                        : 'text-slate-200 hover:bg-white/5 hover:text-white',
+                                ]"
                             >
-                                {{ item.badge }}
-                            </span>
-                        </Link>
+                                <div class="flex items-center gap-3">
+                                    <svg
+                                        class="h-5 w-5 shrink-0"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            :d="item.icon"
+                                        />
+                                    </svg>
+                                    <span>{{ item.name }}</span>
+                                </div>
+                                <span
+                                    v-if="item.badge && item.badge > 0"
+                                    class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                                >
+                                    {{ item.badge }}
+                                </span>
+                            </Link>
+                        </template>
+                        
+                        <!-- Grouped menu items (dropdown) -->
+                        <template v-else>
+                            <div class="space-y-1">
+                                <button
+                                    type="button"
+                                    class="group flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
+                                    :class="[
+                                        item.active
+                                            ? 'bg-white/10 text-portal-gold'
+                                            : 'text-slate-200 hover:bg-white/5 hover:text-white',
+                                    ]"
+                                    @click="
+                                        openNavGroups[item.name] =
+                                            !(openNavGroups[item.name] ?? item.active)
+                                    "
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <svg
+                                            class="h-5 w-5 shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                :d="item.icon"
+                                            />
+                                        </svg>
+                                        <span>{{ item.name }}</span>
+                                    </div>
+                                    <svg
+                                        class="h-4 w-4 transition-transform duration-200"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        :class="[
+                                            (openNavGroups[item.name] ?? item.active)
+                                                ? 'rotate-180'
+                                                : '',
+                                        ]"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                                
+                                <!-- Dropdown menu items -->
+                                <transition
+                                    enter-active-class="transition duration-200 ease-out"
+                                    enter-from-class="opacity-0 transform -translate-y-1"
+                                    enter-to-class="opacity-100 transform translate-y-0"
+                                    leave-active-class="transition duration-150 ease-in"
+                                    leave-from-class="opacity-100 transform translate-y-0"
+                                    leave-to-class="opacity-0 transform -translate-y-1"
+                                >
+                                    <div
+                                        v-show="
+                                            openNavGroups[item.name] ?? item.active
+                                        "
+                                        class="ml-4 space-y-1 border-l-2 border-slate-700/50 pl-2"
+                                    >
+                                        <Link
+                                            v-for="child in item.children"
+                                            :key="child.name"
+                                            :href="child.href"
+                                            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
+                                            :class="[
+                                                child.active
+                                                    ? 'bg-white/10 text-portal-gold'
+                                                    : 'text-slate-300 hover:bg-white/5 hover:text-white',
+                                            ]"
+                                        >
+                                            <div class="flex items-center gap-3">
+                                                <svg
+                                                    class="h-4 w-4 shrink-0"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        :d="child.icon"
+                                                    />
+                                                </svg>
+                                                <span class="text-xs">{{ child.name }}</span>
+                                            </div>
+                                            <span
+                                                v-if="child.badge && child.badge > 0"
+                                                class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                                            >
+                                                {{ child.badge }}
+                                            </span>
+                                        </Link>
+                                    </div>
+                                </transition>
+                            </div>
+                        </template>
                     </template>
                 </nav>
 
@@ -471,36 +606,152 @@ const headerStatus = computed(() => {
                             </button>
                         </div>
 
-                        <nav class="mt-2 flex-1 space-y-1 px-3 text-sm">
+                        <nav class="mt-2 flex-1 space-y-1 px-3 text-sm overflow-y-auto">
                             <template
                                 v-for="item in navigation"
                                 :key="item.name"
                             >
-                                <Link
-                                    :href="item.href"
-                                    class="group flex items-center gap-2 rounded-lg px-3 py-2 font-medium transition"
-                                    :class="[
-                                        item.active
-                                            ? 'bg-white/10 text-portal-gold'
-                                            : 'text-slate-200 hover:bg-white/5 hover:text-white',
-                                    ]"
-                                >
-                                    <svg
-                                        class="h-5 w-5 shrink-0"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
+                                <!-- Regular menu item -->
+                                <template v-if="!item.isGroup">
+                                    <Link
+                                        :href="item.href"
+                                        class="group flex items-center gap-2 rounded-lg px-3 py-2 font-medium transition"
+                                        :class="[
+                                            item.active
+                                                ? 'bg-white/10 text-portal-gold'
+                                                : 'text-slate-200 hover:bg-white/5 hover:text-white',
+                                        ]"
                                     >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            :d="item.icon"
-                                        />
-                                    </svg>
-                                    <span>{{ item.name }}</span>
-                                </Link>
+                                        <svg
+                                            class="h-5 w-5 shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                :d="item.icon"
+                                            />
+                                        </svg>
+                                        <span>{{ item.name }}</span>
+                                        <span
+                                            v-if="item.badge && item.badge > 0"
+                                            class="ml-auto inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                                        >
+                                            {{ item.badge }}
+                                        </span>
+                                    </Link>
+                                </template>
+                                
+                                <!-- Grouped menu items (dropdown) -->
+                                <template v-else>
+                                    <div class="space-y-1">
+                                        <button
+                                            type="button"
+                                            class="group flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
+                                            :class="[
+                                                item.active
+                                                    ? 'bg-white/10 text-portal-gold'
+                                                    : 'text-slate-200 hover:bg-white/5 hover:text-white',
+                                            ]"
+                                            @click="
+                                                openNavGroups[item.name] =
+                                                    !(openNavGroups[item.name] ?? item.active)
+                                            "
+                                        >
+                                            <div class="flex items-center gap-2">
+                                                <svg
+                                                    class="h-5 w-5 shrink-0"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        :d="item.icon"
+                                                    />
+                                                </svg>
+                                                <span>{{ item.name }}</span>
+                                            </div>
+                                            <svg
+                                                class="h-4 w-4 transition-transform duration-200"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                :class="[
+                                                    (openNavGroups[item.name] ?? item.active)
+                                                        ? 'rotate-180'
+                                                        : '',
+                                                ]"
+                                            >
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                    clip-rule="evenodd"
+                                                />
+                                            </svg>
+                                        </button>
+                                        
+                                        <!-- Dropdown menu items -->
+                                        <transition
+                                            enter-active-class="transition duration-200 ease-out"
+                                            enter-from-class="opacity-0 transform -translate-y-1"
+                                            enter-to-class="opacity-100 transform translate-y-0"
+                                            leave-active-class="transition duration-150 ease-in"
+                                            leave-from-class="opacity-100 transform translate-y-0"
+                                            leave-to-class="opacity-0 transform -translate-y-1"
+                                        >
+                                            <div
+                                                v-show="
+                                                    openNavGroups[item.name] ?? item.active
+                                                "
+                                                class="ml-4 space-y-1 border-l-2 border-slate-700/50 pl-2"
+                                            >
+                                                <Link
+                                                    v-for="child in item.children"
+                                                    :key="child.name"
+                                                    :href="child.href"
+                                                    class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium transition"
+                                                    :class="[
+                                                        child.active
+                                                            ? 'bg-white/10 text-portal-gold'
+                                                            : 'text-slate-300 hover:bg-white/5 hover:text-white',
+                                                    ]"
+                                                >
+                                                    <div class="flex items-center gap-2">
+                                                        <svg
+                                                            class="h-4 w-4 shrink-0"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                            stroke-width="2"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                :d="child.icon"
+                                                            />
+                                                        </svg>
+                                                        <span class="text-xs">{{ child.name }}</span>
+                                                    </div>
+                                                    <span
+                                                        v-if="child.badge && child.badge > 0"
+                                                        class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                                                    >
+                                                        {{ child.badge }}
+                                                    </span>
+                                                </Link>
+                                            </div>
+                                        </transition>
+                                    </div>
+                                </template>
                             </template>
                         </nav>
                     </aside>
