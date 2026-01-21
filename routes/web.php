@@ -19,6 +19,7 @@ use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\StudentFeeController;
+use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\PaymentController;
@@ -112,6 +113,9 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
     // Student Grades (read-only)
     Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
+
+    // Student Attendance Report
+    Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
 
     // Student Fees
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');

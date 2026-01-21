@@ -83,6 +83,12 @@ const navigation = computed(() => {
                 icon: getMenuIcon("Grades"),
             },
             {
+                name: "Attendance",
+                href: route("student.attendance.index"),
+                active: route().current("student.attendance.*"),
+                icon: getMenuIcon("Mark Attendance"),
+            },
+            {
                 name: "Fees",
                 href: route("student.fees.index"),
                 active: route().current("student.fees.*"),
