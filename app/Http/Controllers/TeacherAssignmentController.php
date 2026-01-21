@@ -22,27 +22,42 @@ class TeacherAssignmentController extends Controller
         $user = Auth::user();
 
         $subjects = $user->teachingSubjects()
-            ->with(['course', 'assignments' => function ($query) {
-                $query->orderBy('due_date', 'desc');
-            }])
+            ->with([
+                'course:id,course_code,title',
+                'assignments' => function ($query) {
+                    $query->orderBy('due_date', 'desc')
+                        ->withCount('submissions')
+                        ->withCount([
+                            'submissions as graded_submissions_count' => function ($q) {
+                                $q->whereNotNull('score');
+                            },
+                        ]);
+                },
+            ])
             ->orderBy('subject_code')
-            ->get(['id', 'course_id', 'subject_code', 'title', 'photo'])
+            ->get([
+                'subjects.id',
+                'subjects.course_id',
+                'subjects.subject_code',
+                'subjects.title',
+                'subjects.photo',
+            ])
             ->map(function ($subject) {
                 return [
                     'id' => $subject->id,
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
                     'photo' => $subject->photo,
-                    'course_code' => $subject->course->course_code,
-                    'course_title' => $subject->course->title,
+                    'course_code' => $subject->course?->course_code,
+                    'course_title' => $subject->course?->title,
                     'assignments' => $subject->assignments->map(function ($assignment) {
                         return [
                             'id' => $assignment->id,
                             'title' => $assignment->title,
                             'due_date' => $assignment->due_date->format('Y-m-d'),
                             'status' => $assignment->status,
-                            'submissions_count' => $assignment->submissions()->count(),
-                            'graded_count' => $assignment->submissions()->whereNotNull('score')->count(),
+                            'submissions_count' => $assignment->submissions_count ?? 0,
+                            'graded_count' => $assignment->graded_submissions_count ?? 0,
                         ];
                     }),
                 ];
@@ -65,9 +80,12 @@ class TeacherAssignmentController extends Controller
         }
 
         $assignments = Assignment::where('subject_id', $subject->id)
-            ->with(['submissions' => function ($query) {
-                $query->with('student:id,student_no,full_name');
-            }])
+            ->withCount('submissions')
+            ->withCount([
+                'submissions as graded_submissions_count' => function ($q) {
+                    $q->whereNotNull('score');
+                },
+            ])
             ->orderBy('due_date', 'desc')
             ->get()
             ->map(function ($assignment) {
@@ -79,8 +97,8 @@ class TeacherAssignmentController extends Controller
                     'due_time' => $assignment->due_time ? (is_string($assignment->due_time) ? substr($assignment->due_time, 0, 5) : $assignment->due_time->format('H:i')) : null,
                     'max_score' => $assignment->max_score,
                     'status' => $assignment->status,
-                    'submissions_count' => $assignment->submissions->count(),
-                    'graded_count' => $assignment->submissions->whereNotNull('score')->count(),
+                    'submissions_count' => $assignment->submissions_count ?? 0,
+                    'graded_count' => $assignment->graded_submissions_count ?? 0,
                     'is_overdue' => $assignment->isOverdue(),
                 ];
             });

@@ -90,6 +90,11 @@ class StudentAssignmentController extends Controller
             abort(404);
         }
 
+        // Students should not access draft/closed assignments directly by URL.
+        if ($assignment->status !== Assignment::STATUS_PUBLISHED) {
+            abort(404);
+        }
+
         // Check if student is enrolled in the assignment's course
         $isEnrolled = $student->courses()
             ->where('courses.id', $assignment->course_id)
