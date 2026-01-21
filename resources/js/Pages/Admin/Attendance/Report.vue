@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     overall: {
@@ -24,6 +25,47 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+});
+
+const searchStudents = ref("");
+const searchCourses = ref("");
+const searchSubjects = ref("");
+const searchRecent = ref("");
+
+const filteredStudents = computed(() => {
+    const q = searchStudents.value.trim().toLowerCase();
+    if (!q) return props.lowAttendanceStudents;
+    return props.lowAttendanceStudents.filter((s) => {
+        const hay = `${s.student_no} ${s.full_name} ${s.email} ${s.programme ?? ""}`.toLowerCase();
+        return hay.includes(q);
+    });
+});
+
+const filteredCourses = computed(() => {
+    const q = searchCourses.value.trim().toLowerCase();
+    if (!q) return props.byCourse;
+    return props.byCourse.filter((c) => {
+        const hay = `${c.course_code} ${c.title}`.toLowerCase();
+        return hay.includes(q);
+    });
+});
+
+const filteredSubjects = computed(() => {
+    const q = searchSubjects.value.trim().toLowerCase();
+    if (!q) return props.bySubject;
+    return props.bySubject.filter((s) => {
+        const hay = `${s.subject_code} ${s.title} ${s.course_code}`.toLowerCase();
+        return hay.includes(q);
+    });
+});
+
+const filteredRecent = computed(() => {
+    const q = searchRecent.value.trim().toLowerCase();
+    if (!q) return props.recentRecords;
+    return props.recentRecords.filter((r) => {
+        const hay = `${r.student_no} ${r.student_name} ${r.subject_code} ${r.course_code} ${r.date}`.toLowerCase();
+        return hay.includes(q);
+    });
 });
 </script>
 
@@ -96,12 +138,25 @@ const props = defineProps({
                     v-if="lowAttendanceStudents.length > 0"
                     class="mb-6 portal-card p-6"
                 >
-                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
-                        Students with Low Attendance (&lt; 75%)
-                    </h3>
-                    <p class="mb-4 text-sm text-slate-600">
-                        These students may require attention or intervention.
-                    </p>
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">
+                                Students with Low Attendance (&lt; 75%)
+                            </h3>
+                            <p class="mt-1 text-sm text-slate-600">
+                                These students may require attention or intervention.
+                            </p>
+                        </div>
+                        <div class="w-full sm:w-80">
+                            <label class="block text-xs font-medium text-slate-600">Search</label>
+                            <input
+                                v-model="searchStudents"
+                                type="search"
+                                placeholder="Search by student no, name, programme…"
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -140,7 +195,7 @@ const props = defineProps({
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-for="student in lowAttendanceStudents"
+                                    v-for="student in filteredStudents"
                                     :key="student.id"
                                     class="hover:bg-slate-50"
                                 >
@@ -174,6 +229,14 @@ const props = defineProps({
                                         </span>
                                     </td>
                                 </tr>
+                                <tr v-if="filteredStudents.length === 0">
+                                    <td
+                                        colspan="6"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No students match your search.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -181,9 +244,20 @@ const props = defineProps({
 
                 <!-- Attendance by Course -->
                 <div class="mb-6 portal-card p-6">
-                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
-                        Attendance by Course
-                    </h3>
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h3 class="text-lg font-semibold text-slate-900">
+                            Attendance by Course
+                        </h3>
+                        <div class="w-full sm:w-80">
+                            <label class="block text-xs font-medium text-slate-600">Search</label>
+                            <input
+                                v-model="searchCourses"
+                                type="search"
+                                placeholder="Search by course code, title…"
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -222,7 +296,7 @@ const props = defineProps({
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-for="course in byCourse"
+                                    v-for="course in filteredCourses"
                                     :key="course.id"
                                     class="hover:bg-slate-50"
                                 >
@@ -258,12 +332,12 @@ const props = defineProps({
                                         </span>
                                     </td>
                                 </tr>
-                                <tr v-if="byCourse.length === 0">
+                                <tr v-if="filteredCourses.length === 0">
                                     <td
                                         colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No attendance records found for any courses.
+                                        {{ searchCourses.trim() ? "No courses match your search." : "No attendance records found for any courses." }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -273,9 +347,20 @@ const props = defineProps({
 
                 <!-- Attendance by Subject -->
                 <div class="mb-6 portal-card p-6">
-                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
-                        Attendance by Subject
-                    </h3>
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h3 class="text-lg font-semibold text-slate-900">
+                            Attendance by Subject
+                        </h3>
+                        <div class="w-full sm:w-80">
+                            <label class="block text-xs font-medium text-slate-600">Search</label>
+                            <input
+                                v-model="searchSubjects"
+                                type="search"
+                                placeholder="Search by subject code, title, course…"
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -319,7 +404,7 @@ const props = defineProps({
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-for="subject in bySubject"
+                                    v-for="subject in filteredSubjects"
                                     :key="subject.id"
                                     class="hover:bg-slate-50"
                                 >
@@ -358,12 +443,12 @@ const props = defineProps({
                                         </span>
                                     </td>
                                 </tr>
-                                <tr v-if="bySubject.length === 0">
+                                <tr v-if="filteredSubjects.length === 0">
                                     <td
                                         colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No attendance records found for any subjects.
+                                        {{ searchSubjects.trim() ? "No subjects match your search." : "No attendance records found for any subjects." }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -373,9 +458,20 @@ const props = defineProps({
 
                 <!-- Recent Attendance Records -->
                 <div class="portal-card p-6">
-                    <h3 class="mb-4 text-lg font-semibold text-slate-900">
-                        Recent Attendance Records (Last 30 Days)
-                    </h3>
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h3 class="text-lg font-semibold text-slate-900">
+                            Recent Attendance Records (Last 30 Days)
+                        </h3>
+                        <div class="w-full sm:w-80">
+                            <label class="block text-xs font-medium text-slate-600">Search</label>
+                            <input
+                                v-model="searchRecent"
+                                type="search"
+                                placeholder="Search by student, subject, course, date…"
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -409,7 +505,7 @@ const props = defineProps({
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-for="record in recentRecords"
+                                    v-for="record in filteredRecent"
                                     :key="record.id"
                                     class="hover:bg-slate-50"
                                 >
@@ -439,12 +535,12 @@ const props = defineProps({
                                         </span>
                                     </td>
                                 </tr>
-                                <tr v-if="recentRecords.length === 0">
+                                <tr v-if="filteredRecent.length === 0">
                                     <td
                                         colspan="5"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
-                                        No recent attendance records found.
+                                        {{ searchRecent.trim() ? "No records match your search." : "No recent attendance records found." }}
                                     </td>
                                 </tr>
                             </tbody>
