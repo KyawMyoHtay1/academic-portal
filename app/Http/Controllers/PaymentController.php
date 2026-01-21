@@ -106,29 +106,24 @@ class PaymentController extends Controller
             try {
                 $session = Session::retrieve($sessionId);
                 
-                if ($session->payment_status === 'paid' && $fee->payment_intent_id) {
-                    $paymentIntent = PaymentIntent::retrieve($fee->payment_intent_id);
-                    
+                // If Stripe confirms payment, verify the intent one more time
+                if ($session->payment_status === 'paid' && $session->payment_intent) {
+                    $paymentIntent = PaymentIntent::retrieve($session->payment_intent);
                     if ($paymentIntent->status === 'succeeded') {
-                        // Update fee status if not already updated by webhook
-                        if ($fee->status !== 'paid') {
-                            $fee->update([
-                                'status' => 'paid',
-                                'paid_date' => now(),
-                                'payment_method' => $paymentIntent->payment_method_types[0] ?? 'card',
-                                'payment_processed_at' => now(),
-                            ]);
-
-                            // Notify student
-                            if ($student->user) {
-                                $student->user->notify(new FeeStatusUpdated($fee));
-                            }
-                        }
+                        $this->handlePaymentSuccess($paymentIntent);
 
                         return redirect()
                             ->route('student.fees.index')
                             ->with('success', "Payment of £{$fee->amount} completed successfully!");
                     }
+                }
+
+                // If user left checkout without paying, reset the fee so they can try again
+                if ($session->payment_status !== 'paid' && $fee->status === 'payment_pending') {
+                    $fee->update([
+                        'status' => 'pending',
+                        'payment_intent_id' => null,
+                    ]);
                 }
             } catch (ApiErrorException $e) {
                 Log::error('Stripe Session verification failed: ' . $e->getMessage());
@@ -270,6 +265,35 @@ class PaymentController extends Controller
             Log::info('Payment failed via webhook', [
                 'fee_id' => $fee->id,
                 'payment_intent_id' => $paymentIntent->id,
+            ]);
+        }
+    }
+
+    /**
+     * Handle checkout.session.completed webhook.
+     */
+    private function handleCheckoutCompleted($session): void
+    {
+        // When a checkout session completes, Stripe includes the payment_intent id
+        $paymentIntentId = $session->payment_intent ?? null;
+
+        if (!$paymentIntentId) {
+            Log::warning('Checkout completed without payment_intent id', ['session_id' => $session->id]);
+            return;
+        }
+
+        try {
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+
+            if ($paymentIntent->status === 'succeeded') {
+                $this->handlePaymentSuccess($paymentIntent);
+            } elseif ($paymentIntent->status === 'requires_payment_method') {
+                $this->handlePaymentFailure($paymentIntent);
+            }
+        } catch (ApiErrorException $e) {
+            Log::error('Failed to retrieve payment intent after checkout completion', [
+                'session_id' => $session->id,
+                'error' => $e->getMessage(),
             ]);
         }
     }
