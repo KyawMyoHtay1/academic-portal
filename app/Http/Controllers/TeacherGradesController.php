@@ -7,6 +7,8 @@ use App\Models\Grade;
 use App\Models\GradeReviewLog;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Models\User;
+use App\Notifications\GradeReviewRequested;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -164,6 +166,13 @@ class TeacherGradesController extends Controller
                     'course_id' => $subject->course_id,
                 ],
             ]);
+
+            // Notify staff/admin users that a grade needs review.
+            $student = Student::find($record['student_id']);
+            $staffUsers = User::where('role', 'staff')->get(['id', 'name', 'email']);
+            foreach ($staffUsers as $staff) {
+                $staff->notify(new GradeReviewRequested($grade, $student, $subject));
+            }
             
             $savedCount++;
         }
