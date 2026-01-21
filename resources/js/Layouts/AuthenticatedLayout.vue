@@ -140,6 +140,12 @@ const navigation = computed(() => {
                 icon: getMenuIcon("Grades"),
             },
             {
+                name: "My Announcements",
+                href: route("teacher.announcements.index"),
+                active: route().current("teacher.announcements.*"),
+                icon: getMenuIcon("Announcements"),
+            },
+            {
                 name: "Timetable",
                 href: route("teacher.timetable.index"),
                 active: route().current("teacher.timetable.*"),

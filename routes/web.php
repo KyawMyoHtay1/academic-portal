@@ -29,6 +29,7 @@ use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
 use App\Http\Controllers\TeacherTimetableController;
+use App\Http\Controllers\TeacherAnnouncementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Foundation\Application;
@@ -254,6 +255,16 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Timetable View
         Route::get('/teacher/timetable', [TeacherTimetableController::class, 'index'])->name('teacher.timetable.index');
+
+        // Teacher Announcements (manage own announcements)
+        Route::resource('teacher/announcements', TeacherAnnouncementController::class)->names([
+            'index' => 'teacher.announcements.index',
+            'create' => 'teacher.announcements.create',
+            'store' => 'teacher.announcements.store',
+            'edit' => 'teacher.announcements.edit',
+            'update' => 'teacher.announcements.update',
+            'destroy' => 'teacher.announcements.destroy',
+        ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     });
 });
 
