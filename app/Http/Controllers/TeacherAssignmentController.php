@@ -273,7 +273,7 @@ class TeacherAssignmentController extends Controller
 
         $submissions = AssignmentSubmission::where('assignment_id', $assignment->id)
             ->with(['student:id,student_no,full_name,photo', 'grader:id,name'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get()
             ->map(function ($submission) {
                 return [
@@ -293,6 +293,7 @@ class TeacherAssignmentController extends Controller
                     'graded_by' => $submission->grader?->name,
                     'graded_at' => $submission->graded_at?->format('Y-m-d H:i'),
                     'submitted_at' => $submission->created_at->format('Y-m-d H:i'),
+                    'last_submitted_at' => $submission->updated_at?->format('Y-m-d H:i'),
                     'percentage' => $submission->percentage,
                 ];
             });

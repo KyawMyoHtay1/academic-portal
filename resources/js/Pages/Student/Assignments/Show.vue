@@ -21,6 +21,7 @@ const form = useForm({
 });
 
 const fileInput = ref(null);
+const isResubmitting = ref(false);
 
 const selectFile = () => {
     fileInput.value?.click();
@@ -39,6 +40,10 @@ const submit = () => {
     }
     form.post(route("student.assignments.submit", props.assignment.id), {
         forceFormData: true,
+        onSuccess: () => {
+            isResubmitting.value = false;
+            form.reset();
+        },
     });
 };
 
@@ -174,6 +179,85 @@ const downloadSubmission = () => {
                                 Graded on {{ props.submission.graded_at }}{{ props.submission.grader ? ` by ${props.submission.grader}` : "" }}
                             </p>
                         </div>
+                    </div>
+
+                    <!-- Resubmission -->
+                    <div v-if="props.assignment.can_submit" class="mt-6 rounded-md border border-slate-200 bg-slate-50 p-4">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Resubmit (optional)</p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    You can replace your file until the due date/time. If already graded, resubmission will reset the grade.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                class="rounded-md bg-portal-navy px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark"
+                                @click="isResubmitting = !isResubmitting"
+                            >
+                                {{ isResubmitting ? "Cancel" : "Resubmit" }}
+                            </button>
+                        </div>
+
+                        <form v-if="isResubmitting" @submit.prevent="submit" class="mt-4 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700">
+                                    New Assignment File <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1">
+                                    <input
+                                        ref="fileInput"
+                                        type="file"
+                                        @change="handleFileChange"
+                                        :accept="props.assignment.allowed_file_types?.map(t => `.${t}`).join(',')"
+                                        class="hidden"
+                                    />
+                                    <button
+                                        type="button"
+                                        @click="selectFile"
+                                        class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                                    >
+                                        Choose File
+                                    </button>
+                                    <span v-if="form.file" class="ml-3 text-sm text-slate-600">
+                                        {{ form.file.name }}
+                                    </span>
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Allowed types: {{ props.assignment.allowed_file_types?.join(", ").toUpperCase() || "PDF, DOC, DOCX" }}
+                                    <br />
+                                    Max size: {{ Math.round(props.assignment.max_file_size / 1024) }} MB
+                                </p>
+                                <p v-if="form.errors.file" class="mt-1 text-sm text-red-600">
+                                    {{ form.errors.file }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700">
+                                    Comments (optional)
+                                </label>
+                                <textarea
+                                    v-model="form.comments"
+                                    rows="3"
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
+                                ></textarea>
+                                <p v-if="form.errors.comments" class="mt-1 text-sm text-red-600">
+                                    {{ form.errors.comments }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-3 pt-2">
+                                <button
+                                    type="submit"
+                                    :disabled="form.processing || !form.file"
+                                    class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark disabled:opacity-50"
+                                >
+                                    <span v-if="form.processing">Submitting...</span>
+                                    <span v-else>Submit New File</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 

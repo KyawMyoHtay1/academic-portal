@@ -175,14 +175,10 @@ class StudentAssignmentController extends Controller
             return back()->withErrors(['file' => 'This assignment is no longer accepting submissions.']);
         }
 
-        // Check if already submitted
+        // Check if already submitted (allow resubmission before due date)
         $existingSubmission = AssignmentSubmission::where('assignment_id', $assignment->id)
             ->where('student_id', $student->id)
             ->first();
-
-        if ($existingSubmission) {
-            return back()->withErrors(['file' => 'You have already submitted this assignment.']);
-        }
 
         $data = $request->validate([
             'file' => ['required', 'file'],
@@ -213,18 +209,41 @@ class StudentAssignmentController extends Controller
         $filename = 'assignments/' . uniqid() . '.' . $extension;
         Storage::disk('public')->put($filename, file_get_contents($file->getRealPath()));
 
-        AssignmentSubmission::create([
-            'assignment_id' => $assignment->id,
-            'student_id' => $student->id,
-            'file_path' => $filename,
-            'original_filename' => $file->getClientOriginalName(),
-            'comments' => $data['comments'] ?? null,
-            'status' => AssignmentSubmission::STATUS_SUBMITTED,
-        ]);
+        if ($existingSubmission) {
+            // Delete old file (if exists)
+            if ($existingSubmission->file_path && Storage::disk('public')->exists($existingSubmission->file_path)) {
+                Storage::disk('public')->delete($existingSubmission->file_path);
+            }
+
+            // Resubmission resets grading info so teacher grades latest file.
+            $existingSubmission->update([
+                'file_path' => $filename,
+                'original_filename' => $file->getClientOriginalName(),
+                'comments' => $data['comments'] ?? null,
+                'score' => null,
+                'feedback' => null,
+                'graded_by' => null,
+                'graded_at' => null,
+                'status' => AssignmentSubmission::STATUS_SUBMITTED,
+            ]);
+
+            $successMessage = 'Assignment resubmitted successfully.';
+        } else {
+            AssignmentSubmission::create([
+                'assignment_id' => $assignment->id,
+                'student_id' => $student->id,
+                'file_path' => $filename,
+                'original_filename' => $file->getClientOriginalName(),
+                'comments' => $data['comments'] ?? null,
+                'status' => AssignmentSubmission::STATUS_SUBMITTED,
+            ]);
+
+            $successMessage = 'Assignment submitted successfully.';
+        }
 
         return redirect()
             ->route('student.assignments.show', $assignment->id)
-            ->with('success', 'Assignment submitted successfully.');
+            ->with('success', $successMessage);
     }
 
     /**
