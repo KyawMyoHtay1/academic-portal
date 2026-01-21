@@ -20,6 +20,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\StudentFeeController;
 use App\Http\Controllers\StudentAttendanceController;
+use App\Http\Controllers\StudentAssignmentController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\PaymentController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StaffAnnouncementController;
 use App\Http\Controllers\StaffAttendanceReportController;
 use App\Http\Controllers\TeacherAttendanceController;
+use App\Http\Controllers\TeacherAssignmentController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
 use App\Http\Controllers\TeacherTimetableController;
@@ -116,6 +118,12 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
     // Student Attendance Report
     Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
+
+    // Student Assignments
+    Route::get('/student/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignments.index');
+    Route::get('/student/assignments/{assignment}', [StudentAssignmentController::class, 'show'])->name('student.assignments.show');
+    Route::post('/student/assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('student.assignments.submit');
+    Route::get('/student/assignments/submissions/{submission}/download', [StudentAssignmentController::class, 'download'])->name('student.assignments.download');
 
     // Student Fees
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
@@ -256,6 +264,18 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/teacher/grades', [TeacherGradesController::class, 'index'])->name('teacher.grades.index');
         Route::get('/teacher/grades/{subject}', [TeacherGradesController::class, 'show'])->name('teacher.grades.show');
         Route::post('/teacher/grades/{subject}', [TeacherGradesController::class, 'store'])->name('teacher.grades.store');
+
+        // Assignment Management
+        Route::get('/teacher/assignments', [TeacherAssignmentController::class, 'index'])->name('teacher.assignments.index');
+        Route::get('/teacher/assignments/{subject}', [TeacherAssignmentController::class, 'show'])->name('teacher.assignments.show');
+        Route::get('/teacher/assignments/{subject}/create', [TeacherAssignmentController::class, 'create'])->name('teacher.assignments.create');
+        Route::post('/teacher/assignments/{subject}', [TeacherAssignmentController::class, 'store'])->name('teacher.assignments.store');
+        Route::get('/teacher/assignments/{assignment}/edit', [TeacherAssignmentController::class, 'edit'])->name('teacher.assignments.edit');
+        Route::put('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'update'])->name('teacher.assignments.update');
+        Route::delete('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('teacher.assignments.destroy');
+        Route::get('/teacher/assignments/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])->name('teacher.assignments.submissions');
+        Route::post('/teacher/assignments/submissions/{submission}/grade', [TeacherAssignmentController::class, 'grade'])->name('teacher.assignments.grade');
+        Route::get('/teacher/assignments/submissions/{submission}/download', [TeacherAssignmentController::class, 'downloadSubmission'])->name('teacher.assignments.download');
 
         // Timetable View
         Route::get('/teacher/timetable', [TeacherTimetableController::class, 'index'])->name('teacher.timetable.index');

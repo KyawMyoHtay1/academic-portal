@@ -67,6 +67,14 @@ class Course extends Model
     {
         return $this->hasMany(Subject::class);
     }
+
+    /**
+     * The assignments for this course.
+     */
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class);
+    }
 }
 
 

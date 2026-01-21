@@ -58,4 +58,12 @@ class Subject extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    /**
+     * The assignments for this subject.
+     */
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class);
+    }
 }

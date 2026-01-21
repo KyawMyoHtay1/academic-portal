@@ -1,0 +1,246 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class StudentAssignmentController extends Controller
+{
+    /**
+     * List assignments for the authenticated student.
+     */
+    public function index(): Response
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return Inertia::render('Student/Assignments/Index', [
+                'assignments' => [],
+                'message' => 'No student record found. Please contact administration.',
+            ]);
+        }
+
+        // Get assignments for courses the student is enrolled in
+        $enrolledCourseIds = $student->courses()->wherePivot('status', 'approved')->pluck('courses.id');
+
+        $assignments = Assignment::whereIn('course_id', $enrolledCourseIds)
+            ->where('status', Assignment::STATUS_PUBLISHED)
+            ->with(['subject', 'course', 'submissions' => function ($query) use ($student) {
+                $query->where('student_id', $student->id);
+            }])
+            ->orderBy('due_date', 'asc')
+            ->get()
+            ->map(function ($assignment) {
+                $submission = $assignment->submissions->first();
+                return [
+                    'id' => $assignment->id,
+                    'title' => $assignment->title,
+                    'description' => $assignment->description,
+                    'due_date' => $assignment->due_date->format('Y-m-d'),
+                    'due_time' => $assignment->due_time ? (is_string($assignment->due_time) ? substr($assignment->due_time, 0, 5) : $assignment->due_time->format('H:i')) : null,
+                    'max_score' => $assignment->max_score,
+                    'subject' => [
+                        'id' => $assignment->subject->id,
+                        'subject_code' => $assignment->subject->subject_code,
+                        'title' => $assignment->subject->title,
+                    ],
+                    'course' => [
+                        'id' => $assignment->course->id,
+                        'course_code' => $assignment->course->course_code,
+                        'title' => $assignment->course->title,
+                    ],
+                    'is_overdue' => $assignment->isOverdue(),
+                    'can_submit' => $assignment->canSubmit(),
+                    'submission' => $submission ? [
+                        'id' => $submission->id,
+                        'file_path' => $submission->file_path,
+                        'original_filename' => $submission->original_filename,
+                        'score' => $submission->score,
+                        'feedback' => $submission->feedback,
+                        'status' => $submission->status,
+                        'submitted_at' => $submission->created_at->format('Y-m-d H:i'),
+                        'graded_at' => $submission->graded_at?->format('Y-m-d H:i'),
+                        'percentage' => $submission->percentage,
+                    ] : null,
+                ];
+            });
+
+        return Inertia::render('Student/Assignments/Index', [
+            'assignments' => $assignments,
+        ]);
+    }
+
+    /**
+     * Show a specific assignment with submission form.
+     */
+    public function show(Assignment $assignment): Response
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            abort(404);
+        }
+
+        // Check if student is enrolled in the assignment's course
+        $isEnrolled = $student->courses()
+            ->where('courses.id', $assignment->course_id)
+            ->wherePivot('status', 'approved')
+            ->exists();
+
+        if (!$isEnrolled) {
+            abort(403, 'You are not enrolled in this course.');
+        }
+
+        $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        return Inertia::render('Student/Assignments/Show', [
+            'assignment' => [
+                'id' => $assignment->id,
+                'title' => $assignment->title,
+                'description' => $assignment->description,
+                'due_date' => $assignment->due_date->format('Y-m-d'),
+                'due_time' => $assignment->due_time ? (is_string($assignment->due_time) ? substr($assignment->due_time, 0, 5) : $assignment->due_time->format('H:i')) : null,
+                'max_score' => $assignment->max_score,
+                'allowed_file_types' => $assignment->allowed_file_types ?? ['pdf', 'doc', 'docx'],
+                'max_file_size' => $assignment->max_file_size ?? 5120, // Default 5MB
+                'subject' => [
+                    'id' => $assignment->subject->id,
+                    'subject_code' => $assignment->subject->subject_code,
+                    'title' => $assignment->subject->title,
+                ],
+                'course' => [
+                    'id' => $assignment->course->id,
+                    'course_code' => $assignment->course->course_code,
+                    'title' => $assignment->course->title,
+                ],
+                'is_overdue' => $assignment->isOverdue(),
+                'can_submit' => $assignment->canSubmit(),
+            ],
+            'submission' => $submission ? [
+                'id' => $submission->id,
+                'file_path' => $submission->file_path,
+                'original_filename' => $submission->original_filename,
+                'comments' => $submission->comments,
+                'score' => $submission->score,
+                'feedback' => $submission->feedback,
+                'status' => $submission->status,
+                'submitted_at' => $submission->created_at->format('Y-m-d H:i'),
+                'graded_at' => $submission->graded_at?->format('Y-m-d H:i'),
+                'percentage' => $submission->percentage,
+                'grader' => $submission->grader?->name,
+            ] : null,
+        ]);
+    }
+
+    /**
+     * Submit an assignment.
+     */
+    public function submit(Request $request, Assignment $assignment): RedirectResponse
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            abort(404);
+        }
+
+        // Check if student is enrolled
+        $isEnrolled = $student->courses()
+            ->where('courses.id', $assignment->course_id)
+            ->wherePivot('status', 'approved')
+            ->exists();
+
+        if (!$isEnrolled) {
+            abort(403, 'You are not enrolled in this course.');
+        }
+
+        // Check if assignment is still open for submission
+        if (!$assignment->canSubmit()) {
+            return back()->withErrors(['file' => 'This assignment is no longer accepting submissions.']);
+        }
+
+        // Check if already submitted
+        $existingSubmission = AssignmentSubmission::where('assignment_id', $assignment->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if ($existingSubmission) {
+            return back()->withErrors(['file' => 'You have already submitted this assignment.']);
+        }
+
+        $data = $request->validate([
+            'file' => ['required', 'file'],
+            'comments' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $file = $request->file('file');
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        // Validate file type
+        $allowedTypes = $assignment->allowed_file_types ?? ['pdf', 'doc', 'docx', 'txt', 'zip', 'rar'];
+        if (!in_array($extension, $allowedTypes)) {
+            return back()->withErrors([
+                'file' => 'File type not allowed. Allowed types: ' . implode(', ', $allowedTypes)
+            ]);
+        }
+
+        // Validate file size (in KB)
+        $maxSizeKB = $assignment->max_file_size ?? 5120; // Default 5MB
+        $fileSizeKB = $file->getSize() / 1024;
+        if ($fileSizeKB > $maxSizeKB) {
+            return back()->withErrors([
+                'file' => "File size exceeds maximum allowed size of {$maxSizeKB}KB."
+            ]);
+        }
+
+        // Store file
+        $filename = 'assignments/' . uniqid() . '.' . $extension;
+        Storage::disk('public')->put($filename, file_get_contents($file->getRealPath()));
+
+        AssignmentSubmission::create([
+            'assignment_id' => $assignment->id,
+            'student_id' => $student->id,
+            'file_path' => $filename,
+            'original_filename' => $file->getClientOriginalName(),
+            'comments' => $data['comments'] ?? null,
+            'status' => AssignmentSubmission::STATUS_SUBMITTED,
+        ]);
+
+        return redirect()
+            ->route('student.assignments.show', $assignment->id)
+            ->with('success', 'Assignment submitted successfully.');
+    }
+
+    /**
+     * Download a submitted file (for student to view their own submission).
+     */
+    public function download(AssignmentSubmission $submission): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student || $submission->student_id !== $student->id) {
+            abort(403, 'You can only download your own submissions.');
+        }
+
+        if (!Storage::disk('public')->exists($submission->file_path)) {
+            abort(404, 'File not found.');
+        }
+
+        return Storage::disk('public')->download(
+            $submission->file_path,
+            $submission->original_filename
+        );
+    }
+}
