@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     subject: {
@@ -16,9 +16,20 @@ const props = defineProps({
 });
 
 const rejectReason = ref({});
+const searchQuery = ref("");
 
 const approveForm = useForm({});
 const rejectForm = useForm({ reason: "" });
+
+const filteredRows = computed(() => {
+    const q = searchQuery.value.trim().toLowerCase();
+    if (!q) return props.rows;
+    return props.rows.filter((row) => {
+        const name = (row.student?.full_name ?? "").toLowerCase();
+        const studentNo = (row.student?.student_no ?? "").toLowerCase();
+        return name.includes(q) || studentNo.includes(q);
+    });
+});
 
 const approve = (gradeId) => {
     approveForm.post(route("admin.grades.approve", gradeId), {
@@ -88,6 +99,26 @@ const badgeClass = (status) => {
                         </p>
                     </div>
 
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Student Grades
+                            </p>
+                            <p class="mt-1 text-sm text-slate-600">
+                                Review and approve or reject submitted grades for each student.
+                            </p>
+                        </div>
+                        <div class="w-full sm:w-80">
+                            <label class="block text-xs font-medium text-slate-600">Search Students</label>
+                            <input
+                                v-model="searchQuery"
+                                type="search"
+                                placeholder="Search by student name or number…"
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                        </div>
+                    </div>
+
                     <div class="overflow-hidden rounded-md border border-slate-200">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -110,7 +141,7 @@ const badgeClass = (status) => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr v-for="row in rows" :key="row.student.id" class="hover:bg-slate-50">
+                                <tr v-for="row in filteredRows" :key="row.student.id" class="hover:bg-slate-50">
                                     <td class="px-4 py-3 text-sm text-slate-900">
                                         <div class="font-medium">{{ row.student.full_name }}</div>
                                         <div class="text-xs text-slate-500">{{ row.student.student_no }}</div>
@@ -175,6 +206,14 @@ const badgeClass = (status) => {
                                                 Reason: {{ row.grade.rejection_reason }}
                                             </div>
                                         </div>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredRows.length === 0">
+                                    <td
+                                        colspan="5"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        {{ searchQuery.trim() ? "No students match your search." : "No students found." }}
                                     </td>
                                 </tr>
                             </tbody>
