@@ -26,13 +26,7 @@ class TeacherAssignmentController extends Controller
                 $query->orderBy('due_date', 'desc');
             }])
             ->orderBy('subject_code')
-            ->get([
-                'subjects.id',
-                'subjects.course_id',
-                'subjects.subject_code',
-                'subjects.title',
-                'subjects.photo',
-            ])
+            ->get(['id', 'course_id', 'subject_code', 'title', 'photo'])
             ->map(function ($subject) {
                 return [
                     'id' => $subject->id,
