@@ -82,6 +82,8 @@ Route::get('/guest/news', function () {
             'id',
             'title',
             'body',
+            'priority',
+            'pinned',
             'created_at',
         ]),
     ]);
