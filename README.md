@@ -57,3 +57,17 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Automated low attendance alerts
+
+This project includes an automated low-attendance alert that notifies students when their overall attendance rate drops below a configured threshold.
+
+- **Command**: `php artisan attendance:send-low-attendance-alerts`
+- **Schedule**: configured to run daily (see `bootstrap/app.php`). In production you must run Laravel's scheduler (e.g. `php artisan schedule:run` every minute via cron / Windows Task Scheduler, or `php artisan schedule:work`).
+- **Queue worker**: required (notifications are queued). Example: `php artisan queue:work` (this repo's `composer dev` already runs a queue listener).
+- **Mail**: by default `MAIL_MAILER=log`, so emails will be written to logs until SMTP (or another mailer) is configured.
+
+Configuration:
+
+- `ATTENDANCE_LOW_THRESHOLD` (default 75)
+- `ATTENDANCE_ALERT_COOLDOWN_DAYS` (default 7)
