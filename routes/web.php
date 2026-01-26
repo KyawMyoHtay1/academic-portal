@@ -158,7 +158,37 @@ Route::get('/guest/news', function () {
     ]);
 })->name('guest.news');
 
-Route::view('/guest/about', 'guest.about')->name('guest.about');
+Route::get('/guest/about', function () {
+    // Dynamic Statistics
+    $totalStudents = Student::count();
+    $totalFaculty = User::where('role', 'teacher')->count();
+    $totalCourses = Course::count();
+    
+    // Calculate years of excellence (from oldest student enrollment or use a base year)
+    $oldestEnrollment = Student::whereNotNull('enrollment_date')
+        ->orderBy('enrollment_date', 'asc')
+        ->value('enrollment_date');
+    
+    $yearsOfExcellence = 50; // Default
+    if ($oldestEnrollment) {
+        $yearsOfExcellence = max(50, now()->year - $oldestEnrollment->year);
+    }
+    
+    // Get unique programs (based on unique course codes or could be based on student programmes)
+    $uniqueProgrammes = Student::distinct('programme')
+        ->whereNotNull('programme')
+        ->count('programme');
+    $totalPrograms = max($uniqueProgrammes, $totalCourses); // Use courses as fallback
+    
+    return view('guest.about', [
+        'stats' => [
+            'yearsOfExcellence' => $yearsOfExcellence,
+            'totalStudents' => $totalStudents,
+            'totalFaculty' => $totalFaculty,
+            'totalPrograms' => $totalPrograms,
+        ],
+    ]);
+})->name('guest.about');
 Route::view('/guest/contact', 'guest.contact')->name('guest.contact');
 Route::view('/guest/vision', 'guest.vision')->name('guest.vision');
 Route::view('/guest/policies', 'guest.policies')->name('guest.policies');

@@ -225,19 +225,27 @@
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div class="text-center">
-                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">50+</div>
+                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">
+                        {{ $stats['yearsOfExcellence'] > 0 ? number_format($stats['yearsOfExcellence']) . '+' : '50+' }}
+                    </div>
                     <div class="text-sm md:text-base text-slate-300 uppercase tracking-wide">Years of Excellence</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">5,000+</div>
+                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">
+                        {{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) . '+' : '5,000+' }}
+                    </div>
                     <div class="text-sm md:text-base text-slate-300 uppercase tracking-wide">Active Students</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">200+</div>
+                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">
+                        {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}
+                    </div>
                     <div class="text-sm md:text-base text-slate-300 uppercase tracking-wide">Expert Faculty</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">100+</div>
+                    <div class="text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--portal-gold)] mb-2">
+                        {{ $stats['totalPrograms'] > 0 ? number_format($stats['totalPrograms']) . '+' : '100+' }}
+                    </div>
                     <div class="text-sm md:text-base text-slate-300 uppercase tracking-wide">Programs Offered</div>
                 </div>
             </div>
