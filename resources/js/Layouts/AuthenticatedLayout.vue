@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
+import GoogleTranslate from "@/Components/GoogleTranslate.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 
 const showingMobileSidebar = ref(false);
@@ -825,6 +826,9 @@ const headerStatus = computed(() => {
                             <span class="h-2 w-2 rounded-full bg-emerald-500" />
                             {{ headerStatus }}
                         </div>
+
+                        <!-- Google Translate -->
+                        <GoogleTranslate />
 
                         <!-- Notification bell -->
                         <Link

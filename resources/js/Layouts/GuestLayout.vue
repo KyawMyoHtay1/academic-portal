@@ -1,10 +1,16 @@
 <script setup>
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import GoogleTranslate from '@/Components/GoogleTranslate.vue';
 import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
     <div class="portal-gradient flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-10">
+        <!-- Language Selector (top right) -->
+        <div class="fixed top-4 right-4 z-50">
+            <GoogleTranslate />
+        </div>
+
         <div class="w-full max-w-lg px-6 sm:px-8">
             <div class="flex flex-col items-center text-center text-slate-100">
                 <Link href="/" class="mb-4 inline-flex items-center justify-center">
