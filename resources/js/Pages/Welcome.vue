@@ -271,6 +271,35 @@ function handleImageError() {
                     </div>
                 </section>
             </main>
+
+            <!-- Footer -->
+            <footer class="mt-12 border-t border-white/10 pt-6 text-center text-xs text-slate-300">
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <Link
+                        :href="route('privacy-policy')"
+                        class="hover:text-portal-gold transition-colors"
+                    >
+                        Privacy Policy
+                    </Link>
+                    <span class="text-slate-500">•</span>
+                    <Link
+                        :href="route('guest.about')"
+                        class="hover:text-portal-gold transition-colors"
+                    >
+                        About
+                    </Link>
+                    <span class="text-slate-500">•</span>
+                    <Link
+                        :href="route('guest.contact')"
+                        class="hover:text-portal-gold transition-colors"
+                    >
+                        Contact
+                    </Link>
+                </div>
+                <p class="mt-3 text-slate-400">
+                    © {{ new Date().getFullYear() }} University Academic Portal. All rights reserved.
+                </p>
+            </footer>
         </div>
     </div>
 </template>

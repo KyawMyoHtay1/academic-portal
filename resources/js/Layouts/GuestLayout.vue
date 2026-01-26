@@ -34,6 +34,16 @@ import { Link } from '@inertiajs/vue3';
             <p class="mt-4 text-center text-xs text-slate-200">
                 BSc (Hons) Computing – University Academic Portal Project
             </p>
+
+            <!-- Footer Links -->
+            <div class="mt-4 flex items-center justify-center gap-3 text-xs">
+                <Link
+                    :href="route('privacy-policy')"
+                    class="text-slate-300 hover:text-portal-gold transition-colors"
+                >
+                    Privacy Policy
+                </Link>
+            </div>
         </div>
     </div>
 </template>

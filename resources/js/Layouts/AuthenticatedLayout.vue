@@ -929,6 +929,22 @@ const headerStatus = computed(() => {
                     <slot name="breadcrumb" />
                     <slot />
                 </main>
+
+                <!-- Footer -->
+                <footer class="border-t border-slate-200 bg-white px-4 py-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-600">
+                        <Link
+                            :href="route('privacy-policy')"
+                            class="hover:text-portal-navy transition-colors"
+                        >
+                            Privacy Policy
+                        </Link>
+                        <span class="text-slate-400">•</span>
+                        <span>
+                            © {{ new Date().getFullYear() }} University Academic Portal
+                        </span>
+                    </div>
+                </footer>
             </div>
         </div>
     </div>

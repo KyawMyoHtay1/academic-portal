@@ -89,6 +89,9 @@ Route::get('/guest/news', function () {
 
 Route::view('/guest/about', 'guest.about')->name('guest.about');
 Route::view('/guest/contact', 'guest.contact')->name('guest.contact');
+Route::get('/privacy-policy', function () {
+    return Inertia::render('PrivacyPolicy');
+})->name('privacy-policy');
 
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified', 'nocache'])
