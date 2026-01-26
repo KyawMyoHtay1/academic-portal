@@ -19,11 +19,14 @@
                 <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-[color:var(--portal-gold)] text-[color:var(--portal-navy)] shadow-inner">UA</span>
                 <span>University Portal</span>
             </a>
-            <div class="flex flex-wrap items-center gap-3 text-sm">
+            <div class="flex flex-wrap items-center gap-2 text-sm">
                 <a href="{{ route('guest.home') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Home</a>
                 <a href="{{ route('guest.courses') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Courses</a>
                 <a href="{{ route('guest.news') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">News</a>
                 <a href="{{ route('guest.about') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">About</a>
+                <a href="{{ route('guest.vision') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Vision</a>
+                <a href="{{ route('guest.services') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Services</a>
+                <a href="{{ route('guest.support') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Support</a>
                 <a href="{{ route('guest.contact') }}" class="px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100">Contact</a>
                 @if (Route::has('login'))
                     <a href="{{ route('login') }}" class="rounded-full bg-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">Login</a>

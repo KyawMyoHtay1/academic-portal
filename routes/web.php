@@ -91,6 +91,11 @@ Route::get('/guest/news', function () {
 
 Route::view('/guest/about', 'guest.about')->name('guest.about');
 Route::view('/guest/contact', 'guest.contact')->name('guest.contact');
+Route::view('/guest/vision', 'guest.vision')->name('guest.vision');
+Route::view('/guest/policies', 'guest.policies')->name('guest.policies');
+Route::view('/guest/services', 'guest.services')->name('guest.services');
+Route::view('/guest/support', 'guest.support')->name('guest.support');
+Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
 Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
 })->name('privacy-policy');
