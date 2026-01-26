@@ -8,6 +8,8 @@ use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,6 +31,35 @@ class DashboardController extends Controller
                 ? round(($attendancePresent / $attendanceTotal) * 100, 1)
                 : 0;
 
+            // Check alert system status
+            $queueConnection = config('queue.default', 'sync');
+            $queueConfigured = $queueConnection !== 'sync';
+            
+            // Check for pending jobs (if using database queue)
+            $pendingJobs = 0;
+            if ($queueConnection === 'database') {
+                try {
+                    $pendingJobs = DB::table('jobs')->count();
+                } catch (\Exception $e) {
+                    // Jobs table might not exist
+                }
+            }
+
+            // Check scheduler status (we can't detect if it's running, but we can show if configured)
+            $schedulerConfigured = true; // We have it configured in bootstrap/app.php
+            
+            // Determine overall status
+            $alertSystemStatus = [
+                'queueConfigured' => $queueConfigured,
+                'queueConnection' => $queueConnection,
+                'pendingJobs' => $pendingJobs,
+                'schedulerConfigured' => $schedulerConfigured,
+                'status' => $queueConfigured && $schedulerConfigured ? 'ready' : 'warning',
+                'message' => $queueConfigured 
+                    ? ($pendingJobs > 10 ? 'Queue worker may need attention (many pending jobs)' : 'System ready for automatic alerts')
+                    : 'Queue is set to sync mode - configure QUEUE_CONNECTION for automatic alerts',
+            ];
+
             return Inertia::render('Dashboard', [
                 'role' => 'staff',
                 'stats' => [
@@ -37,6 +68,7 @@ class DashboardController extends Controller
                     'feeTotal' => $feeTotal,
                     'attendanceRate' => $attendanceRate,
                 ],
+                'alertSystemStatus' => $alertSystemStatus,
             ]);
         }
 
