@@ -101,6 +101,7 @@ class HandleInertiaRequests extends Middleware
                 'announcements' => $announcementsWidget['unreadCount'] ?? 0,
             ],
             'announcementsWidget' => $announcementsWidget,
+            'recaptchaSiteKey' => config('recaptcha.site_key'),
         ];
     }
 }

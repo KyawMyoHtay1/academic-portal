@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Services\RecaptchaService;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -26,10 +27,33 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
+
+        // Add reCAPTCHA validation if configured
+        if (config('recaptcha.site_key')) {
+            $rules['recaptcha_token'] = ['required', 'string'];
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            // Verify reCAPTCHA if configured
+            if (config('recaptcha.site_key') && $this->filled('recaptcha_token')) {
+                $recaptchaService = app(RecaptchaService::class);
+                if (!$recaptchaService->verify($this->input('recaptcha_token'), $this->ip())) {
+                    $validator->errors()->add('recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+                }
+            }
+        });
     }
 
     /**

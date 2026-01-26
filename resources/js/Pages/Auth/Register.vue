@@ -5,15 +5,25 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useRecaptcha } from '@/composables/useRecaptcha';
 
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    recaptcha_token: '',
 });
 
-const submit = () => {
+const { execute: executeRecaptcha, isAvailable: recaptchaAvailable } = useRecaptcha();
+
+const submit = async () => {
+    // Execute reCAPTCHA if available
+    if (recaptchaAvailable) {
+        const token = await executeRecaptcha('register');
+        form.recaptcha_token = token || '';
+    }
+
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
