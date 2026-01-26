@@ -26,6 +26,7 @@ use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StaffAnnouncementController;
+use App\Http\Controllers\StaffAttendanceAlertsController;
 use App\Http\Controllers\StaffAttendanceReportController;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherAssignmentController;
@@ -249,6 +250,9 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Attendance Reports (staff only)
         Route::get('/admin/attendance/report', [StaffAttendanceReportController::class, 'index'])->name('admin.attendance.report');
+
+        // Attendance Alerts (staff only)
+        Route::post('/admin/attendance/alerts/run', StaffAttendanceAlertsController::class)->name('admin.attendance.alerts.run');
     });
 
     // Timebox 3: Teacher Features (teacher only)

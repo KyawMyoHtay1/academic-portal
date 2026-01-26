@@ -883,6 +883,30 @@ const quickActions = computed(() => {
                     </div>
 
                     <div class="space-y-4">
+                        <!-- Attendance alerts -->
+                        <div class="portal-card p-5">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Attendance alerts
+                            </p>
+                            <p class="mt-1 text-sm text-slate-700">
+                                Manually run the low attendance alert check.
+                                Alerts will be queued and sent in the
+                                background.
+                            </p>
+                            <div class="mt-3">
+                                <Link
+                                    :href="route('admin.attendance.alerts.run')"
+                                    method="post"
+                                    as="button"
+                                    class="inline-flex items-center rounded-md bg-portal-navy px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                >
+                                    Run low attendance alerts
+                                </Link>
+                            </div>
+                        </div>
+
                         <!-- Quick actions -->
                         <div class="portal-card p-5">
                             <p
