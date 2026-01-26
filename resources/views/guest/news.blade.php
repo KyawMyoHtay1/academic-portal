@@ -215,8 +215,8 @@
                 <article class="announcement-card group relative overflow-hidden rounded-2xl border-2 {{ $isPinned ? 'border-[color:var(--portal-gold)] bg-gradient-to-br from-amber-50 to-white' : 'border-' . $colors['border'] . ' bg-white' }} shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" 
                          data-priority="{{ $priority }}" 
                          data-pinned="{{ $isPinned ? 'true' : 'false' }}"
-                         data-title="{{ strtolower($item->title) }}"
-                         data-body="{{ strtolower($item->body) }}">
+                         data-title="{{ htmlspecialchars(strtolower(strip_tags($item->title)), ENT_QUOTES, 'UTF-8') }}"
+                         data-body="{{ htmlspecialchars(strtolower(strip_tags($item->body)), ENT_QUOTES, 'UTF-8') }}">
                     
                     {{-- Priority Indicator Bar --}}
                     <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r {{ $priority === 'urgent' ? 'from-red-500 to-red-600' : ($priority === 'important' ? 'from-amber-500 to-amber-600' : 'from-blue-500 to-blue-600') }}"></div>
@@ -324,22 +324,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const announcementsContainer = document.getElementById('announcementsContainer');
     const noResults = document.getElementById('noResults');
     
+    // Check if required elements exist
+    if (!searchInput || !announcementsContainer) {
+        console.error('Required elements not found for news filtering');
+        return;
+    }
+    
     let currentFilter = 'all';
     
     function filterAnnouncements() {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = (searchInput.value || '').trim().toLowerCase();
         let visibleCount = 0;
         
         announcementCards.forEach(card => {
-            const title = card.dataset.title || '';
-            const body = card.dataset.body || '';
-            const priority = card.dataset.priority || 'info';
+            const title = (card.dataset.title || '').trim();
+            const body = (card.dataset.body || '').trim();
+            const priority = (card.dataset.priority || 'info').trim();
             const isPinned = card.dataset.pinned === 'true';
             
+            // Search filter
             const matchesSearch = !searchTerm || 
                 title.includes(searchTerm) || 
                 body.includes(searchTerm);
             
+            // Priority/Pinned filter
             let matchesFilter = false;
             switch(currentFilter) {
                 case 'pinned':
@@ -362,18 +370,27 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (matchesSearch && matchesFilter) {
                 card.style.display = 'block';
+                card.style.visibility = 'visible';
                 visibleCount++;
             } else {
                 card.style.display = 'none';
+                card.style.visibility = 'hidden';
             }
         });
         
+        // Show/hide no results message
         if (visibleCount === 0) {
-            announcementsContainer.style.display = 'none';
-            noResults.classList.remove('hidden');
+            if (announcementsContainer) {
+                announcementsContainer.style.display = 'none';
+                announcementsContainer.style.visibility = 'hidden';
+            }
+            if (noResults) noResults.classList.remove('hidden');
         } else {
-            announcementsContainer.style.display = 'block';
-            noResults.classList.add('hidden');
+            if (announcementsContainer) {
+                announcementsContainer.style.display = 'block';
+                announcementsContainer.style.visibility = 'visible';
+            }
+            if (noResults) noResults.classList.add('hidden');
         }
     }
     
@@ -391,24 +408,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function clearAllFilters() {
-        searchInput.value = '';
+        if (searchInput) searchInput.value = '';
         setActiveFilter('all');
         filterAnnouncements();
     }
     
-    searchInput.addEventListener('input', filterAnnouncements);
+    // Add event listeners
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAnnouncements);
+        searchInput.addEventListener('keyup', filterAnnouncements);
+    }
     
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            setActiveFilter(this.dataset.filter);
-            filterAnnouncements();
+    if (filterButtons.length > 0) {
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                setActiveFilter(this.dataset.filter);
+                filterAnnouncements();
+            });
         });
-    });
+    }
     
-    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
     if (clearSearchFiltersBtn) {
         clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
     }
+    
+    // Initial filter
+    filterAnnouncements();
 });
 </script>
 @endpush

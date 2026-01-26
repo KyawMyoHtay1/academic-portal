@@ -175,7 +175,11 @@
     <section>
         <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($courses as $course)
-                <div class="course-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="course-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                     data-course-code="{{ strtolower($course->course_code) }}"
+                     data-course-title="{{ strtolower($course->title) }}"
+                     data-semester="{{ strtolower($course->semester ?? '') }}"
+                     data-credits="{{ $course->credits }}">
                     {{-- Gradient Header Bar --}}
                     <div class="h-2 bg-gradient-to-r from-[color:var(--portal-navy)] via-[color:var(--portal-gold)] to-[color:var(--portal-navy)]"></div>
                     
@@ -212,13 +216,13 @@
                                     {{ substr($course->course_code, 0, 2) }}
                                 </div>
                                 <div>
-                                    <p class="text-xs font-bold uppercase tracking-wide text-[color:var(--portal-navy)]">{{ $course->course_code }}</p>
-                                    <p class="text-xs text-slate-500">{{ $course->semester }}</p>
+                                    <p class="text-xs font-bold uppercase tracking-wide text-[color:var(--portal-navy)] course-code">{{ $course->course_code }}</p>
+                                    <p class="text-xs text-slate-500 course-semester">{{ $course->semester }}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-[color:var(--portal-navy)] transition-colors line-clamp-2">
+                        <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-[color:var(--portal-navy)] transition-colors line-clamp-2 course-title">
                             {{ $course->title }}
                         </h3>
                         
@@ -287,25 +291,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const coursesContainer = document.getElementById('coursesContainer');
     const noResults = document.getElementById('noResults');
     
-    let allCourses = courseCards.map(card => ({
-        element: card,
-        title: card.querySelector('h3').textContent.toLowerCase(),
-        code: card.querySelector('.text-xs.uppercase').textContent.toLowerCase(),
-        semester: card.querySelector('.text-xs.text-slate-500')?.textContent.toLowerCase() || '',
-        credits: parseInt(card.querySelector('.text-xs.font-bold').textContent.match(/\d+/)?.[0] || '0')
-    }));
+    // Check if elements exist
+    if (!searchInput || !semesterFilter || !sortFilter || !coursesContainer) {
+        console.error('Required elements not found for course filtering');
+        return;
+    }
+    
+    // Build course data array using data attributes (more reliable)
+    let allCourses = courseCards.map(card => {
+        const titleEl = card.querySelector('.course-title');
+        const codeEl = card.querySelector('.course-code');
+        const semesterEl = card.querySelector('.course-semester');
+        
+        return {
+            element: card,
+            title: card.dataset.courseTitle || (titleEl ? titleEl.textContent.trim().toLowerCase() : ''),
+            code: card.dataset.courseCode || (codeEl ? codeEl.textContent.trim().toLowerCase() : ''),
+            semester: card.dataset.semester || (semesterEl ? semesterEl.textContent.trim().toLowerCase() : ''),
+            credits: parseInt(card.dataset.credits || '0')
+        };
+    });
     
     function filterAndSortCourses() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const selectedSemester = semesterFilter.value.toLowerCase();
-        const sortBy = sortFilter.value;
+        const searchTerm = (searchInput.value || '').trim().toLowerCase();
+        const selectedSemester = (semesterFilter.value || '').trim().toLowerCase();
+        const sortBy = sortFilter.value || 'code';
         
         let filtered = allCourses.filter(course => {
+            // Search filter
             const matchesSearch = !searchTerm || 
                 course.title.includes(searchTerm) || 
                 course.code.includes(searchTerm) ||
                 course.semester.includes(searchTerm);
             
+            // Semester filter
             const matchesSemester = !selectedSemester || course.semester === selectedSemester;
             
             return matchesSearch && matchesSemester;
@@ -326,38 +345,62 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Hide all courses
+        // Hide all courses first
         courseCards.forEach(card => {
             card.style.display = 'none';
+            card.style.visibility = 'hidden';
         });
         
-        // Show filtered courses
+        // Show filtered courses in sorted order
         if (filtered.length === 0) {
-            coursesContainer.style.display = 'none';
-            noResults.classList.remove('hidden');
+            if (coursesContainer) {
+                coursesContainer.style.display = 'none';
+                coursesContainer.style.visibility = 'hidden';
+            }
+            if (noResults) noResults.classList.remove('hidden');
         } else {
-            coursesContainer.style.display = 'grid';
-            noResults.classList.add('hidden');
-            filtered.forEach(course => {
+            if (coursesContainer) {
+                coursesContainer.style.display = 'grid';
+                coursesContainer.style.visibility = 'visible';
+            }
+            if (noResults) noResults.classList.add('hidden');
+            
+            // Show and reorder filtered courses
+            filtered.forEach((course, index) => {
                 course.element.style.display = 'block';
+                course.element.style.visibility = 'visible';
+                course.element.style.order = index;
             });
         }
     }
     
     function clearAllFilters() {
-        searchInput.value = '';
-        semesterFilter.value = '';
-        sortFilter.value = 'code';
+        if (searchInput) searchInput.value = '';
+        if (semesterFilter) semesterFilter.value = '';
+        if (sortFilter) sortFilter.value = 'code';
         filterAndSortCourses();
     }
     
-    searchInput.addEventListener('input', filterAndSortCourses);
-    semesterFilter.addEventListener('change', filterAndSortCourses);
-    sortFilter.addEventListener('change', filterAndSortCourses);
-    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    // Add event listeners
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAndSortCourses);
+        searchInput.addEventListener('keyup', filterAndSortCourses);
+    }
+    if (semesterFilter) {
+        semesterFilter.addEventListener('change', filterAndSortCourses);
+    }
+    if (sortFilter) {
+        sortFilter.addEventListener('change', filterAndSortCourses);
+    }
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
     if (clearSearchFiltersBtn) {
         clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
     }
+    
+    // Initial filter (in case there are URL parameters or default filters)
+    filterAndSortCourses();
 });
 </script>
 @endpush
