@@ -281,127 +281,114 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const courseCards = Array.from(document.querySelectorAll('.course-card'));
-    const searchInput = document.getElementById('courseSearch');
-    const semesterFilter = document.getElementById('semesterFilter');
-    const sortFilter = document.getElementById('sortFilter');
-    const clearFiltersBtn = document.getElementById('clearFilters');
-    const clearSearchFiltersBtn = document.getElementById('clearSearchFilters');
-    const coursesContainer = document.getElementById('coursesContainer');
-    const noResults = document.getElementById('noResults');
+(function() {
+    'use strict';
     
-    // Check if elements exist
-    if (!searchInput || !semesterFilter || !sortFilter || !coursesContainer) {
-        console.error('Required elements not found for course filtering');
-        return;
-    }
-    
-    // Build course data array using data attributes (more reliable)
-    let allCourses = courseCards.map(card => {
-        const titleEl = card.querySelector('.course-title');
-        const codeEl = card.querySelector('.course-code');
-        const semesterEl = card.querySelector('.course-semester');
+    function initCourseFilters() {
+        const courseCards = Array.from(document.querySelectorAll('.course-card'));
+        const searchInput = document.getElementById('courseSearch');
+        const semesterFilter = document.getElementById('semesterFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const clearFiltersBtn = document.getElementById('clearFilters');
+        const clearSearchFiltersBtn = document.getElementById('clearSearchFilters');
+        const coursesContainer = document.getElementById('coursesContainer');
+        const noResults = document.getElementById('noResults');
         
-        return {
+        // Check if elements exist
+        if (!searchInput || !semesterFilter || !sortFilter || !coursesContainer || courseCards.length === 0) {
+            console.warn('Course filter elements not found or no courses available');
+            return;
+        }
+        
+        // Build course data array using data attributes
+        const allCourses = courseCards.map(card => ({
             element: card,
-            title: card.dataset.courseTitle || (titleEl ? titleEl.textContent.trim().toLowerCase() : ''),
-            code: card.dataset.courseCode || (codeEl ? codeEl.textContent.trim().toLowerCase() : ''),
-            semester: card.dataset.semester || (semesterEl ? semesterEl.textContent.trim().toLowerCase() : ''),
-            credits: parseInt(card.dataset.credits || '0')
-        };
-    });
-    
-    function filterAndSortCourses() {
-        const searchTerm = (searchInput.value || '').trim().toLowerCase();
-        const selectedSemester = (semesterFilter.value || '').trim().toLowerCase();
-        const sortBy = sortFilter.value || 'code';
+            title: (card.dataset.courseTitle || '').trim(),
+            code: (card.dataset.courseCode || '').trim(),
+            semester: (card.dataset.semester || '').trim(),
+            credits: parseInt(card.dataset.credits || '0', 10)
+        }));
         
-        let filtered = allCourses.filter(course => {
-            // Search filter
-            const matchesSearch = !searchTerm || 
-                course.title.includes(searchTerm) || 
-                course.code.includes(searchTerm) ||
-                course.semester.includes(searchTerm);
+        function filterAndSortCourses() {
+            const searchTerm = (searchInput.value || '').trim().toLowerCase();
+            const selectedSemester = (semesterFilter.value || '').trim().toLowerCase();
+            const sortBy = sortFilter.value || 'code';
             
-            // Semester filter
-            const matchesSemester = !selectedSemester || course.semester === selectedSemester;
-            
-            return matchesSearch && matchesSemester;
-        });
-        
-        // Sort courses
-        filtered.sort((a, b) => {
-            switch(sortBy) {
-                case 'title':
-                    return a.title.localeCompare(b.title);
-                case 'credits':
-                    return b.credits - a.credits;
-                case 'semester':
-                    return a.semester.localeCompare(b.semester);
-                case 'code':
-                default:
-                    return a.code.localeCompare(b.code);
-            }
-        });
-        
-        // Hide all courses first
-        courseCards.forEach(card => {
-            card.style.display = 'none';
-            card.style.visibility = 'hidden';
-        });
-        
-        // Show filtered courses in sorted order
-        if (filtered.length === 0) {
-            if (coursesContainer) {
-                coursesContainer.style.display = 'none';
-                coursesContainer.style.visibility = 'hidden';
-            }
-            if (noResults) noResults.classList.remove('hidden');
-        } else {
-            if (coursesContainer) {
-                coursesContainer.style.display = 'grid';
-                coursesContainer.style.visibility = 'visible';
-            }
-            if (noResults) noResults.classList.add('hidden');
-            
-            // Show and reorder filtered courses
-            filtered.forEach((course, index) => {
-                course.element.style.display = 'block';
-                course.element.style.visibility = 'visible';
-                course.element.style.order = index;
+            // Filter courses
+            let filtered = allCourses.filter(course => {
+                const matchesSearch = !searchTerm || 
+                    course.title.includes(searchTerm) || 
+                    course.code.includes(searchTerm) ||
+                    course.semester.includes(searchTerm);
+                
+                const matchesSemester = !selectedSemester || course.semester === selectedSemester;
+                
+                return matchesSearch && matchesSemester;
             });
+            
+            // Sort courses
+            filtered.sort((a, b) => {
+                switch(sortBy) {
+                    case 'title':
+                        return a.title.localeCompare(b.title);
+                    case 'credits':
+                        return b.credits - a.credits;
+                    case 'semester':
+                        return a.semester.localeCompare(b.semester);
+                    case 'code':
+                    default:
+                        return a.code.localeCompare(b.code);
+                }
+            });
+            
+            // Hide all courses
+            courseCards.forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            // Show filtered courses
+            if (filtered.length === 0) {
+                coursesContainer.style.display = 'none';
+                if (noResults) noResults.classList.remove('hidden');
+            } else {
+                coursesContainer.style.display = 'grid';
+                if (noResults) noResults.classList.add('hidden');
+                
+                filtered.forEach((course, index) => {
+                    course.element.style.display = 'block';
+                    course.element.style.order = index;
+                });
+            }
+        }
+        
+        function clearAllFilters() {
+            searchInput.value = '';
+            semesterFilter.value = '';
+            sortFilter.value = 'code';
+            filterAndSortCourses();
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', filterAndSortCourses);
+        searchInput.addEventListener('keyup', filterAndSortCourses);
+        semesterFilter.addEventListener('change', filterAndSortCourses);
+        sortFilter.addEventListener('change', filterAndSortCourses);
+        
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', clearAllFilters);
+        }
+        if (clearSearchFiltersBtn) {
+            clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
         }
     }
     
-    function clearAllFilters() {
-        if (searchInput) searchInput.value = '';
-        if (semesterFilter) semesterFilter.value = '';
-        if (sortFilter) sortFilter.value = 'code';
-        filterAndSortCourses();
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCourseFilters);
+    } else {
+        initCourseFilters();
     }
-    
-    // Add event listeners
-    if (searchInput) {
-        searchInput.addEventListener('input', filterAndSortCourses);
-        searchInput.addEventListener('keyup', filterAndSortCourses);
-    }
-    if (semesterFilter) {
-        semesterFilter.addEventListener('change', filterAndSortCourses);
-    }
-    if (sortFilter) {
-        sortFilter.addEventListener('change', filterAndSortCourses);
-    }
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', clearAllFilters);
-    }
-    if (clearSearchFiltersBtn) {
-        clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
-    }
-    
-    // Initial filter (in case there are URL parameters or default filters)
-    filterAndSortCourses();
-});
+})();
 </script>
 @endpush
 @endsection

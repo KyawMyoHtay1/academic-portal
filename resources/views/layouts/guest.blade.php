@@ -218,6 +218,8 @@
         </div>
     </footer>
 
+    @stack('scripts')
+
     <script>
         // Google Translate Functions
         function toggleTranslateDropdown() {

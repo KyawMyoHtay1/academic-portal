@@ -315,129 +315,125 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const announcementCards = Array.from(document.querySelectorAll('.announcement-card'));
-    const searchInput = document.getElementById('newsSearch');
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const clearFiltersBtn = document.getElementById('clearFilters');
-    const clearSearchFiltersBtn = document.getElementById('clearSearchFilters');
-    const announcementsContainer = document.getElementById('announcementsContainer');
-    const noResults = document.getElementById('noResults');
+(function() {
+    'use strict';
     
-    // Check if required elements exist
-    if (!searchInput || !announcementsContainer) {
-        console.error('Required elements not found for news filtering');
-        return;
-    }
-    
-    let currentFilter = 'all';
-    
-    function filterAnnouncements() {
-        const searchTerm = (searchInput.value || '').trim().toLowerCase();
-        let visibleCount = 0;
+    function initNewsFilters() {
+        const announcementCards = Array.from(document.querySelectorAll('.announcement-card'));
+        const searchInput = document.getElementById('newsSearch');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const clearFiltersBtn = document.getElementById('clearFilters');
+        const clearSearchFiltersBtn = document.getElementById('clearSearchFilters');
+        const announcementsContainer = document.getElementById('announcementsContainer');
+        const noResults = document.getElementById('noResults');
         
-        announcementCards.forEach(card => {
-            const title = (card.dataset.title || '').trim();
-            const body = (card.dataset.body || '').trim();
-            const priority = (card.dataset.priority || 'info').trim();
-            const isPinned = card.dataset.pinned === 'true';
-            
-            // Search filter
-            const matchesSearch = !searchTerm || 
-                title.includes(searchTerm) || 
-                body.includes(searchTerm);
-            
-            // Priority/Pinned filter
-            let matchesFilter = false;
-            switch(currentFilter) {
-                case 'pinned':
-                    matchesFilter = isPinned;
-                    break;
-                case 'urgent':
-                    matchesFilter = priority === 'urgent';
-                    break;
-                case 'important':
-                    matchesFilter = priority === 'important';
-                    break;
-                case 'info':
-                    matchesFilter = priority === 'info';
-                    break;
-                case 'all':
-                default:
-                    matchesFilter = true;
-                    break;
-            }
-            
-            if (matchesSearch && matchesFilter) {
-                card.style.display = 'block';
-                card.style.visibility = 'visible';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-                card.style.visibility = 'hidden';
-            }
-        });
-        
-        // Show/hide no results message
-        if (visibleCount === 0) {
-            if (announcementsContainer) {
-                announcementsContainer.style.display = 'none';
-                announcementsContainer.style.visibility = 'hidden';
-            }
-            if (noResults) noResults.classList.remove('hidden');
-        } else {
-            if (announcementsContainer) {
-                announcementsContainer.style.display = 'block';
-                announcementsContainer.style.visibility = 'visible';
-            }
-            if (noResults) noResults.classList.add('hidden');
+        // Check if required elements exist
+        if (!searchInput || !announcementsContainer || announcementCards.length === 0) {
+            console.warn('News filter elements not found or no announcements available');
+            return;
         }
-    }
-    
-    function setActiveFilter(filter) {
-        currentFilter = filter;
-        filterButtons.forEach(btn => {
-            if (btn.dataset.filter === filter) {
-                btn.classList.add('active', 'bg-[color:var(--portal-navy)]', 'text-white');
-                btn.classList.remove('bg-white', 'text-slate-700');
+        
+        let currentFilter = 'all';
+        
+        function filterAnnouncements() {
+            const searchTerm = (searchInput.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+            
+            announcementCards.forEach(card => {
+                const title = (card.dataset.title || '').trim();
+                const body = (card.dataset.body || '').trim();
+                const priority = (card.dataset.priority || 'info').trim();
+                const isPinned = card.dataset.pinned === 'true';
+                
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    title.includes(searchTerm) || 
+                    body.includes(searchTerm);
+                
+                // Priority/Pinned filter
+                let matchesFilter = false;
+                switch(currentFilter) {
+                    case 'pinned':
+                        matchesFilter = isPinned;
+                        break;
+                    case 'urgent':
+                        matchesFilter = priority === 'urgent';
+                        break;
+                    case 'important':
+                        matchesFilter = priority === 'important';
+                        break;
+                    case 'info':
+                        matchesFilter = priority === 'info';
+                        break;
+                    case 'all':
+                    default:
+                        matchesFilter = true;
+                        break;
+                }
+                
+                if (matchesSearch && matchesFilter) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            if (visibleCount === 0) {
+                announcementsContainer.style.display = 'none';
+                if (noResults) noResults.classList.remove('hidden');
             } else {
-                btn.classList.remove('active', 'bg-[color:var(--portal-navy)]', 'text-white');
-                btn.classList.add('bg-white', 'text-slate-700');
+                announcementsContainer.style.display = 'block';
+                if (noResults) noResults.classList.add('hidden');
             }
-        });
-    }
-    
-    function clearAllFilters() {
-        if (searchInput) searchInput.value = '';
-        setActiveFilter('all');
-        filterAnnouncements();
-    }
-    
-    // Add event listeners
-    if (searchInput) {
+        }
+        
+        function setActiveFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active', 'bg-[color:var(--portal-navy)]', 'text-white');
+                    btn.classList.remove('bg-white', 'text-slate-700');
+                } else {
+                    btn.classList.remove('active', 'bg-[color:var(--portal-navy)]', 'text-white');
+                    btn.classList.add('bg-white', 'text-slate-700');
+                }
+            });
+        }
+        
+        function clearAllFilters() {
+            searchInput.value = '';
+            setActiveFilter('all');
+            filterAnnouncements();
+        }
+        
+        // Event listeners
         searchInput.addEventListener('input', filterAnnouncements);
         searchInput.addEventListener('keyup', filterAnnouncements);
-    }
-    
-    if (filterButtons.length > 0) {
+        
         filterButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 setActiveFilter(this.dataset.filter);
                 filterAnnouncements();
             });
         });
+        
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', clearAllFilters);
+        }
+        if (clearSearchFiltersBtn) {
+            clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
+        }
     }
     
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNewsFilters);
+    } else {
+        initNewsFilters();
     }
-    if (clearSearchFiltersBtn) {
-        clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
-    }
-    
-    // Initial filter
-    filterAnnouncements();
-});
+})();
 </script>
 @endpush
 @endsection
