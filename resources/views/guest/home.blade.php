@@ -75,19 +75,31 @@
             {{-- Quick Stats in Hero --}}
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12 mt-12 border-t border-white/20">
                 <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">100+</div>
+                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">
+                        {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) . '+' : '100+' }}
+                    </div>
                     <div class="text-sm text-slate-300 mt-1">Courses</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">5K+</div>
+                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">
+                        @if($stats['totalStudents'] >= 1000)
+                            {{ number_format($stats['totalStudents'] / 1000, 1) }}K+
+                        @elseif($stats['totalStudents'] > 0)
+                            {{ number_format($stats['totalStudents']) }}+
+                        @else
+                            5K+
+                        @endif
+                    </div>
                     <div class="text-sm text-slate-300 mt-1">Students</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">200+</div>
+                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">
+                        {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}
+                    </div>
                     <div class="text-sm text-slate-300 mt-1">Faculty</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">95%</div>
+                    <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">{{ $stats['successRate'] }}%</div>
                     <div class="text-sm text-slate-300 mt-1">Success Rate</div>
                 </div>
             </div>
@@ -103,7 +115,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                     </svg>
                 </div>
-                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">100+</div>
+                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">
+                    {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) . '+' : '100+' }}
+                </div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Active Courses</div>
             </div>
             <div class="text-center group">
@@ -112,7 +126,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                 </div>
-                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">5,000+</div>
+                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">
+                    @if($stats['totalStudents'] >= 1000)
+                        {{ number_format($stats['totalStudents'] / 1000, 1) }}K+
+                    @elseif($stats['totalStudents'] > 0)
+                        {{ number_format($stats['totalStudents']) }}+
+                    @else
+                        5,000+
+                    @endif
+                </div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Students</div>
             </div>
             <div class="text-center group">
@@ -121,7 +143,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">200+</div>
+                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">
+                    {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}
+                </div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Expert Faculty</div>
             </div>
             <div class="text-center group">
@@ -130,7 +154,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                     </svg>
                 </div>
-                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">95%</div>
+                <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">{{ $stats['successRate'] }}%</div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Success Rate</div>
             </div>
         </div>

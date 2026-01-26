@@ -3,6 +3,9 @@
 use App\Http\Controllers\CourseController;
 use App\Models\Course;
 use App\Models\Announcement;
+use App\Models\Student;
+use App\Models\User;
+use App\Models\Attendance;
 use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyCoursesController;
@@ -42,6 +45,24 @@ use Inertia\Inertia;
 
 // Guest-facing public pages (read-only)
 Route::get('/', function () {
+    // Dynamic Statistics
+    $totalCourses = Course::count();
+    $totalStudents = Student::count();
+    $totalFaculty = User::where('role', 'teacher')->count();
+    
+    // Calculate success rate based on attendance (present rate)
+    $totalAttendance = Attendance::count();
+    $presentAttendance = Attendance::where('status', 'present')->count();
+    $successRate = $totalAttendance > 0 
+        ? round(($presentAttendance / $totalAttendance) * 100, 0) 
+        : 95; // Default to 95% if no attendance data
+    
+    // Get total credits
+    $totalCredits = Course::sum('credits');
+    
+    // Get unique semesters count
+    $uniqueSemesters = Course::distinct('semester')->count('semester');
+    
     return view('guest.home', [
         'publicCourses' => Course::orderBy('course_code')
             ->take(6)
@@ -54,6 +75,14 @@ Route::get('/', function () {
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get(['id', 'title', 'body', 'created_at']),
+        'stats' => [
+            'totalCourses' => $totalCourses,
+            'totalStudents' => $totalStudents,
+            'totalFaculty' => $totalFaculty,
+            'successRate' => $successRate,
+            'totalCredits' => $totalCredits,
+            'uniqueSemesters' => $uniqueSemesters,
+        ],
     ]);
 })->name('guest.home');
 
