@@ -10,7 +10,37 @@
             --portal-navy: #0b1f3a;
             --portal-gold: #f4b400;
         }
+        /* Hide Google Translate's default UI */
+        .goog-te-banner-frame,
+        .goog-te-menu-value,
+        .goog-te-menu-frame {
+            display: none !important;
+        }
+        body {
+            top: 0 !important;
+        }
+        #google_translate_element select.goog-te-combo {
+            display: none;
+        }
+        .skiptranslate {
+            display: none !important;
+        }
     </style>
+    <!-- Google Translate -->
+    <script type="text/javascript">
+        window.googleTranslateElementInit = function() {
+            const element = document.getElementById('google_translate_element');
+            if (element && window.google && window.google.translate) {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'ar,zh-CN,zh-TW,fr,de,hi,id,it,ja,ko,pt,ru,es,th,tr,vi',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                    autoDisplay: false
+                }, 'google_translate_element');
+            }
+        };
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body class="bg-gradient-to-b from-slate-50 via-white to-slate-100 font-sans text-slate-900">
     <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
@@ -85,6 +115,95 @@
                         <span>Register</span>
                     </a>
                 @endif
+                
+                {{-- Google Translate Widget --}}
+                <div class="relative" id="google-translate-container">
+                    <div id="google_translate_element" style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;"></div>
+                    <button
+                        type="button"
+                        id="translate-button"
+                        onclick="toggleTranslateDropdown()"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100 transition-colors"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                        </svg>
+                        <span class="hidden sm:inline" id="current-lang">Language</span>
+                        <span class="sm:hidden">🌐</span>
+                    </button>
+                    <div id="translate-dropdown" class="hidden absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-xl border border-slate-200 z-50 max-h-80 overflow-y-auto">
+                        <div class="p-2">
+                            <button onclick="changeLanguage('en')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇬🇧</span>
+                                <span>English</span>
+                            </button>
+                            <button onclick="changeLanguage('ar')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇸🇦</span>
+                                <span>العربية</span>
+                            </button>
+                            <button onclick="changeLanguage('zh-CN')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇨🇳</span>
+                                <span>中文 (简体)</span>
+                            </button>
+                            <button onclick="changeLanguage('zh-TW')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇹🇼</span>
+                                <span>中文 (繁體)</span>
+                            </button>
+                            <button onclick="changeLanguage('fr')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇫🇷</span>
+                                <span>Français</span>
+                            </button>
+                            <button onclick="changeLanguage('de')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇩🇪</span>
+                                <span>Deutsch</span>
+                            </button>
+                            <button onclick="changeLanguage('hi')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇮🇳</span>
+                                <span>हिन्दी</span>
+                            </button>
+                            <button onclick="changeLanguage('id')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇮🇩</span>
+                                <span>Bahasa Indonesia</span>
+                            </button>
+                            <button onclick="changeLanguage('it')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇮🇹</span>
+                                <span>Italiano</span>
+                            </button>
+                            <button onclick="changeLanguage('ja')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇯🇵</span>
+                                <span>日本語</span>
+                            </button>
+                            <button onclick="changeLanguage('ko')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇰🇷</span>
+                                <span>한국어</span>
+                            </button>
+                            <button onclick="changeLanguage('pt')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇵🇹</span>
+                                <span>Português</span>
+                            </button>
+                            <button onclick="changeLanguage('ru')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇷🇺</span>
+                                <span>Русский</span>
+                            </button>
+                            <button onclick="changeLanguage('es')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇪🇸</span>
+                                <span>Español</span>
+                            </button>
+                            <button onclick="changeLanguage('th')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇹🇭</span>
+                                <span>ไทย</span>
+                            </button>
+                            <button onclick="changeLanguage('tr')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇹🇷</span>
+                                <span>Türkçe</span>
+                            </button>
+                            <button onclick="changeLanguage('vi')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md flex items-center gap-2">
+                                <span>🇻🇳</span>
+                                <span>Tiếng Việt</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -98,6 +217,85 @@
             &copy; {{ date('Y') }} University Portal. All rights reserved.
         </div>
     </footer>
+
+    <script>
+        // Google Translate Functions
+        function toggleTranslateDropdown() {
+            const dropdown = document.getElementById('translate-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function changeLanguage(langCode) {
+            const select = document.querySelector('.goog-te-combo');
+            if (select) {
+                // Find the option with matching value
+                for (let i = 0; i < select.options.length; i++) {
+                    const option = select.options[i];
+                    if (option.value === langCode || option.value === `/en/${langCode}`) {
+                        select.selectedIndex = i;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        document.getElementById('translate-dropdown').classList.add('hidden');
+                        updateCurrentLanguage(langCode);
+                        return;
+                    }
+                }
+            }
+
+            // Fallback: Set cookie and reload
+            if (langCode === 'en') {
+                document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            } else {
+                const expires = new Date();
+                expires.setTime(expires.getTime() + 365 * 24 * 60 * 60 * 1000);
+                document.cookie = `googtrans=/en/${langCode};expires=${expires.toUTCString()};path=/`;
+            }
+            window.location.reload();
+        }
+
+        function updateCurrentLanguage(langCode) {
+            const langNames = {
+                'en': 'English',
+                'ar': 'العربية',
+                'zh-CN': '中文 (简体)',
+                'zh-TW': '中文 (繁體)',
+                'fr': 'Français',
+                'de': 'Deutsch',
+                'hi': 'हिन्दी',
+                'id': 'Bahasa Indonesia',
+                'it': 'Italiano',
+                'ja': '日本語',
+                'ko': '한국어',
+                'pt': 'Português',
+                'ru': 'Русский',
+                'es': 'Español',
+                'th': 'ไทย',
+                'tr': 'Türkçe',
+                'vi': 'Tiếng Việt'
+            };
+            const langName = langNames[langCode] || 'Language';
+            document.getElementById('current-lang').textContent = langName;
+        }
+
+        // Check current language on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cookie = document.cookie.match(/(?:^|; )googtrans=([^;]*)/);
+            if (cookie) {
+                const langCode = cookie[1].split('/').pop();
+                updateCurrentLanguage(langCode);
+            } else {
+                updateCurrentLanguage('en');
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const container = document.getElementById('google-translate-container');
+                const dropdown = document.getElementById('translate-dropdown');
+                if (container && dropdown && !container.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 
