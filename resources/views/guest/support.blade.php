@@ -79,7 +79,10 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 mb-2">FAQs</h3>
-                        <p class="text-slate-600 mb-3">Find answers to commonly asked questions.</p>
+                        <p class="text-slate-600 mb-2">Find answers to commonly asked questions.</p>
+                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
+                            {{ $stats['totalAnnouncements'] > 0 ? number_format($stats['totalAnnouncements']) : '0' }} Announcements
+                        </div>
                         <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-blue-600 transition-colors">
                             Browse FAQs →
                         </a>
@@ -96,7 +99,10 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 mb-2">User Guides</h3>
-                        <p class="text-slate-600 mb-3">Step-by-step guides for portal features.</p>
+                        <p class="text-slate-600 mb-2">Step-by-step guides for portal features.</p>
+                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
+                            {{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) : '0' }} Active Users
+                        </div>
                         <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-green-600 transition-colors">
                             View Guides →
                         </a>
@@ -113,7 +119,10 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 mb-2">Report Issues</h3>
-                        <p class="text-slate-600 mb-3">Report technical problems or bugs.</p>
+                        <p class="text-slate-600 mb-2">Report technical problems or bugs.</p>
+                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
+                            {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) : '0' }} Support Staff
+                        </div>
                         <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-purple-600 transition-colors">
                             Report Issue →
                         </a>
@@ -130,7 +139,10 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 mb-2">Contact Support</h3>
-                        <p class="text-slate-600 mb-3">Get direct assistance from our team.</p>
+                        <p class="text-slate-600 mb-2">Get direct assistance from our team.</p>
+                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
+                            {{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) : '0' }} Students Supported
+                        </div>
                         <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-amber-600 transition-colors">
                             Contact Us →
                         </a>

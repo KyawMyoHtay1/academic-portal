@@ -85,7 +85,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Student Registration</h3>
-                    <p class="text-slate-600">Easy and efficient student registration process.</p>
+                    <p class="text-slate-600 mb-2">Easy and efficient student registration process.</p>
+                    <div class="text-lg font-bold text-[color:var(--portal-navy)]">
+                        {{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) : '0' }} Registered
+                    </div>
                 </div>
             </div>
             
@@ -98,7 +101,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Course Enrollment</h3>
-                    <p class="text-slate-600">Browse and enroll in available courses.</p>
+                    <p class="text-slate-600 mb-2">Browse and enroll in available courses.</p>
+                    <div class="text-lg font-bold text-[color:var(--portal-navy)]">
+                        {{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }} Enrollments
+                    </div>
                 </div>
             </div>
             
@@ -111,7 +117,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Assignment Submission</h3>
-                    <p class="text-slate-600">Submit assignments online with ease.</p>
+                    <p class="text-slate-600 mb-2">Submit assignments online with ease.</p>
+                    <div class="text-lg font-bold text-[color:var(--portal-navy)]">
+                        {{ $stats['totalSubmissions'] > 0 ? number_format($stats['totalSubmissions']) : '0' }} Submissions
+                    </div>
                 </div>
             </div>
             
@@ -124,7 +133,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Grade Viewing</h3>
-                    <p class="text-slate-600">Access your grades and academic performance.</p>
+                    <p class="text-slate-600 mb-2">Access your grades and academic performance.</p>
+                    <div class="text-lg font-bold text-[color:var(--portal-navy)]">
+                        {{ $stats['totalGrades'] > 0 ? number_format($stats['totalGrades']) : '0' }} Grades Recorded
+                    </div>
                 </div>
             </div>
             
@@ -137,7 +149,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Fee Management</h3>
-                    <p class="text-slate-600">View and manage tuition fees and payments.</p>
+                    <p class="text-slate-600 mb-2">View and manage tuition fees and payments.</p>
+                    <div class="text-lg font-bold text-[color:var(--portal-navy)]">
+                        {{ $stats['paidFees'] > 0 ? number_format($stats['paidFees']) : '0' }}/{{ $stats['totalFees'] > 0 ? number_format($stats['totalFees']) : '0' }} Paid
+                    </div>
                 </div>
             </div>
             
@@ -150,7 +165,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Academic Records</h3>
-                    <p class="text-slate-600">Access your complete academic history.</p>
+                    <p class="text-slate-600 mb-2">Access your complete academic history.</p>
+                    <div class="text-lg font-bold text-[color:var(--portal-navy)]">
+                        {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }} Courses Available
+                    </div>
                 </div>
             </div>
         </div>

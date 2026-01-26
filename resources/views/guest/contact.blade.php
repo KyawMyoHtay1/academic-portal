@@ -74,7 +74,10 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Email Us</h3>
-                <p class="text-sm text-slate-600 mb-3">Send us an email anytime</p>
+                <p class="text-sm text-slate-600 mb-2">Send us an email anytime</p>
+                <div class="text-sm font-bold text-[color:var(--portal-navy)] mb-2">
+                    {{ ($stats['totalStudents'] + $stats['totalFaculty']) > 0 ? number_format($stats['totalStudents'] + $stats['totalFaculty']) . '+' : '0' }} Users
+                </div>
                 <a href="mailto:info@university.edu" class="text-base font-semibold text-[color:var(--portal-navy)] hover:text-blue-600 transition-colors">
                     info@university.edu
                 </a>
@@ -90,7 +93,10 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Call Us</h3>
-                <p class="text-sm text-slate-600 mb-3">Mon-Fri, 9am-5pm</p>
+                <p class="text-sm text-slate-600 mb-2">Mon-Fri, 9am-5pm</p>
+                <div class="text-sm font-bold text-[color:var(--portal-navy)] mb-2">
+                    {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) : '0' }} Faculty Members
+                </div>
                 <a href="tel:+1234567890" class="text-base font-semibold text-[color:var(--portal-navy)] hover:text-green-600 transition-colors">
                     +123 456 7890
                 </a>
@@ -107,7 +113,10 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Visit Us</h3>
-                <p class="text-sm text-slate-600 mb-3">Come see our campus</p>
+                <p class="text-sm text-slate-600 mb-2">Come see our campus</p>
+                <div class="text-sm font-bold text-[color:var(--portal-navy)] mb-2">
+                    {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }} Courses Offered
+                </div>
                 <p class="text-base font-semibold text-[color:var(--portal-navy)]">
                     123 University Avenue<br>
                     City, Country

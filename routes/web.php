@@ -189,11 +189,107 @@ Route::get('/guest/about', function () {
         ],
     ]);
 })->name('guest.about');
-Route::view('/guest/contact', 'guest.contact')->name('guest.contact');
-Route::view('/guest/vision', 'guest.vision')->name('guest.vision');
+Route::get('/guest/vision', function () {
+    // Dynamic Statistics for Vision Page
+    $totalStudents = Student::count();
+    $totalFaculty = User::where('role', 'teacher')->count();
+    $totalUsers = User::count();
+    $totalCourses = Course::count();
+    $totalEnrollments = DB::table('course_student')
+        ->where('status', 'approved')
+        ->count();
+    
+    return view('guest.vision', [
+        'stats' => [
+            'totalStudents' => $totalStudents,
+            'totalFaculty' => $totalFaculty,
+            'totalUsers' => $totalUsers,
+            'totalCourses' => $totalCourses,
+            'totalEnrollments' => $totalEnrollments,
+        ],
+    ]);
+})->name('guest.vision');
+
+Route::get('/guest/services', function () {
+    // Dynamic Statistics for Services Page
+    $totalStudents = Student::count();
+    $totalCourses = Course::count();
+    $totalEnrollments = DB::table('course_student')
+        ->where('status', 'approved')
+        ->count();
+    
+    // Assignment statistics
+    $totalAssignments = DB::table('assignments')->count();
+    $totalSubmissions = DB::table('assignment_submissions')->count();
+    
+    // Grade statistics
+    $totalGrades = DB::table('grades')->count();
+    
+    // Fee statistics
+    $totalFees = DB::table('fees')->count();
+    $paidFees = DB::table('fees')->where('status', 'paid')->count();
+    
+    return view('guest.services', [
+        'stats' => [
+            'totalStudents' => $totalStudents,
+            'totalCourses' => $totalCourses,
+            'totalEnrollments' => $totalEnrollments,
+            'totalAssignments' => $totalAssignments,
+            'totalSubmissions' => $totalSubmissions,
+            'totalGrades' => $totalGrades,
+            'totalFees' => $totalFees,
+            'paidFees' => $paidFees,
+        ],
+    ]);
+})->name('guest.services');
+
+Route::get('/guest/support', function () {
+    // Dynamic Statistics for Support Page
+    $totalStudents = Student::count();
+    $totalFaculty = User::where('role', 'teacher')->count();
+    $totalUsers = User::count();
+    $totalAnnouncements = DB::table('announcements')
+        ->where('visible_from', '<=', now())
+        ->where(function($query) {
+            $query->whereNull('visible_until')
+                  ->orWhere('visible_until', '>=', now());
+        })
+        ->count();
+    
+    return view('guest.support', [
+        'stats' => [
+            'totalStudents' => $totalStudents,
+            'totalFaculty' => $totalFaculty,
+            'totalUsers' => $totalUsers,
+            'totalAnnouncements' => $totalAnnouncements,
+        ],
+    ]);
+})->name('guest.support');
+
+Route::get('/guest/contact', function () {
+    // Dynamic Statistics for Contact Page
+    $totalStudents = Student::count();
+    $totalFaculty = User::where('role', 'teacher')->count();
+    $totalCourses = Course::count();
+    
+    // Get department/role breakdown
+    $adminCount = User::where('role', 'admin')->count();
+    $teacherCount = User::where('role', 'teacher')->count();
+    $studentCount = Student::count();
+    
+    return view('guest.contact', [
+        'stats' => [
+            'totalStudents' => $totalStudents,
+            'totalFaculty' => $totalFaculty,
+            'totalCourses' => $totalCourses,
+            'adminCount' => $adminCount,
+            'teacherCount' => $teacherCount,
+            'studentCount' => $studentCount,
+        ],
+    ]);
+})->name('guest.contact');
+
 Route::view('/guest/policies', 'guest.policies')->name('guest.policies');
-Route::view('/guest/services', 'guest.services')->name('guest.services');
-Route::view('/guest/support', 'guest.support')->name('guest.support');
 Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
 Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');

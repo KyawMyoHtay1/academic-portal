@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        {{-- Key Objectives --}}
+        {{-- Key Objectives with Statistics --}}
         <div class="grid gap-6 md:grid-cols-3">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white mb-4 shadow-lg">
@@ -78,7 +78,10 @@
                     </svg>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 mb-2">Security First</h3>
-                <p class="text-slate-600">Ensuring data protection and secure access for all users.</p>
+                <p class="text-slate-600 mb-3">Ensuring data protection and secure access for all users.</p>
+                <div class="text-2xl font-bold text-[color:var(--portal-navy)]">
+                    {{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) . '+' : '0' }} Users
+                </div>
             </div>
             
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
@@ -88,7 +91,10 @@
                     </svg>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 mb-2">Efficiency</h3>
-                <p class="text-slate-600">Streamlining processes to save time and resources.</p>
+                <p class="text-slate-600 mb-3">Streamlining processes to save time and resources.</p>
+                <div class="text-2xl font-bold text-[color:var(--portal-navy)]">
+                    {{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }} Enrollments
+                </div>
             </div>
             
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
@@ -98,7 +104,10 @@
                     </svg>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 mb-2">User-Friendly</h3>
-                <p class="text-slate-600">Intuitive design for seamless user experience.</p>
+                <p class="text-slate-600 mb-3">Intuitive design for seamless user experience.</p>
+                <div class="text-2xl font-bold text-[color:var(--portal-navy)]">
+                    {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }} Courses
+                </div>
             </div>
         </div>
     </section>
