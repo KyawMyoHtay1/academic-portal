@@ -387,7 +387,7 @@ const headerStatus = computed(() => {
         <div class="flex min-h-screen">
             <!-- Desktop sidebar -->
             <aside
-                class="portal-gradient hidden w-64 flex-col border-r border-slate-800/40 text-slate-100 shadow-xl sm:flex"
+                class="portal-gradient fixed left-0 top-0 z-20 hidden h-screen w-64 flex-col border-r border-slate-800/40 text-slate-100 shadow-xl sm:flex"
             >
                 <div class="flex items-center gap-3 px-6 py-5">
                     <Link
@@ -774,7 +774,7 @@ const headerStatus = computed(() => {
             </transition>
 
             <!-- Main content area -->
-            <div class="flex min-h-screen flex-1 flex-col">
+            <div class="flex min-h-screen flex-1 flex-col sm:ml-64">
                 <!-- Top bar -->
                 <header
                     class="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-3 shadow-sm backdrop-blur-sm sm:px-6 lg:px-8"
