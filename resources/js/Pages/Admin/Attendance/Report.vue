@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
 const props = defineProps({
@@ -78,6 +78,27 @@ const filteredRecent = computed(() => {
                 <h2 class="text-xl font-semibold leading-tight text-slate-900">
                     Attendance Report
                 </h2>
+                <Link
+                    :href="route('admin.attendance.alerts.run')"
+                    method="post"
+                    as="button"
+                    class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                >
+                    <svg
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                        />
+                    </svg>
+                    <span>Send Low Attendance Alerts</span>
+                </Link>
             </div>
         </template>
 
@@ -134,12 +155,9 @@ const filteredRecent = computed(() => {
                 </div>
 
                 <!-- Students with Low Attendance -->
-                <div
-                    v-if="lowAttendanceStudents.length > 0"
-                    class="mb-6 portal-card p-6"
-                >
+                <div class="mb-6 portal-card p-6">
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
+                        <div class="flex-1">
                             <h3 class="text-lg font-semibold text-slate-900">
                                 Students with Low Attendance (&lt; 75%)
                             </h3>
@@ -147,14 +165,39 @@ const filteredRecent = computed(() => {
                                 These students may require attention or intervention.
                             </p>
                         </div>
-                        <div class="w-full sm:w-80">
-                            <label class="block text-xs font-medium text-slate-600">Search</label>
-                            <input
-                                v-model="searchStudents"
-                                type="search"
-                                placeholder="Search by student no, name, programme…"
-                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                            />
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                            <div class="w-full sm:w-80">
+                                <label class="block text-xs font-medium text-slate-600">Search</label>
+                                <input
+                                    v-model="searchStudents"
+                                    type="search"
+                                    placeholder="Search by student no, name, programme…"
+                                    class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                            </div>
+                            <div class="flex-shrink-0">
+                                <Link
+                                    :href="route('admin.attendance.alerts.run')"
+                                    method="post"
+                                    as="button"
+                                    class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                                >
+                                    <svg
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                                        />
+                                    </svg>
+                                    <span>Send Alerts</span>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -229,7 +272,7 @@ const filteredRecent = computed(() => {
                                         </span>
                                     </td>
                                 </tr>
-                                <tr v-if="filteredStudents.length === 0">
+                                <tr v-if="filteredStudents.length === 0 && lowAttendanceStudents.length > 0">
                                     <td
                                         colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
@@ -237,8 +280,62 @@ const filteredRecent = computed(() => {
                                         No students match your search.
                                     </td>
                                 </tr>
+                                <tr v-if="lowAttendanceStudents.length === 0">
+                                    <td
+                                        colspan="6"
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        <div class="flex flex-col items-center gap-3">
+                                            <svg
+                                                class="h-12 w-12 text-emerald-500"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                            </svg>
+                                            <div>
+                                                <p class="font-semibold text-slate-700">
+                                                    Great news!
+                                                </p>
+                                                <p class="mt-1">
+                                                    All students are meeting the attendance threshold (≥ 75%).
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div
+                        v-if="lowAttendanceStudents.length === 0"
+                        class="mt-4 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800"
+                    >
+                        <div class="flex items-start gap-3">
+                            <svg
+                                class="h-5 w-5 mt-0.5 flex-shrink-0"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                            <div>
+                                <p class="font-semibold">No action needed</p>
+                                <p class="mt-1 text-emerald-700">
+                                    All students are maintaining good attendance. The automated alert system will notify students if their attendance drops below 75%.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

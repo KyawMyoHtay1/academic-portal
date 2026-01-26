@@ -66,8 +66,11 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
                         $cooldownOk = $state->last_alert_sent_at->lte($now->copy()->subDays($cooldownDays));
                     }
 
+                    // Alert if: (1) newly dropped below threshold, OR (2) still below and cooldown passed
+                    $shouldAlert = ($newlyBelow || ($isBelow && $cooldownOk)) && $student && $student->user;
+
                     $lastAlertSentAt = $state?->last_alert_sent_at;
-                    if ($newlyBelow && $cooldownOk && $student && $student->user) {
+                    if ($shouldAlert) {
                         $student->user->notify(new LowAttendanceAlert($student, $rate, $threshold));
                         $lastAlertSentAt = $now;
                     }
