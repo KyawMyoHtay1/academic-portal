@@ -94,7 +94,7 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $courses->count() }}</div>
+                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ number_format($stats['totalCourses']) }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total Courses</div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $courses->unique('semester')->count() }}</div>
+                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ number_format($stats['uniqueSemesters']) }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Semesters</div>
                 </div>
             </div>
@@ -122,7 +122,7 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $courses->sum('credits') }}</div>
+                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ number_format($stats['totalCredits']) }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total Credits</div>
                 </div>
             </div>
@@ -136,7 +136,7 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">100%</div>
+                    <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $stats['availabilityRate'] }}%</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Available</div>
                 </div>
             </div>

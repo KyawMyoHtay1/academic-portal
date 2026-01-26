@@ -41,6 +41,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 // Guest-facing public pages (read-only)
@@ -87,15 +88,54 @@ Route::get('/', function () {
 })->name('guest.home');
 
 Route::get('/guest/courses', function () {
+    $courses = Course::orderBy('course_code')->get([
+        'id',
+        'course_code',
+        'title',
+        'credits',
+        'semester',
+        'photo',
+    ]);
+    
+    // Dynamic Statistics
+    $totalCourses = $courses->count();
+    $uniqueSemesters = $courses->unique('semester')->count();
+    $totalCredits = $courses->sum('credits');
+    $averageCredits = $totalCourses > 0 ? round($totalCredits / $totalCourses, 1) : 0;
+    
+    // Get total enrollments (approved enrollments)
+    $totalEnrollments = DB::table('course_student')
+        ->where('status', 'approved')
+        ->count();
+    
+    // Calculate availability percentage (courses with at least one enrollment)
+    $coursesWithEnrollments = DB::table('course_student')
+        ->where('status', 'approved')
+        ->distinct('course_id')
+        ->count('course_id');
+    $availabilityRate = $totalCourses > 0 
+        ? round(($coursesWithEnrollments / $totalCourses) * 100, 0) 
+        : 100;
+    
+    // Get most popular course (by enrollment count)
+    $popularCourse = DB::table('course_student')
+        ->where('status', 'approved')
+        ->select('course_id', DB::raw('count(*) as enrollment_count'))
+        ->groupBy('course_id')
+        ->orderByDesc('enrollment_count')
+        ->first();
+    
     return view('guest.courses', [
-        'courses' => Course::orderBy('course_code')->get([
-            'id',
-            'course_code',
-            'title',
-            'credits',
-            'semester',
-            'photo',
-        ]),
+        'courses' => $courses,
+        'stats' => [
+            'totalCourses' => $totalCourses,
+            'uniqueSemesters' => $uniqueSemesters,
+            'totalCredits' => $totalCredits,
+            'averageCredits' => $averageCredits,
+            'totalEnrollments' => $totalEnrollments,
+            'availabilityRate' => $availabilityRate,
+            'coursesWithEnrollments' => $coursesWithEnrollments,
+        ],
     ]);
 })->name('guest.courses');
 
