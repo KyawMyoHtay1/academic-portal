@@ -135,10 +135,10 @@ word-break: break-word !important;
         </div>
     </AuthenticatedLayout>
 
-    <!-- Guests see the same Termly policy inside the public layout -->
+    <!-- Guests see full-width Termly policy (GuestLayout switches to full-width for this route) -->
     <GuestLayout v-else>
-        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-            <div class="portal-card p-6 sm:p-8 lg:p-10">
+        <div class="w-full min-h-[80vh] bg-white">
+            <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
                 <div class="prose prose-slate max-w-none">
                     <h1 class="text-3xl font-bold text-slate-900 mb-2">
                         Privacy Policy
@@ -149,7 +149,7 @@ word-break: break-word !important;
 
                     <div
                         v-if="termlyHtml && termlyHtml.trim().length"
-                        class="not-prose min-h-[50vh] rounded-lg bg-white"
+                        class="not-prose min-h-[60vh] rounded-lg"
                         v-html="termlyHtml"
                     />
 
