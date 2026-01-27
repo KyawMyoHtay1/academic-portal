@@ -92,8 +92,11 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('guest.feedback.store') }}" class="space-y-6">
+            <form method="POST" action="{{ route('guest.feedback.store') }}" class="space-y-6" data-recaptcha-action="feedback">
                 @csrf
+                @if (config('recaptcha.site_key'))
+                    <input type="hidden" name="recaptcha_token" value="">
+                @endif
                 <div class="grid gap-6 md:grid-cols-2">
                     <div>
                         <label for="feedbackName" class="block text-sm font-semibold text-slate-700 mb-2">

@@ -237,8 +237,11 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('guest.contact.store') }}" class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-lg">
+            <form method="POST" action="{{ route('guest.contact.store') }}" class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-lg" data-recaptcha-action="contact">
                 @csrf
+                @if (config('recaptcha.site_key'))
+                    <input type="hidden" name="recaptcha_token" value="">
+                @endif
                 <div class="grid gap-6 md:grid-cols-2">
                     <div>
                         <label for="firstName" class="block text-sm font-semibold text-slate-700 mb-2">

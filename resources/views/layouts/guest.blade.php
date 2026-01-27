@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'University Portal')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @if (config('recaptcha.site_key'))
+        <!-- Google reCAPTCHA v3 -->
+        <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.site_key') }}"></script>
+    @endif
+
     <style>
         :root {
             --portal-navy: #0b1f3a;
