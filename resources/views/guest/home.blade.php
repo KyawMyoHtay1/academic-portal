@@ -106,6 +106,143 @@
         </div>
     </section>
 
+    {{-- Image Slider (Hero Highlights) --}}
+    <section class="space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Campus Highlights</p>
+                <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Explore Our University</h2>
+                <p class="text-sm md:text-base text-slate-600">
+                    Add your own campus, classroom, or event photos here to visually introduce the university.
+                </p>
+            </div>
+        </div>
+
+        <div
+            class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden"
+            data-portal-slider
+            data-autoplay="true"
+            data-interval="7000"
+        >
+            <div class="portal-slider-track relative h-56 md:h-72 lg:h-80">
+                {{-- Slide 1 --}}
+                <div
+                    class="portal-slide is-active"
+                    data-portal-slide
+                >
+                    <div class="relative h-full w-full">
+                        {{-- Replace this placeholder with your own image --}}
+                        <div
+                            class="h-full w-full bg-cover bg-center"
+                            style="background-image: url('{{ asset('images/home/slide-campus-1.jpg') }}');"
+                        ></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-2 text-white">
+                                <h3 class="text-xl md:text-2xl font-bold">Modern Learning Environment</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
+                                    Showcase your main campus or learning spaces to welcome students visually.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Slide 2 --}}
+                <div
+                    class="portal-slide"
+                    data-portal-slide
+                >
+                    <div class="relative h-full w-full">
+                        {{-- Replace this placeholder with your own image --}}
+                        <div
+                            class="h-full w-full bg-cover bg-center"
+                            style="background-image: url('{{ asset('images/home/slide-campus-2.jpg') }}');"
+                        ></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-2 text-white">
+                                <h3 class="text-xl md:text-2xl font-bold">Student Life & Activities</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
+                                    Highlight events, clubs, or student activities that reflect your campus culture.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Slide 3 --}}
+                <div
+                    class="portal-slide"
+                    data-portal-slide
+                >
+                    <div class="relative h-full w-full">
+                        {{-- Replace this placeholder with your own image --}}
+                        <div
+                            class="h-full w-full bg-cover bg-center"
+                            style="background-image: url('{{ asset('images/home/slide-campus-3.jpg') }}');"
+                        ></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-2 text-white">
+                                <h3 class="text-xl md:text-2xl font-bold">Labs & Facilities</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
+                                    Use this slide to show laboratories, libraries, or any key facilities.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Slider Controls --}}
+            <div class="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4">
+                <div class="flex gap-2">
+                    <button
+                        type="button"
+                        class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition"
+                        data-portal-slider-prev
+                        aria-label="Previous slide"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition"
+                        data-portal-slider-next
+                        aria-label="Next slide"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50"
+                        data-portal-slider-dot
+                        aria-label="Go to slide 1"
+                    ></button>
+                    <button
+                        type="button"
+                        class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50"
+                        data-portal-slider-dot
+                        aria-label="Go to slide 2"
+                    ></button>
+                    <button
+                        type="button"
+                        class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50"
+                        data-portal-slider-dot
+                        aria-label="Go to slide 3"
+                    ></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Statistics Section --}}
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-50 via-white to-slate-100 border border-slate-200 p-8 md:p-12 shadow-lg">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">

@@ -25,6 +25,29 @@
         .skiptranslate {
             display: none !important;
         }
+        /* Simple image slider */
+        .portal-slider {
+            position: relative;
+        }
+        .portal-slider-track {
+            position: relative;
+            overflow: hidden;
+        }
+        .portal-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: opacity 600ms ease, transform 600ms ease;
+        }
+        .portal-slide.is-active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+        }
+        .portal-slider-dot.is-active {
+            opacity: 1;
+        }
     </style>
     <!-- Google Translate -->
     <script type="text/javascript">
@@ -381,6 +404,83 @@
     @stack('scripts')
 
     <script>
+        // Lightweight, reusable slider for guest pages
+        document.addEventListener('DOMContentLoaded', function () {
+            const sliders = document.querySelectorAll('[data-portal-slider]');
+            sliders.forEach((slider) => {
+                const slides = Array.from(slider.querySelectorAll('[data-portal-slide]'));
+                if (slides.length === 0) return;
+
+                let current = 0;
+                const interval = parseInt(slider.dataset.interval || '7000', 10);
+                const autoplay = slider.dataset.autoplay === 'true';
+                let timer = null;
+
+                const dots = Array.from(slider.querySelectorAll('[data-portal-slider-dot]'));
+
+                function goTo(index) {
+                    current = (index + slides.length) % slides.length;
+                    slides.forEach((s, i) => {
+                        if (i === current) {
+                            s.classList.add('is-active');
+                        } else {
+                            s.classList.remove('is-active');
+                        }
+                    });
+                    dots.forEach((d, i) => {
+                        if (i === current) {
+                            d.classList.add('is-active');
+                        } else {
+                            d.classList.remove('is-active');
+                        }
+                    });
+                }
+
+                function next() {
+                    goTo(current + 1);
+                }
+
+                function prev() {
+                    goTo(current - 1);
+                }
+
+                const nextBtn = slider.querySelector('[data-portal-slider-next]');
+                const prevBtn = slider.querySelector('[data-portal-slider-prev]');
+
+                if (nextBtn) nextBtn.addEventListener('click', () => { next(); restart(); });
+                if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restart(); });
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => {
+                        goTo(index);
+                        restart();
+                    });
+                });
+
+                function start() {
+                    if (!autoplay || interval <= 0) return;
+                    timer = window.setInterval(next, interval);
+                }
+
+                function stop() {
+                    if (timer) {
+                        window.clearInterval(timer);
+                        timer = null;
+                    }
+                }
+
+                function restart() {
+                    stop();
+                    start();
+                }
+
+                slider.addEventListener('mouseenter', stop);
+                slider.addEventListener('mouseleave', start);
+
+                goTo(0);
+                start();
+            });
+        });
+
         // Google Translate Functions
         function toggleTranslateDropdown() {
             const dropdown = document.getElementById('translate-dropdown');
