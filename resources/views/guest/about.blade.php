@@ -83,11 +83,11 @@
             </div>
         </div>
 
-        <div class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden" data-portal-slider data-autoplay="true" data-interval="7000">
-            <div class="portal-slider-track relative h-48 md:h-64 lg:h-72">
+        <div class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden" data-portal-slider data-autoplay="true" data-interval="6000">
+            <div class="portal-slider-track relative">
                 <div class="portal-slide is-active" data-portal-slide>
-                    <div class="relative h-full w-full">
-                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                    <div class="absolute inset-0 overflow-hidden">
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -98,8 +98,8 @@
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
-                    <div class="relative h-full w-full">
-                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                    <div class="absolute inset-0 overflow-hidden">
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -110,8 +110,8 @@
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
-                    <div class="relative h-full w-full">
-                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                    <div class="absolute inset-0 overflow-hidden">
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -137,6 +137,18 @@
                     <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 3"></button>
                 </div>
             </div>
+        </div>
+    </section>
+
+    {{-- Explore strip --}}
+    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex flex-wrap items-center justify-center gap-3 md:gap-6">
+            <a href="{{ route('guest.home') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Home</a>
+            <a href="{{ route('guest.courses') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Courses</a>
+            <a href="{{ route('guest.news') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">News</a>
+            <a href="{{ route('guest.services') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Services</a>
+            <a href="{{ route('guest.support') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Support</a>
+            <a href="{{ route('guest.contact') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Contact</a>
         </div>
     </section>
 
