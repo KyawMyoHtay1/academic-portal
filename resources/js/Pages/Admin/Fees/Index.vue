@@ -254,7 +254,8 @@ const rejectPayment = (feeId) => {
                                     >
                                         {{ late.student_name }} ({{ late.student_no }}) -
                                         £{{ parseFloat(late.amount).toFixed(2) }} -
-                                        {{ late.days_overdue }} day(s) overdue
+                                        {{ Math.abs(Number(late.days_overdue ?? 0)).toFixed(0) }}
+                                        day(s) overdue
                                     </li>
                                     <li
                                         v-if="latePayments.length > 5"
@@ -452,10 +453,10 @@ const rejectPayment = (feeId) => {
                                     >
                                         {{ fee.due_date }}
                                         <span
-                                            v-if="fee.is_late"
+                                            v-if="fee.is_late && fee.days_overdue !== null && fee.days_overdue !== undefined"
                                             class="ml-2 text-xs text-red-600"
                                         >
-                                            ({{ fee.days_overdue }}d late)
+                                            ({{ Math.abs(Number(fee.days_overdue)).toFixed(0) }}d late)
                                         </span>
                                     </td>
                                     <td
