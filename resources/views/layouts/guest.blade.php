@@ -70,6 +70,7 @@
                 <span>University Portal</span>
             </a>
             <div class="flex flex-wrap items-center gap-2 text-sm">
+                {{-- Main links --}}
                 <a href="{{ route('guest.home') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.home') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.home')) aria-current="page" @endif>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -88,52 +89,64 @@
                     </svg>
                     <span>News</span>
                 </a>
-                <a href="{{ route('guest.about') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.about') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.about')) aria-current="page" @endif>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>About</span>
-                </a>
-                <a href="{{ route('guest.vision') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.vision') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.vision')) aria-current="page" @endif>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                    </svg>
-                    <span>Vision</span>
-                </a>
-                <a href="{{ route('guest.services') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.services') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.services')) aria-current="page" @endif>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    <span>Services</span>
-                </a>
-                <a href="{{ route('guest.support') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.support') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.support')) aria-current="page" @endif>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                    <span>Support</span>
-                </a>
-                <a href="{{ route('guest.contact') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.contact') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.contact')) aria-current="page" @endif>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    <span>Contact</span>
-                </a>
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="flex items-center gap-1.5 rounded-full bg-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors">
+
+                {{-- About group --}}
+                <div class="relative group">
+                    <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.about','guest.vision','guest.policies','guest.feedback') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>Login</span>
-                    </a>
-                @endif
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="flex items-center gap-1.5 rounded-full border border-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)] hover:text-white transition-colors">
+                        <span>About</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="invisible absolute right-0 z-40 mt-2 w-44 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                        <a href="{{ route('guest.about') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.about') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">About Us</a>
+                        <a href="{{ route('guest.vision') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.vision') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Our Vision</a>
+                        <a href="{{ route('guest.policies') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.policies') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Policies & Guidelines</a>
+                        <a href="{{ route('guest.feedback') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.feedback') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Feedback</a>
+                    </div>
+                </div>
+
+                {{-- Help / Services group --}}
+                <div class="relative group">
+                    <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.services','guest.support','guest.contact') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        <span>Register</span>
-                    </a>
+                        <span>Help & Services</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="invisible absolute right-0 z-40 mt-2 w-52 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                        <a href="{{ route('guest.services') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.services') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Academic Services</a>
+                        <a href="{{ route('guest.support') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.support') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Support & Help Desk</a>
+                        <a href="{{ route('guest.contact') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.contact') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Contact Us</a>
+                    </div>
+                </div>
+                {{-- Account group --}}
+                @if (Route::has('login') || Route::has('register'))
+                    <div class="relative group">
+                        <button type="button" class="flex items-center gap-1.5 rounded-full border border-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-[color:var(--portal-navy)] bg-white hover:bg-[color:var(--portal-navy)] hover:text-white transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <span>Account</span>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="invisible absolute right-0 z-40 mt-2 w-40 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                            @if (Route::has('login'))
+                                <a href="{{ route('login') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('login') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Login</a>
+                            @endif
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('register') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Register</a>
+                            @endif
+                        </div>
+                    </div>
                 @endif
                 
                 {{-- Google Translate Widget --}}
