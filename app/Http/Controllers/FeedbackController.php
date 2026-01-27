@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-import App\Models\FeedbackMessage;
+use App\Models\FeedbackMessage;
 use App\Services\RecaptchaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
