@@ -24,12 +24,9 @@ function markRead(messageId) {
 
         <template #header>
             <div class="flex items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <h2 class="text-xl font-semibold leading-tight text-slate-900">
-                        Feedback Messages
-                    </h2>
-                    <Breadcrumb :items="items" />
-                </div>
+                <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                    Feedback Messages
+                </h2>
                 <div
                     class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700"
                 >
@@ -39,6 +36,12 @@ function markRead(messageId) {
                     ></span>
                     <span>{{ unreadCount }} unread</span>
                 </div>
+            </div>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="items" />
             </div>
         </template>
 
