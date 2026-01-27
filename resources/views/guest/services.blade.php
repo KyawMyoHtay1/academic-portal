@@ -64,11 +64,14 @@
                 
                 <div class="prose prose-lg max-w-none">
                     <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)] mb-6">Academic Services</h2>
-                    <p class="text-lg text-slate-700 leading-relaxed mb-6">
-                        The University Academic Portal offers a range of services to support academic operations, including student registration, course enrollment, assignment submission, grade viewing, fee management, and academic record administration.
+                    <p class="text-lg text-slate-700 leading-relaxed mb-4">
+                        The University Academic Portal brings together the core academic processes in one place, including student registration, course registration, grade submission, fee payment, timetable management, attendance tracking, and communication.
+                    </p>
+                    <p class="text-lg text-slate-700 leading-relaxed mb-4">
+                        Instead of paper forms and manual spreadsheets, each process is handled through a secure and user-friendly web interface that keeps records accurate, up to date, and easy to review for students, teachers, and administrative staff.
                     </p>
                     <p class="text-lg text-slate-700 leading-relaxed">
-                        These services are designed to streamline academic workflows and provide convenient access to essential university resources.
+                        By centralizing these services, the portal reduces errors, saves administrative time, and makes it faster for everyone to find information, follow schedules, and stay informed about important academic activities.
                     </p>
                 </div>
             </div>
@@ -169,6 +172,54 @@
                     <div class="text-lg font-bold text-[color:var(--portal-navy)]">
                         {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }} Courses Available
                     </div>
+                </div>
+            </div>
+
+            {{-- Timetable Management --}}
+            <div class="service-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Timetable Management</h3>
+                    <p class="text-slate-600">
+                        Automatically manages class and teacher timetables based on course enrolments and room availability, so everyone always sees the latest schedule without manual spreadsheet updates.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Attendance Tracking --}}
+            <div class="service-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Attendance Tracking</h3>
+                    <p class="text-slate-600">
+                        Lets teachers record attendance online and automatically builds reports, helping staff monitor attendance patterns and students keep track of their own attendance status.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Communication & Notifications --}}
+            <div class="service-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-sky-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Communication & Notifications</h3>
+                    <p class="text-slate-600">
+                        Centralizes announcements and notifications for exams, schedules, events, and policy updates so that students, teachers, and staff receive clear, timely information in one place.
+                    </p>
                 </div>
             </div>
         </div>
