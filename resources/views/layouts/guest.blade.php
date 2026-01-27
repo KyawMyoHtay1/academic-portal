@@ -45,18 +45,29 @@
 <body class="bg-gradient-to-b from-slate-50 via-white to-slate-100 font-sans text-slate-900">
     @php
         $guestRouteName = Route::currentRouteName();
+
+        // Page labels
         $guestCrumbsMap = [
             'guest.home' => 'Home',
             'guest.courses' => 'Courses',
             'guest.news' => 'News',
-            'guest.about' => 'About',
-            'guest.vision' => 'Vision',
-            'guest.policies' => 'Policies',
-            'guest.services' => 'Services',
-            'guest.support' => 'Support',
-            'guest.feedback' => 'Feedback',
+            'guest.about' => 'About Us',
+            'guest.vision' => 'Our Vision',
+            'guest.policies' => 'Policies & Guidelines',
+            'guest.services' => 'Academic Services',
+            'guest.support' => 'Support & Help Desk',
+            'guest.feedback' => 'Feedback & Suggestions',
             'guest.contact' => 'Contact',
         ];
+
+        // Section (group) labels to align with dropdown menus
+        $guestSection = null;
+        if (in_array($guestRouteName, ['guest.about', 'guest.vision', 'guest.policies', 'guest.feedback'])) {
+            $guestSection = 'About';
+        } elseif (in_array($guestRouteName, ['guest.services', 'guest.support', 'guest.contact'])) {
+            $guestSection = 'Help & Services';
+        }
+
         $guestCurrentLabel = $guestCrumbsMap[$guestRouteName] ?? null;
         $guestShowBreadcrumbs = $guestCurrentLabel && $guestRouteName !== 'guest.home';
         $guestActiveLinkClass = 'bg-slate-100 text-[color:var(--portal-navy)] font-semibold';
@@ -251,6 +262,12 @@
                                 Home
                             </a>
                         </li>
+                        @if ($guestSection)
+                            <li class="text-slate-400">/</li>
+                            <li class="font-semibold text-slate-700">
+                                {{ $guestSection }}
+                            </li>
+                        @endif
                         <li class="text-slate-400">/</li>
                         <li class="font-semibold text-slate-900" aria-current="page">
                             {{ $guestCurrentLabel }}
