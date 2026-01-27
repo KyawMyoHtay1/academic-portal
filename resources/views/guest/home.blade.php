@@ -124,15 +124,15 @@
             data-autoplay="true"
             data-interval="6000"
         >
-            <div class="portal-slider-track relative w-full h-56 sm:h-64 md:h-72 lg:h-80">
+            <div class="portal-slider-track relative">
                 {{-- Slide 1 --}}
                 <div
                     class="portal-slide is-active"
                     data-portal-slide
                 >
-                    <div class="relative h-full w-full min-h-0 overflow-hidden">
+                    <div class="absolute inset-0 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                            class="portal-slide-image"
                             style="background-image: url('{{ asset('images/home/slide1.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -152,9 +152,9 @@
                     class="portal-slide"
                     data-portal-slide
                 >
-                    <div class="relative h-full w-full min-h-0 overflow-hidden">
+                    <div class="absolute inset-0 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                            class="portal-slide-image"
                             style="background-image: url('{{ asset('images/home/slide2.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -174,9 +174,9 @@
                     class="portal-slide"
                     data-portal-slide
                 >
-                    <div class="relative h-full w-full min-h-0 overflow-hidden">
+                    <div class="absolute inset-0 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                            class="portal-slide-image"
                             style="background-image: url('{{ asset('images/home/slide3.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
