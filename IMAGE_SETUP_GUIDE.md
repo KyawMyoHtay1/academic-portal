@@ -8,44 +8,47 @@ All pages have been enhanced with:
 - ✅ Improved visual hierarchy
 - ✅ Image directory structure
 - ✅ Easy-to-use image placeholders
-- ✅ **NEW: Image Card Sections** - Single or double image cards on all guest pages
+- ✅ **Page-specific image + text cards** - Each guest page has its own set of visual feature cards (image + title + short text)
 
 ## 📁 Image Directory Structure
 
 ```
 public/images/
-├── home/          # Home page images (slide4.png, slide5.png, slide6.png)
-├── courses/       # Courses page images (slide1.png, slide2.png, slide3.png)
-├── news/          # News page images (slide1.png, slide2.png, slide3.png)
-├── about/         # About page images (slide1.png, slide2.png, slide3.png)
-├── services/      # Services page images (slide1.png, slide2.png, slide3.png)
-└── support/       # Support page images (slide1.png, slide2.png, slide3.png)
+├── home/          # Home: sliders + card images (campus_life, learning_excellence, community)
+├── courses/       # Courses: sliders + card images (programs, faculty, labs_facilities, career_ready)
+├── news/          # News: sliders + card images (announcements, events, research)
+├── about/         # About: sliders + card images (our_campus, leadership, milestones)
+├── services/      # Services: sliders + card images (registration, grades_records, fees, timetables)
+├── support/       # Support: sliders + card images (faqs, report_issue, contact_support)
+└── contact/       # Contact: card images only (visit_us, get_in_touch)
 ```
 
 ## 🖼️ How to Add Your Images
 
-### 🆕 Image Card Sections (NEW!)
+### 🆕 Page-Specific Image + Text Feature Cards
 
-Each guest page now includes a customizable image card section right after the quick links strip. You can add 1 or 2 images per page.
+Each guest page has its **own** section of visual feature cards (image + title + short description). Card count and content vary by page.
 
-**Location**: `resources/views/guest/partials/image-card.blade.php`
+| Page | Partial | Cards | What to add |
+|------|---------|-------|-------------|
+| **Home** | `guest/partials/image-cards-home.blade.php` | 3 | `campus_life.jpg`, `learning_excellence.jpg`, `community.jpg` in `images/home/` |
+| **Courses** | `guest/partials/image-cards-courses.blade.php` | 4 | `programs.jpg`, `faculty.jpg`, `labs_facilities.jpg`, `career_ready.jpg` in `images/courses/` |
+| **News** | `guest/partials/image-cards-news.blade.php` | 3 | `announcements.jpg`, `events.jpg`, `research.jpg` in `images/news/` |
+| **About Us** | `guest/partials/image-cards-about.blade.php` | 3 | `our_campus.jpg`, `leadership.jpg`, `milestones.jpg` in `images/about/` |
+| **Academic Services** | `guest/partials/image-cards-services.blade.php` | 4 | `registration.jpg`, `grades_records.jpg`, `fees.jpg`, `timetables.jpg` in `images/services/` |
+| **Support & Help** | `guest/partials/image-cards-support.blade.php` | 3 | `faqs.jpg`, `report_issue.jpg`, `contact_support.jpg` in `images/support/` |
+| **Contact Us** | `guest/partials/image-cards-contact.blade.php` | 2 | `visit_us.jpg`, `get_in_touch.jpg` in `images/contact/` |
 
-**Quick Setup**:
-1. Open `resources/views/guest/partials/image-card.blade.php`
-2. Replace `images/home/custom_image_1.jpg` with your image path
-3. For a second image, uncomment the "Two Image Cards" section and update `custom_image_2.jpg`
-4. Images will appear on: Home, Courses, News, About Us, Academic Services, Support, and Contact Us pages
+**What you can customize in each partial**:
+- **Image paths** — change the `asset('images/...')` path to point to your file (e.g. `.jpg` or `.png`).
+- **Titles** — the `<h3>` under each image (e.g. “Campus Life”, “Diverse Programs”).
+- **Descriptions** — the short `<p>` under each title.
 
-**Image Recommendations for Cards**:
-- **Format**: PNG or JPG
-- **Recommended Size**: 1200×675 pixels (16:9 aspect ratio)
-- **File Size**: Keep under 300KB for optimal loading
-- **Placement**: Add images to `public/images/home/` or create page-specific folders
-
-**Example Paths**:
-- `images/home/campus_photo.jpg`
-- `images/courses/featured_course.jpg`
-- `images/about/university_building.jpg`
+**Image recommendations for cards**:
+- **Format**: PNG or JPG  
+- **Size**: 1200×675 px (16:9) or similar  
+- **File size**: Under 300KB  
+- **Folders**: Use `public/images/home/`, `public/images/courses/`, etc. Create `public/images/contact/` if you use it.
 
 ---
 
@@ -191,15 +194,9 @@ After adding your images, you can update the titles and captions in the Blade te
 
 ## 🎯 Image Card Customization
 
-The image card section supports:
-- **Single Image**: One full-width image card (default)
-- **Two Images**: Side-by-side layout (uncomment the second section)
-- **Hover Effects**: Images scale slightly on hover
-- **Responsive**: Automatically adjusts for mobile, tablet, and desktop
-- **Placeholder**: Shows a helpful message if image is missing
-
-To customize per page, you can:
-1. Create page-specific image card partials (e.g., `image-card-home.blade.php`)
-2. Or modify the main partial to use different images based on the current route
+Each page uses its own partial, so you can:
+- **Change image paths** in that partial’s `asset('...')` calls.
+- **Edit titles and descriptions** in the same file (the `<h3>` and `<p>` under each image).
+- **Rely on built-in behaviour**: hover zoom, responsive layout, and a short “Add: path” placeholder if the image is missing.
 
 For more details, see `public/images/README.md`

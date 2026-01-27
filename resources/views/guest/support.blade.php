@@ -115,8 +115,8 @@
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
-    {{-- Image Card Section (Customize image paths in guest/partials/image-card.blade.php) --}}
-    @include('guest.partials.image-card')
+    {{-- Page-specific image + text feature cards (3 cards) --}}
+    @include('guest.partials.image-cards-support')
 
     {{-- Main Content --}}
     <section class="max-w-4xl mx-auto space-y-8">

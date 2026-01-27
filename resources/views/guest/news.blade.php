@@ -160,8 +160,8 @@
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
-    {{-- Image Card Section (Customize image paths in guest/partials/image-card.blade.php) --}}
-    @include('guest.partials.image-card')
+    {{-- Page-specific image + text feature cards (3 cards) --}}
+    @include('guest.partials.image-cards-news')
 
     {{-- Statistics Overview --}}
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
