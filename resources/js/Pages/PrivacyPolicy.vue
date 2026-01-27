@@ -140,13 +140,6 @@ word-break: break-word !important;
         <div class="w-full min-h-[80vh] bg-white">
             <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
                 <div class="prose prose-slate max-w-none">
-                    <h1 class="text-3xl font-bold text-slate-900 mb-2">
-                        Privacy Policy
-                    </h1>
-                    <p class="text-sm text-slate-600 mb-6">
-                        Last updated: {{ lastUpdated }}
-                    </p>
-
                     <div
                         v-if="termlyHtml && termlyHtml.trim().length"
                         class="not-prose min-h-[60vh] rounded-lg"
