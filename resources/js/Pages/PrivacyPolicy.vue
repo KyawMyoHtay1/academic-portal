@@ -98,9 +98,9 @@ word-break: break-word !important;
             <Breadcrumb :items="[{ label: 'Privacy Policy' }]" class="mb-4" />
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                <div class="portal-card p-8">
+        <div class="py-8 sm:py-12">
+            <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div class="portal-card p-6 sm:p-8 lg:p-10">
                     <div class="prose prose-slate max-w-none">
                         <h1 class="text-3xl font-bold text-slate-900 mb-2">
                             Privacy Policy
@@ -111,7 +111,7 @@ word-break: break-word !important;
 
                         <div
                             v-if="termlyHtml && termlyHtml.trim().length"
-                            class="not-prose border border-slate-200 rounded-xl p-4 bg-white"
+                            class="not-prose min-h-[50vh] rounded-lg bg-white"
                             v-html="termlyHtml"
                         />
 
@@ -137,8 +137,8 @@ word-break: break-word !important;
 
     <!-- Guests see the same Termly policy inside the public layout -->
     <GuestLayout v-else>
-        <div class="w-full max-w-4xl px-6 py-8 sm:px-8">
-            <div class="portal-card p-8">
+        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="portal-card p-6 sm:p-8 lg:p-10">
                 <div class="prose prose-slate max-w-none">
                     <h1 class="text-3xl font-bold text-slate-900 mb-2">
                         Privacy Policy
@@ -149,7 +149,7 @@ word-break: break-word !important;
 
                     <div
                         v-if="termlyHtml && termlyHtml.trim().length"
-                        class="not-prose border border-slate-200 rounded-xl p-4 bg-white"
+                        class="not-prose min-h-[50vh] rounded-lg bg-white"
                         v-html="termlyHtml"
                     />
 
