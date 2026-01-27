@@ -101,7 +101,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="invisible absolute right-0 z-40 mt-2 w-44 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                    <div class="invisible absolute right-0 z-40 top-full w-44 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
                         <a href="{{ route('guest.about') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.about') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">About Us</a>
                         <a href="{{ route('guest.vision') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.vision') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Our Vision</a>
                         <a href="{{ route('guest.policies') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.policies') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Policies & Guidelines</a>
@@ -120,7 +120,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="invisible absolute right-0 z-40 mt-2 w-52 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                    <div class="invisible absolute right-0 z-40 top-full w-52 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
                         <a href="{{ route('guest.services') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.services') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Academic Services</a>
                         <a href="{{ route('guest.support') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.support') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Support & Help Desk</a>
                         <a href="{{ route('guest.contact') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.contact') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Contact Us</a>
@@ -138,7 +138,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-                        <div class="invisible absolute right-0 z-40 mt-2 w-40 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                        <div class="invisible absolute right-0 z-40 top-full w-40 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
                             @if (Route::has('login'))
                                 <a href="{{ route('login') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('login') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Login</a>
                             @endif
