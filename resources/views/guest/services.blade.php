@@ -65,7 +65,7 @@
             <div class="portal-slider-track relative h-48 md:h-64 lg:h-72">
                 <div class="portal-slide is-active" data-portal-slide>
                     <div class="relative h-full w-full">
-                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/services/slide-1.jpg') }}');"></div>
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -77,7 +77,7 @@
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="relative h-full w-full">
-                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/services/slide-2.jpg') }}');"></div>
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -89,7 +89,7 @@
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="relative h-full w-full">
-                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/services/slide-3.jpg') }}');"></div>
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
