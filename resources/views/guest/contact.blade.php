@@ -152,7 +152,26 @@
                 <p class="text-slate-600">Fill out the form below and we'll respond as soon as possible.</p>
             </div>
             
-            <form class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-lg">
+            @if (session('success'))
+                <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                    <div class="font-semibold">Message sent</div>
+                    <div class="text-sm">{{ session('success') }}</div>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">
+                    <div class="font-semibold">Please fix the errors below</div>
+                    <ul class="mt-2 list-disc pl-5 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('guest.contact.store') }}" class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-lg">
+                @csrf
                 <div class="grid gap-6 md:grid-cols-2">
                     <div>
                         <label for="firstName" class="block text-sm font-semibold text-slate-700 mb-2">
@@ -165,6 +184,7 @@
                             required
                             class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all"
                             placeholder="John"
+                            value="{{ old('firstName') }}"
                         >
                     </div>
                     <div>
@@ -178,6 +198,7 @@
                             required
                             class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all"
                             placeholder="Doe"
+                            value="{{ old('lastName') }}"
                         >
                     </div>
                 </div>
@@ -193,6 +214,7 @@
                         required
                         class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all"
                         placeholder="john.doe@example.com"
+                        value="{{ old('email') }}"
                     >
                 </div>
                 
@@ -206,6 +228,7 @@
                         name="phone"
                         class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all"
                         placeholder="+123 456 7890"
+                        value="{{ old('phone') }}"
                     >
                 </div>
                 
@@ -220,11 +243,11 @@
                         class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all cursor-pointer"
                     >
                         <option value="">Select a subject</option>
-                        <option value="admissions">Admissions Inquiry</option>
-                        <option value="academic">Academic Questions</option>
-                        <option value="financial">Financial Aid</option>
-                        <option value="general">General Inquiry</option>
-                        <option value="other">Other</option>
+                        <option value="admissions" @selected(old('subject') === 'admissions')>Admissions Inquiry</option>
+                        <option value="academic" @selected(old('subject') === 'academic')>Academic Questions</option>
+                        <option value="financial" @selected(old('subject') === 'financial')>Financial Aid</option>
+                        <option value="general" @selected(old('subject') === 'general')>General Inquiry</option>
+                        <option value="other" @selected(old('subject') === 'other')>Other</option>
                     </select>
                 </div>
                 
@@ -239,7 +262,7 @@
                         required
                         class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all resize-none"
                         placeholder="Tell us how we can help you..."
-                    ></textarea>
+                    >{{ old('message') }}</textarea>
                 </div>
                 
                 <button

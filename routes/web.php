@@ -39,6 +39,8 @@ use App\Http\Controllers\TeacherTimetableController;
 use App\Http\Controllers\TeacherAnnouncementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\StaffContactMessageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -289,6 +291,9 @@ Route::get('/guest/contact', function () {
     ]);
 })->name('guest.contact');
 
+// Guest contact form submission (stores into contact_messages)
+Route::post('/guest/contact', [ContactController::class, 'store'])->name('guest.contact.store');
+
 Route::view('/guest/policies', 'guest.policies')->name('guest.policies');
 Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
 Route::get('/privacy-policy', function () {
@@ -359,6 +364,10 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {
+        // Contact Messages (staff inbox)
+        Route::get('/admin/contact-messages', [StaffContactMessageController::class, 'index'])->name('admin.contact-messages.index');
+        Route::post('/admin/contact-messages/{contactMessage}/read', [StaffContactMessageController::class, 'markRead'])->name('admin.contact-messages.read');
+
         // Student Management
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
         Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
