@@ -133,7 +133,7 @@
                     <div class="absolute inset-0 overflow-hidden">
                         <div
                             class="portal-slide-image"
-                            style="background-image: url('{{ asset('images/home/slide1.png') }}');"
+                            style="background-image: url('{{ asset('images/home/modern_learning.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -155,7 +155,7 @@
                     <div class="absolute inset-0 overflow-hidden">
                         <div
                             class="portal-slide-image"
-                            style="background-image: url('{{ asset('images/home/slide2.png') }}');"
+                            style="background-image: url('{{ asset('images/home/student_life.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -177,7 +177,7 @@
                     <div class="absolute inset-0 overflow-hidden">
                         <div
                             class="portal-slide-image"
-                            style="background-image: url('{{ asset('images/home/slide3.png') }}');"
+                            style="background-image: url('{{ asset('images/home/lab.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">

@@ -39,7 +39,7 @@
             position: relative;
             overflow: hidden;
             width: 100%;
-            height: 22rem; /* fixed height so every slide is the same size */
+            height: clamp(20rem, 45vw, 34rem);/* fixed height so every slide is the same size */
             background: #0f172a;
         }
         .portal-slide {
