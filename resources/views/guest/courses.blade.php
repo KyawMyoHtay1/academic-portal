@@ -100,36 +100,36 @@
             <div class="portal-slider-track relative">
                 <div class="portal-slide is-active" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/courses/slide1.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Featured Programs</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase your most popular or flagship courses.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase your most popular or flagship courses. Add image: courses/slide1.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/courses/slide2.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Faculty & Mentors</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight teaching staff or guest lecturers.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight teaching staff or guest lecturers. Add image: courses/slide2.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/courses/slide3.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Labs & Learning Spaces</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Use this to show labs, studios, or fieldwork photos.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Use this to show labs, studios, or fieldwork photos. Add image: courses/slide3.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
@@ -220,6 +220,48 @@
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $stats['availabilityRate'] }}%</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Available</div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Visual Feature Cards --}}
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Diverse Programs</h3>
+                <p class="text-sm text-slate-600">Explore a wide range of academic programs designed to meet your career goals.</p>
+            </div>
+        </div>
+        
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Expert Faculty</h3>
+                <p class="text-sm text-slate-600">Learn from experienced professors and industry professionals.</p>
+            </div>
+        </div>
+        
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Career Ready</h3>
+                <p class="text-sm text-slate-600">Gain practical skills and knowledge for your future career.</p>
             </div>
         </div>
     </section>

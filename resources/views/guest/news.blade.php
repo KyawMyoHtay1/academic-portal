@@ -104,36 +104,36 @@
             <div class="portal-slider-track relative">
                 <div class="portal-slide is-active" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/news/slide1.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">University Announcements</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Show important updates, deadlines, and policy changes.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Show important updates, deadlines, and policy changes. Add image: news/slide1.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/news/slide2.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Events & Activities</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight campus events, seminars, and workshops.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight campus events, seminars, and workshops. Add image: news/slide2.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/news/slide3.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Research & Innovation</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Share breakthroughs, grants, and faculty achievements.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Share breakthroughs, grants, and faculty achievements. Add image: news/slide3.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
@@ -224,6 +224,48 @@
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $announcements->where('pinned', true)->count() }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Pinned</div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Visual Feature Cards --}}
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-red-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-red-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Urgent Updates</h3>
+                <p class="text-sm text-slate-600">Stay informed about critical announcements and deadlines.</p>
+            </div>
+        </div>
+        
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Campus Events</h3>
+                <p class="text-sm text-slate-600">Discover workshops, seminars, and social activities.</p>
+            </div>
+        </div>
+        
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Research News</h3>
+                <p class="text-sm text-slate-600">Latest breakthroughs and academic achievements.</p>
             </div>
         </div>
     </section>

@@ -59,36 +59,36 @@
             <div class="portal-slider-track relative">
                 <div class="portal-slide is-active" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/support/slide1.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">FAQs & Guides</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase self-help resources that answer common questions.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase self-help resources that answer common questions. Add image: support/slide1.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/support/slide2.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Issue Reporting</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight how users report issues and track resolution.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight how users report issues and track resolution. Add image: support/slide2.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/lab.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/support/slide3.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Contact Channels</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Display support contacts, office hours, or live help options.</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Display support contacts, office hours, or live help options. Add image: support/slide3.png (1920×640px)</p>
                             </div>
                         </div>
                     </div>

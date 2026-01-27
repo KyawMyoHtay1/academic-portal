@@ -191,43 +191,43 @@
                     </div>
                 </div>
 
-                {{-- Optional slide 4: duplicate this block to add more slides; add one dot per slide below --}}
+                {{-- Custom Image Slide 4: Add your first custom image here --}}
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/slide4.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/slide4.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
-                                <h3 class="text-xl md:text-2xl font-bold">Your Title Here</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your caption. Recommended image: 1920×640 px in public/images/home/ (e.g. slide4.png).</p>
+                                <h3 class="text-xl md:text-2xl font-bold">Campus Excellence</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your custom image: slide4.png (1920×640px recommended) in public/images/home/</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Optional slide 5 --}}
+                {{-- Custom Image Slide 5: Add your second custom image here --}}
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/slide5.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/slide5.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
-                                <h3 class="text-xl md:text-2xl font-bold">Your Title Here</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your caption. Use slide5.png or change path above.</p>
+                                <h3 class="text-xl md:text-2xl font-bold">Academic Excellence</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your custom image: slide5.png (1920×640px recommended) in public/images/home/</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Optional slide 6 --}}
+                {{-- Custom Image Slide 6: Add your third custom image here --}}
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/slide6.png') }}');"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/slide6.png') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
-                                <h3 class="text-xl md:text-2xl font-bold">Your Title Here</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your caption. Use slide6.png or change path above. Remove this block if you use fewer than 6 slides.</p>
+                                <h3 class="text-xl md:text-2xl font-bold">Innovation Hub</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your custom image: slide6.png (1920×640px recommended) in public/images/home/</p>
                             </div>
                         </div>
                     </div>
