@@ -134,7 +134,7 @@
                         {{-- Replace this placeholder with your own image --}}
                         <div
                             class="h-full w-full bg-cover bg-center"
-                            style="background-image: url('{{ asset('images/home/slide-campus-1.jpg') }}');"
+                            style="background-image: url('{{ asset('images/home/slide1.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -157,7 +157,7 @@
                         {{-- Replace this placeholder with your own image --}}
                         <div
                             class="h-full w-full bg-cover bg-center"
-                            style="background-image: url('{{ asset('images/home/slide-campus-2.jpg') }}');"
+                            style="background-image: url('{{ asset('images/home/slide2.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -180,7 +180,7 @@
                         {{-- Replace this placeholder with your own image --}}
                         <div
                             class="h-full w-full bg-cover bg-center"
-                            style="background-image: url('{{ asset('images/home/slide-campus-3.jpg') }}');"
+                            style="background-image: url('{{ asset('images/home/slide3.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
