@@ -63,6 +63,73 @@
         </div>
     </section>
 
+    {{-- Contact & Campus Slider --}}
+    <section class="space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Visit & Connect</p>
+                <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Campus & Contact</h2>
+                <p class="text-sm md:text-base text-slate-600">Add your own campus, office, or support team photos here.</p>
+            </div>
+        </div>
+
+        <div class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden" data-portal-slider data-autoplay="true" data-interval="7000">
+            <div class="portal-slider-track relative h-48 md:h-64 lg:h-72">
+                <div class="portal-slide is-active" data-portal-slide>
+                    <div class="relative h-full w-full">
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/contact/slide-1.jpg') }}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-1 text-white">
+                                <h3 class="text-lg md:text-xl font-bold">Main Campus</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Show the main campus location or front desk.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="portal-slide" data-portal-slide>
+                    <div class="relative h-full w-full">
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/contact/slide-2.jpg') }}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-1 text-white">
+                                <h3 class="text-lg md:text-xl font-bold">Support & Help Desk</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight your support center or team.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="portal-slide" data-portal-slide>
+                    <div class="relative h-full w-full">
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/contact/slide-3.jpg') }}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-1 text-white">
+                                <h3 class="text-lg md:text-xl font-bold">Events & Visits</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add photos from open days or campus tours.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4">
+                <div class="flex gap-2">
+                    <button type="button" class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition" data-portal-slider-prev aria-label="Previous slide">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button type="button" class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition" data-portal-slider-next aria-label="Next slide">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 1"></button>
+                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 2"></button>
+                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 3"></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Contact Information Cards --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="contact-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">

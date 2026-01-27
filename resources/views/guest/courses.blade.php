@@ -84,6 +84,75 @@
         </div>
     </section>
 
+    {{-- Courses Showcase Slider --}}
+    <section class="space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Course Highlights</p>
+                <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Explore Programs</h2>
+                <p class="text-sm md:text-base text-slate-600">
+                    Add your own course banners or faculty photos here to introduce key programs.
+                </p>
+            </div>
+        </div>
+
+        <div class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden" data-portal-slider data-autoplay="true" data-interval="7000">
+            <div class="portal-slider-track relative h-48 md:h-64 lg:h-72">
+                <div class="portal-slide is-active" data-portal-slide>
+                    <div class="relative h-full w-full">
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/courses/slide-1.jpg') }}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-1 text-white">
+                                <h3 class="text-lg md:text-xl font-bold">Featured Programs</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase your most popular or flagship courses.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="portal-slide" data-portal-slide>
+                    <div class="relative h-full w-full">
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/courses/slide-2.jpg') }}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-1 text-white">
+                                <h3 class="text-lg md:text-xl font-bold">Faculty & Mentors</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight teaching staff or guest lecturers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="portal-slide" data-portal-slide>
+                    <div class="relative h-full w-full">
+                        <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/courses/slide-3.jpg') }}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 flex items-end">
+                            <div class="p-6 md:p-8 space-y-1 text-white">
+                                <h3 class="text-lg md:text-xl font-bold">Labs & Learning Spaces</h3>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Use this to show labs, studios, or fieldwork photos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4">
+                <div class="flex gap-2">
+                    <button type="button" class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition" data-portal-slider-prev aria-label="Previous slide">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button type="button" class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition" data-portal-slider-next aria-label="Next slide">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 1"></button>
+                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 2"></button>
+                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 3"></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Statistics Overview --}}
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
