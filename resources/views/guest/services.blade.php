@@ -118,17 +118,8 @@
         </div>
     </section>
 
-    {{-- Explore strip --}}
-    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div class="flex flex-wrap items-center justify-center gap-3 md:gap-6">
-            <a href="{{ route('guest.home') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Home</a>
-            <a href="{{ route('guest.courses') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Courses</a>
-            <a href="{{ route('guest.news') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">News</a>
-            <a href="{{ route('guest.about') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">About</a>
-            <a href="{{ route('guest.support') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Support</a>
-            <a href="{{ route('guest.contact') }}" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">Contact</a>
-        </div>
-    </section>
+    {{-- Quick links strip (consistent with Home) --}}
+    @include('guest.partials.quick-links-strip')
 
     {{-- Main Content --}}
     <section class="max-w-6xl mx-auto space-y-12">

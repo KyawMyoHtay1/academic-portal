@@ -49,6 +49,9 @@
         </div>
     </section>
 
+    {{-- Quick links strip (consistent with Home) --}}
+    @include('guest.partials.quick-links-strip')
+
     {{-- Main Content --}}
     <section class="max-w-4xl mx-auto space-y-8">
         <div class="group relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 md:p-12 shadow-xl hover:shadow-2xl transition-all duration-300">
