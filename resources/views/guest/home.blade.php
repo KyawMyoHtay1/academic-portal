@@ -122,18 +122,17 @@
             class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden"
             data-portal-slider
             data-autoplay="true"
-            data-interval="7000"
+            data-interval="6000"
         >
-            <div class="portal-slider-track relative h-56 md:h-72 lg:h-80">
+            <div class="portal-slider-track relative w-full h-56 sm:h-64 md:h-72 lg:h-80">
                 {{-- Slide 1 --}}
                 <div
                     class="portal-slide is-active"
                     data-portal-slide
                 >
-                    <div class="relative h-full w-full">
-                        {{-- Replace this placeholder with your own image --}}
+                    <div class="relative h-full w-full min-h-0 overflow-hidden">
                         <div
-                            class="h-full w-full bg-cover bg-center"
+                            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
                             style="background-image: url('{{ asset('images/home/slide1.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -153,10 +152,9 @@
                     class="portal-slide"
                     data-portal-slide
                 >
-                    <div class="relative h-full w-full">
-                        {{-- Replace this placeholder with your own image --}}
+                    <div class="relative h-full w-full min-h-0 overflow-hidden">
                         <div
-                            class="h-full w-full bg-cover bg-center"
+                            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
                             style="background-image: url('{{ asset('images/home/slide2.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -176,10 +174,9 @@
                     class="portal-slide"
                     data-portal-slide
                 >
-                    <div class="relative h-full w-full">
-                        {{-- Replace this placeholder with your own image --}}
+                    <div class="relative h-full w-full min-h-0 overflow-hidden">
                         <div
-                            class="h-full w-full bg-cover bg-center"
+                            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
                             style="background-image: url('{{ asset('images/home/slide3.png') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>

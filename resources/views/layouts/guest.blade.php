@@ -31,25 +31,27 @@
         .skiptranslate {
             display: none !important;
         }
-        /* Simple image slider */
+        /* Simple image slider — all slides stay absolute so they stack and size consistently */
         .portal-slider {
             position: relative;
         }
         .portal-slider-track {
             position: relative;
             overflow: hidden;
+            min-height: 14rem;
         }
         .portal-slide {
             position: absolute;
             inset: 0;
             opacity: 0;
-            transform: translateX(10px);
-            transition: opacity 600ms ease, transform 600ms ease;
+            transform: translateX(12px);
+            transition: opacity 500ms ease, transform 500ms ease;
+            pointer-events: none;
         }
         .portal-slide.is-active {
             opacity: 1;
             transform: translateX(0);
-            position: relative;
+            pointer-events: auto;
         }
         .portal-slider-dot.is-active {
             opacity: 1;
