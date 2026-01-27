@@ -14,7 +14,19 @@ class StaffFeedbackMessageController extends Controller
      */
     public function index(): Response
     {
+        $q = trim((string) request('q', ''));
+
         $messages = FeedbackMessage::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+
+                $query->where(function ($sub) use ($like) {
+                    $sub->where('name', 'like', $like)
+                        ->orWhere('email', 'like', $like)
+                        ->orWhere('type', 'like', $like)
+                        ->orWhere('message', 'like', $like);
+                });
+            })
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
@@ -26,6 +38,9 @@ class StaffFeedbackMessageController extends Controller
         return Inertia::render('Admin/FeedbackMessages/Index', [
             'messages' => $messages,
             'unreadCount' => $unreadCount,
+            'filters' => [
+                'q' => $q,
+            ],
         ]);
     }
 

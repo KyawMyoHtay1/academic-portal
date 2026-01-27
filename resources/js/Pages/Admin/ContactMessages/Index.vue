@@ -1,17 +1,36 @@
 <script setup>
-import { computed } from "vue";
-import { Head, router, useForm } from "@inertiajs/vue3";
+import { computed, ref, watch } from "vue";
+import { Head, router } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 const props = defineProps({
     messages: { type: Object, required: true },
     unreadCount: { type: Number, required: true },
+    filters: { type: Object, default: () => ({}) },
 });
 
 const items = computed(() => [
     { label: "Contact Messages" },
 ]);
+
+const search = ref(props.filters?.q ?? "");
+let searchTimer = null;
+
+watch(
+    search,
+    (value) => {
+        if (searchTimer) window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(() => {
+            router.get(
+                route("admin.contact-messages.index"),
+                { q: value || undefined },
+                { preserveState: true, replace: true, preserveScroll: true }
+            );
+        }, 250);
+    },
+    { flush: "post" }
+);
 
 function markRead(messageId) {
     router.post(route("admin.contact-messages.read", messageId), {}, { preserveScroll: true });
@@ -49,9 +68,38 @@ function markRead(messageId) {
             <div class="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
                 <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
                     <div class="border-b border-slate-200 px-6 py-4">
-                        <p class="text-sm text-slate-600">
-                            Messages submitted from the public Contact page.
-                        </p>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <p class="text-sm text-slate-600">
+                                Messages submitted from the public Contact page.
+                            </p>
+
+                            <div class="w-full sm:max-w-sm">
+                                <div class="relative">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        v-model="search"
+                                        type="text"
+                                        class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-9 text-sm text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                        placeholder="Search name, email, subject, message..."
+                                    />
+                                    <button
+                                        v-if="search"
+                                        type="button"
+                                        class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-700"
+                                        @click="search = ''"
+                                        aria-label="Clear search"
+                                    >
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -125,7 +173,8 @@ function markRead(messageId) {
 
                                 <tr v-if="messages.data.length === 0">
                                     <td class="px-6 py-6 text-center text-sm text-slate-600" colspan="5">
-                                        No contact messages yet.
+                                        <span v-if="search">No results for "{{ search }}".</span>
+                                        <span v-else>No contact messages yet.</span>
                                     </td>
                                 </tr>
                             </tbody>
