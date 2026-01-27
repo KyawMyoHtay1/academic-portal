@@ -121,6 +121,8 @@ const getGroupForRoute = (currentRoute) => {
         // Communication group
         if (
             routeName.match(/^admin\.announcements\./) ||
+            routeName.match(/^admin\.contact-messages\./) ||
+            routeName.match(/^admin\.feedback-messages\./) ||
             routeName.match(/^notifications\./) ||
             routeName.match(/^messages\./)
         ) {
