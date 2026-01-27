@@ -8,6 +8,145 @@ import { computed } from "vue";
 const page = usePage();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
 
+const lastUpdated = new Date().toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+});
+
+/**
+ * TERMELY INTEGRATION
+ *
+ * 1. In Termly, go to your Privacy Policy.
+ * 2. Click "Add to website" → choose "HTML".
+ * 3. COPY the full <div> / HTML embed that Termly gives you.
+ * 4. PASTE it as the value of this `termlyHtml` string (between the backticks).
+ *
+ * Important:
+ * - Only paste trusted HTML here (Termly is trusted).
+ * - Do NOT allow end‑users to edit this HTML.
+ */
+const termlyHtml = `
+<!-- TODO: Admin: paste Termly "Add to website" HTML embed here. -->
+`;
+</script>
+
+<template>
+    <Head title="Privacy Policy" />
+
+    <!-- Authenticated users see the policy inside the main dashboard layout -->
+    <AuthenticatedLayout v-if="isAuthenticated">
+        <template #header>
+            <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                Privacy Policy
+            </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Privacy Policy' }]" />
+            </div>
+        </template>
+
+        <div class="py-12">
+            <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
+                <div class="portal-card p-8">
+                    <div class="prose prose-slate max-w-none">
+                        <h1 class="text-3xl font-bold text-slate-900 mb-2">
+                            Privacy Policy
+                        </h1>
+                        <p class="text-sm text-slate-600 mb-6">
+                            Last updated: {{ lastUpdated }}
+                        </p>
+                        <p class="text-slate-700 mb-6">
+                            This page displays the official Privacy Policy for the
+                            University Academic Portal, powered by
+                            <span class="font-semibold">Termly</span>.
+                        </p>
+
+                        <!-- Termly HTML embed -->
+                        <div
+                            v-if="termlyHtml && termlyHtml.trim().length"
+                            class="not-prose border border-slate-200 rounded-xl p-4 bg-white"
+                            v-html="termlyHtml"
+                        />
+
+                        <!-- Admin-only helper state (shows until you paste the Termly HTML) -->
+                        <div
+                            v-else
+                            class="not-prose border border-dashed border-amber-400 bg-amber-50 rounded-xl p-4 text-sm text-amber-800"
+                        >
+                            <p class="font-semibold mb-1">Admin setup required</p>
+                            <p>
+                                In Termly, open your Privacy Policy →
+                                <span class="font-semibold">Add to website</span> →
+                                choose <span class="font-semibold">HTML</span> →
+                                copy the full embed and paste it into the
+                                <code>termlyHtml</code> string in
+                                <code>resources/js/Pages/PrivacyPolicy.vue</code>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+
+    <!-- Guests see the same Termly policy inside the public layout -->
+    <GuestLayout v-else>
+        <div class="w-full max-w-4xl px-6 py-8 sm:px-8">
+            <div class="portal-card p-8">
+                <div class="prose prose-slate max-w-none">
+                    <h1 class="text-3xl font-bold text-slate-900 mb-2">
+                        Privacy Policy
+                    </h1>
+                    <p class="text-sm text-slate-600 mb-6">
+                        Last updated: {{ lastUpdated }}
+                    </p>
+                    <p class="text-slate-700 mb-6">
+                        This page displays the official Privacy Policy for the
+                        University Academic Portal, powered by
+                        <span class="font-semibold">Termly</span>.
+                    </p>
+
+                    <!-- Termly HTML embed -->
+                    <div
+                        v-if="termlyHtml && termlyHtml.trim().length"
+                        class="not-prose border border-slate-200 rounded-xl p-4 bg-white"
+                        v-html="termlyHtml"
+                    />
+
+                    <!-- Admin-only helper state (shows until you paste the Termly HTML) -->
+                    <div
+                        v-else
+                        class="not-prose border border-dashed border-amber-400 bg-amber-50 rounded-xl p-4 text-sm text-amber-800"
+                    >
+                        <p class="font-semibold mb-1">Admin setup required</p>
+                        <p>
+                            In Termly, open your Privacy Policy →
+                            <span class="font-semibold">Add to website</span> →
+                            choose <span class="font-semibold">HTML</span> →
+                            copy the full embed and paste it into the
+                            <code>termlyHtml</code> string in
+                            <code>resources/js/Pages/PrivacyPolicy.vue</code>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </GuestLayout>
+</template>
+
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { Head, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
+
+const page = usePage();
+const isAuthenticated = computed(() => !!page.props.auth?.user);
+
 const lastUpdated = new Date().toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'long',

@@ -399,7 +399,9 @@
                     <span>Secure · Accessible · Student-first</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-4">
-                    <a class="hover:text-amber-200 transition" href="{{ route('guest.policies') }}">Privacy & Policies</a>
+                    <a class="hover:text-amber-200 transition" href="{{ route('privacy-policy') }}">Privacy Policy</a>
+                    <span class="hidden md:block text-white/20">|</span>
+                    <a class="hover:text-amber-200 transition" href="{{ route('guest.policies') }}">Academic Policies & Guidelines</a>
                     <span class="hidden md:block text-white/20">|</span>
                     <span>&copy; {{ date('Y') }} University Portal. All rights reserved.</span>
                 </div>
