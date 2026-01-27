@@ -160,6 +160,9 @@
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
+    {{-- Image Card Section (Customize image paths in guest/partials/image-card.blade.php) --}}
+    @include('guest.partials.image-card')
+
     {{-- Statistics Overview --}}
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">

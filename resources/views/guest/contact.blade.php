@@ -133,6 +133,9 @@
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
+    {{-- Image Card Section (Customize image paths in guest/partials/image-card.blade.php) --}}
+    @include('guest.partials.image-card')
+
     {{-- Contact Information Cards --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="contact-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">

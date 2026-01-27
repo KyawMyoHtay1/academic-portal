@@ -121,6 +121,9 @@
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
+    {{-- Image Card Section (Customize image paths in guest/partials/image-card.blade.php) --}}
+    @include('guest.partials.image-card')
+
     {{-- Main Content --}}
     <section class="max-w-6xl mx-auto space-y-12">
         <div class="group relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 md:p-12 shadow-xl hover:shadow-2xl transition-all duration-300">

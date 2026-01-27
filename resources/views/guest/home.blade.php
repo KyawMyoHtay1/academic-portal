@@ -300,6 +300,9 @@
         </div>
     </section>
 
+    {{-- Image Card Section (Customize image paths in guest/partials/image-card.blade.php) --}}
+    @include('guest.partials.image-card')
+
     {{-- Statistics Section --}}
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-50 via-white to-slate-100 border border-slate-200 p-8 md:p-12 shadow-lg">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">

@@ -8,6 +8,7 @@ All pages have been enhanced with:
 - ✅ Improved visual hierarchy
 - ✅ Image directory structure
 - ✅ Easy-to-use image placeholders
+- ✅ **NEW: Image Card Sections** - Single or double image cards on all guest pages
 
 ## 📁 Image Directory Structure
 
@@ -22,6 +23,31 @@ public/images/
 ```
 
 ## 🖼️ How to Add Your Images
+
+### 🆕 Image Card Sections (NEW!)
+
+Each guest page now includes a customizable image card section right after the quick links strip. You can add 1 or 2 images per page.
+
+**Location**: `resources/views/guest/partials/image-card.blade.php`
+
+**Quick Setup**:
+1. Open `resources/views/guest/partials/image-card.blade.php`
+2. Replace `images/home/custom_image_1.jpg` with your image path
+3. For a second image, uncomment the "Two Image Cards" section and update `custom_image_2.jpg`
+4. Images will appear on: Home, Courses, News, About Us, Academic Services, Support, and Contact Us pages
+
+**Image Recommendations for Cards**:
+- **Format**: PNG or JPG
+- **Recommended Size**: 1200×675 pixels (16:9 aspect ratio)
+- **File Size**: Keep under 300KB for optimal loading
+- **Placement**: Add images to `public/images/home/` or create page-specific folders
+
+**Example Paths**:
+- `images/home/campus_photo.jpg`
+- `images/courses/featured_course.jpg`
+- `images/about/university_building.jpg`
+
+---
 
 ### Step 1: Prepare Your Images
 - **Format**: PNG or JPG
@@ -160,5 +186,20 @@ After adding your images, you can update the titles and captions in the Blade te
 - Images are automatically optimized with CSS for better performance
 - The slider includes autoplay functionality (6-second intervals)
 - All sliders are fully responsive and touch-enabled
+- **Image Card sections** show a placeholder if the image file is not found
+- You can customize each page's image card independently by editing the partial file
+
+## 🎯 Image Card Customization
+
+The image card section supports:
+- **Single Image**: One full-width image card (default)
+- **Two Images**: Side-by-side layout (uncomment the second section)
+- **Hover Effects**: Images scale slightly on hover
+- **Responsive**: Automatically adjusts for mobile, tablet, and desktop
+- **Placeholder**: Shows a helpful message if image is missing
+
+To customize per page, you can:
+1. Create page-specific image card partials (e.g., `image-card-home.blade.php`)
+2. Or modify the main partial to use different images based on the current route
 
 For more details, see `public/images/README.md`
