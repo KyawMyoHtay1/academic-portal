@@ -74,7 +74,26 @@
 
         {{-- Feedback Form --}}
         <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-lg">
-            <form class="space-y-6">
+            @if (session('success'))
+                <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                    <div class="font-semibold">Feedback submitted</div>
+                    <div class="text-sm">{{ session('success') }}</div>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">
+                    <div class="font-semibold">Please fix the errors below</div>
+                    <ul class="mt-2 list-disc pl-5 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('guest.feedback.store') }}" class="space-y-6">
+                @csrf
                 <div class="grid gap-6 md:grid-cols-2">
                     <div>
                         <label for="feedbackName" class="block text-sm font-semibold text-slate-700 mb-2">
@@ -87,6 +106,7 @@
                             required
                             class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all"
                             placeholder="John Doe"
+                            value="{{ old('name') }}"
                         >
                     </div>
                     <div>
@@ -100,6 +120,7 @@
                             required
                             class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all"
                             placeholder="john.doe@example.com"
+                            value="{{ old('email') }}"
                         >
                     </div>
                 </div>
@@ -115,10 +136,10 @@
                         class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all cursor-pointer"
                     >
                         <option value="">Select feedback type</option>
-                        <option value="suggestion">Suggestion</option>
-                        <option value="issue">Report Issue</option>
-                        <option value="compliment">Compliment</option>
-                        <option value="other">Other</option>
+                        <option value="suggestion" @selected(old('type') === 'suggestion')>Suggestion</option>
+                        <option value="issue" @selected(old('type') === 'issue')>Report Issue</option>
+                        <option value="compliment" @selected(old('type') === 'compliment')>Compliment</option>
+                        <option value="other" @selected(old('type') === 'other')>Other</option>
                     </select>
                 </div>
                 
@@ -133,7 +154,7 @@
                         required
                         class="form-input w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)] focus:border-transparent transition-all resize-none"
                         placeholder="Please share your feedback, suggestions, or report any issues you've encountered..."
-                    ></textarea>
+                    >{{ old('message') }}</textarea>
                 </div>
                 
                 <button

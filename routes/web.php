@@ -40,7 +40,9 @@ use App\Http\Controllers\TeacherAnnouncementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\StaffContactMessageController;
+use App\Http\Controllers\StaffFeedbackMessageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -296,6 +298,9 @@ Route::post('/guest/contact', [ContactController::class, 'store'])->name('guest.
 
 Route::view('/guest/policies', 'guest.policies')->name('guest.policies');
 Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
+
+// Guest feedback form submission (stores into feedback_messages)
+Route::post('/guest/feedback', [FeedbackController::class, 'store'])->name('guest.feedback.store');
 Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
 })->name('privacy-policy');
@@ -367,6 +372,10 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         // Contact Messages (staff inbox)
         Route::get('/admin/contact-messages', [StaffContactMessageController::class, 'index'])->name('admin.contact-messages.index');
         Route::post('/admin/contact-messages/{contactMessage}/read', [StaffContactMessageController::class, 'markRead'])->name('admin.contact-messages.read');
+
+        // Feedback Messages (staff inbox)
+        Route::get('/admin/feedback-messages', [StaffFeedbackMessageController::class, 'index'])->name('admin.feedback-messages.index');
+        Route::post('/admin/feedback-messages/{feedbackMessage}/read', [StaffFeedbackMessageController::class, 'markRead'])->name('admin.feedback-messages.read');
 
         // Student Management
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
