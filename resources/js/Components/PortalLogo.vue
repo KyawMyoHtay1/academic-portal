@@ -1,13 +1,10 @@
 <script setup>
-const props = withDefaults(
-    defineProps({
-        /** 'nav' (default) or 'footer' – affects wrapper size */
-        variant: { type: String, default: "nav" },
-        /** Extra class for the wrapper */
-        class: { type: String, default: "" },
-    }),
-    { variant: "nav", class: "" },
-);
+const props = defineProps({
+    /** 'nav' (default) or 'footer' – affects wrapper size */
+    variant: { type: String, default: "nav" },
+    /** Extra class for the wrapper */
+    class: { type: String, default: "" },
+});
 
 // Unique id per instance so gradients/filters don't clash when multiple logos on page
 const uid = "pl-" + Math.random().toString(36).slice(2, 10);
