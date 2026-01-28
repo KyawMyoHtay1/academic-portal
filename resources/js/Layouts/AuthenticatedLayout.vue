@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from "vue";
-import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import PortalLogo from "@/Components/PortalLogo.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import GoogleTranslate from "@/Components/GoogleTranslate.vue";
@@ -13,36 +13,63 @@ const openNavGroups = ref({});
 // Icon mapping for menu items
 const getMenuIcon = (name) => {
     const iconMap = {
-        "Dashboard": "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
-        "My Profile": "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-        "Courses": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-        "My Courses": "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
-        "Grades": "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
-        "Fees": "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
-        "Timetable": "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-        "Announcements": "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z",
-        "Notifications": "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
-        "Messages": "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
-        "Contact Messages": "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-        "Feedback Messages": "M7 8h10M7 12h6m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2h-3l-4 4z",
-        "My Teaching Subjects": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-        "Mark Attendance": "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
-        "Assignments": "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-        "Manage Courses": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-        "Enrollment Requests": "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-        "Manage Subjects": "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-        "Student Records": "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
-        "Manage Users": "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
-        "Manage Fees": "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
-        "Grade Reviews": "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
-        "Manage Timetable": "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-        "Attendance Report": "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-        "Student": "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-        "Teaching": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-        "Academics": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-        "People": "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
-        "Finance": "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
-        "Communication": "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+        Dashboard:
+            "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+        "My Profile":
+            "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+        Courses:
+            "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        "My Courses":
+            "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
+        Grades: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+        Fees: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
+        Timetable:
+            "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+        Announcements:
+            "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z",
+        Notifications:
+            "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
+        Messages:
+            "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+        "Contact Messages":
+            "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+        "Feedback Messages":
+            "M7 8h10M7 12h6m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2h-3l-4 4z",
+        "My Teaching Subjects":
+            "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        "Mark Attendance":
+            "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+        Assignments:
+            "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        "Manage Courses":
+            "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        "Enrollment Requests":
+            "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        "Manage Subjects":
+            "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        "Student Records":
+            "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+        "Manage Users":
+            "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+        "Manage Fees":
+            "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
+        "Grade Reviews":
+            "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+        "Manage Timetable":
+            "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+        "Attendance Report":
+            "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        Student:
+            "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+        Teaching:
+            "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        Academics:
+            "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        People: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+        Finance:
+            "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
+        Communication:
+            "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
     };
     return iconMap[name] || "M4 6h16M4 12h16M4 18h16"; // Default icon (menu lines)
 };
@@ -158,7 +185,7 @@ const navigation = computed(() => {
                     badge: unreadMessages,
                     icon: getMenuIcon("Messages"),
                 },
-            ])
+            ]),
         );
     }
 
@@ -225,7 +252,7 @@ const navigation = computed(() => {
                     badge: unreadMessages,
                     icon: getMenuIcon("Messages"),
                 },
-            ])
+            ]),
         );
     }
 
@@ -326,7 +353,7 @@ const navigation = computed(() => {
                     badge: unreadMessages,
                     icon: getMenuIcon("Messages"),
                 },
-            ])
+            ]),
         );
     }
 
@@ -407,18 +434,18 @@ const headerStatus = computed(() => {
                 <div class="flex items-center gap-3 px-6 py-5">
                     <Link
                         :href="route('dashboard')"
-                        class="flex items-center gap-3"
+                        class="flex items-center gap-3 transition-opacity hover:opacity-90"
                     >
-                        <ApplicationLogo
-                            class="h-9 w-9 shrink-0 fill-current text-portal-gold"
-                        />
+                        <PortalLogo class="h-9 w-9 shrink-0" />
                         <div>
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-300"
                             >
-                                University Academic
+                                University
                             </p>
-                            <p class="text-sm font-semibold">Portal</p>
+                            <p class="text-sm font-semibold text-portal-gold">
+                                Portal
+                            </p>
                         </div>
                     </Link>
                 </div>
@@ -461,7 +488,7 @@ const headerStatus = computed(() => {
                                 </span>
                             </Link>
                         </template>
-                        
+
                         <!-- Grouped menu items (dropdown) -->
                         <template v-else>
                             <div class="space-y-1">
@@ -474,8 +501,10 @@ const headerStatus = computed(() => {
                                             : 'text-slate-200 hover:bg-white/5 hover:text-white',
                                     ]"
                                     @click="
-                                        openNavGroups[item.name] =
-                                            !(openNavGroups[item.name] ?? item.active)
+                                        openNavGroups[item.name] = !(
+                                            openNavGroups[item.name] ??
+                                            item.active
+                                        )
                                     "
                                 >
                                     <div class="flex items-center gap-3">
@@ -501,7 +530,8 @@ const headerStatus = computed(() => {
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
                                         :class="[
-                                            (openNavGroups[item.name] ?? item.active)
+                                            (openNavGroups[item.name] ??
+                                            item.active)
                                                 ? 'rotate-180'
                                                 : '',
                                         ]"
@@ -513,7 +543,7 @@ const headerStatus = computed(() => {
                                         />
                                     </svg>
                                 </button>
-                                
+
                                 <!-- Dropdown menu items -->
                                 <transition
                                     enter-active-class="transition duration-200 ease-out"
@@ -525,7 +555,8 @@ const headerStatus = computed(() => {
                                 >
                                     <div
                                         v-show="
-                                            openNavGroups[item.name] ?? item.active
+                                            openNavGroups[item.name] ??
+                                            item.active
                                         "
                                         class="ml-4 space-y-1 border-l-2 border-slate-700/50 pl-2"
                                     >
@@ -540,7 +571,9 @@ const headerStatus = computed(() => {
                                                     : 'text-slate-300 hover:bg-white/5 hover:text-white',
                                             ]"
                                         >
-                                            <div class="flex items-center gap-3">
+                                            <div
+                                                class="flex items-center gap-3"
+                                            >
                                                 <svg
                                                     class="h-4 w-4 shrink-0"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -555,10 +588,15 @@ const headerStatus = computed(() => {
                                                         :d="child.icon"
                                                     />
                                                 </svg>
-                                                <span class="text-xs">{{ child.name }}</span>
+                                                <span class="text-xs">{{
+                                                    child.name
+                                                }}</span>
                                             </div>
                                             <span
-                                                v-if="child.badge && child.badge > 0"
+                                                v-if="
+                                                    child.badge &&
+                                                    child.badge > 0
+                                                "
                                                 class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
                                             >
                                                 {{ child.badge }}
@@ -606,11 +644,9 @@ const headerStatus = computed(() => {
                             class="flex items-center justify-between px-4 py-4"
                         >
                             <div class="flex items-center gap-2">
-                                <ApplicationLogo
-                                    class="h-8 w-8 fill-current text-portal-gold"
-                                />
+                                <PortalLogo class="h-8 w-8 shrink-0" />
                                 <span class="text-sm font-semibold">
-                                    Academic Portal
+                                    University Portal
                                 </span>
                             </div>
                             <button
@@ -636,7 +672,9 @@ const headerStatus = computed(() => {
                             </button>
                         </div>
 
-                        <nav class="mt-2 flex-1 space-y-1 px-3 text-sm overflow-y-auto">
+                        <nav
+                            class="mt-2 flex-1 space-y-1 px-3 text-sm overflow-y-auto"
+                        >
                             <template
                                 v-for="item in navigation"
                                 :key="item.name"
@@ -675,7 +713,7 @@ const headerStatus = computed(() => {
                                         </span>
                                     </Link>
                                 </template>
-                                
+
                                 <!-- Grouped menu items (dropdown) -->
                                 <template v-else>
                                     <div class="space-y-1">
@@ -688,11 +726,15 @@ const headerStatus = computed(() => {
                                                     : 'text-slate-200 hover:bg-white/5 hover:text-white',
                                             ]"
                                             @click="
-                                                openNavGroups[item.name] =
-                                                    !(openNavGroups[item.name] ?? item.active)
+                                                openNavGroups[item.name] = !(
+                                                    openNavGroups[item.name] ??
+                                                    item.active
+                                                )
                                             "
                                         >
-                                            <div class="flex items-center gap-2">
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
                                                 <svg
                                                     class="h-5 w-5 shrink-0"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -715,7 +757,8 @@ const headerStatus = computed(() => {
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                                 :class="[
-                                                    (openNavGroups[item.name] ?? item.active)
+                                                    (openNavGroups[item.name] ??
+                                                    item.active)
                                                         ? 'rotate-180'
                                                         : '',
                                                 ]"
@@ -727,7 +770,7 @@ const headerStatus = computed(() => {
                                                 />
                                             </svg>
                                         </button>
-                                        
+
                                         <!-- Dropdown menu items -->
                                         <transition
                                             enter-active-class="transition duration-200 ease-out"
@@ -739,7 +782,8 @@ const headerStatus = computed(() => {
                                         >
                                             <div
                                                 v-show="
-                                                    openNavGroups[item.name] ?? item.active
+                                                    openNavGroups[item.name] ??
+                                                    item.active
                                                 "
                                                 class="ml-4 space-y-1 border-l-2 border-slate-700/50 pl-2"
                                             >
@@ -754,7 +798,9 @@ const headerStatus = computed(() => {
                                                             : 'text-slate-300 hover:bg-white/5 hover:text-white',
                                                     ]"
                                                 >
-                                                    <div class="flex items-center gap-2">
+                                                    <div
+                                                        class="flex items-center gap-2"
+                                                    >
                                                         <svg
                                                             class="h-4 w-4 shrink-0"
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -769,10 +815,15 @@ const headerStatus = computed(() => {
                                                                 :d="child.icon"
                                                             />
                                                         </svg>
-                                                        <span class="text-xs">{{ child.name }}</span>
+                                                        <span class="text-xs">{{
+                                                            child.name
+                                                        }}</span>
                                                     </div>
                                                     <span
-                                                        v-if="child.badge && child.badge > 0"
+                                                        v-if="
+                                                            child.badge &&
+                                                            child.badge > 0
+                                                        "
                                                         class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
                                                     >
                                                         {{ child.badge }}
@@ -945,8 +996,12 @@ const headerStatus = computed(() => {
                 </main>
 
                 <!-- Footer -->
-                <footer class="border-t border-slate-200 bg-white px-4 py-4 sm:px-6 lg:px-8">
-                    <div class="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-600">
+                <footer
+                    class="border-t border-slate-200 bg-white px-4 py-4 sm:px-6 lg:px-8"
+                >
+                    <div
+                        class="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-600"
+                    >
                         <Link
                             :href="route('privacy-policy')"
                             class="hover:text-portal-navy transition-colors"
@@ -955,7 +1010,8 @@ const headerStatus = computed(() => {
                         </Link>
                         <span class="text-slate-400">•</span>
                         <span>
-                            © {{ new Date().getFullYear() }} University Academic Portal
+                            © {{ new Date().getFullYear() }} University Academic
+                            Portal
                         </span>
                     </div>
                 </footer>
