@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/courses/programs.jpg') }}" alt="Diverse Programs" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/courses/diverse.png') }}" alt="Diverse Programs" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[color:var(--portal-navy)]/10 to-slate-200">
                     <span class="text-slate-400 text-xs font-medium text-center px-2">images/courses/programs.jpg</span>
                 </div>
@@ -19,7 +19,7 @@
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/courses/faculty.jpg') }}" alt="Expert Faculty" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/courses/faculty.png') }}" alt="Expert Faculty" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[color:var(--portal-gold)]/10 to-slate-200">
                     <span class="text-slate-400 text-xs font-medium text-center px-2">images/courses/faculty.jpg</span>
                 </div>
@@ -31,7 +31,7 @@
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/courses/labs_facilities.jpg') }}" alt="Labs & Facilities" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/courses/labs_facilities.png') }}" alt="Labs & Facilities" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
                     <span class="text-slate-400 text-xs font-medium text-center px-2">images/courses/labs_facilities.jpg</span>
                 </div>
@@ -43,7 +43,7 @@
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/courses/career_ready.jpg') }}" alt="Career Ready" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/courses/career_ready.png') }}" alt="Career Ready" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
                     <span class="text-slate-400 text-xs font-medium text-center px-2">images/courses/career_ready.jpg</span>
                 </div>

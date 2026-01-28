@@ -8,7 +8,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/home/lab.png') }}" alt="Campus Life" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/home/campuslife.png') }}" alt="Campus Life" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[color:var(--portal-navy)]/10 to-slate-200">
                     <span class="text-slate-400 text-sm font-medium">Add: images/home/campus_life.jpg</span>
                 </div>
@@ -20,7 +20,7 @@
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/home/lab.png') }}" alt="Learning Excellence" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/home/learningexcellence.png') }}" alt="Learning Excellence" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[color:var(--portal-gold)]/10 to-slate-200">
                     <span class="text-slate-400 text-sm font-medium">Add: images/home/learning_excellence.jpg</span>
                 </div>
@@ -32,7 +32,7 @@
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/home/community.jpg') }}" alt="Community" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/home/community.png') }}" alt="Community" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
                     <span class="text-slate-400 text-sm font-medium">Add: images/home/community.jpg</span>
                 </div>

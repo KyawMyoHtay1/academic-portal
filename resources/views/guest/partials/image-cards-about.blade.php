@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/about/our_campus.jpg') }}" alt="Our Campus" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/about/ourcampus.jpg') }}" alt="Our Campus" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[color:var(--portal-navy)]/10 to-slate-200">
                     <span class="text-slate-400 text-sm font-medium">Add: images/about/our_campus.jpg</span>
                 </div>
@@ -19,7 +19,7 @@
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-                <img src="{{ asset('images/about/leadership.jpg') }}" alt="Leadership" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ asset('images/about/vision.jpg') }}" alt="Leadership" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[color:var(--portal-gold)]/10 to-slate-200">
                     <span class="text-slate-400 text-sm font-medium">Add: images/about/leadership.jpg</span>
                 </div>
