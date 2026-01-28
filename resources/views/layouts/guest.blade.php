@@ -65,6 +65,17 @@
         .portal-slider-dot.is-active {
             opacity: 1;
         }
+        /* University Portal logo: hover lift and glow */
+        a .portal-logo,
+        .portal-logo-link .portal-logo {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        a:hover .portal-logo,
+        a:focus-visible .portal-logo,
+        .portal-logo-link:hover .portal-logo {
+            transform: scale(1.06);
+            box-shadow: 0 4px 14px rgba(11, 31, 58, 0.2), 0 0 0 1px rgba(244, 180, 0, 0.15);
+        }
     </style>
     <!-- Google Translate -->
     <script type="text/javascript">
@@ -116,9 +127,9 @@
 
     <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
         <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-            <a href="{{ route('guest.home') }}" class="flex items-center gap-2 text-xl font-bold text-[color:var(--portal-navy)]">
-                <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-[color:var(--portal-gold)] text-[color:var(--portal-navy)] shadow-inner">UA</span>
-                <span>University Portal</span>
+            <a href="{{ route('guest.home') }}" class="portal-logo-link flex items-center gap-3 text-xl font-bold text-[color:var(--portal-navy)]">
+                @include('guest.partials.portal-logo', ['variant' => 'nav'])
+                <span class="tracking-tight">University <span class="text-[color:var(--portal-gold)]">Portal</span></span>
             </a>
             <div class="flex flex-wrap items-center gap-2 text-sm">
                 {{-- Main links --}}
@@ -327,7 +338,7 @@
             <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
-                        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--portal-gold)] text-[color:var(--portal-navy)] text-lg font-bold shadow-inner">UA</span>
+                        @include('guest.partials.portal-logo', ['variant' => 'footer'])
                         <div>
                             <p class="text-sm font-semibold uppercase tracking-wide text-amber-200">University Portal</p>
                             <p class="text-lg font-bold">Academic Excellence</p>
