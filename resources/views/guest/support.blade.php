@@ -64,7 +64,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">FAQs & Guides</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase self-help resources that answer common questions. Add image: support/slide1.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Find answers to common questions, step-by-step guides, and self-help resources so you can resolve issues quickly.</p>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Issue Reporting</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight how users report issues and track resolution. Add image: support/slide2.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Submit tickets, track progress, and get updates until your issue is resolved by our support team.</p>
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Contact Channels</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Display support contacts, office hours, or live help options. Add image: support/slide3.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Reach us by phone, email, or in person. Office hours and live help are here when you need them.</p>
                             </div>
                         </div>
                     </div>

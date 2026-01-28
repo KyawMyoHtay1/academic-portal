@@ -70,7 +70,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Registration & Courses</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Show how students register, pick courses, and stay organized. Add image: services/slide1.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Register for courses, manage your schedule, and keep your academic plan on track in one place.</p>
                             </div>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Grades, Fees, Attendance</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight grading workflows, fee payment, and attendance tracking. Add image: services/slide2.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">View grades, pay fees, and check attendance through a simple, secure academic dashboard.</p>
                             </div>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Timetables & Notifications</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Use this to show live timetables, alerts, and announcements. Add image: services/slide3.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Access live timetables, exam dates, and important announcements so you never miss a deadline.</p>
                             </div>
                         </div>
                     </div>

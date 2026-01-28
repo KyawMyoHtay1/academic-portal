@@ -92,7 +92,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Campus Life</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Show everyday life and the spirit of the university. Add image: about/slide1.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Everyday moments, campus culture, and the community that makes our university unique.</p>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Leadership & Vision</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Introduce leaders, faculty, or founders. Add image: about/slide2.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Meet the leaders, faculty, and visionaries guiding our institution and shaping the future.</p>
                             </div>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Milestones & Achievements</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight key achievements or awards. Add image: about/slide3.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Awards, accreditations, and milestones that reflect our commitment to excellence.</p>
                             </div>
                         </div>
                     </div>

@@ -140,7 +140,7 @@
                             <div class="p-6 md:p-8 space-y-2 text-white">
                                 <h3 class="text-xl md:text-2xl font-bold">Modern Learning Environment</h3>
                                 <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
-                                    Showcase your main campus or learning spaces to welcome students visually.
+                                    Spaces built for collaboration, creativity, and hands-on learning.
                                 </p>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                             <div class="p-6 md:p-8 space-y-2 text-white">
                                 <h3 class="text-xl md:text-2xl font-bold">Student Life & Activities</h3>
                                 <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
-                                    Highlight events, clubs, or student activities that reflect your campus culture.
+                                    Clubs, events, and activities that build community and shape your university experience.
                                 </p>
                             </div>
                         </div>
@@ -184,7 +184,7 @@
                             <div class="p-6 md:p-8 space-y-2 text-white">
                                 <h3 class="text-xl md:text-2xl font-bold">Labs & Facilities</h3>
                                 <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
-                                    Use this slide to show laboratories, libraries, or any key facilities.
+                                    Labs, libraries, and facilities that support teaching, research, and innovation.
                                 </p>
                             </div>
                         </div>
@@ -199,7 +199,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
                                 <h3 class="text-xl md:text-2xl font-bold">Campus Excellence</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your custom image: slide4.png (1920×640px recommended) in public/images/home/</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Modern facilities, green spaces, and a vibrant community where students learn, grow, and build lasting connections.</p>
                             </div>
                         </div>
                     </div>
@@ -213,7 +213,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
                                 <h3 class="text-xl md:text-2xl font-bold">Academic Excellence</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your custom image: slide5.png (1920×640px recommended) in public/images/home/</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Rigorous programs, expert faculty, and a focus on research and innovation to prepare you for your future career.</p>
                             </div>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
                                 <h3 class="text-xl md:text-2xl font-bold">Innovation Hub</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Add your custom image: slide6.png (1920×640px recommended) in public/images/home/</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Labs, studios, and partnerships that turn ideas into impact and support discovery across every discipline.</p>
                             </div>
                         </div>
                     </div>

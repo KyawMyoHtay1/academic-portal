@@ -109,7 +109,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">University Announcements</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Show important updates, deadlines, and policy changes. Add image: news/slide1.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Official updates, deadlines, and policy changes that matter to students and staff.</p>
                             </div>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Events & Activities</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight campus events, seminars, and workshops. Add image: news/slide2.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Seminars, workshops, and campus events that enrich learning and bring the community together.</p>
                             </div>
                         </div>
                     </div>
@@ -133,7 +133,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Research & Innovation</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Share breakthroughs, grants, and faculty achievements. Add image: news/slide3.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Research breakthroughs, grants, and faculty achievements that drive innovation and impact.</p>
                             </div>
                         </div>
                     </div>

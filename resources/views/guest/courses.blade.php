@@ -105,7 +105,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Featured Programs</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Showcase your most popular or flagship courses. Add image: courses/slide1.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Explore our flagship and most sought-after programs designed to prepare you for tomorrow.</p>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Faculty & Mentors</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Highlight teaching staff or guest lecturers. Add image: courses/slide2.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Learn from experienced faculty and visiting experts who bring industry and research into the classroom.</p>
                             </div>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
                                 <h3 class="text-lg md:text-xl font-bold">Labs & Learning Spaces</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Use this to show labs, studios, or fieldwork photos. Add image: courses/slide3.png (1920×640px)</p>
+                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Labs, studios, and hands-on spaces where theory meets practice and ideas take shape.</p>
                             </div>
                         </div>
                     </div>
