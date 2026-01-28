@@ -87,7 +87,7 @@
             <div class="portal-slider-track relative">
                 <div class="portal-slide is-active" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/about/slide1.png') }}'); background-size: cover; background-position: center;"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/about/campuslife.jpg') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -99,7 +99,7 @@
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/about/slide2.png') }}'); background-size: cover; background-position: center;"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/about/leadership.jpg') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
@@ -111,7 +111,7 @@
                 </div>
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/about/slide3.png') }}'); background-size: cover; background-position: center;"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/about/achievement.jpg') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-1 text-white">
