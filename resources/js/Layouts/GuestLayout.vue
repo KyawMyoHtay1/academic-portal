@@ -36,7 +36,7 @@ const isRegisterPage = computed(
                         <PortalLogo class="h-10 w-10 shrink-0" />
                         <span
                             class="text-sm font-semibold uppercase tracking-wide"
-                            >University Portal</span
+                            >University Academic Portal</span
                         >
                     </Link>
                     <Link
@@ -75,7 +75,7 @@ const isRegisterPage = computed(
                         <p
                             class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-300"
                         >
-                            University Portal
+                            University Academic Portal
                         </p>
                         <h1 class="mt-2 text-2xl font-semibold">
                             {{

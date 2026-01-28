@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Welcome to University Portal')
+@section('title', 'Welcome to University Academic Portal')
 
 @push('styles')
 <style>

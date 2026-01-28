@@ -1,4 +1,4 @@
-{{-- University Portal logo: SVG mark (book + star) with optional wordmark. Use variant="nav" (default) or "footer". --}}
+{{-- University Academic Portal logo: SVG mark (book + star) with optional wordmark. Use variant="nav" (default) or "footer". --}}
 @props([
     'variant' => 'nav',
     'class'   => '',
@@ -10,7 +10,7 @@
 <span
     {{ $attributes->merge(['class' => "portal-logo inline-flex shrink-0 items-center justify-center rounded-xl {$size} {$class}"]) }}
     role="img"
-    aria-label="University Portal"
+    aria-label="University Academic Portal"
 >
     <svg class="h-full w-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>

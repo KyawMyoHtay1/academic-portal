@@ -441,7 +441,7 @@ const headerStatus = computed(() => {
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-300"
                             >
-                                University
+                                University Academic
                             </p>
                             <p class="text-sm font-semibold text-portal-gold">
                                 Portal
@@ -646,7 +646,7 @@ const headerStatus = computed(() => {
                             <div class="flex items-center gap-2">
                                 <PortalLogo class="h-8 w-8 shrink-0" />
                                 <span class="text-sm font-semibold">
-                                    University Portal
+                                    University Academic Portal
                                 </span>
                             </div>
                             <button

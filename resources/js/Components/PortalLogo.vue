@@ -18,7 +18,7 @@ const uid = "pl-" + Math.random().toString(36).slice(2, 10);
             props.class,
         ]"
         role="img"
-        aria-label="University Portal"
+        aria-label="University Academic Portal"
     >
         <svg
             class="h-full w-full"

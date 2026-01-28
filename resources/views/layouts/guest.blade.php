@@ -3,7 +3,7 @@
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'University Portal')</title>
+    <title>@yield('title', 'University Academic Portal')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @if (config('recaptcha.site_key'))
@@ -65,7 +65,7 @@
         .portal-slider-dot.is-active {
             opacity: 1;
         }
-        /* University Portal logo: hover lift and glow */
+        /* University Academic Portal logo: hover lift and glow */
         a .portal-logo,
         .portal-logo-link .portal-logo {
             transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -129,7 +129,7 @@
         <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
             <a href="{{ route('guest.home') }}" class="portal-logo-link flex items-center gap-3 text-xl font-bold text-[color:var(--portal-navy)]">
                 @include('guest.partials.portal-logo', ['variant' => 'nav'])
-                <span class="tracking-tight">University <span class="text-[color:var(--portal-gold)]">Portal</span></span>
+                <span class="tracking-tight">University Academic <span class="text-[color:var(--portal-gold)]">Portal</span></span>
             </a>
             <div class="flex flex-wrap items-center gap-2 text-sm">
                 {{-- Main links --}}
@@ -340,7 +340,7 @@
                     <div class="flex items-center gap-3">
                         @include('guest.partials.portal-logo', ['variant' => 'footer'])
                         <div>
-                            <p class="text-sm font-semibold uppercase tracking-wide text-amber-200">University Portal</p>
+                            <p class="text-sm font-semibold uppercase tracking-wide text-amber-200">University Academic Portal</p>
                             <p class="text-lg font-bold">Academic Excellence</p>
                         </div>
                     </div>
@@ -425,7 +425,7 @@
                     <span class="hidden md:block text-white/20">|</span>
                     <a class="hover:text-amber-200 transition" href="{{ route('guest.policies') }}">Academic Policies & Guidelines</a>
                     <span class="hidden md:block text-white/20">|</span>
-                    <span>&copy; {{ date('Y') }} University Portal. All rights reserved.</span>
+                    <span>&copy; {{ date('Y') }} University Academic Portal. All rights reserved.</span>
                 </div>
             </div>
         </div>

@@ -94,6 +94,16 @@ word-break: break-word !important;
 
         <div class="py-8 sm:py-12">
             <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <Link
+                        :href="route('dashboard')"
+                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                    >
+                        <span aria-hidden="true">←</span>
+                        <span>Back to Dashboard</span>
+                    </Link>
+                </div>
+
                 <div class="portal-card p-6 sm:p-8 lg:p-10">
                     <div class="prose prose-slate max-w-none">
                         <div
@@ -106,14 +116,20 @@ word-break: break-word !important;
                             v-else
                             class="not-prose border border-dashed border-amber-400 bg-amber-50 rounded-xl p-4 text-sm text-amber-800"
                         >
-                            <p class="font-semibold mb-1">Admin setup required</p>
+                            <p class="font-semibold mb-1">
+                                Admin setup required
+                            </p>
                             <p>
                                 In Termly, open your Privacy Policy →
-                                <span class="font-semibold">Add to website</span> →
-                                choose <span class="font-semibold">HTML</span> →
-                                copy the full embed and paste it into the
+                                <span class="font-semibold"
+                                    >Add to website</span
+                                >
+                                → choose
+                                <span class="font-semibold">HTML</span> → copy
+                                the full embed and paste it into the
                                 <code>termlyHtml</code> string in
-                                <code>resources/js/Pages/PrivacyPolicy.vue</code>.
+                                <code>resources/js/Pages/PrivacyPolicy.vue</code
+                                >.
                             </p>
                         </div>
                     </div>
@@ -125,7 +141,22 @@ word-break: break-word !important;
     <!-- Guests see full-width Termly policy (GuestLayout switches to full-width for this route) -->
     <GuestLayout v-else>
         <div class="w-full min-h-[80vh] bg-white">
-            <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+            <div
+                class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12"
+            >
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <Link
+                        :href="route('guest.home')"
+                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                    >
+                        <span aria-hidden="true">←</span>
+                        <span>Back to Home</span>
+                    </Link>
+                    <span class="text-xs text-slate-500"
+                        >Termly Privacy Policy</span
+                    >
+                </div>
+
                 <div class="prose prose-slate max-w-none">
                     <div
                         v-if="termlyHtml && termlyHtml.trim().length"
