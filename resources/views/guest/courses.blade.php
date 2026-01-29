@@ -73,18 +73,30 @@
             
             {{-- Search Bar --}}
             <div class="max-w-2xl">
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
+                <div class="relative flex gap-3">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            id="courseSearch"
+                            placeholder="Search courses by name, code, or semester..."
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)] focus:border-transparent transition-all"
+                        >
                     </div>
-                    <input
-                        type="text"
-                        id="courseSearch"
-                        placeholder="Search courses by name, code, or semester..."
-                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)] focus:border-transparent transition-all"
+                    <button
+                        id="courseSearchButton"
+                        type="button"
+                        class="inline-flex items-center gap-2 rounded-2xl bg-white/90 px-4 md:px-5 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-lg hover:bg-white hover:scale-105 transition-all"
                     >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.2-5.2M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                        </svg>
+                        <span>Search</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -412,6 +424,7 @@
         const searchInput = document.getElementById('courseSearch');
         const semesterFilter = document.getElementById('semesterFilter');
         const sortFilter = document.getElementById('sortFilter');
+        const searchButton = document.getElementById('courseSearchButton');
         const clearFiltersBtn = document.getElementById('clearFilters');
         const clearSearchFiltersBtn = document.getElementById('clearSearchFilters');
         const coursesContainer = document.getElementById('coursesContainer');
@@ -432,7 +445,7 @@
             credits: parseInt(card.dataset.credits || '0', 10)
         }));
         
-        function filterAndSortCourses() {
+        function filterAndSortCourses(shouldScroll = false) {
             const searchTerm = (searchInput.value || '').trim().toLowerCase();
             const selectedSemester = (semesterFilter.value || '').trim().toLowerCase();
             const sortBy = sortFilter.value || 'code';
@@ -472,7 +485,13 @@
             // Show filtered courses
             if (filtered.length === 0) {
                 coursesContainer.style.display = 'none';
-                if (noResults) noResults.classList.remove('hidden');
+                if (noResults) {
+                    noResults.classList.remove('hidden');
+                    // When explicitly searching and nothing is found, scroll to the no-results message
+                    if (shouldScroll && typeof noResults.scrollIntoView === 'function') {
+                        noResults.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
             } else {
                 coursesContainer.style.display = 'grid';
                 if (noResults) noResults.classList.add('hidden');
@@ -481,6 +500,11 @@
                     course.element.style.display = 'block';
                     course.element.style.order = index;
                 });
+
+                // When explicitly searching and we have matches, gently scroll to the courses grid so results are in view
+                if (shouldScroll && searchTerm && typeof coursesContainer.scrollIntoView === 'function') {
+                    coursesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
         }
         
@@ -492,10 +516,21 @@
         }
         
         // Event listeners
-        searchInput.addEventListener('input', filterAndSortCourses);
-        searchInput.addEventListener('keyup', filterAndSortCourses);
+        // Live filtering while typing, but without auto-scroll
+        searchInput.addEventListener('input', () => filterAndSortCourses(false));
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                filterAndSortCourses(true);
+            } else {
+                filterAndSortCourses(false);
+            }
+        });
         semesterFilter.addEventListener('change', filterAndSortCourses);
-        sortFilter.addEventListener('change', filterAndSortCourses);
+        sortFilter.addEventListener('change', () => filterAndSortCourses(false));
+
+        if (searchButton) {
+            searchButton.addEventListener('click', () => filterAndSortCourses(true));
+        }
         
         if (clearFiltersBtn) {
             clearFiltersBtn.addEventListener('click', clearAllFilters);
