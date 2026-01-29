@@ -371,6 +371,12 @@
             <p class="text-base text-slate-700 leading-relaxed">
                 Our mission is to provide quality education, foster innovation, and prepare students for a successful future. We are committed to excellence in teaching, research, and community engagement.
             </p>
+            <p class="text-base text-slate-700 leading-relaxed mt-3">
+                As a university community, we bring together dedicated lecturers, researchers, and support teams who care deeply about student success. Whether you are the first in your family to attend university or continuing your academic journey, you will find personalised support, modern learning spaces, and programmes that are aligned with real-world careers.
+            </p>
+            <p class="text-base text-slate-700 leading-relaxed mt-3">
+                Beyond the classroom, students can take part in clubs, leadership opportunities, internships, and community projects that help you grow as a professional and as a person. Our University Academic Portal connects all of these experiences in one place—so you can manage courses, track progress, access services, and stay informed about campus life.
+            </p>
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-2 mb-2">
@@ -557,6 +563,113 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    {{-- More Success Stories – visual gallery (replace placeholders with real photos + stories) --}}
+    <section class="space-y-6">
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-2">
+                    More Success Stories
+                </p>
+                <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)]">
+                    Journeys from Our Community
+                </h2>
+                <p class="text-base text-slate-600 mt-2 max-w-2xl">
+                    Highlight students, alumni, and staff whose stories represent what makes your university special.
+                    Replace the placeholder images and text below with your own photos and real success stories.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+            {{-- Story Card 1 – Student Graduate (image placeholder) --}}
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative h-56 overflow-hidden">
+                    <img
+                        src="{{ asset('images/home/success-student-1.png') }}"
+                        alt="Success story student 1 placeholder"
+                        class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                            Graduate Story
+                        </p>
+                        <h3 class="mt-1 text-lg font-bold">
+                            From First-Year Student to Industry-Ready Graduate
+                        </h3>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        Use this space to describe how a student made the most of your programmes, internships,
+                        and campus opportunities to launch a successful career.
+                    </p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Replace with real name · Programme · Graduation year
+                    </p>
+                </div>
+            </article>
+
+            {{-- Story Card 2 – International Student (image placeholder) --}}
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative h-56 overflow-hidden">
+                    <img
+                        src="{{ asset('images/home/success-student-2.png') }}"
+                        alt="Success story student 2 placeholder"
+                        class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                            International Experience
+                        </p>
+                        <h3 class="mt-1 text-lg font-bold">
+                            Finding a Second Home on Campus
+                        </h3>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        Describe how international students are welcomed and supported—from language assistance
+                        and cultural events to academic advising and career services.
+                    </p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Replace with real name · Country · Programme
+                    </p>
+                </div>
+            </article>
+
+            {{-- Story Card 3 – Research or Faculty (image placeholder) --}}
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative h-56 overflow-hidden">
+                    <img
+                        src="{{ asset('images/home/success-research-1.png') }}"
+                        alt="Success story research or faculty placeholder"
+                        class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                            Research & Innovation
+                        </p>
+                        <h3 class="mt-1 text-lg font-bold">
+                            Turning Ideas into Real-World Impact
+                        </h3>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        Share how your staff or students are involved in research, community projects, or
+                        innovations that benefit society and reflect your university values.
+                    </p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Replace with real name · Role · Project or department
+                    </p>
+                </div>
+            </article>
         </div>
     </section>
 
