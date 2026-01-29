@@ -242,8 +242,8 @@
         </div>
     </section>
 
-    {{-- Visual Feature Cards --}}
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    {{-- Visual Feature Cards – Stay informed: What’s Happening on Campus --}}
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="absolute top-0 right-0 w-32 h-32 bg-red-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
@@ -280,6 +280,36 @@
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Research News</h3>
                 <p class="text-sm text-slate-600">Latest breakthroughs and academic achievements.</p>
+            </div>
+        </div>
+
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5 6v2a2 2 0 01-2 2H7l-4 2 1-4V7a2 2 0 012-2h6"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Student Opportunities</h3>
+                <p class="text-sm text-slate-600">
+                    Scholarships, competitions, internships, and calls for volunteers shared throughout the year.
+                </p>
+            </div>
+        </div>
+
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-sky-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2h2m2-3h6a2 2 0 012 2v1H7V7a2 2 0 012-2z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Community Stories</h3>
+                <p class="text-sm text-slate-600">
+                    Highlights from clubs, societies, alumni, and partner organisations across campus life.
+                </p>
             </div>
         </div>
     </section>
