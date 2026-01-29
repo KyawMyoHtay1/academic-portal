@@ -518,11 +518,32 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     </div>
                     <p class="text-slate-200 mb-4 leading-relaxed">"The courses here have transformed my career. The faculty is exceptional and the resources are world-class."</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[color:var(--portal-gold)] to-amber-400 flex items-center justify-center font-bold text-white">SM</div>
-                        <div>
-                            <p class="font-semibold text-white">Sarah Mitchell</p>
-                            <p class="text-xs text-slate-400">Computer Science Graduate</p>
+                    <div class="mt-2 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[color:var(--portal-gold)] to-amber-400 flex items-center justify-center font-bold text-white">
+                                SM
+                            </div>
+                            <div>
+                                <p class="font-semibold text-white">Sarah Mitchell</p>
+                                <p class="text-xs text-slate-400">Computer Science Graduate</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-300">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.22 8.5h4.56V23H.22zM8.34 8.5h4.37v1.98h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.2c0-1.48-.03-3.39-2.07-3.39-2.07 0-2.39 1.62-2.39 3.28V23H8.34z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H8.08v-2.9h2.36V9.41c0-2.33 1.39-3.62 3.52-3.62 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18V22c4.78-.8 8.44-4.94 8.44-9.93z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.36 8.55 8.55 0 01-2.71 1.04 4.26 4.26 0 00-7.4 2.91c0 .33.04.65.1.96A12.1 12.1 0 013 4.8a4.26 4.26 0 001.32 5.68 4.23 4.23 0 01-1.93-.53v.05c0 2.07 1.47 3.8 3.43 4.19a4.3 4.3 0 01-1.92.07 4.27 4.27 0 003.98 2.96A8.56 8.56 0 012 19.54 12.07 12.07 0 008.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.34 8.34 0 0022.46 6z"/>
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -536,11 +557,32 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     </div>
                     <p class="text-slate-200 mb-4 leading-relaxed">"Outstanding support system and modern facilities. The online portal makes everything so accessible and organized."</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-bold text-white">JD</div>
-                        <div>
-                            <p class="font-semibold text-white">James Davis</p>
-                            <p class="text-xs text-slate-400">Business Administration</p>
+                    <div class="mt-2 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-bold text-white">
+                                JD
+                            </div>
+                            <div>
+                                <p class="font-semibold text-white">James Davis</p>
+                                <p class="text-xs text-slate-400">Business Administration</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-300">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.22 8.5h4.56V23H.22zM8.34 8.5h4.37v1.98h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.2c0-1.48-.03-3.39-2.07-3.39-2.07 0-2.39 1.62-2.39 3.28V23H8.34z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H8.08v-2.9h2.36V9.41c0-2.33 1.39-3.62 3.52-3.62 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18V22c4.78-.8 8.44-4.94 8.44-9.93z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.36 8.55 8.55 0 01-2.71 1.04 4.26 4.26 0 00-7.4 2.91c0 .33.04.65.1.96A12.1 12.1 0 013 4.8a4.26 4.26 0 001.32 5.68 4.23 4.23 0 01-1.93-.53v.05c0 2.07 1.47 3.8 3.43 4.19a4.3 4.3 0 01-1.92.07 4.27 4.27 0 003.98 2.96A8.56 8.56 0 012 19.54 12.07 12.07 0 008.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.34 8.34 0 0022.46 6z"/>
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -554,11 +596,32 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     </div>
                     <p class="text-slate-200 mb-4 leading-relaxed">"As a faculty member, I'm proud to be part of an institution that truly values both teaching excellence and student success."</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center font-bold text-white">PW</div>
-                        <div>
-                            <p class="font-semibold text-white">Prof. Williams</p>
-                            <p class="text-xs text-slate-400">Department Head</p>
+                    <div class="mt-2 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center font-bold text-white">
+                                PW
+                            </div>
+                            <div>
+                                <p class="font-semibold text-white">Prof. Williams</p>
+                                <p class="text-xs text-slate-400">Department Head</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-300">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.22 8.5h4.56V23H.22zM8.34 8.5h4.37v1.98h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.2c0-1.48-.03-3.39-2.07-3.39-2.07 0-2.39 1.62-2.39 3.28V23H8.34z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H8.08v-2.9h2.36V9.41c0-2.33 1.39-3.62 3.52-3.62 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18V22c4.78-.8 8.44-4.94 8.44-9.93z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile (placeholder)">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.36 8.55 8.55 0 01-2.71 1.04 4.26 4.26 0 00-7.4 2.91c0 .33.04.65.1.96A12.1 12.1 0 013 4.8a4.26 4.26 0 001.32 5.68 4.23 4.23 0 01-1.93-.53v.05c0 2.07 1.47 3.8 3.43 4.19a4.3 4.3 0 01-1.92.07 4.27 4.27 0 003.98 2.96A8.56 8.56 0 012 19.54 12.07 12.07 0 008.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.34 8.34 0 0022.46 6z"/>
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
