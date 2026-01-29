@@ -111,5 +111,70 @@
             </div>
         </div>
     </section>
+
+    {{-- Future Focus Areas --}}
+    <section class="space-y-8">
+        <div class="text-center max-w-3xl mx-auto">
+            <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-3">
+                Looking Ahead
+            </p>
+            <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)] mb-3">
+                Where Our Vision Leads Us
+            </h2>
+            <p class="text-lg text-slate-600">
+                Our long-term vision is grounded in a practical roadmap that strengthens teaching, technology, and community.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="animate-fade-in-up group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[color:var(--portal-navy)]/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10 space-y-3">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[color:var(--portal-navy)] to-slate-700 text-white shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-9l3 3-3 3m3 3l-3 3 3 3M6 9l3-3-3-3m0 12l3 3-3 3"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Digital Innovation</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Continuously improving the portal with secure, scalable technologies, analytics, and integrations
+                        that support smarter decision‑making and richer learning experiences.
+                    </p>
+                </div>
+            </div>
+
+            <div class="animate-fade-in-up group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10 space-y-3">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2 0 1.105.843 2 1.88 2.21L12 12.5l1.12-.29C14.157 12 15 11.105 15 10c0-1.105-1.343-2-3-2zm0 5c-2.21 0-4 1.12-4 2.5V18h8v-2.5C16 14.12 14.21 13 12 13z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Personalised Experience</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Building dashboards and tools that adapt to each user’s role—so students, lecturers, and staff
+                        see the information and actions that matter most to them.
+                    </p>
+                </div>
+            </div>
+
+            <div class="animate-fade-in-up group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[color:var(--portal-gold)]/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10 space-y-3">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[color:var(--portal-gold)] to-amber-500 text-[color:var(--portal-navy)] shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Global Reach</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Supporting international partnerships, online learning, and collaborative projects so that the
+                        university community can connect and contribute globally.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 @endsection

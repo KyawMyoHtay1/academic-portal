@@ -236,8 +236,21 @@
         </div>
     </section>
 
-    {{-- Visual Feature Cards --}}
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    {{-- Programme Highlights – Why Choose Our Courses --}}
+    <section class="space-y-4 mb-8">
+        <div class="text-center max-w-3xl mx-auto">
+            <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-2">
+                Programme Highlights
+            </p>
+            <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)]">
+                Why Choose Our Courses
+            </h2>
+            <p class="text-sm md:text-base text-slate-600 mt-2">
+                Each programme is designed to balance strong academic foundations with practical, real-world skills.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
@@ -275,6 +288,87 @@
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Career Ready</h3>
                 <p class="text-sm text-slate-600">Gain practical skills and knowledge for your future career.</p>
             </div>
+        </div>
+
+        {{-- Additional highlight 4 --}}
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Innovative Teaching</h3>
+                <p class="text-sm text-slate-600">
+                    Blended learning, project-based assessments, and up-to-date teaching methods keep courses engaging and relevant.
+                </p>
+            </div>
+        </div>
+
+        {{-- Additional highlight 5 --}}
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-rose-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-rose-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h6m-6 4h4m1-14l-1 4H5.5A1.5 1.5 0 004 9.5v9A1.5 1.5 0 005.5 20h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0018.5 9H14l-1-4z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Accredited Quality</h3>
+                <p class="text-sm text-slate-600">
+                    Programmes aligned with national and international standards to support your academic and professional recognition.
+                </p>
+            </div>
+        </div>
+
+        {{-- Additional highlight 6 --}}
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-sky-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M5 11h14M7 15h10M9 19h6"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Flexible Pathways</h3>
+                <p class="text-sm text-slate-600">
+                    Electives, specialisations, and progression routes that let you tailor your degree to your goals.
+                </p>
+            </div>
+        </div>
+
+        {{-- Additional highlight 7 --}}
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-lime-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-lime-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-lime-500 to-lime-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2 0 1.105.843 2 1.88 2.21L12 12.5l1.12-.29C14.157 12 15 11.105 15 10c0-1.105-1.343-2-3-2zm0 5c-2.21 0-4 1.12-4 2.5V18h8v-2.5C16 14.12 14.21 13 12 13z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Student Support</h3>
+                <p class="text-sm text-slate-600">
+                    Academic advisors, tutoring, and wellbeing services that help you stay on track from enrolment to graduation.
+                </p>
+            </div>
+        </div>
+
+        {{-- Additional highlight 8 --}}
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-stone-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-stone-200/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-stone-700 to-stone-900 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h4l2 10h8l2-8H9"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Industry Links</h3>
+                <p class="text-sm text-slate-600">
+                    Partnerships with employers, placement opportunities, and real-world projects that connect you with the workplace.
+                </p>
+            </div>
+        </div>
         </div>
     </section>
 

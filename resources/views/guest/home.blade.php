@@ -733,6 +733,93 @@
                     </p>
                 </div>
             </article>
+
+            {{-- Story Card 4 – Alumni Mentor --}}
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative h-56 overflow-hidden">
+                    <img
+                        src="{{ asset('images/home/community.png') }}"
+                        alt="Success story alumni mentor placeholder"
+                        class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                            Alumni Story
+                        </p>
+                        <h3 class="mt-1 text-lg font-bold">
+                            Giving Back as a Mentor
+                        </h3>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        Use this card to showcase graduates who return as mentors, guest speakers, or industry partners,
+                        helping the next generation of students succeed.
+                    </p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Replace with real name · Role · Organisation
+                    </p>
+                </div>
+            </article>
+
+            {{-- Story Card 5 – Student Leader --}}
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative h-56 overflow-hidden">
+                    <img
+                        src="{{ asset('images/home/student_life.png') }}"
+                        alt="Success story student leader placeholder"
+                        class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                            Leadership
+                        </p>
+                        <h3 class="mt-1 text-lg font-bold">
+                            Leading Clubs and Student Projects
+                        </h3>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        Tell the story of a student who built confidence and experience by leading a club,
+                        organising events, or coordinating community outreach projects.
+                    </p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Replace with real name · Club or society · Years active
+                    </p>
+                </div>
+            </article>
+
+            {{-- Story Card 6 – Community Impact --}}
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative h-56 overflow-hidden">
+                    <img
+                        src="{{ asset('images/home/innovation.png') }}"
+                        alt="Success story community impact placeholder"
+                        class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                            Community Impact
+                        </p>
+                        <h3 class="mt-1 text-lg font-bold">
+                            Projects that Change Lives Beyond Campus
+                        </h3>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        Highlight a project or initiative where students and staff worked together to support
+                        local communities, industry, or global causes.
+                    </p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Replace with project name · Partners · Impact summary
+                    </p>
+                </div>
+            </article>
         </div>
     </section>
 

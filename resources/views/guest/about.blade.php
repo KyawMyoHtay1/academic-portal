@@ -286,6 +286,66 @@
                     <p class="text-sm text-slate-600 leading-relaxed">Maintaining the highest ethical standards in all our endeavors.</p>
                 </div>
             </div>
+
+            <div class="value-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 10c0 4.418-4.03 8-9 8a9.003 9.003 0 01-8.485-5.657L3 10h18z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Collaboration</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Working together across disciplines, departments, and communities to solve complex problems.
+                    </p>
+                </div>
+            </div>
+
+            <div class="value-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2m4-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Student Focus</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Placing students at the heart of every decision, from curriculum design to campus services.
+                    </p>
+                </div>
+            </div>
+
+            <div class="value-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0v7"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Lifelong Learning</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Encouraging curiosity and continuous development long after graduation.
+                    </p>
+                </div>
+            </div>
+
+            <div class="value-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-rose-500/10 to-transparent rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4zm0 7l9 4 9-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Community Engagement</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Building meaningful partnerships and contributing positively to local and global communities.
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -375,12 +435,12 @@
         </div>
     </section>
 
-    {{-- Campus Highlights --}}
+    {{-- Our Story – See Who We Are --}}
     <section class="space-y-8">
         <div class="text-center max-w-3xl mx-auto">
-            <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-3">Our Facilities</p>
-            <h2 class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-4">Campus Highlights</h2>
-            <p class="text-lg text-slate-600">State-of-the-art facilities designed to enhance your learning experience</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-3">Our Story</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-4">See Who We Are</h2>
+            <p class="text-lg text-slate-600">People, places, and experiences that define our university community</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -392,7 +452,7 @@
                 </div>
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Modern Libraries</h3>
-                    <p class="text-slate-600">Extensive collections and digital resources for research and study.</p>
+                    <p class="text-slate-600">Extensive collections, quiet study areas, and digital resources for research and independent learning.</p>
                 </div>
             </div>
             
@@ -404,7 +464,7 @@
                 </div>
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-slate-900 mb-2">Research Labs</h3>
-                    <p class="text-slate-600">Cutting-edge laboratories equipped with the latest technology.</p>
+                    <p class="text-slate-600">Cutting-edge laboratories where staff and students work together on real-world challenges.</p>
                 </div>
             </div>
             
@@ -415,8 +475,44 @@
                     </svg>
                 </div>
                 <div class="p-6">
-                    <h3 class="text-xl font-bold text-slate-900 mb-2">Student Centers</h3>
-                    <p class="text-slate-600">Vibrant spaces for collaboration, events, and student activities.</p>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Student Centres</h3>
+                    <p class="text-slate-600">Vibrant spaces for collaboration, events, and student activities that build lasting connections.</p>
+                </div>
+            </div>
+
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="h-48 bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                    <svg class="w-20 h-20 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Industry Connections</h3>
+                    <p class="text-slate-600">Partnerships with employers and organisations that open doors for internships, projects, and careers.</p>
+                </div>
+            </div>
+
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="h-48 bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                    <svg class="w-20 h-20 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m-7 8h8a2 2 0 002-2v-3a2 2 0 00-2-2h-1M7 17H5a2 2 0 01-2-2v-3a2 2 0 012-2h3"/>
+                    </svg>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Support Services</h3>
+                    <p class="text-slate-600">Dedicated teams for academic advising, wellbeing, and career guidance at every stage of your journey.</p>
+                </div>
+            </div>
+
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="h-48 bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                    <svg class="w-20 h-20 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2 0 1.105.843 2 1.88 2.21L12 12.5l1.12-.29C14.157 12 15 11.105 15 10c0-1.105-1.343-2-3-2zm0 5c-2.21 0-4 1.12-4 2.5V18h8v-2.5C16 14.12 14.21 13 12 13z"/>
+                    </svg>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Global Community</h3>
+                    <p class="text-slate-600">A diverse mix of local and international students, alumni, and staff connected across the world.</p>
                 </div>
             </div>
         </div>
