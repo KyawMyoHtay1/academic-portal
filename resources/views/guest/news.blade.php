@@ -79,18 +79,30 @@
             
             {{-- Search Bar --}}
             <div class="max-w-2xl">
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
+                <div class="relative flex gap-3">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            id="newsSearch"
+                            placeholder="Search announcements by title or content..."
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)] focus:border-transparent transition-all"
+                        >
                     </div>
-                    <input
-                        type="text"
-                        id="newsSearch"
-                        placeholder="Search announcements by title or content..."
-                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)] focus:border-transparent transition-all"
+                    <button
+                        id="newsSearchButton"
+                        type="button"
+                        class="inline-flex items-center gap-2 rounded-2xl bg-white/90 px-4 md:px-5 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-lg hover:bg-white hover:scale-105 transition-all"
                     >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.2-5.2M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                        </svg>
+                        <span>Search</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -444,6 +456,7 @@
     function initNewsFilters() {
         const announcementCards = Array.from(document.querySelectorAll('.announcement-card'));
         const searchInput = document.getElementById('newsSearch');
+        const searchButton = document.getElementById('newsSearchButton');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const clearFiltersBtn = document.getElementById('clearFilters');
         const clearSearchFiltersBtn = document.getElementById('clearSearchFilters');
@@ -458,7 +471,7 @@
         
         let currentFilter = 'all';
         
-        function filterAnnouncements() {
+        function filterAnnouncements(shouldScroll = false) {
             const searchTerm = (searchInput.value || '').trim().toLowerCase();
             let visibleCount = 0;
             
@@ -505,10 +518,18 @@
             // Show/hide no results message
             if (visibleCount === 0) {
                 announcementsContainer.style.display = 'none';
-                if (noResults) noResults.classList.remove('hidden');
+                if (noResults) {
+                    noResults.classList.remove('hidden');
+                    if (shouldScroll && typeof noResults.scrollIntoView === 'function') {
+                        noResults.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
             } else {
                 announcementsContainer.style.display = 'block';
                 if (noResults) noResults.classList.add('hidden');
+                if (shouldScroll && searchTerm && typeof announcementsContainer.scrollIntoView === 'function') {
+                    announcementsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
         }
         
@@ -532,13 +553,20 @@
         }
         
         // Event listeners
-        searchInput.addEventListener('input', filterAnnouncements);
-        searchInput.addEventListener('keyup', filterAnnouncements);
+        // Live filtering while typing, but without auto-scroll
+        searchInput.addEventListener('input', () => filterAnnouncements(false));
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                filterAnnouncements(true);
+            } else {
+                filterAnnouncements(false);
+            }
+        });
         
         filterButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 setActiveFilter(this.dataset.filter);
-                filterAnnouncements();
+                filterAnnouncements(false);
             });
         });
         
@@ -547,6 +575,10 @@
         }
         if (clearSearchFiltersBtn) {
             clearSearchFiltersBtn.addEventListener('click', clearAllFilters);
+        }
+
+        if (searchButton) {
+            searchButton.addEventListener('click', () => filterAnnouncements(true));
         }
     }
     
