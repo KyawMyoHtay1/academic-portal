@@ -48,6 +48,12 @@
                     Portal Features
                 </span>
             </h1>
+            <p class="text-lg md:text-xl text-slate-200 max-w-3xl mx-auto leading-relaxed">
+                From registration and course enrolment to grades, fees, timetables, and academic records, the University Academic Portal is designed to keep your most important tasks in one secure, easy-to-use place.
+            </p>
+            <p class="text-sm md:text-base text-slate-200/90 max-w-3xl mx-auto leading-relaxed">
+                Whether you are a student checking your timetable, a teacher submitting grades, or an administrator monitoring attendance and fee status, the services below have been built to support reliable, day-to-day academic operations while giving you a clear view of your progress.
+            </p>
         </div>
     </section>
 

@@ -56,6 +56,12 @@
                     <p class="text-lg md:text-xl text-slate-200 max-w-2xl">
                         Browse through our comprehensive catalog of courses designed to shape your future.
                     </p>
+                    <p class="mt-3 text-sm md:text-base text-slate-200/90 max-w-2xl">
+                        Each course listing shows key information such as code, credits, semester, and availability so you can plan your academic pathway with confidence. Use the search and filters below to quickly find programmes by name, code, semester, or area of interest.
+                    </p>
+                    <p class="mt-2 text-sm md:text-base text-slate-200/90 max-w-2xl">
+                        Many courses include labs, projects, or industry-linked activities. As you explore, think about how core subjects, electives, and capstone modules can be combined to support your goals—whether that is further study, research, or entering the workplace.
+                    </p>
                 </div>
                 <a href="{{ route('guest.home') }}" class="flex items-center gap-2 rounded-full border border-white/30 backdrop-blur-sm bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +97,7 @@
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Course Highlights</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Explore Programs</h2>
                 <p class="text-sm md:text-base text-slate-600">
-                    Add your own course banners or faculty photos here to introduce key programs.
+                    See how different programmes connect to facilities, labs, and lecturers across the university.
                 </p>
             </div>
         </div>

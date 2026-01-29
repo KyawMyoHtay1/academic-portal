@@ -69,7 +69,9 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Visit & Connect</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Campus & Contact</h2>
-                <p class="text-sm md:text-base text-slate-600">Add your own campus, office, or support team photos here.</p>
+                <p class="text-sm md:text-base text-slate-600">
+                    A closer look at how to visit us on campus, where to find key offices, and the people ready to help you.
+                </p>
             </div>
         </div>
 

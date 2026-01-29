@@ -42,6 +42,12 @@
                     Help Desk
                 </span>
             </h1>
+            <p class="text-lg md:text-xl text-slate-200 max-w-3xl mx-auto leading-relaxed">
+                The Support & Help Desk is your first stop when you have questions about the University Academic Portal, encounter technical issues, or need guidance using any of the online services.
+            </p>
+            <p class="text-sm md:text-base text-slate-200/90 max-w-3xl mx-auto leading-relaxed">
+                Here you can explore self-help resources, read step-by-step guides, and contact our support team if you need personal assistance. Whether you are logging in for the first time, troubleshooting access, or unsure where to find a feature, our goal is to resolve your request quickly and clearly so you can focus on your studies or work.
+            </p>
         </div>
     </section>
 
@@ -131,11 +137,14 @@
                 
                 <div class="prose prose-lg max-w-none">
                     <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)] mb-6">Support & Help Desk</h2>
-                    <p class="text-lg text-slate-700 leading-relaxed mb-6">
-                        The Support & Help Desk section assists users in resolving technical issues and academic portal inquiries. Users can find guidance on using portal features, report system issues, and contact administrative support for assistance.
+                    <p class="text-lg text-slate-700 leading-relaxed mb-4">
+                        The Support & Help Desk brings together the most important ways to get help with the academic portal—whether that is understanding how a feature works, resolving login or access problems, or clarifying a notification you have received.
+                    </p>
+                    <p class="text-lg text-slate-700 leading-relaxed mb-4">
+                        Many questions can be answered immediately through our FAQs and user guides, which are organised around common tasks such as viewing grades, enrolling on courses, submitting assignments, or checking your timetable. For more complex issues, you can submit a request or contact support directly so that a member of our team can investigate and respond.
                     </p>
                     <p class="text-lg text-slate-700 leading-relaxed">
-                        This ensures smooth and uninterrupted use of the academic portal.
+                        Behind the scenes, the support team works closely with academic and technical staff to track recurring issues, improve documentation, and enhance the portal based on feedback. This shared effort helps ensure that your experience of the University Academic Portal is as smooth and reliable as possible.
                     </p>
                 </div>
             </div>

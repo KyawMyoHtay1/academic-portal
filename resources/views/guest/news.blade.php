@@ -62,6 +62,12 @@
                     <p class="text-lg md:text-xl text-slate-200 max-w-2xl">
                         Stay updated with the latest campus news, events, and important announcements.
                     </p>
+                    <p class="mt-3 text-sm md:text-base text-slate-200/90 max-w-2xl">
+                        This page brings together official messages from the university, including academic calendar updates, examination notices, fee reminders, student opportunities, and campus events. Items marked as <strong>Urgent</strong> or <strong>Important</strong> highlight information that may require quick action from students or staff.
+                    </p>
+                    <p class="mt-2 text-sm md:text-base text-slate-200/90 max-w-2xl">
+                        Use the search and filters to focus on pinned items, urgent notices, or information stories. Checking this page regularly helps you stay ahead of key dates, new policies, scholarship announcements, and opportunities to participate in seminars, workshops, and community projects.
+                    </p>
                 </div>
                 <a href="{{ route('guest.home') }}" class="flex items-center gap-2 rounded-full border border-white/30 backdrop-blur-sm bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +102,9 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Latest Highlights</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Campus News & Events</h2>
-                <p class="text-sm md:text-base text-slate-600">Add your own news banners or event photos here.</p>
+                <p class="text-sm md:text-base text-slate-600">
+                    Visual highlights from important announcements, events, research stories, and campus life.
+                </p>
             </div>
         </div>
 

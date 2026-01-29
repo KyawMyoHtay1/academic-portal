@@ -113,7 +113,7 @@
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Campus Highlights</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Explore Our University</h2>
                 <p class="text-sm md:text-base text-slate-600">
-                    Add your own campus, classroom, or event photos here to visually introduce the university.
+                    Get a feel for everyday life on campus—from learning spaces and labs to student activities and events.
                 </p>
             </div>
         </div>

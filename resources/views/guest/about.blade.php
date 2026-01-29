@@ -56,6 +56,12 @@
             <p class="text-xl md:text-2xl text-slate-200 max-w-3xl mx-auto leading-relaxed">
                 We are committed to academic excellence, innovation, and student success. Our mission is to provide quality education and foster a vibrant learning community that prepares students for global challenges.
             </p>
+            <p class="text-sm md:text-base text-slate-200/90 max-w-3xl mx-auto leading-relaxed">
+                Across our faculties and departments, students work alongside lecturers and researchers who are active in their fields, contributing to new knowledge and practical solutions. Small-group teaching, project-based learning, and modern digital tools help you connect theory to real-world applications.
+            </p>
+            <p class="text-sm md:text-base text-slate-200/90 max-w-3xl mx-auto leading-relaxed">
+                As part of the wider campus community, you will also find mentoring, wellbeing services, career guidance, and opportunities to lead clubs or initiatives. The University Academic Portal extends this experience online, making it easier to stay informed, access services, and participate fully in university life—wherever you are.
+            </p>
             <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <a href="{{ route('guest.courses') }}" class="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-[color:var(--portal-navy)] shadow-lg hover:bg-slate-100 hover:scale-105 transition-all duration-300">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
