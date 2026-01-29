@@ -651,7 +651,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/success-student-1.png') }}"
+                        src="{{ asset('images/home/journey1.jpg') }}"
                         alt="Success story student 1 placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -680,7 +680,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/success-student-2.png') }}"
+                        src="{{ asset('images/home/journey2.jpg') }}"
                         alt="Success story student 2 placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -709,7 +709,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/success-research-1.png') }}"
+                        src="{{ asset('images/home/journey3.jpg') }}"
                         alt="Success story research or faculty placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
