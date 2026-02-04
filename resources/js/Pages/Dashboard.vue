@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import HeroBanner from "@/Components/Dashboard/HeroBanner.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
@@ -199,40 +200,8 @@ const quickActions = computed(() => {
         </template>
 
         <div class="space-y-6">
-            <!-- Logged-in user summary with photo -->
-            <div v-if="user" class="portal-card flex items-center gap-4 p-5">
-                <div
-                    class="h-14 w-14 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
-                >
-                    <img
-                        v-if="user.photo"
-                        :src="`/storage/${user.photo}`"
-                        :alt="`Photo for ${user.name}`"
-                        class="h-full w-full object-cover"
-                    />
-                    <span v-else class="text-base font-semibold text-slate-500">
-                        {{ user.name.charAt(0).toUpperCase() }}
-                    </span>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-slate-900">
-                        {{ user.name }}
-                    </p>
-                    <p class="text-xs text-slate-500">
-                        {{ userRoleLabel || "User" }} &bull;
-                        <span v-if="role === 'student'">
-                            Student dashboard overview
-                        </span>
-                        <span v-else-if="role === 'teacher'">
-                            Teacher dashboard overview
-                        </span>
-                        <span v-else-if="role === 'staff'">
-                            Staff dashboard overview
-                        </span>
-                        <span v-else> Academic portal overview </span>
-                    </p>
-                </div>
-            </div>
+            <!-- Hero Banner -->
+            <HeroBanner :user="user" :role="role" />
 
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                 <div
@@ -373,17 +342,8 @@ const quickActions = computed(() => {
                     <div class="portal-card p-6 lg:col-span-2">
                         <div class="flex items-center justify-between gap-4">
                             <div>
-                                <p class="portal-badge">
+                                <p class="portal-badge-no-margin mb-4">
                                     Your academic snapshot
-                                </p>
-                                <h3
-                                    class="mt-3 text-lg font-semibold text-slate-900"
-                                >
-                                    Welcome back to your student dashboard
-                                </h3>
-                                <p class="mt-1 text-sm text-slate-600">
-                                    Quickly see notifications, grades, courses
-                                    and profile information at a glance.
                                 </p>
                             </div>
                         </div>
