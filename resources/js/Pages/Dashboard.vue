@@ -798,7 +798,8 @@ const quickActions = computed(() => {
                                 <p class="portal-badge-no-margin mb-4">Staff dashboard</p>
                             </div>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-3">
+                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            <!-- Existing Cards -->
                             <div class="rounded-lg bg-slate-50 p-3">
                                 <p
                                     class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -830,6 +831,38 @@ const quickActions = computed(() => {
                                 <p class="mt-1 text-xs text-slate-600">
                                     Coordinate timetables and track overall
                                     attendance.
+                                </p>
+                            </div>
+
+                            <!-- New Cards -->
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    User Management
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Control access rights and profiles for staff, teachers, and students.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Communication Center
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Manage announcements, contact messages, feedback and system notifications.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    System Health & Logs
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                     Monitor system alerts, queue status, and application logs.
                                 </p>
                             </div>
                         </div>
