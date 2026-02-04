@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm, router } from "@inertiajs/vue3";
+import { computed } from "vue";
 
 const props = defineProps({
     subject: {
@@ -22,6 +23,14 @@ const form = useForm({
     description: props.subject.description || "",
     photo: null,
 });
+
+const selectedCourse = computed(
+    () => props.courses.find((c) => c.id === form.course_id) || null
+);
+
+const subjectCodePrefix = computed(() =>
+    selectedCourse.value ? `${selectedCourse.value.course_code}-` : ""
+);
 
 const submit = () => {
     form.transform((data) => ({
@@ -126,7 +135,19 @@ const removePhoto = () => {
                                         'border-red-300 focus:border-red-500 focus:ring-red-500':
                                             form.errors.subject_code,
                                     }"
+                                    :placeholder="
+                                        selectedCourse
+                                            ? `${subjectCodePrefix}101`
+                                            : 'e.g., CS101'
+                                    "
                                 />
+                                <p class="mt-1 text-xs text-slate-500">
+                                    When a course is selected, start the subject
+                                    code with the course code, for example:
+                                    <span class="font-semibold">
+                                        {{ subjectCodePrefix }}101
+                                    </span>
+                                </p>
                                 <p
                                     v-if="form.errors.subject_code"
                                     class="mt-1 text-sm text-red-600"
