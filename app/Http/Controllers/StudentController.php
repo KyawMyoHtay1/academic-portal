@@ -17,7 +17,7 @@ class StudentController extends Controller
     {
         $students = Student::with('user')
             ->orderBy('student_no')
-            ->paginate(50)
+            ->paginate(10)
             ->through(function (Student $student) {
                 return [
                     'id' => $student->id,
