@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import Pagination from "@/Components/Pagination.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
@@ -22,8 +23,8 @@ const props = defineProps({
         default: () => [],
     },
     recentRecords: {
-        type: Array,
-        default: () => [],
+        type: Object,
+        default: () => ({}),
     },
 });
 
@@ -61,8 +62,8 @@ const filteredSubjects = computed(() => {
 
 const filteredRecent = computed(() => {
     const q = searchRecent.value.trim().toLowerCase();
-    if (!q) return props.recentRecords;
-    return props.recentRecords.filter((r) => {
+    if (!q) return props.recentRecords.data;
+    return props.recentRecords.data.filter((r) => {
         const hay = `${r.student_no} ${r.student_name} ${r.subject_code} ${r.course_code} ${r.date}`.toLowerCase();
         return hay.includes(q);
     });
@@ -642,6 +643,9 @@ const filteredRecent = computed(() => {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="mt-4">
+                        <Pagination :links="recentRecords.links" />
                     </div>
                 </div>
             </div>

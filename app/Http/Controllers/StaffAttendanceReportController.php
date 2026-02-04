@@ -109,9 +109,8 @@ class StaffAttendanceReportController extends Controller
         $recentRecords = Attendance::with(['student', 'subject.course', 'course'])
             ->where('date', '>=', now()->subDays(30))
             ->orderBy('date', 'desc')
-            ->limit(50)
-            ->get()
-            ->map(function ($attendance) {
+            ->paginate(20)
+            ->through(function ($attendance) {
                 $courseCode = $attendance->subject?->course?->course_code 
                     ?? $attendance->course?->course_code 
                     ?? 'N/A';
