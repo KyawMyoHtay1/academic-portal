@@ -4,7 +4,14 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
-    users: Array,
+    users: {
+        type: Array,
+        required: true,
+    },
+    programmes: {
+        type: Array,
+        required: true,
+    },
 });
 
 const form = useForm({
@@ -288,14 +295,22 @@ const submit = () => {
                         >
                             Programme
                         </label>
-                        <input
+                        <select
                             v-model="form.programme"
-                            type="text"
-                            placeholder="e.g. BSc (Hons) Computing, BBA, BEng Software"
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                        />
+                        >
+                            <option value="">Select programme</option>
+                            <option
+                                v-for="programme in props.programmes"
+                                :key="programme"
+                                :value="programme"
+                            >
+                                {{ programme }}
+                            </option>
+                        </select>
                         <p class="mt-1 text-xs text-slate-500">
-                            Students will enroll in specific courses themselves through the dashboard
+                            Students will enroll in specific courses themselves
+                            through the dashboard.
                         </p>
                         <p
                             v-if="form.errors.programme"
@@ -477,7 +492,9 @@ const submit = () => {
                 </div>
 
                 <div class="border-t border-slate-200 pt-6">
-                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-700">
+                    <h3
+                        class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-700"
+                    >
                         Required Documents
                     </h3>
                     <div class="grid gap-4 md:grid-cols-2">
@@ -494,7 +511,9 @@ const submit = () => {
                                 type="file"
                                 accept=".pdf,image/jpeg,image/jpg,image/png"
                                 class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
-                                @change="(e) => (form.id_card = e.target.files[0])"
+                                @change="
+                                    (e) => (form.id_card = e.target.files[0])
+                                "
                             />
                             <p
                                 v-if="form.errors.id_card"
@@ -517,7 +536,9 @@ const submit = () => {
                                 type="file"
                                 accept=".pdf,image/jpeg,image/jpg,image/png"
                                 class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
-                                @change="(e) => (form.transcript = e.target.files[0])"
+                                @change="
+                                    (e) => (form.transcript = e.target.files[0])
+                                "
                             />
                             <p
                                 v-if="form.errors.transcript"

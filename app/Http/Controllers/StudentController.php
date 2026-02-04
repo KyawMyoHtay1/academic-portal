@@ -46,6 +46,7 @@ class StudentController extends Controller
 
         return Inertia::render('Students/Create', [
             'users' => $users,
+            'programmes' => $this->getProgrammes(),
         ]);
     }
 
@@ -128,6 +129,7 @@ class StudentController extends Controller
                     ? asset('storage/' . $student->transcript)
                     : null,
             ],
+            'programmes' => $this->getProgrammes(),
         ]);
     }
 
@@ -222,6 +224,25 @@ class StudentController extends Controller
         }
 
         return 'STU' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get the list of available programmes.
+     *
+     * NOTE: This is a fixed list for now. If the university later
+     *       decides to manage programmes dynamically, this can be
+     *       replaced with a Programme model + table.
+     */
+    protected function getProgrammes(): array
+    {
+        return [
+            'BSc (Hons) Computing',
+            'BSc Computer Science',
+            'BSc Information Technology',
+            'BSE Software Engineering',
+            'BEng Software Engineering',
+            'BBA Business Administration',
+        ];
     }
 
     /**
