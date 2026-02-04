@@ -203,46 +203,208 @@ const quickActions = computed(() => {
             <!-- Hero Banner -->
             <HeroBanner :user="user" :role="role" />
 
+            <!-- Enhanced Visual Stats Cards -->
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                 <div
                     v-for="card in cards"
                     :key="card.title"
-                    class="portal-card p-5 transition-shadow hover:shadow-md"
+                    class="group relative overflow-hidden rounded-xl bg-gradient-to-br p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                    :class="{
+                        'from-blue-50 to-blue-100 border border-blue-200':
+                            card.title === 'Students' ||
+                            card.title === 'My Courses',
+                        'from-emerald-50 to-emerald-100 border border-emerald-200':
+                            card.title === 'Courses' ||
+                            card.title === 'My Subjects',
+                        'from-amber-50 to-amber-100 border border-amber-200':
+                            card.title === 'Fees' ||
+                            card.title === 'Outstanding Fees',
+                        'from-indigo-50 to-indigo-100 border border-indigo-200':
+                            card.title === 'Attendance' ||
+                            card.title === 'Grades' ||
+                            card.title === 'Grades Recorded',
+                        'from-purple-50 to-purple-100 border border-purple-200':
+                            card.title === 'Students Taught',
+                    }"
                 >
-                    <div class="flex items-center justify-between">
+                    <!-- Decorative background pattern -->
+                    <div
+                        class="absolute inset-0 opacity-5"
+                        :class="{
+                            'bg-blue-600':
+                                card.title === 'Students' ||
+                                card.title === 'My Courses',
+                            'bg-emerald-600':
+                                card.title === 'Courses' ||
+                                card.title === 'My Subjects',
+                            'bg-amber-600':
+                                card.title === 'Fees' ||
+                                card.title === 'Outstanding Fees',
+                            'bg-indigo-600':
+                                card.title === 'Attendance' ||
+                                card.title === 'Grades' ||
+                                card.title === 'Grades Recorded',
+                            'bg-purple-600': card.title === 'Students Taught',
+                        }"
+                    >
+                        <svg
+                            class="h-full w-full"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <defs>
+                                <pattern
+                                    id="grid"
+                                    width="40"
+                                    height="40"
+                                    patternUnits="userSpaceOnUse"
+                                >
+                                    <path
+                                        d="M 40 0 L 0 0 0 40"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1"
+                                    />
+                                </pattern>
+                            </defs>
+                            <rect
+                                width="100%"
+                                height="100%"
+                                fill="url(#grid)"
+                            />
+                        </svg>
+                    </div>
+
+                    <div class="relative flex items-center justify-between">
                         <div class="flex-1">
                             <p
-                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                class="text-xs font-bold uppercase tracking-wider"
+                                :class="{
+                                    'text-blue-700':
+                                        card.title === 'Students' ||
+                                        card.title === 'My Courses',
+                                    'text-emerald-700':
+                                        card.title === 'Courses' ||
+                                        card.title === 'My Subjects',
+                                    'text-amber-700':
+                                        card.title === 'Fees' ||
+                                        card.title === 'Outstanding Fees',
+                                    'text-indigo-700':
+                                        card.title === 'Attendance' ||
+                                        card.title === 'Grades' ||
+                                        card.title === 'Grades Recorded',
+                                    'text-purple-700':
+                                        card.title === 'Students Taught',
+                                }"
                             >
                                 {{ card.title }}
                             </p>
                             <p
-                                class="mt-2 text-2xl font-semibold text-slate-900"
-                            >
-                                {{ card.value }}
-                            </p>
-                            <p class="mt-1 text-xs text-slate-500">
-                                {{ card.helper }}
-                            </p>
-                        </div>
-                        <div class="ml-4 flex-shrink-0">
-                            <div
-                                class="flex h-12 w-12 items-center justify-center rounded-lg"
+                                class="mt-3 text-3xl font-bold"
                                 :class="{
-                                    'bg-blue-100':
+                                    'text-blue-900':
                                         card.title === 'Students' ||
                                         card.title === 'My Courses',
-                                    'bg-emerald-100':
+                                    'text-emerald-900':
                                         card.title === 'Courses' ||
                                         card.title === 'My Subjects',
-                                    'bg-amber-100':
+                                    'text-amber-900':
                                         card.title === 'Fees' ||
                                         card.title === 'Outstanding Fees',
-                                    'bg-indigo-100':
+                                    'text-indigo-900':
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
                                         card.title === 'Grades Recorded',
-                                    'bg-purple-100':
+                                    'text-purple-900':
+                                        card.title === 'Students Taught',
+                                }"
+                            >
+                                {{ card.value }}
+                            </p>
+                            <p
+                                class="mt-2 text-xs font-medium"
+                                :class="{
+                                    'text-blue-600':
+                                        card.title === 'Students' ||
+                                        card.title === 'My Courses',
+                                    'text-emerald-600':
+                                        card.title === 'Courses' ||
+                                        card.title === 'My Subjects',
+                                    'text-amber-600':
+                                        card.title === 'Fees' ||
+                                        card.title === 'Outstanding Fees',
+                                    'text-indigo-600':
+                                        card.title === 'Attendance' ||
+                                        card.title === 'Grades' ||
+                                        card.title === 'Grades Recorded',
+                                    'text-purple-600':
+                                        card.title === 'Students Taught',
+                                }"
+                            >
+                                {{ card.helper }}
+                            </p>
+                            <!-- Progress bar for Attendance -->
+                            <div
+                                v-if="card.title === 'Attendance'"
+                                class="mt-4"
+                            >
+                                <div
+                                    class="mb-1 flex items-center justify-between text-xs"
+                                >
+                                    <span
+                                        class="font-semibold"
+                                        :class="{
+                                            'text-indigo-700':
+                                                card.title === 'Attendance',
+                                        }"
+                                    >
+                                        Progress
+                                    </span>
+                                    <span
+                                        class="font-bold"
+                                        :class="{
+                                            'text-indigo-700':
+                                                card.title === 'Attendance',
+                                        }"
+                                    >
+                                        {{ stats.attendanceRate ?? 0 }}%
+                                    </span>
+                                </div>
+                                <div
+                                    class="h-2 overflow-hidden rounded-full bg-white/60"
+                                >
+                                    <div
+                                        class="h-full rounded-full transition-all duration-500"
+                                        :class="{
+                                            'bg-gradient-to-r from-indigo-500 to-indigo-600':
+                                                card.title === 'Attendance',
+                                        }"
+                                        :style="{
+                                            width: `${
+                                                stats.attendanceRate ?? 0
+                                            }%`,
+                                        }"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <div
+                                class="flex h-16 w-16 items-center justify-center rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                :class="{
+                                    'bg-gradient-to-br from-blue-500 to-blue-600':
+                                        card.title === 'Students' ||
+                                        card.title === 'My Courses',
+                                    'bg-gradient-to-br from-emerald-500 to-emerald-600':
+                                        card.title === 'Courses' ||
+                                        card.title === 'My Subjects',
+                                    'bg-gradient-to-br from-amber-500 to-amber-600':
+                                        card.title === 'Fees' ||
+                                        card.title === 'Outstanding Fees',
+                                    'bg-gradient-to-br from-indigo-500 to-indigo-600':
+                                        card.title === 'Attendance' ||
+                                        card.title === 'Grades' ||
+                                        card.title === 'Grades Recorded',
+                                    'bg-gradient-to-br from-purple-500 to-purple-600':
                                         card.title === 'Students Taught',
                                 }"
                             >
@@ -251,15 +413,15 @@ const quickActions = computed(() => {
                                         card.title === 'Students' ||
                                         card.title === 'Students Taught'
                                     "
-                                    class="h-6 w-6 text-blue-600"
+                                    class="h-8 w-8 text-white"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
+                                    stroke-width="2"
                                 >
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
                                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                                     />
                                 </svg>
@@ -269,15 +431,15 @@ const quickActions = computed(() => {
                                         card.title === 'My Courses' ||
                                         card.title === 'My Subjects'
                                     "
-                                    class="h-6 w-6 text-emerald-600"
+                                    class="h-8 w-8 text-white"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
+                                    stroke-width="2"
                                 >
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
                                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                                     />
                                 </svg>
@@ -286,29 +448,29 @@ const quickActions = computed(() => {
                                         card.title === 'Fees' ||
                                         card.title === 'Outstanding Fees'
                                     "
-                                    class="h-6 w-6 text-amber-600"
+                                    class="h-8 w-8 text-white"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
+                                    stroke-width="2"
                                 >
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                 </svg>
                                 <svg
                                     v-else-if="card.title === 'Attendance'"
-                                    class="h-6 w-6 text-indigo-600"
+                                    class="h-8 w-8 text-white"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
+                                    stroke-width="2"
                                 >
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
                                     />
                                 </svg>
@@ -317,15 +479,15 @@ const quickActions = computed(() => {
                                         card.title === 'Grades' ||
                                         card.title === 'Grades Recorded'
                                     "
-                                    class="h-6 w-6 text-indigo-600"
+                                    class="h-8 w-8 text-white"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
+                                    stroke-width="2"
                                 >
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
                                         d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                                     />
                                 </svg>
@@ -337,6 +499,126 @@ const quickActions = computed(() => {
 
             <!-- Student dashboard: more visual overview for key areas -->
             <div v-if="role === 'student'" class="space-y-6">
+                <!-- GPA & Key Metrics Banner -->
+                <div class="grid gap-4 md:grid-cols-3">
+                    <!-- GPA Card -->
+                    <div
+                        v-if="stats.gpa !== null"
+                        class="group relative overflow-hidden rounded-xl border-2 border-portal-navy bg-gradient-to-br from-portal-navy via-blue-700 to-indigo-800 p-6 text-white shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                        <div class="relative z-10">
+                            <p
+                                class="text-xs font-bold uppercase tracking-wider text-blue-200"
+                            >
+                                Your GPA
+                            </p>
+                            <p class="mt-3 text-5xl font-bold">
+                                {{ stats.gpa?.toFixed(2) ?? "N/A" }}
+                            </p>
+                            <p class="mt-2 text-sm text-blue-100">
+                                Cumulative Grade Point Average
+                            </p>
+                        </div>
+                        <div class="absolute bottom-0 right-0 opacity-10">
+                            <svg
+                                class="h-32 w-32"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Pending Enrollments Alert -->
+                    <Link
+                        v-if="stats.pendingEnrollments > 0"
+                        :href="route('my-courses.index')"
+                        class="group relative overflow-hidden rounded-xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-amber-800"
+                                >
+                                    Enrollment Status
+                                </p>
+                                <p
+                                    class="mt-2 text-2xl font-bold text-amber-900"
+                                >
+                                    {{ stats.pendingEnrollments }}
+                                </p>
+                                <p
+                                    class="mt-1 text-xs font-medium text-amber-700"
+                                >
+                                    Pending approval
+                                </p>
+                            </div>
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500 shadow-lg"
+                            >
+                                <svg
+                                    class="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </Link>
+
+                    <!-- Outstanding Fees Alert -->
+                    <Link
+                        v-if="stats.outstandingFees > 0"
+                        :href="route('student.fees.index')"
+                        class="group relative overflow-hidden rounded-xl border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-red-800"
+                                >
+                                    Outstanding Fees
+                                </p>
+                                <p class="mt-2 text-2xl font-bold text-red-900">
+                                    {{ formatCurrency(stats.outstandingFees) }}
+                                </p>
+                                <p
+                                    class="mt-1 text-xs font-medium text-red-700"
+                                >
+                                    Payment required
+                                </p>
+                            </div>
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 shadow-lg"
+                            >
+                                <svg
+                                    class="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+
                 <!-- Top row: hero + profile + quick actions -->
                 <div class="grid gap-6 lg:grid-cols-3">
                     <div class="portal-card p-6 lg:col-span-2">
@@ -348,7 +630,9 @@ const quickActions = computed(() => {
                             </div>
                         </div>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <div
+                            class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+                        >
                             <!-- Existing Cards -->
                             <div class="rounded-lg bg-slate-50 p-3">
                                 <p
@@ -387,19 +671,50 @@ const quickActions = computed(() => {
                                     Subject scores
                                 </p>
                             </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
+                            <div
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:shadow-lg"
+                            >
                                 <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    class="text-xs font-bold uppercase tracking-wider text-indigo-700"
                                 >
                                     Attendance
                                 </p>
                                 <p
-                                    class="mt-1 text-sm font-semibold text-slate-900"
+                                    class="mt-2 text-3xl font-bold text-indigo-900"
                                 >
                                     {{ stats.attendanceRate ?? 0 }}%
                                 </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Overall rate
+                                <div class="mt-3">
+                                    <div
+                                        class="mb-1 flex items-center justify-between text-xs"
+                                    >
+                                        <span
+                                            class="font-semibold text-indigo-700"
+                                            >Progress</span
+                                        >
+                                        <span class="font-bold text-indigo-900"
+                                            >{{
+                                                stats.attendanceRate ?? 0
+                                            }}%</span
+                                        >
+                                    </div>
+                                    <div
+                                        class="h-2 overflow-hidden rounded-full bg-indigo-200"
+                                    >
+                                        <div
+                                            class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500"
+                                            :style="{
+                                                width: `${
+                                                    stats.attendanceRate ?? 0
+                                                }%`,
+                                            }"
+                                        ></div>
+                                    </div>
+                                </div>
+                                <p
+                                    class="mt-2 text-xs font-medium text-indigo-600"
+                                >
+                                    Overall attendance rate
                                 </p>
                             </div>
 
@@ -414,7 +729,7 @@ const quickActions = computed(() => {
                                     Check your upcoming classes and schedule.
                                 </p>
                             </div>
-                             <div class="rounded-lg bg-slate-50 p-3">
+                            <div class="rounded-lg bg-slate-50 p-3">
                                 <p
                                     class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                                 >
@@ -424,7 +739,7 @@ const quickActions = computed(() => {
                                     View outstanding fees and payment history.
                                 </p>
                             </div>
-                             <div class="rounded-lg bg-slate-50 p-3">
+                            <div class="rounded-lg bg-slate-50 p-3">
                                 <p
                                     class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                                 >
@@ -824,78 +1139,524 @@ const quickActions = computed(() => {
 
             <!-- Staff view: admin-focused overview -->
             <div v-else-if="role === 'staff'" class="space-y-6">
+                <!-- Pending Actions Alert Cards -->
+                <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Link
+                        v-if="stats.pendingEnrollments > 0"
+                        :href="route('admin.enrollments.index')"
+                        class="group relative overflow-hidden rounded-xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100 p-5 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-amber-800"
+                                >
+                                    Pending Enrollments
+                                </p>
+                                <p
+                                    class="mt-2 text-3xl font-bold text-amber-900"
+                                >
+                                    {{ stats.pendingEnrollments ?? 0 }}
+                                </p>
+                                <p
+                                    class="mt-1 text-xs font-medium text-amber-700"
+                                >
+                                    Require approval
+                                </p>
+                            </div>
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500 shadow-lg"
+                            >
+                                <svg
+                                    class="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-amber-200"
+                        >
+                            <div
+                                class="h-full bg-amber-500 transition-all duration-500"
+                                :style="{
+                                    width: `${Math.min(
+                                        (stats.pendingEnrollments / 10) * 100,
+                                        100
+                                    )}%`,
+                                }"
+                            ></div>
+                        </div>
+                    </Link>
+
+                    <Link
+                        v-if="stats.pendingGrades > 0"
+                        :href="route('admin.grades.index')"
+                        class="group relative overflow-hidden rounded-xl border-2 border-indigo-300 bg-gradient-to-br from-indigo-50 to-indigo-100 p-5 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-indigo-800"
+                                >
+                                    Pending Grades
+                                </p>
+                                <p
+                                    class="mt-2 text-3xl font-bold text-indigo-900"
+                                >
+                                    {{ stats.pendingGrades ?? 0 }}
+                                </p>
+                                <p
+                                    class="mt-1 text-xs font-medium text-indigo-700"
+                                >
+                                    Awaiting review
+                                </p>
+                            </div>
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500 shadow-lg"
+                            >
+                                <svg
+                                    class="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-200"
+                        >
+                            <div
+                                class="h-full bg-indigo-500 transition-all duration-500"
+                                :style="{
+                                    width: `${Math.min(
+                                        (stats.pendingGrades / 20) * 100,
+                                        100
+                                    )}%`,
+                                }"
+                            ></div>
+                        </div>
+                    </Link>
+
+                    <Link
+                        v-if="stats.pendingPayments > 0"
+                        :href="route('admin.fees.index')"
+                        class="group relative overflow-hidden rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100 p-5 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-emerald-800"
+                                >
+                                    Pending Payments
+                                </p>
+                                <p
+                                    class="mt-2 text-3xl font-bold text-emerald-900"
+                                >
+                                    {{ stats.pendingPayments ?? 0 }}
+                                </p>
+                                <p
+                                    class="mt-1 text-xs font-medium text-emerald-700"
+                                >
+                                    Need confirmation
+                                </p>
+                            </div>
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 shadow-lg"
+                            >
+                                <svg
+                                    class="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-200"
+                        >
+                            <div
+                                class="h-full bg-emerald-500 transition-all duration-500"
+                                :style="{
+                                    width: `${Math.min(
+                                        (stats.pendingPayments / 15) * 100,
+                                        100
+                                    )}%`,
+                                }"
+                            ></div>
+                        </div>
+                    </Link>
+
+                    <div
+                        v-if="stats.pendingWithdrawals > 0"
+                        class="group relative overflow-hidden rounded-xl border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 p-5"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-red-800"
+                                >
+                                    Pending Withdrawals
+                                </p>
+                                <p class="mt-2 text-3xl font-bold text-red-900">
+                                    {{ stats.pendingWithdrawals ?? 0 }}
+                                </p>
+                                <p
+                                    class="mt-1 text-xs font-medium text-red-700"
+                                >
+                                    Awaiting approval
+                                </p>
+                            </div>
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 shadow-lg"
+                            >
+                                <svg
+                                    class="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-red-200"
+                        >
+                            <div
+                                class="h-full bg-red-500 transition-all duration-500"
+                                :style="{
+                                    width: `${Math.min(
+                                        (stats.pendingWithdrawals / 10) * 100,
+                                        100
+                                    )}%`,
+                                }"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid gap-6 lg:grid-cols-3">
                     <div class="portal-card p-6 lg:col-span-2">
                         <div class="flex items-center justify-between gap-4">
-                                <p class="portal-badge-no-margin mb-4">Staff dashboard</p>
-                            </div>
+                            <p class="portal-badge-no-margin mb-4">
+                                Staff dashboard
+                            </p>
+                        </div>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                            <!-- Existing Cards -->
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Student & Course Registration
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Approve enrollments and keep records
-                                    accurate and up to date.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Grades & Fees
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Monitor grade submissions and student fee
-                                    payments.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Timetable & Attendance
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Coordinate timetables and track overall
-                                    attendance.
-                                </p>
-                            </div>
+                        <div
+                            class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+                        >
+                            <!-- Enhanced Visual Action Cards -->
+                            <Link
+                                :href="route('admin.enrollments.index')"
+                                class="group relative overflow-hidden rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-blue-700"
+                                        >
+                                            Student & Course Registration
+                                        </p>
+                                        <p
+                                            class="mt-2 text-sm font-medium text-blue-900"
+                                        >
+                                            Approve enrollments and keep records
+                                            accurate.
+                                        </p>
+                                        <div
+                                            v-if="stats.pendingEnrollments > 0"
+                                            class="mt-3 inline-flex items-center gap-2 rounded-full bg-blue-500 px-3 py-1 text-xs font-bold text-white"
+                                        >
+                                            <span>{{
+                                                stats.pendingEnrollments
+                                            }}</span>
+                                            <span>pending</span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </Link>
 
-                            <!-- New Cards -->
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    User Management
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Control access rights and profiles for staff, teachers, and students.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Communication Center
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Manage announcements, contact messages, feedback and system notifications.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    System Health & Logs
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                     Monitor system alerts, queue status, and application logs.
-                                </p>
+                            <Link
+                                :href="route('admin.grades.index')"
+                                class="group relative overflow-hidden rounded-xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-indigo-700"
+                                        >
+                                            Grades & Fees
+                                        </p>
+                                        <p
+                                            class="mt-2 text-sm font-medium text-indigo-900"
+                                        >
+                                            Monitor grade submissions and fee
+                                            payments.
+                                        </p>
+                                        <div
+                                            v-if="stats.pendingGrades > 0"
+                                            class="mt-3 inline-flex items-center gap-2 rounded-full bg-indigo-500 px-3 py-1 text-xs font-bold text-white"
+                                        >
+                                            <span>{{
+                                                stats.pendingGrades
+                                            }}</span>
+                                            <span>to review</span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-indigo-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                :href="route('admin.timetables.index')"
+                                class="group relative overflow-hidden rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-emerald-700"
+                                        >
+                                            Timetable & Attendance
+                                        </p>
+                                        <p
+                                            class="mt-2 text-sm font-medium text-emerald-900"
+                                        >
+                                            Coordinate schedules and track
+                                            attendance.
+                                        </p>
+                                        <div
+                                            class="mt-3 flex items-center gap-2 text-xs font-semibold text-emerald-700"
+                                        >
+                                            <span
+                                                >{{
+                                                    stats.attendanceRate ?? 0
+                                                }}%</span
+                                            >
+                                            <span>overall rate</span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                :href="route('admin.users.index')"
+                                class="group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-purple-700"
+                                        >
+                                            User Management
+                                        </p>
+                                        <p
+                                            class="mt-2 text-sm font-medium text-purple-900"
+                                        >
+                                            Control access rights and profiles.
+                                        </p>
+                                    </div>
+                                    <div
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-purple-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                :href="route('admin.announcements.index')"
+                                class="group relative overflow-hidden rounded-xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 via-amber-100 to-amber-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-amber-700"
+                                        >
+                                            Communication Center
+                                        </p>
+                                        <p
+                                            class="mt-2 text-sm font-medium text-amber-900"
+                                        >
+                                            Manage announcements, messages, and
+                                            feedback.
+                                        </p>
+                                    </div>
+                                    <div
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-amber-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <div
+                                class="group relative overflow-hidden rounded-xl border-2 border-slate-200 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 p-5"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-slate-700"
+                                        >
+                                            System Health
+                                        </p>
+                                        <p
+                                            class="mt-2 text-sm font-medium text-slate-900"
+                                        >
+                                            Monitor alerts, queue status, and
+                                            logs.
+                                        </p>
+                                        <div
+                                            v-if="alertSystemStatus"
+                                            class="mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold"
+                                            :class="{
+                                                'bg-emerald-500 text-white':
+                                                    alertSystemStatus.status ===
+                                                    'ready',
+                                                'bg-amber-500 text-white':
+                                                    alertSystemStatus.status ===
+                                                    'warning',
+                                            }"
+                                        >
+                                            <span
+                                                :class="{
+                                                    'bg-emerald-400':
+                                                        alertSystemStatus.status ===
+                                                        'ready',
+                                                    'bg-amber-400':
+                                                        alertSystemStatus.status ===
+                                                        'warning',
+                                                }"
+                                                class="h-2 w-2 rounded-full"
+                                            ></span>
+                                            <span>{{
+                                                alertSystemStatus.status ===
+                                                "ready"
+                                                    ? "Active"
+                                                    : "Warning"
+                                            }}</span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -911,23 +1672,30 @@ const quickActions = computed(() => {
                                         Attendance alerts
                                     </p>
                                     <p class="mt-1 text-sm text-slate-700">
-                                        Manually run the low attendance alert check.
-                                        Alerts will be queued and sent in the
-                                        background.
+                                        Manually run the low attendance alert
+                                        check. Alerts will be queued and sent in
+                                        the background.
                                     </p>
-                                    
+
                                     <!-- Status indicator -->
                                     <div
                                         v-if="alertSystemStatus"
                                         class="mt-3 rounded-lg border p-3"
                                         :class="{
-                                            'border-emerald-200 bg-emerald-50': alertSystemStatus.status === 'ready',
-                                            'border-amber-200 bg-amber-50': alertSystemStatus.status === 'warning',
+                                            'border-emerald-200 bg-emerald-50':
+                                                alertSystemStatus.status ===
+                                                'ready',
+                                            'border-amber-200 bg-amber-50':
+                                                alertSystemStatus.status ===
+                                                'warning',
                                         }"
                                     >
                                         <div class="flex items-start gap-2">
                                             <svg
-                                                v-if="alertSystemStatus.status === 'ready'"
+                                                v-if="
+                                                    alertSystemStatus.status ===
+                                                    'ready'
+                                                "
                                                 class="h-5 w-5 mt-0.5 flex-shrink-0 text-emerald-600"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
@@ -954,30 +1722,55 @@ const quickActions = computed(() => {
                                                 <p
                                                     class="text-xs font-semibold"
                                                     :class="{
-                                                        'text-emerald-800': alertSystemStatus.status === 'ready',
-                                                        'text-amber-800': alertSystemStatus.status === 'warning',
+                                                        'text-emerald-800':
+                                                            alertSystemStatus.status ===
+                                                            'ready',
+                                                        'text-amber-800':
+                                                            alertSystemStatus.status ===
+                                                            'warning',
                                                     }"
                                                 >
-                                                    {{ alertSystemStatus.status === 'ready' ? 'Automatic alerts active' : 'Setup required' }}
+                                                    {{
+                                                        alertSystemStatus.status ===
+                                                        "ready"
+                                                            ? "Automatic alerts active"
+                                                            : "Setup required"
+                                                    }}
                                                 </p>
                                                 <p
                                                     class="mt-1 text-xs"
                                                     :class="{
-                                                        'text-emerald-700': alertSystemStatus.status === 'ready',
-                                                        'text-amber-700': alertSystemStatus.status === 'warning',
+                                                        'text-emerald-700':
+                                                            alertSystemStatus.status ===
+                                                            'ready',
+                                                        'text-amber-700':
+                                                            alertSystemStatus.status ===
+                                                            'warning',
                                                     }"
                                                 >
-                                                    {{ alertSystemStatus.message }}
+                                                    {{
+                                                        alertSystemStatus.message
+                                                    }}
                                                 </p>
                                                 <div
-                                                    v-if="alertSystemStatus.pendingJobs > 0"
+                                                    v-if="
+                                                        alertSystemStatus.pendingJobs >
+                                                        0
+                                                    "
                                                     class="mt-2 text-xs"
                                                     :class="{
-                                                        'text-emerald-700': alertSystemStatus.pendingJobs <= 10,
-                                                        'text-amber-700': alertSystemStatus.pendingJobs > 10,
+                                                        'text-emerald-700':
+                                                            alertSystemStatus.pendingJobs <=
+                                                            10,
+                                                        'text-amber-700':
+                                                            alertSystemStatus.pendingJobs >
+                                                            10,
                                                     }"
                                                 >
-                                                    {{ alertSystemStatus.pendingJobs }} job(s) in queue
+                                                    {{
+                                                        alertSystemStatus.pendingJobs
+                                                    }}
+                                                    job(s) in queue
                                                 </div>
                                             </div>
                                         </div>
@@ -1176,93 +1969,307 @@ const quickActions = computed(() => {
 
             <!-- Teacher view: teaching-focused overview -->
             <div v-else class="space-y-6">
+                <!-- Pending Grades Alert for Teachers -->
+                <div
+                    v-if="stats.pendingGrades > 0"
+                    class="group relative overflow-hidden rounded-xl border-2 border-indigo-300 bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                >
+                    <Link
+                        :href="route('admin.grades.index')"
+                        class="flex items-center justify-between"
+                    >
+                        <div>
+                            <p
+                                class="text-xs font-bold uppercase tracking-wider text-indigo-800"
+                            >
+                                ⚠️ Action Required
+                            </p>
+                            <p class="mt-2 text-3xl font-bold text-indigo-900">
+                                {{ stats.pendingGrades ?? 0 }}
+                            </p>
+                            <p class="mt-1 text-sm font-medium text-indigo-700">
+                                Grades pending staff review
+                            </p>
+                            <p class="mt-2 text-xs text-indigo-600">
+                                Click to view and track approval status
+                            </p>
+                        </div>
+                        <div
+                            class="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500 shadow-lg"
+                        >
+                            <svg
+                                class="h-8 w-8 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                />
+                            </svg>
+                        </div>
+                    </Link>
+                    <div
+                        class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-200"
+                    >
+                        <div
+                            class="h-full bg-indigo-500 transition-all duration-500"
+                            :style="{
+                                width: `${Math.min(
+                                    (stats.pendingGrades / 30) * 100,
+                                    100
+                                )}%`,
+                            }"
+                        ></div>
+                    </div>
+                </div>
+
                 <div class="grid gap-6 lg:grid-cols-3">
                     <div class="portal-card p-6 lg:col-span-2">
                         <div class="flex items-center justify-between gap-4">
                             <div>
-                                <p class="portal-badge-no-margin mb-4">Teaching dashboard</p>
+                                <p class="portal-badge-no-margin mb-4">
+                                    Teaching dashboard
+                                </p>
                             </div>
                         </div>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                            <!-- Existing Cards -->
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    My Subjects
-                                </p>
-                                <p
-                                    class="mt-1 text-sm font-semibold text-slate-900"
-                                >
-                                    {{ stats.teachingSubjects ?? 0 }}
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Assigned subjects
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Students taught
-                                </p>
-                                <p
-                                    class="mt-1 text-sm font-semibold text-slate-900"
-                                >
-                                    {{ stats.studentsTaught ?? 0 }}
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Total unique students
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Grades recorded
-                                </p>
-                                <p
-                                    class="mt-1 text-sm font-semibold text-slate-900"
-                                >
-                                    {{ stats.gradesRecorded ?? 0 }}
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Submitted entries
-                                </p>
+                        <div
+                            class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+                        >
+                            <!-- Enhanced Visual Cards -->
+                            <div
+                                class="group relative overflow-hidden rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 transition-all duration-300 hover:shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-emerald-700"
+                                        >
+                                            My Subjects
+                                        </p>
+                                        <p
+                                            class="mt-2 text-3xl font-bold text-emerald-900"
+                                        >
+                                            {{ stats.teachingSubjects ?? 0 }}
+                                        </p>
+                                        <p
+                                            class="mt-1 text-xs font-medium text-emerald-600"
+                                        >
+                                            Assigned subjects
+                                        </p>
+                                    </div>
+                                    <div
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- New Cards -->
-                            <div class="rounded-lg bg-slate-50 p-3">
+                            <div
+                                class="group relative overflow-hidden rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 transition-all duration-300 hover:shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-purple-700"
+                                        >
+                                            Students Taught
+                                        </p>
+                                        <p
+                                            class="mt-2 text-3xl font-bold text-purple-900"
+                                        >
+                                            {{ stats.studentsTaught ?? 0 }}
+                                        </p>
+                                        <p
+                                            class="mt-1 text-xs font-medium text-purple-600"
+                                        >
+                                            Unique students
+                                        </p>
+                                    </div>
+                                    <div
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p
+                                            class="text-xs font-bold uppercase tracking-wider text-indigo-700"
+                                        >
+                                            Grades Recorded
+                                        </p>
+                                        <p
+                                            class="mt-2 text-3xl font-bold text-indigo-900"
+                                        >
+                                            {{ stats.gradesRecorded ?? 0 }}
+                                        </p>
+                                        <div
+                                            class="mt-2 flex items-center gap-2 text-xs"
+                                        >
+                                            <span
+                                                class="font-semibold text-emerald-600"
+                                            >
+                                                ✓
+                                                {{
+                                                    stats.approvedGrades ?? 0
+                                                }}
+                                                approved
+                                            </span>
+                                            <span
+                                                v-if="stats.pendingGrades > 0"
+                                                class="font-semibold text-amber-600"
+                                            >
+                                                ⏳
+                                                {{
+                                                    stats.pendingGrades
+                                                }}
+                                                pending
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500 shadow-md"
+                                    >
+                                        <svg
+                                            class="h-6 w-6 text-white"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Enhanced Action Cards -->
+                            <Link
+                                :href="route('teacher.timetable.index')"
+                                class="group relative overflow-hidden rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                            >
                                 <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    class="text-xs font-bold uppercase tracking-wider text-blue-700"
                                 >
                                     My Timetable
                                 </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    View your teaching schedule and class locations.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
                                 <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    class="mt-2 text-xs font-medium text-blue-600"
+                                >
+                                    View your teaching schedule and class
+                                    locations.
+                                </p>
+                                <div
+                                    class="mt-3 flex items-center gap-2 text-xs font-semibold text-blue-700"
+                                >
+                                    <span>View schedule</span>
+                                    <span>→</span>
+                                </div>
+                            </Link>
+
+                            <Link
+                                :href="route('teacher.attendance.index')"
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                            >
+                                <p
+                                    class="text-xs font-bold uppercase tracking-wider text-indigo-700"
                                 >
                                     Attendance Mgmt
                                 </p>
-                                <p class="mt-1 text-xs text-slate-600">
+                                <p
+                                    class="mt-2 text-xs font-medium text-indigo-600"
+                                >
                                     Record and review student attendance.
                                 </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
+                                <div class="mt-3">
+                                    <div
+                                        class="mb-1 flex items-center justify-between text-xs"
+                                    >
+                                        <span
+                                            class="font-semibold text-indigo-700"
+                                            >Rate</span
+                                        >
+                                        <span class="font-bold text-indigo-900"
+                                            >{{
+                                                stats.attendanceRate ?? 0
+                                            }}%</span
+                                        >
+                                    </div>
+                                    <div
+                                        class="h-1.5 overflow-hidden rounded-full bg-indigo-200"
+                                    >
+                                        <div
+                                            class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500"
+                                            :style="{
+                                                width: `${
+                                                    stats.attendanceRate ?? 0
+                                                }%`,
+                                            }"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                :href="route('messages.index')"
+                                class="group relative overflow-hidden rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                            >
                                 <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    class="text-xs font-bold uppercase tracking-wider text-purple-700"
                                 >
                                     Communication
                                 </p>
-                                <p class="mt-1 text-xs text-slate-600">
+                                <p
+                                    class="mt-2 text-xs font-medium text-purple-600"
+                                >
                                     Send messages to students and view alerts.
                                 </p>
-                            </div>
+                                <div
+                                    class="mt-3 flex items-center gap-2 text-xs font-semibold text-purple-700"
+                                >
+                                    <span>Open messages</span>
+                                    <span>→</span>
+                                </div>
+                            </Link>
                         </div>
                     </div>
 

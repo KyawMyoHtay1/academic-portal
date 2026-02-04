@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Student;
+use App\Models\Enrollment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -60,6 +61,18 @@ class DashboardController extends Controller
                     : 'Queue is set to sync mode - configure QUEUE_CONNECTION for automatic alerts',
             ];
 
+            // Additional stats for staff dashboard
+            $pendingEnrollments = DB::table('course_student')
+                ->where('status', 'pending')
+                ->count();
+            $pendingWithdrawals = DB::table('course_student')
+                ->where('status', 'withdrawal_pending')
+                ->count();
+            $pendingGrades = Grade::where('status', 'pending')->count();
+            $pendingPayments = Fee::where('status', 'payment_pending')->count();
+            $paidFees = Fee::where('status', 'paid')->sum('amount');
+            $pendingFees = Fee::where('status', 'pending')->sum('amount');
+
             return Inertia::render('Dashboard', [
                 'role' => 'staff',
                 'stats' => [
@@ -67,6 +80,12 @@ class DashboardController extends Controller
                     'courses' => $courseCount,
                     'feeTotal' => $feeTotal,
                     'attendanceRate' => $attendanceRate,
+                    'pendingEnrollments' => $pendingEnrollments,
+                    'pendingWithdrawals' => $pendingWithdrawals,
+                    'pendingGrades' => $pendingGrades,
+                    'pendingPayments' => $pendingPayments,
+                    'paidFees' => $paidFees,
+                    'pendingFees' => $pendingFees,
                 ],
                 'alertSystemStatus' => $alertSystemStatus,
             ]);
@@ -92,6 +111,14 @@ class DashboardController extends Controller
                 ? round(($attendancePresent / $attendanceTotal) * 100, 1)
                 : 0;
 
+            // Additional stats for teacher dashboard
+            $pendingGrades = Grade::whereIn('subject_id', $subjectIds)
+                ->where('status', 'pending')
+                ->count();
+            $approvedGrades = Grade::whereIn('subject_id', $subjectIds)
+                ->where('status', 'approved')
+                ->count();
+
             return Inertia::render('Dashboard', [
                 'role' => 'teacher',
                 'stats' => [
@@ -99,6 +126,8 @@ class DashboardController extends Controller
                     'studentsTaught' => $studentsTaught,
                     'gradesRecorded' => $gradesRecorded,
                     'attendanceRate' => $attendanceRate,
+                    'pendingGrades' => $pendingGrades,
+                    'approvedGrades' => $approvedGrades,
                 ],
             ]);
         }
@@ -119,6 +148,21 @@ class DashboardController extends Controller
             ? round(($attendancePresent / $attendanceTotal) * 100, 1)
             : 0;
 
+        // Additional stats for student dashboard
+        $gpa = $student?->calculateGPA() ?? null;
+        $pendingEnrollments = $student
+            ? DB::table('course_student')
+                ->where('student_id', $student->id)
+                ->where('status', 'pending')
+                ->count()
+            : 0;
+        $approvedEnrollments = $student
+            ? DB::table('course_student')
+                ->where('student_id', $student->id)
+                ->where('status', 'approved')
+                ->count()
+            : 0;
+
         return Inertia::render('Dashboard', [
             'role' => 'student',
             'stats' => [
@@ -126,6 +170,9 @@ class DashboardController extends Controller
                 'outstandingFees' => $outstandingFees,
                 'myGrades' => $myGrades,
                 'attendanceRate' => $attendanceRate,
+                'gpa' => $gpa,
+                'pendingEnrollments' => $pendingEnrollments,
+                'approvedEnrollments' => $approvedEnrollments,
             ],
         ]);
     }
