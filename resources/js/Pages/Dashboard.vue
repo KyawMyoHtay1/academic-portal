@@ -298,26 +298,7 @@ const quickActions = computed(() => {
                             >
                                 {{ card.title }}
                             </p>
-                            <p
-                                class="mt-3 text-3xl font-bold"
-                                :class="{
-                                    'text-blue-900':
-                                        card.title === 'Students' ||
-                                        card.title === 'My Courses',
-                                    'text-emerald-900':
-                                        card.title === 'Courses' ||
-                                        card.title === 'My Subjects',
-                                    'text-amber-900':
-                                        card.title === 'Fees' ||
-                                        card.title === 'Outstanding Fees',
-                                    'text-indigo-900':
-                                        card.title === 'Attendance' ||
-                                        card.title === 'Grades' ||
-                                        card.title === 'Grades Recorded',
-                                    'text-purple-900':
-                                        card.title === 'Students Taught',
-                                }"
-                            >
+                            <p class="mt-3 text-3xl font-bold text-slate-900">
                                 {{ card.value }}
                             </p>
                             <p
@@ -1450,7 +1431,7 @@ const quickActions = computed(() => {
                                         </div>
                                     </div>
                                     <div
-                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-indigo-500 shadow-md"
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-md"
                                     >
                                         <svg
                                             class="h-6 w-6 text-white"
@@ -1640,7 +1621,15 @@ const quickActions = computed(() => {
                                         </div>
                                     </div>
                                     <div
-                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-500 shadow-md"
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md"
+                                        :class="{
+                                            'bg-emerald-600':
+                                                alertSystemStatus?.status ===
+                                                'ready',
+                                            'bg-amber-600':
+                                                alertSystemStatus?.status ===
+                                                'warning',
+                                        }"
                                     >
                                         <svg
                                             class="h-6 w-6 text-white"
@@ -1995,7 +1984,7 @@ const quickActions = computed(() => {
                             </p>
                         </div>
                         <div
-                            class="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500 shadow-lg"
+                            class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-500 shadow-lg"
                         >
                             <svg
                                 class="h-8 w-8 text-white"
@@ -2145,9 +2134,7 @@ const quickActions = computed(() => {
                                                 class="font-semibold text-emerald-600"
                                             >
                                                 ✓
-                                                {{
-                                                    stats.approvedGrades ?? 0
-                                                }}
+                                                {{ stats.approvedGrades ?? 0 }}
                                                 approved
                                             </span>
                                             <span
@@ -2155,9 +2142,7 @@ const quickActions = computed(() => {
                                                 class="font-semibold text-amber-600"
                                             >
                                                 ⏳
-                                                {{
-                                                    stats.pendingGrades
-                                                }}
+                                                {{ stats.pendingGrades }}
                                                 pending
                                             </span>
                                         </div>
