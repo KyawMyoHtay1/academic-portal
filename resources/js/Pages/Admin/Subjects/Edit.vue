@@ -1,8 +1,9 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+
 import { Head, Link, useForm, router } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 
 const props = defineProps({
     subject: {
@@ -30,6 +31,34 @@ const selectedCourse = computed(
 
 const subjectCodePrefix = computed(() =>
     selectedCourse.value ? `${selectedCourse.value.course_code}-` : ""
+);
+
+// When the course changes, prefill the subject code prefix if appropriate
+watch(
+    () => form.course_id,
+    (newId, oldId) => {
+        const newCourse = props.courses.find((c) => c.id === newId) || null;
+        const oldCourse = props.courses.find((c) => c.id === oldId) || null;
+
+        if (!newCourse) return;
+
+        const newPrefix = `${newCourse.course_code}-`;
+        const oldPrefix = oldCourse ? `${oldCourse.course_code}-` : null;
+        const current = form.subject_code || "";
+
+        // Replace old prefix with new one, or just set if empty
+        if (!current || (oldPrefix && current.startsWith(oldPrefix))) {
+            // Remove old prefix if present
+            const suffix =
+                oldPrefix && current.startsWith(oldPrefix)
+                    ? current.substring(oldPrefix.length)
+                    : current;
+            form.subject_code = newPrefix + suffix;
+        } else if (!current.includes("-")) {
+            // If just a number/text without prefix, prepend
+             form.subject_code = newPrefix + current;
+        }
+    }
 );
 
 const submit = () => {
