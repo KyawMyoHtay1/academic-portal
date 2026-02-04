@@ -1,14 +1,24 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import Pagination from "@/Components/Pagination.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
     users: {
-        type: Array,
+        type: Object,
         required: true,
+    },
+    stats: {
+        type: Object,
+        required: true,
+    },
+    filters: {
+        type: Object,
+        default: () => ({}),
     },
 });
 
@@ -22,19 +32,33 @@ const tabs = [
     { key: "staff", label: "Staff" },
 ];
 
-const activeTab = ref("all");
-const query = ref("");
+const activeTab = ref(props.filters.role || "all");
+const query = ref(props.filters.search || "");
 
-const stats = computed(() => {
-    const list = props.users ?? [];
-    const countByRole = (role) => list.filter((u) => u.role === role).length;
-    return {
-        total: list.length,
-        students: countByRole("student"),
-        teachers: countByRole("teacher"),
-        staff: countByRole("staff"),
-    };
-});
+const performSearch = debounce(() => {
+    router.get(
+        route("admin.users.index"),
+        {
+            search: query.value,
+            role: activeTab.value === "all" ? null : activeTab.value,
+        },
+        { preserveState: true, preserveScroll: true, replace: true }
+    );
+}, 300);
+
+watch(
+    () => activeTab.value,
+    (newValue) => {
+        performSearch();
+    }
+);
+
+watch(
+    () => query.value,
+    () => {
+        performSearch();
+    }
+);
 
 const getRoleBadgeClass = (role) => {
     const classes = {
@@ -44,26 +68,6 @@ const getRoleBadgeClass = (role) => {
     };
     return classes[role] || "bg-slate-100 text-slate-800";
 };
-
-const filtered = computed(() => {
-    const q = query.value.trim().toLowerCase();
-    let list = props.users ?? [];
-
-    if (activeTab.value !== "all") {
-        list = list.filter((u) => u.role === activeTab.value);
-    }
-
-    if (q) {
-        list = list.filter((u) => {
-            const name = (u.name ?? "").toLowerCase();
-            const email = (u.email ?? "").toLowerCase();
-            const role = (u.role ?? "").toLowerCase();
-            return name.includes(q) || email.includes(q) || role.includes(q);
-        });
-    }
-
-    return list;
-});
 
 const deleteUser = (id) => {
     if (currentUserId.value && String(id) === String(currentUserId.value)) {
@@ -276,20 +280,20 @@ const deleteUser = (id) => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr v-if="filtered.length === 0" class="bg-white">
+                                <tr v-if="users.data.length === 0" class="bg-white">
                                     <td
                                         colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         {{
-                                            users.length === 0
+                                            users.data.length === 0
                                                 ? "No users found."
                                                 : "No users match your filters."
                                         }}
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="user in filtered"
+                                    v-for="user in users.data"
                                     :key="user.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                 >
@@ -383,6 +387,11 @@ const deleteUser = (id) => {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-4 border-t border-slate-200 px-4 py-3 sm:px-6">
+                        <Pagination :links="users.links" />
                     </div>
                 </div>
             </div>

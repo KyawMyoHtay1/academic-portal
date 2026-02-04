@@ -18,18 +18,45 @@ class StaffUserController extends Controller
      */
     public function index(): Response
     {
-        $users = User::orderBy('name')
-            ->get([
-                'id',
-                'name',
-                'email',
-                'role',
-                'photo',
-                'created_at',
-            ]);
+        $query = User::orderBy('name');
+
+        if ($search = request('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($role = request('role')) {
+            if ($role !== 'all') {
+                $query->where('role', $role);
+            }
+        }
+
+        $users = $query->paginate(10)
+            ->withQueryString()
+            ->through(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'photo' => $user->photo,
+                    'created_at' => $user->created_at,
+                ];
+            });
+
+        $stats = [
+            'total' => User::count(),
+            'students' => User::where('role', 'student')->count(),
+            'teachers' => User::where('role', 'teacher')->count(),
+            'staff' => User::where('role', 'staff')->count(),
+        ];
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
+            'filters' => request()->only(['search', 'role']),
+            'stats' => $stats,
         ]);
     }
 
