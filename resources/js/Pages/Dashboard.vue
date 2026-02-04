@@ -614,122 +614,153 @@ const quickActions = computed(() => {
                         <div
                             class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
                         >
-                            <!-- Existing Cards -->
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    My Courses
-                                </p>
-                                <p
-                                    class="mt-1 text-sm font-semibold text-slate-900"
-                                >
-                                    {{ stats.myCourses ?? 0 }}
-                                    course<span
-                                        v-if="(stats.myCourses ?? 0) !== 1"
-                                        >s</span
-                                    >
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Enrolled courses
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Grades
-                                </p>
-                                <p
-                                    class="mt-1 text-sm font-semibold text-slate-900"
-                                >
-                                    {{ stats.myGrades ?? 0 }} record<span
-                                        v-if="(stats.myGrades ?? 0) !== 1"
-                                        >s</span
-                                    >
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Subject scores
-                                </p>
-                            </div>
-                            <div
-                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:shadow-lg"
+                            <!-- My Courses Card -->
+                            <Link
+                                :href="route('my-courses.index')"
+                                class="group relative overflow-hidden rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                             >
-                                <p
-                                    class="text-xs font-bold uppercase tracking-wider text-indigo-700"
-                                >
-                                    Attendance
-                                </p>
-                                <p
-                                    class="mt-2 text-3xl font-bold text-indigo-900"
-                                >
-                                    {{ stats.attendanceRate ?? 0 }}%
-                                </p>
-                                <div class="mt-3">
-                                    <div
-                                        class="mb-1 flex items-center justify-between text-xs"
-                                    >
-                                        <span
-                                            class="font-semibold text-indigo-700"
-                                            >Progress</span
-                                        >
-                                        <span class="font-bold text-indigo-900"
-                                            >{{
-                                                stats.attendanceRate ?? 0
-                                            }}%</span
-                                        >
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-blue-700">
+                                            My Courses
+                                        </p>
+                                        <svg class="h-5 w-5 text-blue-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
                                     </div>
-                                    <div
-                                        class="h-2 overflow-hidden rounded-full bg-indigo-200"
-                                    >
-                                        <div
-                                            class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500"
-                                            :style="{
-                                                width: `${
-                                                    stats.attendanceRate ?? 0
-                                                }%`,
-                                            }"
-                                        ></div>
-                                    </div>
+                                    <p class="mt-2 text-3xl font-bold text-blue-900">
+                                        {{ stats.myCourses ?? 0 }}
+                                    </p>
+                                    <p class="mt-1 text-xs font-medium text-blue-600">
+                                        Enrolled courses
+                                    </p>
                                 </div>
-                                <p
-                                    class="mt-2 text-xs font-medium text-indigo-600"
-                                >
-                                    Overall attendance rate
-                                </p>
+                            </Link>
+
+                            <!-- Grades Card -->
+                            <Link
+                                :href="route('student.grades.index')"
+                                class="group relative overflow-hidden rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                            >
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-purple-700">
+                                            Grades
+                                        </p>
+                                        <svg class="h-5 w-5 text-purple-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                        </svg>
+                                    </div>
+                                    <p class="mt-2 text-3xl font-bold text-purple-900">
+                                        {{ stats.myGrades ?? 0 }}
+                                    </p>
+                                    <p class="mt-1 text-xs font-medium text-purple-600">
+                                        Subject scores
+                                    </p>
+                                </div>
+                            </Link>
+
+                            <!-- Attendance Card (Existing, slightly tweaked for consistency) -->
+                            <div
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                            >
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-indigo-700">
+                                            Attendance
+                                        </p>
+                                        <svg class="h-5 w-5 text-indigo-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                    </div>
+                                    <p class="mt-2 text-3xl font-bold text-indigo-900">
+                                        {{ stats.attendanceRate ?? 0 }}%
+                                    </p>
+                                    <div class="mt-3">
+                                        <div class="mb-1 flex items-center justify-between text-xs">
+                                            <span class="font-semibold text-indigo-700">Progress</span>
+                                        </div>
+                                        <div class="h-2 overflow-hidden rounded-full bg-indigo-200">
+                                            <div
+                                                class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500"
+                                                :style="{ width: `${stats.attendanceRate ?? 0}%` }"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-2 text-xs font-medium text-indigo-600">
+                                        Overall attendance rate
+                                    </p>
+                                </div>
                             </div>
 
-                            <!-- New Cards -->
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    My Timetable
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Check your upcoming classes and schedule.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    Fees & Payments
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    View outstanding fees and payment history.
-                                </p>
-                            </div>
-                            <div class="rounded-lg bg-slate-50 p-3">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >
-                                    My Profile
-                                </p>
-                                <p class="mt-1 text-xs text-slate-600">
-                                    Update contact info and personal details.
-                                </p>
-                            </div>
+                            <!-- My Timetable Card -->
+                            <Link
+                                :href="route('student.timetable.index')"
+                                class="group relative overflow-hidden rounded-xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                            >
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-cyan-700">
+                                            My Timetable
+                                        </p>
+                                        <svg class="h-5 w-5 text-cyan-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p class="mt-2 text-sm font-semibold text-cyan-900 line-clamp-2">
+                                        Check schedule
+                                    </p>
+                                    <p class="mt-4 text-xs font-medium text-cyan-600">
+                                        View upcoming classes
+                                    </p>
+                                </div>
+                            </Link>
+
+                            <!-- Fees & Payments Card -->
+                            <Link
+                                :href="route('student.fees.index')"
+                                class="group relative overflow-hidden rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                            >
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-amber-700">
+                                            Fees
+                                        </p>
+                                        <svg class="h-5 w-5 text-amber-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p class="mt-2 text-xl font-bold text-amber-900 truncate">
+                                        {{ formatCurrency(stats.outstandingFees) }}
+                                    </p>
+                                    <p class="mt-2 text-xs font-medium text-amber-600">
+                                        Outstanding balance
+                                    </p>
+                                </div>
+                            </Link>
+
+                            <!-- My Profile Card -->
+                            <Link
+                                :href="route('student.profile.show')"
+                                class="group relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                            >
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                            Profile
+                                        </p>
+                                        <svg class="h-5 w-5 text-slate-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                    <p class="mt-2 text-sm font-semibold text-slate-900">
+                                        Manage Account
+                                    </p>
+                                    <p class="mt-4 text-xs font-medium text-slate-600">
+                                        Update personal details
+                                    </p>
+                                </div>
+                            </Link>
                         </div>
                     </div>
 
