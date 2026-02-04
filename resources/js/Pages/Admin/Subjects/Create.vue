@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, useForm } from "@inertiajs/vue3";
+import { computed, watch } from "vue";
 
 const props = defineProps({
     courses: {
@@ -18,6 +19,33 @@ const form = useForm({
     description: "",
     photo: null,
 });
+
+const selectedCourse = computed(
+    () => props.courses.find((c) => c.id === form.course_id) || null
+);
+
+const subjectCodePrefix = computed(() =>
+    selectedCourse.value ? `${selectedCourse.value.course_code}-` : ""
+);
+
+// When the course changes, prefill the subject code prefix if appropriate
+watch(
+    () => form.course_id,
+    (newId, oldId) => {
+        const newCourse = props.courses.find((c) => c.id === newId) || null;
+        const oldCourse = props.courses.find((c) => c.id === oldId) || null;
+
+        if (!newCourse) return;
+
+        const newPrefix = `${newCourse.course_code}-`;
+        const oldPrefix = oldCourse ? `${oldCourse.course_code}-` : null;
+        const current = form.subject_code || "";
+
+        if (!current || (oldPrefix && current === oldPrefix)) {
+            form.subject_code = newPrefix;
+        }
+    }
+);
 
 const submit = () => {
     form.post(route("admin.subjects.store"), {
@@ -110,8 +138,19 @@ const submit = () => {
                                         'border-red-300 focus:border-red-500 focus:ring-red-500':
                                             form.errors.subject_code,
                                     }"
-                                    placeholder="e.g., CS101"
+                                    :placeholder="
+                                        selectedCourse
+                                            ? `${subjectCodePrefix}101`
+                                            : 'e.g., CS101'
+                                    "
                                 />
+                                <p class="mt-1 text-xs text-slate-500">
+                                    When a course is selected, start the subject
+                                    code with the course code, for example:
+                                    <span class="font-semibold">
+                                        {{ subjectCodePrefix }}101
+                                    </span>
+                                </p>
                                 <p
                                     v-if="form.errors.subject_code"
                                     class="mt-1 text-sm text-red-600"

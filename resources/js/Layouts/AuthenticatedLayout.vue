@@ -10,6 +10,36 @@ const showingMobileSidebar = ref(false);
 const page = usePage();
 const openNavGroups = ref({});
 
+// Local flash visibility so success/error messages can auto-dismiss
+const showSuccessFlash = ref(!!page.props.flash?.success);
+const showErrorFlash = ref(!!page.props.flash?.error);
+
+watch(
+    () => page.props.flash?.success,
+    (value) => {
+        showSuccessFlash.value = !!value;
+        if (value) {
+            setTimeout(() => {
+                showSuccessFlash.value = false;
+            }, 5000);
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => page.props.flash?.error,
+    (value) => {
+        showErrorFlash.value = !!value;
+        if (value) {
+            setTimeout(() => {
+                showErrorFlash.value = false;
+            }, 7000);
+        }
+    },
+    { immediate: true }
+);
+
 // Icon mapping for menu items
 const getMenuIcon = (name) => {
     const iconMap = {
@@ -185,7 +215,7 @@ const navigation = computed(() => {
                     badge: unreadMessages,
                     icon: getMenuIcon("Messages"),
                 },
-            ]),
+            ])
         );
     }
 
@@ -252,7 +282,7 @@ const navigation = computed(() => {
                     badge: unreadMessages,
                     icon: getMenuIcon("Messages"),
                 },
-            ]),
+            ])
         );
     }
 
@@ -353,7 +383,7 @@ const navigation = computed(() => {
                     badge: unreadMessages,
                     icon: getMenuIcon("Messages"),
                 },
-            ]),
+            ])
         );
     }
 
@@ -384,11 +414,11 @@ const headerStatus = computed(() => {
         <!-- Flash messages -->
         <div
             class="fixed top-4 right-4 z-50 max-w-md space-y-2"
-            v-if="$page.props.flash?.success || $page.props.flash?.error"
+            v-if="showSuccessFlash || showErrorFlash"
         >
             <div
-                v-if="$page.props.flash?.success"
-                class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200 shadow-lg"
+                v-if="showSuccessFlash && $page.props.flash?.success"
+                class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200 shadow-lg flex items-start justify-between gap-3"
             >
                 <div class="flex items-center gap-2">
                     <svg
@@ -404,10 +434,17 @@ const headerStatus = computed(() => {
                     </svg>
                     <span>{{ $page.props.flash.success }}</span>
                 </div>
+                <button
+                    type="button"
+                    class="ml-2 text-emerald-700/70 hover:text-emerald-900"
+                    @click="showSuccessFlash = false"
+                >
+                    ✕
+                </button>
             </div>
             <div
-                v-if="$page.props.flash?.error"
-                class="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-800 ring-1 ring-red-200 shadow-lg"
+                v-if="showErrorFlash && $page.props.flash?.error"
+                class="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-800 ring-1 ring-red-200 shadow-lg flex items-start justify-between gap-3"
             >
                 <div class="flex items-center gap-2">
                     <svg
@@ -423,6 +460,13 @@ const headerStatus = computed(() => {
                     </svg>
                     <span>{{ $page.props.flash.error }}</span>
                 </div>
+                <button
+                    type="button"
+                    class="ml-2 text-red-700/70 hover:text-red-900"
+                    @click="showErrorFlash = false"
+                >
+                    ✕
+                </button>
             </div>
         </div>
 
@@ -530,8 +574,8 @@ const headerStatus = computed(() => {
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
                                         :class="[
-                                            (openNavGroups[item.name] ??
-                                            item.active)
+                                            openNavGroups[item.name] ??
+                                            item.active
                                                 ? 'rotate-180'
                                                 : '',
                                         ]"
@@ -757,8 +801,8 @@ const headerStatus = computed(() => {
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                                 :class="[
-                                                    (openNavGroups[item.name] ??
-                                                    item.active)
+                                                    openNavGroups[item.name] ??
+                                                    item.active
                                                         ? 'rotate-180'
                                                         : '',
                                                 ]"
