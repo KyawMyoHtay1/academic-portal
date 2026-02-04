@@ -37,6 +37,16 @@ function markRead(messageId) {
 }
 </script>
 
+<script>
+import Pagination from "@/Components/Pagination.vue";
+
+export default {
+    components: {
+        Pagination,
+    },
+};
+</script>
+
 <template>
     <AuthenticatedLayout>
         <Head title="Contact Messages" />
@@ -181,22 +191,8 @@ function markRead(messageId) {
                         </table>
                     </div>
 
-                    <div v-if="messages.links?.length" class="border-t border-slate-200 px-6 py-4">
-                        <div class="flex flex-wrap gap-2">
-                            <a
-                                v-for="(link, idx) in messages.links"
-                                :key="idx"
-                                :href="link.url || '#'"
-                                class="rounded-lg px-3 py-2 text-sm font-semibold"
-                                :class="[
-                                    link.active
-                                        ? 'bg-slate-900 text-white'
-                                        : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50',
-                                    !link.url ? 'pointer-events-none opacity-50' : '',
-                                ]"
-                                v-html="link.label"
-                            />
-                        </div>
+                    <div class="mt-4 border-t border-slate-200 px-6 py-4">
+                        <Pagination :links="messages.links" />
                     </div>
                 </div>
             </div>

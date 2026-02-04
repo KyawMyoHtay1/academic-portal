@@ -92,6 +92,16 @@ const deleteStudent = (id) => {
 };
 </script>
 
+<script>
+import Pagination from "@/Components/Pagination.vue";
+
+export default {
+    components: {
+        Pagination,
+    },
+};
+</script>
+
 <template>
     <Head title="Students" />
 
@@ -372,6 +382,10 @@ const deleteStudent = (id) => {
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <div class="mt-6">
+            <Pagination :links="students.links" />
         </div>
     </AuthenticatedLayout>
 </template>

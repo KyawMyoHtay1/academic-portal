@@ -53,6 +53,16 @@ const deleteEntry = (id) => {
 };
 </script>
 
+<script>
+import Pagination from "@/Components/Pagination.vue";
+
+export default {
+    components: {
+        Pagination,
+    },
+};
+</script>
+
 <template>
     <Head title="Timetable Management" />
 
@@ -327,25 +337,10 @@ const deleteEntry = (id) => {
 
                     <!-- Pagination -->
                     <div
-                        v-if="viewMode === 'table' && timetables.links && timetables.links.length > 3"
-                        class="mt-4 flex items-center justify-between border-t border-slate-200 px-4 py-3 sm:px-6"
+                        v-if="viewMode === 'table'"
+                        class="mt-4 border-t border-slate-200 px-4 py-3 sm:px-6"
                     >
-                        <div class="flex flex-1 justify-between sm:hidden">
-                            <Link
-                                v-if="timetables.prev_page_url"
-                                :href="timetables.prev_page_url"
-                                class="relative inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                            >
-                                Previous
-                            </Link>
-                            <Link
-                                v-if="timetables.next_page_url"
-                                :href="timetables.next_page_url"
-                                class="relative ml-3 inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                            >
-                                Next
-                            </Link>
-                        </div>
+                        <Pagination :links="timetables.links" />
                     </div>
                 </div>
             </div>
