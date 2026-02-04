@@ -74,7 +74,7 @@ const roleLabel = computed(() => {
                     Manage your classes, grades, and student progress from one central hub.
                 </p>
                  <p class="max-w-xl text-lg text-slate-300" v-else>
-                    Overview of university operations and administration.
+                    Manage students, courses and academic data. High-level view of registrations, fees and attendance across the institution.
                 </p>
             </div>
 

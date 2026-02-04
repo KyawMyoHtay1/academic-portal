@@ -795,19 +795,8 @@ const quickActions = computed(() => {
                 <div class="grid gap-6 lg:grid-cols-3">
                     <div class="portal-card p-6 lg:col-span-2">
                         <div class="flex items-center justify-between gap-4">
-                            <div>
-                                <p class="portal-badge">Staff dashboard</p>
-                                <h3
-                                    class="mt-3 text-lg font-semibold text-slate-900"
-                                >
-                                    Manage students, courses and academic data
-                                </h3>
-                                <p class="mt-1 text-sm text-slate-600">
-                                    High-level view of registrations, fees and
-                                    attendance across the institution.
-                                </p>
+                                <p class="portal-badge-no-margin mb-4">Staff dashboard</p>
                             </div>
-                        </div>
 
                         <div class="mt-4 grid gap-4 md:grid-cols-3">
                             <div class="rounded-lg bg-slate-50 p-3">
