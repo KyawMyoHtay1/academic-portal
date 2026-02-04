@@ -68,10 +68,10 @@ const roleLabel = computed(() => {
                 </h1>
                 
                 <p class="max-w-xl text-lg text-blue-50/90" v-if="role === 'student'">
-                    Ready to continue your learning journey? Check your notifications for new updates.
+                    Stay updated with your course enrolments, check your latest grades, and manage your academic profile.
                 </p>
                 <p class="max-w-xl text-lg text-emerald-50/90" v-else-if="role === 'teacher'">
-                    Manage your classes, grades, and student progress from one central hub.
+                     Manage your subjects, track student performance, and organize your teaching schedule efficiently.
                 </p>
                  <p class="max-w-xl text-lg text-slate-300" v-else>
                     Manage students, courses and academic data. High-level view of registrations, fees and attendance across the institution.

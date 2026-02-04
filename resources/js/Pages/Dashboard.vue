@@ -348,7 +348,8 @@ const quickActions = computed(() => {
                             </div>
                         </div>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-3">
+                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            <!-- Existing Cards -->
                             <div class="rounded-lg bg-slate-50 p-3">
                                 <p
                                     class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -365,8 +366,7 @@ const quickActions = computed(() => {
                                     >
                                 </p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    View enrolled courses and manage
-                                    registrations.
+                                    Enrolled courses
                                 </p>
                             </div>
                             <div class="rounded-lg bg-slate-50 p-3">
@@ -384,7 +384,7 @@ const quickActions = computed(() => {
                                     >
                                 </p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    Check subject scores published so far.
+                                    Subject scores
                                 </p>
                             </div>
                             <div class="rounded-lg bg-slate-50 p-3">
@@ -399,7 +399,39 @@ const quickActions = computed(() => {
                                     {{ stats.attendanceRate ?? 0 }}%
                                 </p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    Overall attendance across your subjects.
+                                    Overall rate
+                                </p>
+                            </div>
+
+                            <!-- New Cards -->
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    My Timetable
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Check your upcoming classes and schedule.
+                                </p>
+                            </div>
+                             <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Fees & Payments
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    View outstanding fees and payment history.
+                                </p>
+                            </div>
+                             <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    My Profile
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Update contact info and personal details.
                                 </p>
                             </div>
                         </div>
@@ -1148,20 +1180,12 @@ const quickActions = computed(() => {
                     <div class="portal-card p-6 lg:col-span-2">
                         <div class="flex items-center justify-between gap-4">
                             <div>
-                                <p class="portal-badge">Teaching dashboard</p>
-                                <h3
-                                    class="mt-3 text-lg font-semibold text-slate-900"
-                                >
-                                    Overview of your subjects and students
-                                </h3>
-                                <p class="mt-1 text-sm text-slate-600">
-                                    Track subjects taught, student coverage and
-                                    grades you have recorded.
-                                </p>
+                                <p class="portal-badge-no-margin mb-4">Teaching dashboard</p>
                             </div>
                         </div>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-3">
+                        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            <!-- Existing Cards -->
                             <div class="rounded-lg bg-slate-50 p-3">
                                 <p
                                     class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -1174,7 +1198,7 @@ const quickActions = computed(() => {
                                     {{ stats.teachingSubjects ?? 0 }}
                                 </p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    Subjects assigned to you this period.
+                                    Assigned subjects
                                 </p>
                             </div>
                             <div class="rounded-lg bg-slate-50 p-3">
@@ -1189,7 +1213,7 @@ const quickActions = computed(() => {
                                     {{ stats.studentsTaught ?? 0 }}
                                 </p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    Unique students across all your courses.
+                                    Total unique students
                                 </p>
                             </div>
                             <div class="rounded-lg bg-slate-50 p-3">
@@ -1204,7 +1228,39 @@ const quickActions = computed(() => {
                                     {{ stats.gradesRecorded ?? 0 }}
                                 </p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    Grade entries you’ve submitted so far.
+                                    Submitted entries
+                                </p>
+                            </div>
+
+                            <!-- New Cards -->
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    My Timetable
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    View your teaching schedule and class locations.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Attendance Mgmt
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Record and review student attendance.
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                >
+                                    Communication
+                                </p>
+                                <p class="mt-1 text-xs text-slate-600">
+                                    Send messages to students and view alerts.
                                 </p>
                             </div>
                         </div>
