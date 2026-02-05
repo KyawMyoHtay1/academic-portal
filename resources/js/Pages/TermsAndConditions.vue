@@ -62,13 +62,144 @@ word-break: break-word !important;
       <div style="line-height: 1.5;"><br></div>
       <div style="line-height: 1.5;">
           <span style="font-size: 15px;">
-             [Placeholder for full terms content and clauses...]
+              <strong>1. ACCEPTANCE OF TERMS</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              By registering for, accessing, or using the University Academic Portal ("Services"), you agree to be bound by these Terms and Conditions. If you differ with any of these terms, you are prohibited from using the Services. We reserve the right to update or modify these terms at any time without prior notice. Your continued use of the Services following any changes indicates your acceptance of the new terms.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>2. USER ACCOUNTS AND SECURITY</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>2.1 Registration:</strong> You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete.<br>
+              <strong>2.2 Account Security:</strong> You are responsible for maintaining the confidentiality of your password and account details. You are fully responsible for all activities that occur under your password or account.<br>
+              <strong>2.3 Unauthorized Access:</strong> You agree to immediately notify University Academic Portal of any unauthorized use of your password or account or any other breach of security.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>3. ACCEPTABLE USE</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              You agree not to use the Services for any unlawful purpose or in any way that interrupts, damages, or impairs the service. Prohibited activities include but are not limited to:<br>
+              - Transmitting any material that is defamatory, offensive, or of an obscene or menacing character.<br>
+              - Attempting to gain unauthorized access to other computer systems.<br>
+              - Interfering with any other person's use or enjoyment of the Services.<br>
+              - Breaching any applicable laws concerning the use of public telecommunications networks.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>4. INTELLECTUAL PROPERTY RIGHTS</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              All content included on the Site, such as text, graphics, logos, images, as well as the compilation thereof, and any software used on the Site, is the property of University Academic Portal or its suppliers and protected by copyright and other laws. You agree not to modify, copy, distribute, transmit, display, perform, reproduce, publish, license, create derivative works from, transfer, or sell any information, software, products, or services obtained from the Site.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>5. ACADEMIC INTEGRITY</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              Users (students and staff) must adhere to the University's strict policies on academic integrity. The Portal shall not be used to facilitate cheating, plagiarism, or any form of academic misconduct. Any suspected violation using the Portal will be reported to the appropriate University disciplinary bodies.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>6. LIMITATION OF LIABILITY</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              In no event shall University Academic Portal be liable for any direct, indirect, punitive, incidental, special, consequential damages or any damages whatsoever including, without limitation, damages for loss of use, data or profits, arising out of or in any way connected with the use or performance of the Site, with the delay or inability to use the Site or related services.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>7. TERMINATION/ACCESS RESTRICTION</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              University Academic Portal reserves the right, in its sole discretion, to terminate your access to the Site and the related services or any portion thereof at any time, without notice.
           </span>
       </div>
       <div style="line-height: 1.5;"><br></div>
       <div style="line-height: 1.5;">
           <span style="font-size: 15px;">
-              <strong>CONTACT US</strong>
+              <strong>8. PRIVACY POLICY</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              Your use of the Site is also governed by our Privacy Policy. Please review our Privacy Policy, which also governs the Site and informs users of our data collection practices. By using the Site, you consent to your information being handled as described in our Privacy Policy.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>9. DATA ACCURACY AND OFFICIAL RECORDS</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              While we strive to ensure that the information provided on the Portal (including grades, timetables, and fee status) is accurate and up-to-date, it is provided for informational purposes only. In the event of a discrepancy between the Portal and the University's official physical records, the official physical records shall prevail. The Portal does not constitute an official transcript.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>10. MODIFICATIONS TO SERVICE</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              University Academic Portal reserves the right to modify, suspend, or discontinue the Service (or any part or content thereof) at any time with or without notice. We shall not be liable to you or to any third party for any modification, suspension, or discontinuance of the Service.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>11. GOVERNING LAW</strong>
+          </span>
+      </div>
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              These terms shall be governed by and defined following the laws of the jurisdiction in which the University is established. University Academic Portal and yourself irrevocably consent that the courts of that jurisdiction shall have exclusive authority to resolve any dispute which may arise in connection with these terms.
+          </span>
+      </div>
+      <div style="line-height: 1.5;"><br></div>
+
+      <div style="line-height: 1.5;">
+          <span style="font-size: 15px;">
+              <strong>12. CONTACT US</strong>
           </span>
       </div>
       <div style="line-height: 1.5;"><br></div>
@@ -80,7 +211,11 @@ word-break: break-word !important;
       <div style="line-height: 1.5;"><br></div>
       <div style="line-height: 1.5;">
           <span style="font-size: 15px;">
-              <strong>University Academic Portal</strong>
+              <strong>University Academic Portal Administration</strong><br>
+              Student Services Department<br>
+              University Campus<br>
+              Email: support@university-portal.edu<br>
+              Phone: +1 (555) 123-4567
           </span>
       </div>
       </div>`;
