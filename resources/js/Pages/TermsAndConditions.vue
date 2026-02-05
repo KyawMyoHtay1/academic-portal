@@ -201,6 +201,118 @@ word-break: break-word !important;
           <span style="font-size: 15px;">
               <strong>12. CONTACT US</strong>
           </span>
+          <div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>13. USER RESPONSIBILITIES</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        Users of the University Academic Portal are responsible for ensuring that all information they provide is truthful and up to date. 
+        Users must ensure that any materials uploaded to the Portal do not violate copyright, privacy, or any other legal rights of third parties. 
+        Misuse of the system may result in account suspension, disciplinary action, or legal consequences.
+    </span>
+</div>
+
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>14. SYSTEM AVAILABILITY</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        While we strive to maintain continuous availability of the Portal, we do not guarantee uninterrupted access. 
+        The system may be temporarily unavailable due to maintenance, technical issues, or circumstances beyond our control. 
+        The University is not responsible for any inconvenience or loss caused by service downtime.
+    </span>
+</div>
+
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>15. THIRD-PARTY SERVICES</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        The Portal may contain links to external websites or services provided by third parties. 
+        These links are provided for convenience only. The University Academic Portal does not control or take responsibility for the content, 
+        privacy policies, or practices of any third-party services.
+    </span>
+</div>
+
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>16. COMMUNICATIONS</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        By creating an account, you agree to receive official communications from the University Academic Portal via email or internal messaging. 
+        These communications may include important notices about your academic status, deadlines, fees, or system updates. 
+        Users are responsible for regularly checking their accounts and registered email addresses.
+    </span>
+</div>
+
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>17. PASSWORD RECOVERY AND ACCOUNT SUPPORT</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        The Portal provides mechanisms for password recovery and account support. 
+        Users must follow official procedures for resetting passwords or recovering accounts. 
+        The University will never ask for your password through email or phone communication. 
+        Sharing account credentials with others is strictly prohibited.
+    </span>
+</div>
+
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>18. CHANGES TO TERMS</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        We reserve the right to revise these Terms and Conditions at any time. 
+        Any updates will be posted within the Portal with a revised "Last Updated" date. 
+        Continued use of the Portal after changes have been made constitutes acceptance of the updated terms.
+    </span>
+</div>
+
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        <strong>19. ENTIRE AGREEMENT</strong>
+    </span>
+</div>
+
+<div style="line-height: 1.5;">
+    <span style="font-size: 15px;">
+        These Terms and Conditions constitute the entire agreement between you and the University Academic Portal 
+        regarding the use of the Site and Services, and they replace any prior agreements or understandings.
+    </span>
+</div>
+
       </div>
       <div style="line-height: 1.5;"><br></div>
       <div style="line-height: 1.5;">
@@ -215,7 +327,7 @@ word-break: break-word !important;
               Student Services Department<br>
               University Campus<br>
               Email: support@university-portal.edu<br>
-              Phone: +1 (555) 123-4567
+              Phone: +123 456 7890
           </span>
       </div>
       </div>`;
