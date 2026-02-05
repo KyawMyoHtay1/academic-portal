@@ -305,6 +305,10 @@ Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
 })->name('privacy-policy');
 
+Route::get('/terms-and-conditions', function () {
+    return Inertia::render('TermsAndConditions');
+})->name('terms-and-conditions');
+
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified', 'nocache'])
     ->name('dashboard');

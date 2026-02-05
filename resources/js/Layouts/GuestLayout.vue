@@ -7,7 +7,7 @@ import { computed } from "vue";
 const page = usePage();
 const isFullWidthPage = computed(
     () =>
-        typeof page.url === "string" && page.url.startsWith("/privacy-policy"),
+        typeof page.url === "string" && (page.url.startsWith("/privacy-policy") || page.url.startsWith("/terms-and-conditions")),
 );
 const isRegisterPage = computed(
     () => typeof page.url === "string" && page.url.includes("/register"),
@@ -44,6 +44,12 @@ const isRegisterPage = computed(
                         class="text-xs text-slate-300 hover:text-portal-gold transition-colors"
                     >
                         Privacy Policy
+                    </Link>
+                    <Link
+                        :href="route('terms-and-conditions')"
+                        class="text-xs text-slate-300 hover:text-portal-gold transition-colors"
+                    >
+                        Terms & Conditions
                     </Link>
                 </div>
             </header>
@@ -112,6 +118,12 @@ const isRegisterPage = computed(
                             class="text-slate-300 hover:text-portal-gold transition-colors"
                         >
                             Privacy Policy
+                        </Link>
+                        <Link
+                            :href="route('terms-and-conditions')"
+                            class="text-slate-300 hover:text-portal-gold transition-colors"
+                        >
+                            Terms & Conditions
                         </Link>
                     </div>
                 </div>
