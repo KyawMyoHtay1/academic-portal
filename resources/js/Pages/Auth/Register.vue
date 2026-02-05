@@ -1,4 +1,5 @@
 <script setup>
+import Checkbox from '@/Components/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -12,6 +13,7 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    terms: false,
     recaptcha_token: '',
 });
 
@@ -100,6 +102,23 @@ const submit = async () => {
                     class="mt-2"
                     :message="form.errors.password_confirmation"
                 />
+            </div>
+
+            <div class="mt-4 block">
+                <label class="flex items-center">
+                    <Checkbox name="terms" v-model:checked="form.terms" required />
+                    <span class="ms-2 text-sm text-gray-600">
+                        I agree to the
+                        <a
+                            target="_blank"
+                            :href="route('terms-and-conditions')"
+                            class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Terms & Conditions
+                        </a>
+                    </span>
+                </label>
+                <InputError class="mt-2" :message="form.errors.terms" />
             </div>
 
             <div class="mt-4 flex items-center justify-end">
