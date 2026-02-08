@@ -19,6 +19,7 @@ class Fee extends Model
         'payment_intent_id',
         'payment_method',
         'payment_processed_at',
+        'processed_by',
     ];
 
     protected $casts = [
@@ -34,5 +35,13 @@ class Fee extends Model
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    /**
+     * The user (staff) who processed/approved the payment.
+     */
+    public function processor()
+    {
+        return $this->belongsTo(User::class, 'processed_by');
     }
 }

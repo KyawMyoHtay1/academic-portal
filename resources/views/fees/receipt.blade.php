@@ -121,6 +121,12 @@
             <p><span class="info-label">Receipt No:</span> {{ $receipt_number }}</p>
             <p><span class="info-label">Date:</span> {{ $generated_at }}</p>
             <p><span class="info-label">Status:</span> <span class="status-badge status-paid">PAID</span></p>
+            @if($fee->processor)
+            <p><span class="info-label">Processed by:</span> {{ $fee->processor->name }}</p>
+            @if($fee->payment_processed_at)
+            <p><span class="info-label">Processed at:</span> {{ $fee->payment_processed_at->format('F j, Y g:i A') }}</p>
+            @endif
+            @endif
         </div>
         <div class="info-box">
             <h3>Student Information</h3>

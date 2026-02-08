@@ -374,6 +374,12 @@ export default {
                                     </th>
                                     <th
                                         scope="col"
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Processed By
+                                    </th>
+                                    <th
+                                        scope="col"
                                         class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
                                         Actions
@@ -386,7 +392,7 @@ export default {
                                     class="bg-white"
                                 >
                                     <td
-                                        colspan="8"
+                                        colspan="9"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         {{ entries.length === 0 ? 'No fees found. Create your first fee to get started.' : 'No fees match your filters.' }}
@@ -473,6 +479,20 @@ export default {
                                         class="whitespace-nowrap px-4 py-4 text-sm text-slate-600"
                                     >
                                         {{ fee.paid_date || "-" }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-600"
+                                    >
+                                        <template v-if="fee.status === 'paid' && (fee.processed_by || fee.payment_processed_at)">
+                                            <div>{{ fee.processed_by || "—" }}</div>
+                                            <div
+                                                v-if="fee.payment_processed_at"
+                                                class="text-xs text-slate-500"
+                                            >
+                                                {{ fee.payment_processed_at }}
+                                            </div>
+                                        </template>
+                                        <span v-else>—</span>
                                     </td>
                                     <td
                                         class="whitespace-nowrap px-4 py-4 text-right text-sm"

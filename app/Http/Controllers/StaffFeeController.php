@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fee;
 use App\Models\Student;
 use App\Notifications\FeeStatusUpdated;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class StaffFeeController extends Controller
                 ];
             });
 
-        $fees = Fee::with('student')
+        $fees = Fee::with(['student', 'processor:id,name'])
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->through(function (Fee $fee) {
@@ -51,6 +52,8 @@ class StaffFeeController extends Controller
                     'status' => $fee->status,
                     'due_date' => $fee->due_date->format('Y-m-d'),
                     'paid_date' => $fee->paid_date?->format('Y-m-d'),
+                    'processed_by' => $fee->processor?->name,
+                    'payment_processed_at' => $fee->payment_processed_at?->toDateTimeString(),
                     'created_at' => $fee->created_at->format('Y-m-d'),
                     'is_late' => $isLate,
                     'days_overdue' => $isLate ? now()->diffInDays($fee->due_date) : null,
@@ -146,9 +149,17 @@ class StaffFeeController extends Controller
             $data['paid_date'] = now()->format('Y-m-d');
         }
 
-        // If status changed to pending, clear paid_date
+        // If status changed to pending, clear paid_date and processed info
         if ($data['status'] === 'pending') {
             $data['paid_date'] = null;
+            $data['payment_processed_at'] = null;
+            $data['processed_by'] = null;
+        }
+
+        // When staff marks as paid, record who processed it and when
+        if ($data['status'] === 'paid') {
+            $data['payment_processed_at'] = $data['payment_processed_at'] ?? now();
+            $data['processed_by'] = Auth::id();
         }
 
         $originalStatus = $fee->status;
@@ -194,6 +205,8 @@ class StaffFeeController extends Controller
         $fee->update([
             'status' => 'paid',
             'paid_date' => now()->format('Y-m-d'),
+            'payment_processed_at' => now(),
+            'processed_by' => Auth::id(),
         ]);
 
         // Notify the student
@@ -246,7 +259,7 @@ class StaffFeeController extends Controller
                 ->with('error', 'Receipt can only be generated for paid fees.');
         }
 
-        $fee->load('student');
+        $fee->load(['student', 'processor:id,name']);
 
         $pdf = Pdf::loadView('fees.receipt', [
             'fee' => $fee,
