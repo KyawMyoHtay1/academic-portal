@@ -35,6 +35,10 @@ watch(
 function markRead(messageId) {
     router.post(route("admin.feedback-messages.read", messageId), {}, { preserveScroll: true });
 }
+
+function markReplied(messageId) {
+    router.post(route("admin.feedback-messages.mark-replied", messageId), {}, { preserveScroll: true });
+}
 </script>
 
 <script>
@@ -139,6 +143,11 @@ export default {
                                         Date
                                     </th>
                                     <th
+                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600"
+                                    >
+                                        Replied
+                                    </th>
+                                    <th
                                         class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600"
                                     >
                                         Actions
@@ -185,22 +194,42 @@ export default {
                                     <td class="px-6 py-4 text-sm text-slate-600">
                                         {{ new Date(m.created_at).toLocaleString() }}
                                     </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                                            :disabled="m.is_read"
-                                            @click="markRead(m.id)"
+                                    <td class="px-6 py-4 text-sm">
+                                        <span
+                                            v-if="m.replied_at"
+                                            class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800"
                                         >
-                                            Mark read
-                                        </button>
+                                            {{ new Date(m.replied_at).toLocaleString() }}
+                                        </span>
+                                        <span v-else class="text-slate-400">—</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex flex-wrap justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                                                :disabled="m.is_read"
+                                                @click="markRead(m.id)"
+                                            >
+                                                Mark read
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
+                                                :disabled="!!m.replied_at"
+                                                :title="m.replied_at ? 'Already replied' : 'Mark as replied'"
+                                                @click="markReplied(m.id)"
+                                            >
+                                                {{ m.replied_at ? "Replied" : "Mark as replied" }}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
 
                                 <tr v-if="messages.data.length === 0">
                                     <td
                                         class="px-6 py-6 text-center text-sm text-slate-600"
-                                        colspan="5"
+                                        colspan="6"
                                     >
                                         <span v-if="search">No results for "{{ search }}".</span>
                                         <span v-else>No feedback messages yet.</span>

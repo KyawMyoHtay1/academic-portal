@@ -67,7 +67,7 @@ Send password reset emails
 Send system notifications (low attendance, etc.)
 Use Case Diagram (PlantUML)
 You can paste this into any PlantUML tool to generate the diagram:
-@startumlleft to right directionactor Studentactor Teacheractor "Administrative Staff" as Adminactor Guestactor "Payment Gateway" as Stripeactor "Email Service" as Mailrectangle "University Academic Portal" {  (Register Account) as UC_Register  (Login / Logout) as UC_Login  (Manage Profile) as UC_Profile  (View Timetable) as UC_ViewTimetable  (View Attendance) as UC_ViewAttendance  (View Grades & GPA) as UC_ViewGrades  (Browse Courses & Subjects) as UC_BrowseCourses  (Request Course Enrolment) as UC_RequestEnroll  (Request Course Withdrawal) as UC_RequestWithdraw  (View My Courses) as UC_MyCourses  (View Fees & Payments) as UC_ViewFees  (Submit Payment Confirmation) as UC_SubmitPayment  (Pay via Stripe) as UC_StripePay  (View Announcements) as UC_ViewAnnouncements  (Send / Receive Messages) as UC_Messages  (Receive Notifications) as UC_Notifications  (Record Attendance) as UC_RecordAttendance  (Record Grades) as UC_RecordGrades  (View Student Summaries) as UC_TeacherSummaries  (Post Announcements to Students) as UC_TeacherAnnouncements  (Manage Users) as UC_ManageUsers  (Manage Students) as UC_ManageStudents  (Manage Courses) as UC_ManageCourses  (Manage Subjects & Teachers) as UC_ManageSubjects  (Manage Timetables) as UC_ManageTimetables  (Review Enrolments & Withdrawals) as UC_ReviewEnroll  (Review Grades) as UC_ReviewGrades  (Manage Fees) as UC_ManageFees  (Approve / Reject Payments) as UC_ApprovePayments  (Generate Receipts) as UC_Receipts  (View Attendance Reports) as UC_AttendanceReports  (Manage Announcements) as UC_ManageAnnouncements  (View Contact & Feedback Messages) as UC_ContactFeedback  (View Public Info) as UC_PublicInfo  (Submit Contact Form) as UC_ContactForm  (Submit Feedback) as UC_FeedbackForm  (Process Payment) as UC_ProcessPayment  (Send Email) as UC_SendEmail}Student --> UC_RegisterStudent --> UC_LoginStudent --> UC_ProfileStudent --> UC_ViewTimetableStudent --> UC_ViewAttendanceStudent --> UC_ViewGradesStudent --> UC_BrowseCoursesStudent --> UC_RequestEnrollStudent --> UC_RequestWithdrawStudent --> UC_MyCoursesStudent --> UC_ViewFeesStudent --> UC_SubmitPaymentStudent --> UC_StripePayStudent --> UC_ViewAnnouncementsStudent --> UC_MessagesStudent --> UC_NotificationsTeacher --> UC_LoginTeacher --> UC_ViewTimetableTeacher --> UC_RecordAttendanceTeacher --> UC_RecordGradesTeacher --> UC_TeacherSummariesTeacher --> UC_TeacherAnnouncementsTeacher --> UC_MessagesTeacher --> UC_NotificationsAdmin --> UC_LoginAdmin --> UC_ManageUsersAdmin --> UC_ManageStudentsAdmin --> UC_ManageCoursesAdmin --> UC_ManageSubjectsAdmin --> UC_ManageTimetablesAdmin --> UC_ReviewEnrollAdmin --> UC_ReviewGradesAdmin --> UC_ManageFeesAdmin --> UC_ApprovePaymentsAdmin --> UC_ReceiptsAdmin --> UC_AttendanceReportsAdmin --> UC_ManageAnnouncementsAdmin --> UC_ContactFeedbackAdmin --> UC_NotificationsGuest --> UC_PublicInfoGuest --> UC_ContactFormGuest --> UC_FeedbackFormStripe --> UC_ProcessPaymentUC_StripePay --> UC_ProcessPaymentMail --> UC_SendEmailUC_Register --> UC_SendEmailUC_Login --> UC_SendEmailUC_ManageFees --> UC_SendEmailUC_ReviewGrades --> UC_SendEmailUC_AttendanceReports --> UC_SendEmail@enduml
+@startumlleft to right directionactor Studentactor Teacheractor "Administrative Staff" as Adminactor Guestactor "Payment Gateway" as Stripeactor "Email Service" as Mailrectangle "University Academic Portal" { (Register Account) as UC_Register (Login / Logout) as UC_Login (Manage Profile) as UC_Profile (View Timetable) as UC_ViewTimetable (View Attendance) as UC_ViewAttendance (View Grades & GPA) as UC_ViewGrades (Browse Courses & Subjects) as UC_BrowseCourses (Request Course Enrolment) as UC_RequestEnroll (Request Course Withdrawal) as UC_RequestWithdraw (View My Courses) as UC_MyCourses (View Fees & Payments) as UC_ViewFees (Submit Payment Confirmation) as UC_SubmitPayment (Pay via Stripe) as UC_StripePay (View Announcements) as UC_ViewAnnouncements (Send / Receive Messages) as UC_Messages (Receive Notifications) as UC_Notifications (Record Attendance) as UC_RecordAttendance (Record Grades) as UC_RecordGrades (View Student Summaries) as UC_TeacherSummaries (Post Announcements to Students) as UC_TeacherAnnouncements (Manage Users) as UC_ManageUsers (Manage Students) as UC_ManageStudents (Manage Courses) as UC_ManageCourses (Manage Subjects & Teachers) as UC_ManageSubjects (Manage Timetables) as UC_ManageTimetables (Review Enrolments & Withdrawals) as UC_ReviewEnroll (Review Grades) as UC_ReviewGrades (Manage Fees) as UC_ManageFees (Approve / Reject Payments) as UC_ApprovePayments (Generate Receipts) as UC_Receipts (View Attendance Reports) as UC_AttendanceReports (Manage Announcements) as UC_ManageAnnouncements (View Contact & Feedback Messages) as UC_ContactFeedback (View Public Info) as UC_PublicInfo (Submit Contact Form) as UC_ContactForm (Submit Feedback) as UC_FeedbackForm (Process Payment) as UC_ProcessPayment (Send Email) as UC_SendEmail}Student --> UC_RegisterStudent --> UC_LoginStudent --> UC_ProfileStudent --> UC_ViewTimetableStudent --> UC_ViewAttendanceStudent --> UC_ViewGradesStudent --> UC_BrowseCoursesStudent --> UC_RequestEnrollStudent --> UC_RequestWithdrawStudent --> UC_MyCoursesStudent --> UC_ViewFeesStudent --> UC_SubmitPaymentStudent --> UC_StripePayStudent --> UC_ViewAnnouncementsStudent --> UC_MessagesStudent --> UC_NotificationsTeacher --> UC_LoginTeacher --> UC_ViewTimetableTeacher --> UC_RecordAttendanceTeacher --> UC_RecordGradesTeacher --> UC_TeacherSummariesTeacher --> UC_TeacherAnnouncementsTeacher --> UC_MessagesTeacher --> UC_NotificationsAdmin --> UC_LoginAdmin --> UC_ManageUsersAdmin --> UC_ManageStudentsAdmin --> UC_ManageCoursesAdmin --> UC_ManageSubjectsAdmin --> UC_ManageTimetablesAdmin --> UC_ReviewEnrollAdmin --> UC_ReviewGradesAdmin --> UC_ManageFeesAdmin --> UC_ApprovePaymentsAdmin --> UC_ReceiptsAdmin --> UC_AttendanceReportsAdmin --> UC_ManageAnnouncementsAdmin --> UC_ContactFeedbackAdmin --> UC_NotificationsGuest --> UC_PublicInfoGuest --> UC_ContactFormGuest --> UC_FeedbackFormStripe --> UC_ProcessPaymentUC_StripePay --> UC_ProcessPaymentMail --> UC_SendEmailUC_Register --> UC_SendEmailUC_Login --> UC_SendEmailUC_ManageFees --> UC_SendEmailUC_ReviewGrades --> UC_SendEmailUC_AttendanceReports --> UC_SendEmail@enduml
 4.x Whole System Class Diagram
 Main Classes & Relationships
 User
@@ -122,7 +122,7 @@ LowAttendanceAlertState
 id, student_id, last_rate, is_below_threshold, last_alert_sent_at
 Class Diagram (PlantUML)
 Again, paste this into a PlantUML tool for a visual diagram. It focuses on core entities and relationships (not every field):
-@startumlhide circlehide methodsskinparam classAttributeIconSize 0class User {  +id: int  +name: string  +email: string  +password: string  +role: enum  +photo: string  +email_verified_at: datetime}class Student {  +id: int  +user_id: int  +student_no: string  +full_name: string  +dob: date  +gender: enum  +programme: string  +intake_year: string  +status: enum}class Course {  +id: int  +course_code: string  +title: string  +credits: int  +semester: string}class Subject {  +id: int  +course_id: int  +subject_code: string  +title: string  +credits: int}class Enrollment {  +id: int  +course_id: int  +student_id: int  +status: enum}class Grade {  +id: int  +subject_id: int  +course_id: int  +student_id: int  +graded_by: int  +reviewed_by: int  +score: decimal  +status: enum}class GradeReviewLog {  +id: int  +grade_id: int  +performed_by: int  +action: enum  +reason: string}class Fee {  +id: int  +student_id: int  +amount: decimal  +status: enum  +due_date: date  +paid_date: date}class Timetable {  +id: int  +course_id: int  +subject_id: int  +day_of_week: string  +start_time: time  +end_time: time}class Attendance {  +id: int  +course_id: int  +subject_id: int  +student_id: int  +date: date  +status: enum}class Announcement {  +id: int  +user_id: int  +title: string  +priority: enum  +pinned: bool}class AnnouncementRead {  +id: int  +announcement_id: int  +user_id: int  +read_at: datetime  +acknowledged_at: datetime}class Message {  +id: int  +sender_id: int  +receiver_id: int  +body: text  +read: bool}class Notification {  +id: uuid  +notifiable_id: int  +type: string}class ContactMessage {  +id: int  +email: string  +subject: string}class FeedbackMessage {  +id: int  +email: string  +type: string  +is_read: bool}class LowAttendanceAlertState {  +id: int  +student_id: int  +last_rate: float  +is_below_threshold: bool}' RelationshipsUser "1" -- "0..1" StudentUser "1" -- "0..*" Message : sends >User "1" -- "0..*" Message : < receivesUser "1" -- "0..*" Announcement : creates >User "1" -- "0..*" NotificationStudent "1" -- "0..*" EnrollmentCourse  "1" -- "0..*" EnrollmentStudent "1" -- "0..*" GradeSubject "1" -- "0..*" GradeCourse  "1" -- "0..*" GradeCourse  "1" -- "0..*" SubjectCourse  "1" -- "0..*" TimetableSubject "1" -- "0..*" TimetableStudent "1" -- "0..*" AttendanceSubject "1" -- "0..*" AttendanceStudent "1" -- "0..*" FeeAnnouncement "1" -- "0..*" AnnouncementReadUser "1" -- "0..*" AnnouncementReadStudent "1" -- "0..1" LowAttendanceAlertState@enduml
+@startumlhide circlehide methodsskinparam classAttributeIconSize 0class User { +id: int +name: string +email: string +password: string +role: enum +photo: string +email_verified_at: datetime}class Student { +id: int +user_id: int +student_no: string +full_name: string +dob: date +gender: enum +programme: string +intake_year: string +status: enum}class Course { +id: int +course_code: string +title: string +credits: int +semester: string}class Subject { +id: int +course_id: int +subject_code: string +title: string +credits: int}class Enrollment { +id: int +course_id: int +student_id: int +status: enum}class Grade { +id: int +subject_id: int +course_id: int +student_id: int +graded_by: int +reviewed_by: int +score: decimal +status: enum}class GradeReviewLog { +id: int +grade_id: int +performed_by: int +action: enum +reason: string}class Fee { +id: int +student_id: int +amount: decimal +status: enum +due_date: date +paid_date: date}class Timetable { +id: int +course_id: int +subject_id: int +day_of_week: string +start_time: time +end_time: time}class Attendance { +id: int +course_id: int +subject_id: int +student_id: int +date: date +status: enum}class Announcement { +id: int +user_id: int +title: string +priority: enum +pinned: bool}class AnnouncementRead { +id: int +announcement_id: int +user_id: int +read_at: datetime +acknowledged_at: datetime}class Message { +id: int +sender_id: int +receiver_id: int +body: text +read: bool}class Notification { +id: uuid +notifiable_id: int +type: string}class ContactMessage { +id: int +email: string +subject: string}class FeedbackMessage { +id: int +email: string +type: string +is_read: bool}class LowAttendanceAlertState { +id: int +student_id: int +last_rate: float +is_below_threshold: bool}' RelationshipsUser "1" -- "0..1" StudentUser "1" -- "0.._" Message : sends >User "1" -- "0.._" Message : < receivesUser "1" -- "0.._" Announcement : creates >User "1" -- "0.._" NotificationStudent "1" -- "0.._" EnrollmentCourse "1" -- "0.._" EnrollmentStudent "1" -- "0.._" GradeSubject "1" -- "0.._" GradeCourse "1" -- "0.._" GradeCourse "1" -- "0.._" SubjectCourse "1" -- "0.._" TimetableSubject "1" -- "0.._" TimetableStudent "1" -- "0.._" AttendanceSubject "1" -- "0.._" AttendanceStudent "1" -- "0.._" FeeAnnouncement "1" -- "0.._" AnnouncementReadUser "1" -- "0..\*" AnnouncementReadStudent "1" -- "0..1" LowAttendanceAlertState@enduml
 If you tell me which tool you’ll use (e.g. draw.io, StarUML, Visual Paradigm, Word), I can adapt the description (e.g. list actors/use cases or classes/associations in the exact format you need for manual drawing.
 Can you check my project to ensure?
 
@@ -234,39 +234,40 @@ Send account verification emails
 Send password reset emails
 Send email notifications (e.g. low attendance)
 You can draw one system boundary “University Academic Portal” and place these use cases inside, connecting each actor to its relevant use cases.
+
 4.x Whole System Class Diagram
 Core Identity & Security
 User
 Attributes: id, name, email, password, role, photo, email_verified_at
 Relationships:
 1–0..1 with Student (a student user has one student profile)
-1–* with Message (sent / received)
-1–* with Announcement (author)
-1–* with Notification (Laravel notifications)
+1–_ with Message (sent / received)
+1–_ with Announcement (author)
+1–_ with Notification (Laravel notifications)
 Student
 Attributes: id, user_id, student_no, full_name, dob, gender, email, phone, address, programme, intake_year, status, photo, id_card, transcript
 Relationships:
-*–* with Course via Enrollment
-1–* with Grade
-1–* with Fee
-1–* with Attendance
+_–_ with Course via Enrollment
+1–_ with Grade
+1–_ with Fee
+1–_ with Attendance
 1–0..1 with LowAttendanceAlertState
 Academic Structure
 Course
 Attributes: id, course_code, title, credits, semester, photo
 Relationships:
-1–* with Subject
-*–* with Student via Enrollment
-*–* with User (teachers) via course_teacher
-1–* with Timetable
-1–* with Grade
+1–_ with Subject
+_–_ with Student via Enrollment
+_–_ with User (teachers) via course_teacher
+1–_ with Timetable
+1–_ with Grade
 Subject
 Attributes: id, course_id, subject_code, title, credits, description, photo
 Relationships:
-*–* with User (teachers) via subject_teacher
-1–* with Grade
-1–* with Timetable
-1–* with Attendance
+_–_ with User (teachers) via subject_teacher
+1–_ with Grade
+1–_ with Timetable
+1–_ with Attendance
 Enrollment (pivot course_student)
 Attributes: id, course_id, student_id, status, timestamps
 Relationships:
@@ -279,7 +280,7 @@ Relationships:
 Many-to-one to Student
 Many-to-one to Subject
 Many-to-one to Course
-1–* with GradeReviewLog
+1–_ with GradeReviewLog
 GradeReviewLog
 Attributes: id, grade_id, performed_by, action, reason, meta, timestamps
 Relationships:
@@ -311,7 +312,7 @@ Announcement
 Attributes: id, user_id, title, body, priority, pinned, require_ack, audience, publish_at, expires_at
 Relationships:
 Many-to-one to User (author)
-1–* with AnnouncementRead
+1–_ with AnnouncementRead
 AnnouncementRead
 Attributes: id, announcement_id, user_id, read_at, acknowledged_at
 Relationships:
@@ -334,4 +335,4 @@ You can now:
 Draw the use case diagram with these actors + grouped use cases inside one system boundary.
 Draw the class diagram with these classes, showing:
 Associations: e.g. Student–Enrollment–Course, Student–Grade–Subject–Course.
-Multiplicities: 1, 0..1, * as outlined above.
+Multiplicities: 1, 0..1, \* as outlined above.

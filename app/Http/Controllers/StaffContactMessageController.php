@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -56,6 +57,24 @@ class StaffContactMessageController extends Controller
         }
 
         return back();
+    }
+
+    /**
+     * Reply to a contact message (store reply text and mark as replied).
+     */
+    public function reply(Request $request, ContactMessage $contactMessage): RedirectResponse
+    {
+        $data = $request->validate([
+            'reply' => ['required', 'string', 'max:5000'],
+        ]);
+
+        $contactMessage->update([
+            'reply' => $data['reply'],
+            'replied_at' => now(),
+            'is_read' => true,
+        ]);
+
+        return back()->with('success', 'Reply saved.');
     }
 }
 

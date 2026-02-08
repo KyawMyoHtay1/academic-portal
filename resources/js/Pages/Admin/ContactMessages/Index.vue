@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from "vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
@@ -16,6 +16,13 @@ const items = computed(() => [
 
 const search = ref(props.filters?.q ?? "");
 let searchTimer = null;
+
+const replyModalOpen = ref(false);
+const replyTargetMessage = ref(null);
+
+const replyForm = useForm({
+    reply: "",
+});
 
 watch(
     search,
@@ -34,6 +41,26 @@ watch(
 
 function markRead(messageId) {
     router.post(route("admin.contact-messages.read", messageId), {}, { preserveScroll: true });
+}
+
+function openReplyModal(message) {
+    replyTargetMessage.value = message;
+    replyForm.reply = message.reply || "";
+    replyModalOpen.value = true;
+}
+
+function closeReplyModal() {
+    replyModalOpen.value = false;
+    replyTargetMessage.value = null;
+    replyForm.reset();
+}
+
+function submitReply() {
+    if (!replyTargetMessage.value) return;
+    replyForm.post(route("admin.contact-messages.reply", replyTargetMessage.value.id), {
+        preserveScroll: true,
+        onSuccess: () => closeReplyModal(),
+    });
 }
 </script>
 
@@ -128,6 +155,9 @@ export default {
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Date
                                     </th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                        Reply
+                                    </th>
                                     <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Actions
                                     </th>
@@ -169,20 +199,45 @@ export default {
                                     <td class="px-6 py-4 text-sm text-slate-600">
                                         {{ new Date(m.created_at).toLocaleString() }}
                                     </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                                            :disabled="m.is_read"
-                                            @click="markRead(m.id)"
+                                    <td class="px-6 py-4 text-sm">
+                                        <span
+                                            v-if="m.reply"
+                                            class="max-w-xs truncate block text-slate-700"
+                                            :title="m.reply"
                                         >
-                                            Mark read
-                                        </button>
+                                            {{ m.reply }}
+                                        </span>
+                                        <span
+                                            v-else-if="m.replied_at"
+                                            class="text-slate-500 italic"
+                                        >
+                                            Replied
+                                        </span>
+                                        <span v-else class="text-slate-400">—</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex flex-wrap justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
+                                                @click="openReplyModal(m)"
+                                            >
+                                                {{ m.reply || m.replied_at ? "Edit reply" : "Reply" }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                                                :disabled="m.is_read"
+                                                @click="markRead(m.id)"
+                                            >
+                                                Mark read
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
 
                                 <tr v-if="messages.data.length === 0">
-                                    <td class="px-6 py-6 text-center text-sm text-slate-600" colspan="5">
+                                    <td class="px-6 py-6 text-center text-sm text-slate-600" colspan="6">
                                         <span v-if="search">No results for "{{ search }}".</span>
                                         <span v-else>No contact messages yet.</span>
                                     </td>
@@ -197,6 +252,72 @@ export default {
                 </div>
             </div>
         </div>
+
+        <!-- Reply Modal -->
+        <Teleport to="body">
+            <div
+                v-if="replyModalOpen"
+                class="fixed inset-0 z-50 overflow-y-auto"
+                aria-labelledby="modal-title"
+                role="dialog"
+                aria-modal="true"
+            >
+                <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                    <div
+                        class="fixed inset-0 bg-slate-500/75 transition-opacity"
+                        aria-hidden="true"
+                        @click="closeReplyModal"
+                    />
+                    <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+                    <div
+                        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+                    >
+                        <div>
+                            <h3
+                                id="modal-title"
+                                class="text-lg font-semibold leading-6 text-slate-900"
+                            >
+                                Reply to {{ replyTargetMessage?.first_name }} {{ replyTargetMessage?.last_name }}
+                            </h3>
+                            <p class="mt-1 text-sm text-slate-500">
+                                {{ replyTargetMessage?.email }}
+                            </p>
+                            <div class="mt-4">
+                                <label for="reply-text" class="block text-sm font-medium text-slate-700">Your reply</label>
+                                <textarea
+                                    id="reply-text"
+                                    v-model="replyForm.reply"
+                                    rows="4"
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
+                                    :class="{ 'border-red-300': replyForm.errors.reply }"
+                                    placeholder="Type your reply here..."
+                                />
+                                <p v-if="replyForm.errors.reply" class="mt-1 text-sm text-red-600">
+                                    {{ replyForm.errors.reply }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                            <button
+                                type="button"
+                                :disabled="replyForm.processing"
+                                class="inline-flex w-full justify-center rounded-md bg-portal-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 disabled:opacity-50 sm:col-start-2"
+                                @click="submitReply"
+                            >
+                                {{ replyForm.processing ? "Saving..." : "Save reply" }}
+                            </button>
+                            <button
+                                type="button"
+                                class="mt-3 inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 sm:col-start-1 sm:mt-0"
+                                @click="closeReplyModal"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </AuthenticatedLayout>
 </template>
 

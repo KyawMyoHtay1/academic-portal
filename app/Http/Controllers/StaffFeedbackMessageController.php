@@ -55,5 +55,20 @@ class StaffFeedbackMessageController extends Controller
 
         return back();
     }
+
+    /**
+     * Mark a feedback message as replied.
+     */
+    public function markReplied(FeedbackMessage $feedbackMessage): RedirectResponse
+    {
+        if (! $feedbackMessage->replied_at) {
+            $feedbackMessage->forceFill([
+                'replied_at' => now(),
+                'is_read' => true,
+            ])->save();
+        }
+
+        return back()->with('success', 'Feedback marked as replied.');
+    }
 }
 

@@ -376,10 +376,12 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         // Contact Messages (staff inbox)
         Route::get('/admin/contact-messages', [StaffContactMessageController::class, 'index'])->name('admin.contact-messages.index');
         Route::post('/admin/contact-messages/{contactMessage}/read', [StaffContactMessageController::class, 'markRead'])->name('admin.contact-messages.read');
+        Route::post('/admin/contact-messages/{contactMessage}/reply', [StaffContactMessageController::class, 'reply'])->name('admin.contact-messages.reply');
 
         // Feedback Messages (staff inbox)
         Route::get('/admin/feedback-messages', [StaffFeedbackMessageController::class, 'index'])->name('admin.feedback-messages.index');
         Route::post('/admin/feedback-messages/{feedbackMessage}/read', [StaffFeedbackMessageController::class, 'markRead'])->name('admin.feedback-messages.read');
+        Route::post('/admin/feedback-messages/{feedbackMessage}/mark-replied', [StaffFeedbackMessageController::class, 'markReplied'])->name('admin.feedback-messages.mark-replied');
 
         // Student Management
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
