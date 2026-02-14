@@ -381,7 +381,7 @@ const quickActions = computed(() => {
                         </div>
                         <div class="ml-4 flex-shrink-0">
                             <div
-                                class="flex h-16 w-16 items-center justify-center rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                class="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-500 text-white shadow-lg transition-transform duration-300 group-hover:scale-110"
                                 :class="{
                                     'bg-gradient-to-br from-blue-500 to-blue-600':
                                         card.title === 'Students' ||
@@ -858,7 +858,7 @@ const quickActions = computed(() => {
                         hasChartData(charts.attendanceLine) ||
                         hasChartData(charts.courseEnrollment)
                     "
-                    class="space-y-6 rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
+                    class="space-y-6 rounded-2xl border border-blue-100 border-l-4 border-l-blue-500 bg-gradient-to-b from-blue-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
                     <div
                         class="flex items-start gap-4 rounded-xl border border-blue-200/60 bg-white px-5 py-4 shadow-sm"
@@ -892,7 +892,7 @@ const quickActions = computed(() => {
                             </p>
                         </div>
                     </div>
-                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                     <DashboardChart
                         v-if="hasChartData(charts.feeStatus)"
                         type="doughnut"
@@ -1471,7 +1471,7 @@ const quickActions = computed(() => {
                         hasChartData(charts.feesCollectedLine) ||
                         hasChartData(charts.gradeStatus)
                     "
-                    class="space-y-6 rounded-2xl border border-emerald-100 bg-gradient-to-b from-emerald-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
+                    class="space-y-6 rounded-2xl border border-emerald-100 border-l-4 border-l-emerald-500 bg-gradient-to-b from-emerald-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
                     <div
                         class="flex items-start gap-4 rounded-xl border border-emerald-200/60 bg-white px-5 py-4 shadow-sm"
@@ -1505,7 +1505,7 @@ const quickActions = computed(() => {
                             </p>
                         </div>
                     </div>
-                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                     <DashboardChart
                         v-if="hasChartData(charts.feeStatus)"
                         type="doughnut"
@@ -2218,7 +2218,7 @@ const quickActions = computed(() => {
                         hasChartData(charts.attendanceLine) ||
                         hasChartData(charts.assignmentsBySubject)
                     "
-                    class="space-y-6 rounded-2xl border border-indigo-100 bg-gradient-to-b from-indigo-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
+                    class="space-y-6 rounded-2xl border border-indigo-100 border-l-4 border-l-indigo-500 bg-gradient-to-b from-indigo-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
                     <div
                         class="flex items-start gap-4 rounded-xl border border-indigo-200/60 bg-white px-5 py-4 shadow-sm"
@@ -2248,11 +2248,11 @@ const quickActions = computed(() => {
                                 Teaching analytics
                             </p>
                             <p class="mt-1 text-sm font-medium text-indigo-900">
-                                Class performance and engagement indicators for your subjects.
-                            </p>
+                        Class performance and engagement indicators for your subjects.
+                    </p>
                         </div>
                     </div>
-                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                     <DashboardChart
                         v-if="hasChartData(charts.gradeStatus)"
                         type="doughnut"

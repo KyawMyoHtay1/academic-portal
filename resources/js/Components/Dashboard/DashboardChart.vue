@@ -181,24 +181,41 @@ const titleClass = computed(() => {
 });
 
 const iconClass = computed(() => {
-    if (props.variant === "staff") return "text-emerald-500";
-    if (props.variant === "teacher") return "text-indigo-500";
-    return "text-blue-500";
+    if (props.variant === "staff") return "text-emerald-600";
+    if (props.variant === "teacher") return "text-indigo-600";
+    return "text-blue-600";
+});
+
+const iconBgClass = computed(() => {
+    if (props.variant === "staff") return "bg-emerald-100";
+    if (props.variant === "teacher") return "bg-indigo-100";
+    return "bg-blue-100";
+});
+
+const accentDotClass = computed(() => {
+    if (props.variant === "staff") return "bg-emerald-400";
+    if (props.variant === "teacher") return "bg-indigo-400";
+    return "bg-blue-400";
 });
 </script>
 
 <template>
     <div
-        class="rounded-2xl border p-5 transition-all duration-300"
+        class="relative rounded-2xl border p-5 transition-all duration-300"
         :class="chartCardClass"
     >
+        <span
+            class="absolute right-4 top-4 h-2 w-2 rounded-full"
+            :class="accentDotClass"
+            aria-hidden="true"
+        />
         <div
             v-if="title"
             class="mb-4 flex items-center gap-2.5"
         >
             <span
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100"
-                :class="iconClass"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                :class="[iconBgClass, iconClass]"
                 aria-hidden="true"
             >
                 <svg
