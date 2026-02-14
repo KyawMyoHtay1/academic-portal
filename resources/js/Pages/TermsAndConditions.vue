@@ -1,6 +1,7 @@
 <script setup>
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
+import { computed } from "vue";
 
 const termlyHtml = `<style>
   [data-custom-class='body'], [data-custom-class='body'] * {
@@ -331,20 +332,133 @@ word-break: break-word !important;
           </span>
       </div>
       </div>`;
+
+const renderedTermlyHtml = computed(() => {
+    if (!termlyHtml) return "";
+
+    const currentOrigin =
+        typeof window !== "undefined" ? window.location.origin : "";
+
+    return termlyHtml
+        .replaceAll("http://127.0.0.1:8000", currentOrigin || "https://example.com")
+        .replaceAll("__________", "University Academic Portal")
+        .replaceAll("â†’", "->")
+        .replaceAll("â€‘", "-")
+        .replaceAll("â€™", "'")
+        .replaceAll("â€œ", "\"")
+        .replaceAll("â€", "\"")
+        .replaceAll("Â ", " ")
+        .replaceAll("Â", "");
+});
+
+const hasTermlyContent = computed(
+    () => !!renderedTermlyHtml.value && renderedTermlyHtml.value.trim().length > 0
+);
+
+const termsLastUpdated = computed(() => {
+    const match = termlyHtml.match(/Last updated\s*<bdt class="question">([^<]+)<\/bdt>/i);
+    return match?.[1] ?? "Recently updated";
+});
 </script>
 
 <template>
-  <GuestLayout>
-    <Head title="Terms & Conditions" />
-    <div class="font-sans text-gray-900 antialiased">
-      <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
-        <div class="min-h-screen flex flex-col items-center pt-6 sm:pt-0">
-          <div
-            class="w-full sm:max-w-7xl mt-6 p-6 bg-white shadow-md overflow-hidden sm:rounded-lg prose"
-            v-html="termlyHtml"
-          />
+    <GuestLayout>
+        <Head title="Terms & Conditions" />
+
+        <div
+            class="min-h-[80vh] w-full bg-gradient-to-b from-slate-50 via-white to-emerald-50/30"
+        >
+            <div
+                class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12"
+            >
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <Link
+                        href="/"
+                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M15 19l-7-7 7-7"
+                            />
+                        </svg>
+                        <span>Back to Home</span>
+                    </Link>
+                    <span
+                        class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                    >
+                        Termly Terms & Conditions
+                    </span>
+                </div>
+
+                <section
+                    class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8"
+                >
+                    <div
+                        class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-emerald-100/40 blur-3xl"
+                    ></div>
+                    <div
+                        class="pointer-events-none absolute -left-24 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-teal-100/40 blur-3xl"
+                    ></div>
+                    <div class="relative">
+                        <div
+                            class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700"
+                        >
+                            Legal Agreement
+                        </div>
+                        <h1
+                            class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
+                        >
+                            Terms & Conditions
+                        </h1>
+                        <p class="mt-2 max-w-3xl text-sm text-slate-600">
+                            Review usage terms, account responsibilities,
+                            academic conduct expectations, and legal conditions
+                            for the University Academic Portal.
+                        </p>
+                        <div
+                            class="mt-4 inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700"
+                        >
+                            Last updated: {{ termsLastUpdated }}
+                        </div>
+                    </div>
+                </section>
+
+                <div
+                    class="prose prose-slate mt-6 max-w-none rounded-3xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 sm:p-6 lg:p-8"
+                >
+                    <div
+                        v-if="hasTermlyContent"
+                        class="policy-shell not-prose min-h-[60vh] rounded-2xl border border-slate-100 bg-white p-4 sm:p-6"
+                        v-html="renderedTermlyHtml"
+                    />
+
+                    <div
+                        v-else
+                        class="not-prose rounded-2xl border border-dashed border-amber-400 bg-amber-50 p-4 text-sm text-amber-800"
+                    >
+                        <p class="mb-1 font-semibold">Admin setup required</p>
+                        <p>
+                            In Termly, open your Terms & Conditions ->
+                            <span class="font-semibold">Add to website</span> ->
+                            choose <span class="font-semibold">HTML</span> ->
+                            copy the full embed and paste it into
+                            <code>termlyHtml</code> in
+                            <code
+                                >resources/js/Pages/TermsAndConditions.vue</code
+                            >.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </GuestLayout>
+    </GuestLayout>
 </template>
