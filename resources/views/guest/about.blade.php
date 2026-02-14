@@ -105,6 +105,45 @@
     </section>
 
     <section class="space-y-6">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Why Students Choose Us</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">A complete learning environment, not just a classroom</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                Our student experience combines strong academics, career mentorship, and modern campus services. From first-year orientation to graduation support, we focus on practical outcomes, wellbeing, and long-term employability.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Academic Depth</h3>
+                <p class="mt-2 text-sm text-slate-600">Programs designed with clear progression, specialist pathways, and assessment practices aligned with quality assurance standards.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5V4H2v16h5m10 0v-5a3 3 0 00-6 0v5m6 0H7" />
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Career Readiness</h3>
+                <p class="mt-2 text-sm text-slate-600">Industry-focused projects, practical assignments, and employability support that connect classroom learning to real work contexts.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-1.414 1.414M6.343 17.657l-1.414 1.414M12 8v4l2 2m6-2a8 8 0 11-16 0 8 8 0 0116 0z" />
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Student Support</h3>
+                <p class="mt-2 text-sm text-slate-600">Dedicated academic advising, responsive support channels, and transparent communication throughout each academic term.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="space-y-6">
         <div class="max-w-2xl">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Core Values</p>
             <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Principles that guide every decision</h2>

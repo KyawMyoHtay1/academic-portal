@@ -119,6 +119,30 @@
         </div>
     </section>
 
+    <section class="space-y-6">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Role-Based Experience</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Purpose-built interfaces for each user group</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                The portal is structured so each role can focus on relevant tasks without unnecessary complexity. Students track progress, teachers manage delivery, and staff oversee institutional workflows.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <h3 class="text-lg font-semibold text-slate-900">Students</h3>
+                <p class="mt-2 text-sm text-slate-600">View enrollments, grades, fees, announcements, and attendance trends from one personalized dashboard.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <h3 class="text-lg font-semibold text-slate-900">Teachers</h3>
+                <p class="mt-2 text-sm text-slate-600">Manage attendance, assignment grading, class communication, and academic performance oversight for taught subjects.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <h3 class="text-lg font-semibold text-slate-900">Administrative Staff</h3>
+                <p class="mt-2 text-sm text-slate-600">Oversee admissions, approvals, timetables, course structures, and compliance reporting across departments.</p>
+            </div>
+        </div>
+    </section>
+
     <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Service Flow</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How the portal supports the academic cycle</h2>

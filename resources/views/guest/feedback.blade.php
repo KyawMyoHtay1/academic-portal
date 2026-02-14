@@ -184,5 +184,44 @@
             </div>
         </div>
     </section>
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">What Makes Feedback Useful</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Include context, impact, and expected outcome</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                High-quality feedback helps us prioritize the right fixes and enhancements. Sharing where the issue occurred, what happened, and what result you expected allows teams to reproduce and resolve problems faster.
+            </p>
+        </div>
+        <div class="mt-6 grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h6m-8 8h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h3 class="mt-3 text-sm font-semibold text-slate-900">Describe the page or feature</h3>
+                <p class="mt-1 text-xs text-slate-600">Mention the exact area (for example: grades page, timetable screen, or payment status section).</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8m-8 4h5m4 7H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <h3 class="mt-3 text-sm font-semibold text-slate-900">Explain what happened</h3>
+                <p class="mt-1 text-xs text-slate-600">Share actual behavior, any error message shown, and whether the issue is repeatable.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h3 class="mt-3 text-sm font-semibold text-slate-900">State the expected result</h3>
+                <p class="mt-1 text-xs text-slate-600">Tell us what you expected to see so we can align fixes with user needs and academic workflows.</p>
+            </div>
+        </div>
+    </section>
 </div>
 @endsection

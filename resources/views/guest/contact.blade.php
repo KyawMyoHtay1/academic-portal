@@ -214,6 +214,30 @@
         </div>
     </section>
 
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Before You Submit</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Send clearer requests for faster responses</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                Including the right information helps our team route your message to the correct department and reduce back-and-forth delays. For technical issues, include your role and the page where the issue occurred.
+            </p>
+        </div>
+        <div class="mt-6 grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 class="text-sm font-semibold text-slate-900">Select a clear subject</h3>
+                <p class="mt-2 text-xs text-slate-600">Use a concise subject line such as "Fee receipt issue" or "Enrollment approval delay".</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 class="text-sm font-semibold text-slate-900">Provide key details</h3>
+                <p class="mt-2 text-xs text-slate-600">Mention your role, affected course or module, and any deadline impacted.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 class="text-sm font-semibold text-slate-900">Add supporting context</h3>
+                <p class="mt-2 text-xs text-slate-600">Include reference numbers or screenshots when applicable so we can investigate quickly.</p>
+            </div>
+        </div>
+    </section>
+
     <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-md ring-1 ring-amber-200/50 md:p-12">
         <h2 class="text-3xl font-bold text-[color:var(--portal-navy)]">Need help with the portal right now?</h2>
         <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-700 md:text-base">

@@ -82,6 +82,38 @@
     </section>
 
     <section class="space-y-6">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Policy Lifecycle</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How university policies are created and maintained</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                Policies are not static documents. They are reviewed with academic leaders, compliance teams, and operations staff to ensure regulations remain current, practical, and fair for all users.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">01</p>
+                <h3 class="mt-1 text-sm font-semibold text-slate-900">Drafting</h3>
+                <p class="mt-2 text-xs text-slate-600">Academic and operational teams define scope, obligations, and expected behaviors.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">02</p>
+                <h3 class="mt-1 text-sm font-semibold text-slate-900">Review</h3>
+                <p class="mt-2 text-xs text-slate-600">Cross-functional review confirms legal alignment, enforceability, and clarity.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">03</p>
+                <h3 class="mt-1 text-sm font-semibold text-slate-900">Publication</h3>
+                <p class="mt-2 text-xs text-slate-600">Approved policy updates are communicated through portal announcements and guidance pages.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">04</p>
+                <h3 class="mt-1 text-sm font-semibold text-slate-900">Monitoring</h3>
+                <p class="mt-2 text-xs text-slate-600">Feedback and operational data inform refinements for the next review cycle.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="space-y-6">
         <div class="max-w-2xl">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Policy Areas</p>
             <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Key guidelines at a glance</h2>

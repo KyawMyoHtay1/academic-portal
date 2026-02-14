@@ -114,6 +114,33 @@
     </section>
 
     <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Issue Priorities</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How requests are triaged and resolved</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                Support tickets are processed according to academic impact, urgency, and scope. This helps us resolve critical issues quickly while maintaining transparent communication for all request types.
+            </p>
+        </div>
+        <div class="mt-6 grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+                <p class="text-xs font-semibold uppercase tracking-wide text-red-700">High Priority</p>
+                <h3 class="mt-1 text-sm font-semibold text-red-900">Login and access failures</h3>
+                <p class="mt-2 text-xs text-red-800">Account lockouts, role permission errors, and service unavailability affecting coursework.</p>
+            </div>
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Medium Priority</p>
+                <h3 class="mt-1 text-sm font-semibold text-amber-900">Data mismatch and workflow issues</h3>
+                <p class="mt-2 text-xs text-amber-800">Incorrect timetable entries, missing course links, and delayed record updates.</p>
+            </div>
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Standard Priority</p>
+                <h3 class="mt-1 text-sm font-semibold text-emerald-900">General guidance requests</h3>
+                <p class="mt-2 text-xs text-emerald-800">Navigation help, feature questions, and best-practice support for common tasks.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Recommended Path</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How to resolve issues quickly</h2>
         <div class="mt-6 grid gap-4 md:grid-cols-4">

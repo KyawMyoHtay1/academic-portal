@@ -89,6 +89,45 @@
     </section>
 
     <section class="space-y-6">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Vision In Practice</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How this direction translates into daily experience</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                Our long-term vision is executed through measurable improvements in reliability, data quality, and user confidence. Every feature decision is tied to academic outcomes and operational clarity.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h8m0 0l-3-3m3 3l-3 3M7 7h10a4 4 0 014 4v6a2 2 0 01-2 2H7a4 4 0 01-4-4V9a2 2 0 012-2z" />
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Reliable Access</h3>
+                <p class="mt-2 text-sm text-slate-600">Stable service delivery with predictable performance during peak periods such as enrollment and results release.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Transparent Records</h3>
+                <p class="mt-2 text-sm text-slate-600">Role-based visibility of grades, attendance, enrollments, and fees to reduce confusion and repetitive support requests.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Continuous Improvement</h3>
+                <p class="mt-2 text-sm text-slate-600">Iterative enhancements driven by feedback, service analytics, and institutional priorities each academic cycle.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="space-y-6">
         <div class="max-w-2xl">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Focus Areas</p>
             <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Where our vision leads us next</h2>
