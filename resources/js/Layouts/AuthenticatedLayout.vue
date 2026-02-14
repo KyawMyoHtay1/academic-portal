@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import PortalLogo from "@/Components/PortalLogo.vue";
+import GlobalSearch from "@/Components/GlobalSearch.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import GoogleTranslate from "@/Components/GoogleTranslate.vue";
@@ -928,6 +929,9 @@ const headerStatus = computed(() => {
                     </div>
 
                     <div class="flex items-center gap-4">
+                        <!-- Global search -->
+                        <GlobalSearch />
+
                         <!-- Status pill -->
                         <div
                             class="hidden items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 sm:flex"

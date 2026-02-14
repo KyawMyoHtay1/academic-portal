@@ -10,6 +10,7 @@ use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffEnrollmentController;
@@ -314,6 +315,8 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth', 'nocache'])->group(function () {
+    Route::get('/search', SearchController::class)->name('search');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
