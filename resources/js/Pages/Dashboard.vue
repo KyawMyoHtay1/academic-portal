@@ -884,6 +884,7 @@ const quickActions = computed(() => {
                         :chart-data="charts.gradesBySubject"
                         title="Scores by subject"
                         :variant="role"
+                        :decimals="1"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.attendanceLine)"
@@ -893,6 +894,7 @@ const quickActions = computed(() => {
                         :y-max="100"
                         :variant="role"
                         value-format="percent"
+                        :decimals="1"
                     />
                 </div>
 
@@ -2176,6 +2178,7 @@ const quickActions = computed(() => {
                         :y-max="100"
                         :variant="role"
                         value-format="percent"
+                        :decimals="1"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.assignmentsBySubject)"

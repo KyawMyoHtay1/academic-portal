@@ -58,24 +58,33 @@ const props = defineProps({
         default: "number",
         validator: (v) => ["number", "percent", "currency"].includes(v),
     },
+    decimals: {
+        type: Number,
+        default: null,
+    },
 });
 
 const formatValue = (rawValue) => {
     const value = Number(rawValue ?? 0);
+    const fractionDigits = props.decimals ?? 0;
 
     if (props.valueFormat === "percent") {
-        return `${value}%`;
+        return `${value.toFixed(fractionDigits)}%`;
     }
 
     if (props.valueFormat === "currency") {
         return new Intl.NumberFormat("en-GB", {
             style: "currency",
             currency: "GBP",
-            maximumFractionDigits: 0,
+            minimumFractionDigits: fractionDigits,
+            maximumFractionDigits: fractionDigits,
         }).format(value);
     }
 
-    return new Intl.NumberFormat().format(value);
+    return new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits,
+    }).format(value);
 };
 
 const options = computed(() => {
