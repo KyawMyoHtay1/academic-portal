@@ -42,7 +42,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Access the standards that govern assessment, attendance, grading, conduct, and academic integrity across the university.
+                Access the standards that govern assessment, attendance, grading, conduct, and academic integrity across the university. These guidelines help ensure fair treatment, consistent decisions, and a shared understanding of responsibilities for all roles.
             </p>
         </div>
     </section>
@@ -75,10 +75,10 @@
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">A clear framework for fair academic practice</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
             <p>
-                This page provides the official policy framework used by students, teachers, and staff to manage academic responsibilities consistently and transparently.
+                This page provides the official policy framework used by students, teachers, and staff to manage academic responsibilities consistently and transparently across faculties and departments.
             </p>
             <p>
-                Policies are reviewed periodically to reflect institutional requirements, legal obligations, and quality assurance standards.
+                Policies are reviewed periodically to reflect institutional requirements, legal obligations, and quality assurance standards. Where needed, updates are coordinated with academic leadership so policy language remains practical, enforceable, and easy to interpret.
             </p>
         </div>
     </section>

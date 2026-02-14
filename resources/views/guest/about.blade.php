@@ -42,7 +42,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                We combine rigorous teaching, modern learning technology, and a supportive campus culture to help students grow as professionals, researchers, and leaders.
+                We combine rigorous teaching, modern learning technology, and a deeply supportive campus culture to help learners develop strong knowledge, practical capability, and professional confidence. From orientation to graduation, our focus is on helping every student build a meaningful academic and career path.
             </p>
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <a href="{{ route('guest.courses') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-md hover:bg-slate-100">
@@ -83,7 +83,7 @@
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Our Mission</p>
             <h2 class="mt-3 text-3xl font-bold text-[color:var(--portal-navy)]">Deliver quality education for all learners</h2>
             <p class="mt-4 text-sm leading-relaxed text-slate-600">
-                We empower students through research-informed teaching, mentorship, and practical learning experiences that prepare them for meaningful careers and lifelong growth.
+                We empower students through research-informed teaching, consistent mentorship, and practical learning experiences that connect theory to real-world challenges. Our teaching model emphasizes critical thinking, communication, and ethical responsibility so graduates can contribute with confidence in fast-changing environments.
             </p>
             <ul class="mt-5 space-y-2 text-sm text-slate-700">
                 <li>Research-driven instruction</li>
@@ -96,7 +96,7 @@
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Our Vision</p>
             <h2 class="mt-3 text-3xl font-bold text-[color:var(--portal-navy)]">Lead innovation and global impact</h2>
             <p class="mt-4 text-sm leading-relaxed text-slate-600">
-                We aim to be recognized for academic excellence, impactful research, and graduates who contribute solutions to local and global challenges.
+                We aim to be recognized for academic excellence, impactful research, and graduates who create practical solutions to local and global challenges. Our long-term direction is to strengthen interdisciplinary collaboration, expand international engagement, and advance a culture where innovation and inclusion grow together.
             </p>
             <ul class="mt-5 space-y-2 text-sm text-slate-700">
                 <li>Global academic recognition</li>

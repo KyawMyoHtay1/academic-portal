@@ -42,7 +42,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Contact admissions, academics, support, or student services. Send us a message and we will respond as quickly as possible.
+                Contact admissions, academics, support, or student services through one clear channel. Send us a message with context and we will route it to the right team for timely follow-up.
             </p>
         </div>
     </section>
@@ -76,7 +76,7 @@
             <div class="mb-6">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Send Message</p>
                 <h2 class="mt-2 text-2xl font-bold text-[color:var(--portal-navy)] md:text-3xl">Contact our team</h2>
-                <p class="mt-2 text-sm text-slate-600">Complete the form and include enough detail so we can respond effectively.</p>
+                <p class="mt-2 text-sm text-slate-600">Complete the form and include enough detail so we can respond effectively. Specific requests help us reduce delays and provide more accurate guidance on the first response.</p>
             </div>
 
             @if (session('success'))

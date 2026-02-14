@@ -41,7 +41,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Your suggestions and issue reports help us improve usability, performance, and academic service quality.
+                Your suggestions and issue reports help us improve usability, performance, and academic service quality. Feedback from students, teachers, and administrative teams directly informs product priorities, workflow improvements, and support planning.
             </p>
         </div>
     </section>
@@ -74,7 +74,7 @@
             <div class="mb-6">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Submit Feedback</p>
                 <h2 class="mt-2 text-2xl font-bold text-[color:var(--portal-navy)] md:text-3xl">Tell us what should improve</h2>
-                <p class="mt-2 text-sm text-slate-600">Use the form below to share suggestions, report issues, or leave compliments.</p>
+                <p class="mt-2 text-sm text-slate-600">Use the form below to share suggestions, report issues, or leave compliments. Clear, specific feedback helps us investigate quickly and apply improvements where they matter most.</p>
             </div>
 
             @if (session('success'))

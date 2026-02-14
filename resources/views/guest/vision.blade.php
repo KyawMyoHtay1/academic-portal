@@ -41,7 +41,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Our vision is to make academic processes simple, transparent, and reliable for students, teachers, and administrators.
+                Our vision is to make academic processes simple, transparent, and reliable for students, teachers, and administrators. We want every user to move through important academic tasks with clarity, confidence, and minimal friction.
             </p>
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <a href="{{ route('guest.courses') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-md hover:bg-slate-100">
@@ -82,10 +82,10 @@
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">A trusted digital backbone for academic life</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
             <p>
-                The University Academic Portal is designed to provide a secure, efficient, and user-focused environment for managing teaching, learning, and academic administration.
+                The University Academic Portal is designed to provide a secure, efficient, and user-focused environment for managing teaching, learning, and academic administration at scale.
             </p>
             <p>
-                We aim to reduce manual overhead, improve communication across roles, and keep academic records accurate and accessible so the institution can focus more on learning outcomes and innovation.
+                We aim to reduce manual overhead, improve communication across roles, and keep academic records accurate, auditable, and easy to access. This allows faculty and staff to spend less time on fragmented processes and more time on student outcomes, curriculum quality, and innovation.
             </p>
         </div>
     </section>

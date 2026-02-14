@@ -44,7 +44,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Manage registration, courses, grades, fees, timetables, attendance, and communication through one secure and easy-to-use platform.
+                Manage registration, courses, grades, fees, timetables, attendance, and communication through one secure and easy-to-use platform. The goal is to reduce administrative friction while improving data quality and institutional responsiveness at every stage of the academic cycle.
             </p>
         </div>
     </section>
@@ -77,10 +77,10 @@
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">Built for students, teachers, and academic staff</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
             <p>
-                The portal centralizes critical academic services so every role can complete daily tasks with fewer delays and better visibility.
+                The portal centralizes critical academic services so every role can complete daily tasks with fewer delays and better visibility into academic operations.
             </p>
             <p>
-                Instead of disconnected systems and manual handoffs, information is synchronized across enrollment, assessment, finance, and scheduling workflows.
+                Instead of disconnected systems and manual handoffs, information is synchronized across enrollment, assessment, finance, and scheduling workflows. This improves coordination between teams and gives decision-makers a more reliable operational picture.
             </p>
         </div>
     </section>

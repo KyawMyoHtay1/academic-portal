@@ -42,7 +42,7 @@
                 </span>
             </h1>
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Get quick answers, practical guides, and direct support for any question about the University Academic Portal.
+                Get quick answers, practical guides, and direct support for any question about the University Academic Portal. Whether you are resolving an urgent access issue or requesting process guidance, our support model is designed for clarity and fast turnaround.
             </p>
         </div>
     </section>
@@ -75,10 +75,10 @@
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">Fast help for portal access and academic workflows</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
             <p>
-                The Help Desk supports login issues, role access, timetable questions, grade visibility, fee pages, and service navigation.
+                The Help Desk supports login issues, role access, timetable questions, grade visibility, fee pages, and service navigation across all portal roles.
             </p>
             <p>
-                Start with self-help resources when possible, then contact support for direct investigation and follow-up.
+                Start with self-help resources when possible, then contact support for direct investigation and follow-up. Our objective is to keep service interruptions short and communicate resolution progress clearly.
             </p>
         </div>
     </section>
