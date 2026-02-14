@@ -135,12 +135,6 @@ const navigation = computed(() => {
             active: route().current("dashboard"),
             icon: getMenuIcon("Dashboard"),
         },
-        {
-            name: "Settings",
-            href: route("settings.index"),
-            active: route().current("settings.*"),
-            icon: getMenuIcon("Settings"),
-        },
     ];
 
     // Student features (show for students only)
@@ -395,6 +389,14 @@ const navigation = computed(() => {
             ])
         );
     }
+
+    // Settings at bottom (all roles)
+    items.push({
+        name: "Settings",
+        href: route("settings.index"),
+        active: route().current("settings.*"),
+        icon: getMenuIcon("Settings"),
+    });
 
     return items;
 });
