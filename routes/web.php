@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffEnrollmentController;
@@ -322,6 +323,10 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Settings (all roles: Staff, Teacher, Student)
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
     // Timebox 1: Student Profile (student self-view)
     Route::get('/student/profile', [StudentProfileController::class, 'show'])->name('student.profile.show');

@@ -1,0 +1,250 @@
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { computed } from "vue";
+
+const props = defineProps({
+    role: {
+        type: String,
+        required: true,
+    },
+    preferences: {
+        type: Object,
+        default: () => ({}),
+    },
+    status: {
+        type: String,
+        default: null,
+    },
+});
+
+const form = useForm({
+    email_announcements: props.preferences.email_announcements ?? true,
+    email_messages: props.preferences.email_messages ?? true,
+    email_notifications: props.preferences.email_notifications ?? true,
+});
+
+const roleLabel = computed(() => {
+    const r = props.role;
+    if (r === "student") return "Student";
+    if (r === "teacher") return "Teacher";
+    if (r === "staff" || r === "admin") return "Staff";
+    return r ? r.charAt(0).toUpperCase() + r.slice(1) : "User";
+});
+
+const submit = () => {
+    form.patch(route("settings.update"), {
+        preserveScroll: true,
+        onSuccess: () => form.reset(),
+    });
+};
+</script>
+
+<template>
+    <Head title="Settings" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                Settings
+            </h2>
+        </template>
+
+        <template #breadcrumb>
+            <div class="mb-4">
+                <Breadcrumb :items="[{ label: 'Settings' }]" />
+            </div>
+        </template>
+
+        <div class="py-12">
+            <div class="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
+                <!-- Status message -->
+                <div
+                    v-if="status"
+                    class="portal-card rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                >
+                    {{ status }}
+                </div>
+
+                <!-- Account section -->
+                <div class="portal-card overflow-hidden shadow sm:rounded-lg">
+                    <div class="border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-6">
+                        <h3 class="text-base font-semibold text-slate-900">
+                            Account
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-600">
+                            Manage your profile, password, and account details.
+                        </p>
+                    </div>
+                    <div class="px-4 py-4 sm:px-6">
+                        <Link
+                            :href="route('profile.edit')"
+                            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                        >
+                            <span>Edit profile &amp; password</span>
+                            <svg
+                                class="h-4 w-4 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </Link>
+                        <p class="mt-2 text-xs text-slate-500">
+                            Update your name, email, photo, and password.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Role-specific profile link (Student) -->
+                <div
+                    v-if="role === 'student'"
+                    class="portal-card overflow-hidden shadow sm:rounded-lg"
+                >
+                    <div class="border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-6">
+                        <h3 class="text-base font-semibold text-slate-900">
+                            Student profile
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-600">
+                            View and edit your student record (programme, ID, etc.).
+                        </p>
+                    </div>
+                    <div class="px-4 py-4 sm:px-6">
+                        <Link
+                            :href="route('student.profile.show')"
+                            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                        >
+                            <span>Student profile</span>
+                            <svg
+                                class="h-4 w-4 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Notifications section -->
+                <div class="portal-card overflow-hidden shadow sm:rounded-lg">
+                    <div class="border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-6">
+                        <h3 class="text-base font-semibold text-slate-900">
+                            Email notifications
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-600">
+                            Choose which emails you receive from the portal.
+                        </p>
+                    </div>
+                    <form @submit.prevent="submit" class="px-4 py-4 sm:px-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                <div class="flex-1">
+                                    <InputLabel
+                                        for="email_announcements"
+                                        value="Announcements"
+                                        class="font-medium text-slate-900"
+                                    />
+                                    <p class="mt-0.5 text-sm text-slate-500">
+                                        Receive emails when new announcements are published.
+                                    </p>
+                                </div>
+                                <Checkbox
+                                    id="email_announcements"
+                                    v-model:checked="form.email_announcements"
+                                    class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                />
+                            </div>
+                            <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                <div class="flex-1">
+                                    <InputLabel
+                                        for="email_messages"
+                                        value="Messages"
+                                        class="font-medium text-slate-900"
+                                    />
+                                    <p class="mt-0.5 text-sm text-slate-500">
+                                        Receive emails when you get a new message.
+                                    </p>
+                                </div>
+                                <Checkbox
+                                    id="email_messages"
+                                    v-model:checked="form.email_messages"
+                                    class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                />
+                            </div>
+                            <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                <div class="flex-1">
+                                    <InputLabel
+                                        for="email_notifications"
+                                        value="Portal notifications"
+                                        class="font-medium text-slate-900"
+                                    />
+                                    <p class="mt-0.5 text-sm text-slate-500">
+                                        Receive emails for grades, assignments, and other alerts.
+                                    </p>
+                                </div>
+                                <Checkbox
+                                    id="email_notifications"
+                                    v-model:checked="form.email_notifications"
+                                    class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                />
+                            </div>
+                        </div>
+                        <InputError class="mt-2" :message="form.errors.email_announcements" />
+                        <InputError class="mt-2" :message="form.errors.email_messages" />
+                        <InputError class="mt-2" :message="form.errors.email_notifications" />
+                        <div class="mt-6 flex items-center gap-4">
+                            <PrimaryButton :disabled="form.processing">
+                                Save preferences
+                            </PrimaryButton>
+                            <Transition
+                                enter-active-class="transition ease-in-out"
+                                enter-from-class="opacity-0"
+                                leave-active-class="transition ease-in-out"
+                                leave-to-class="opacity-0"
+                            >
+                                <p
+                                    v-if="form.recentlySuccessful"
+                                    class="text-sm text-slate-600"
+                                >
+                                    Saved.
+                                </p>
+                            </Transition>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Role badge -->
+                <div
+                    class="portal-card flex items-center gap-3 rounded-lg border border-slate-200 px-4 py-3 text-sm text-slate-600"
+                >
+                    <span class="font-medium text-slate-500">Logged in as</span>
+                    <span
+                        class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-800"
+                    >
+                        {{ roleLabel }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
