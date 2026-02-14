@@ -91,7 +91,7 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            // Chart data: Enrollments by course (bar) – top 8 courses
+            // Chart data: Enrollments by course (bar) - top 8 courses
             $enrollmentsByCourse = DB::table('course_student')
                 ->join('courses', 'courses.id', '=', 'course_student.course_id')
                 ->where('course_student.status', 'approved')
@@ -111,7 +111,7 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            // Chart data: Fees collected by month (line) – last 6 months
+            // Chart data: Fees collected by month (line) - last 6 months
             $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
             $feesByMonth = Fee::where('status', 'paid')
                 ->whereNotNull('paid_date')
@@ -132,7 +132,7 @@ class DashboardController extends Controller
             $chartsFeesCollectedLine = [
                 'labels' => $monthLabels,
                 'datasets' => [[
-                    'label' => 'Fees collected (£)',
+                    'label' => 'Fees collected (GBP)',
                     'data' => $monthTotals,
                     'borderColor' => '#10b981',
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
@@ -249,7 +249,7 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            // Chart data: Attendance rate by month (line) – last 6 months for my subjects
+            // Chart data: Attendance rate by month (line) - last 6 months for my subjects
             $attendanceByMonth = [];
             for ($i = 5; $i >= 0; $i--) {
                 $start = Carbon::now()->subMonths($i)->startOfMonth();
@@ -278,7 +278,7 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            // Chart data: Assignments by subject (bar) – my subjects
+            // Chart data: Assignments by subject (bar) - my subjects
             $assignmentsBySubject = Assignment::whereIn('subject_id', $subjectIds)
                 ->join('subjects', 'subjects.id', '=', 'assignments.subject_id')
                 ->select('subjects.subject_code', DB::raw('count(*) as total'))
@@ -351,7 +351,7 @@ class DashboardController extends Controller
         $chartsFeeStatus = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#f59e0b', '#10b981'], 'borderWidth' => 0]]];
         $chartsGradesBySubject = ['labels' => [], 'datasets' => [['label' => 'Score', 'data' => [], 'backgroundColor' => 'rgba(139, 92, 246, 0.7)', 'borderColor' => '#8b5cf6', 'borderWidth' => 1]]];
         $chartsAttendanceLine = ['labels' => [], 'datasets' => [['label' => 'Attendance %', 'data' => [], 'borderColor' => '#06b6d4', 'backgroundColor' => 'rgba(6, 182, 212, 0.1)', 'fill' => true, 'tension' => 0.3]]];
-        $chartsCourseEnrollment = ['labels' => ['Enrolled', 'Pending'], 'datasets' => [['data' => [0, 0], 'backgroundColor' => ['#3b82f6', '#f59e0b'], 'borderWidth' => 0]]];
+        $chartsCourseEnrollment = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#3b82f6', '#f59e0b'], 'borderWidth' => 0]]];
 
         if ($student) {
             $feePendingCount = $student->fees()->where('status', 'pending')->count();
@@ -437,5 +437,4 @@ class DashboardController extends Controller
         ]);
     }
 }
-
 

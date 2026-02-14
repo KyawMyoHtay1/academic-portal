@@ -49,6 +49,15 @@ const formatCurrency = (value) =>
         currency: "GBP",
         maximumFractionDigits: 0,
     }).format(value ?? 0);
+const hasChartData = (chart) => {
+    if (!chart || !Array.isArray(chart.datasets)) {
+        return false;
+    }
+
+    return chart.datasets.some(
+        (dataset) => Array.isArray(dataset?.data) && dataset.data.length > 0
+    );
+};
 
 const cards = computed(() => {
     const list = [];
@@ -847,29 +856,34 @@ const quickActions = computed(() => {
 
                 <!-- Dashboard charts - Student -->
                 <div
-                    v-if="charts.feeStatus || charts.gradesBySubject || charts.attendanceLine || charts.courseEnrollment"
+                    v-if="
+                        hasChartData(charts.feeStatus) ||
+                        hasChartData(charts.gradesBySubject) ||
+                        hasChartData(charts.attendanceLine) ||
+                        hasChartData(charts.courseEnrollment)
+                    "
                     class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
                 >
                     <DashboardChart
-                        v-if="charts.feeStatus"
+                        v-if="hasChartData(charts.feeStatus)"
                         type="doughnut"
                         :chart-data="charts.feeStatus"
                         title="Fee status"
                     />
                     <DashboardChart
-                        v-if="charts.courseEnrollment"
+                        v-if="hasChartData(charts.courseEnrollment)"
                         type="doughnut"
                         :chart-data="charts.courseEnrollment"
                         title="Enrollment status"
                     />
                     <DashboardChart
-                        v-if="charts.gradesBySubject"
+                        v-if="hasChartData(charts.gradesBySubject)"
                         type="bar"
                         :chart-data="charts.gradesBySubject"
                         title="Scores by subject"
                     />
                     <DashboardChart
-                        v-if="charts.attendanceLine"
+                        v-if="hasChartData(charts.attendanceLine)"
                         type="line"
                         :chart-data="charts.attendanceLine"
                         title="Attendance (last 6 months)"
@@ -1414,29 +1428,34 @@ const quickActions = computed(() => {
 
                 <!-- Dashboard charts - Staff -->
                 <div
-                    v-if="charts.feeStatus || charts.enrollmentsByCourse || charts.feesCollectedLine || charts.gradeStatus"
+                    v-if="
+                        hasChartData(charts.feeStatus) ||
+                        hasChartData(charts.enrollmentsByCourse) ||
+                        hasChartData(charts.feesCollectedLine) ||
+                        hasChartData(charts.gradeStatus)
+                    "
                     class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
                 >
                     <DashboardChart
-                        v-if="charts.feeStatus"
+                        v-if="hasChartData(charts.feeStatus)"
                         type="doughnut"
                         :chart-data="charts.feeStatus"
                         title="Fee status (all fees)"
                     />
                     <DashboardChart
-                        v-if="charts.gradeStatus"
+                        v-if="hasChartData(charts.gradeStatus)"
                         type="doughnut"
                         :chart-data="charts.gradeStatus"
                         title="Grade review status"
                     />
                     <DashboardChart
-                        v-if="charts.enrollmentsByCourse"
+                        v-if="hasChartData(charts.enrollmentsByCourse)"
                         type="bar"
                         :chart-data="charts.enrollmentsByCourse"
                         title="Enrollments by course (top 8)"
                     />
                     <DashboardChart
-                        v-if="charts.feesCollectedLine"
+                        v-if="hasChartData(charts.feesCollectedLine)"
                         type="line"
                         :chart-data="charts.feesCollectedLine"
                         title="Fees collected (last 6 months)"
@@ -2117,30 +2136,35 @@ const quickActions = computed(() => {
 
                 <!-- Dashboard charts - Teacher -->
                 <div
-                    v-if="charts.gradeStatus || charts.gradesBySubject || charts.attendanceLine || charts.assignmentsBySubject"
+                    v-if="
+                        hasChartData(charts.gradeStatus) ||
+                        hasChartData(charts.gradesBySubject) ||
+                        hasChartData(charts.attendanceLine) ||
+                        hasChartData(charts.assignmentsBySubject)
+                    "
                     class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
                 >
                     <DashboardChart
-                        v-if="charts.gradeStatus"
+                        v-if="hasChartData(charts.gradeStatus)"
                         type="doughnut"
                         :chart-data="charts.gradeStatus"
                         title="Grade status (my subjects)"
                     />
                     <DashboardChart
-                        v-if="charts.gradesBySubject"
+                        v-if="hasChartData(charts.gradesBySubject)"
                         type="bar"
                         :chart-data="charts.gradesBySubject"
                         title="Grades by subject (top 8)"
                     />
                     <DashboardChart
-                        v-if="charts.attendanceLine"
+                        v-if="hasChartData(charts.attendanceLine)"
                         type="line"
                         :chart-data="charts.attendanceLine"
                         title="Attendance % (last 6 months)"
                         :y-max="100"
                     />
                     <DashboardChart
-                        v-if="charts.assignmentsBySubject"
+                        v-if="hasChartData(charts.assignmentsBySubject)"
                         type="bar"
                         :chart-data="charts.assignmentsBySubject"
                         title="Assignments by subject"

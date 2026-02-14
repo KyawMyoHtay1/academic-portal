@@ -84,6 +84,16 @@ const options = computed(() => {
     };
 });
 
+const hasData = computed(() => {
+    if (!props.chartData || !Array.isArray(props.chartData.datasets)) {
+        return false;
+    }
+
+    return props.chartData.datasets.some(
+        (dataset) => Array.isArray(dataset?.data) && dataset.data.length > 0
+    );
+});
+
 </script>
 
 <template>
@@ -96,17 +106,31 @@ const options = computed(() => {
         </h3>
         <div :style="{ height: `${height}px` }">
             <Doughnut
-                v-if="type === 'doughnut'"
+                v-if="hasData && type === 'doughnut'"
                 :data="chartData"
                 :options="options"
             />
             <Pie
-                v-else-if="type === 'pie'"
+                v-else-if="hasData && type === 'pie'"
                 :data="chartData"
                 :options="options"
             />
-            <Bar v-else-if="type === 'bar'" :data="chartData" :options="options" />
-            <Line v-else-if="type === 'line'" :data="chartData" :options="options" />
+            <Bar
+                v-else-if="hasData && type === 'bar'"
+                :data="chartData"
+                :options="options"
+            />
+            <Line
+                v-else-if="hasData && type === 'line'"
+                :data="chartData"
+                :options="options"
+            />
+            <div
+                v-else
+                class="flex h-full items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500"
+            >
+                No data available
+            </div>
         </div>
     </div>
 </template>
