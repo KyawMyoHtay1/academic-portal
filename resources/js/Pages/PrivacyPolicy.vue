@@ -7,6 +7,11 @@ import { computed } from "vue";
 
 const page = usePage();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
+const hasTermlyContent = computed(() => !!termlyHtml && termlyHtml.trim().length > 0);
+const policyLastUpdated = computed(() => {
+    const match = termlyHtml.match(/Last updated\s*<bdt class="question">([^<]+)<\/bdt>/i);
+    return match?.[1] ?? "Recently updated";
+});
 
 /**
  * TERMELY INTEGRATION
@@ -92,40 +97,68 @@ word-break: break-word !important;
             <Breadcrumb :items="[{ label: 'Privacy Policy' }]" class="mb-4" />
         </template>
 
-        <div class="py-8 sm:py-12">
+        <div class="bg-gradient-to-b from-slate-50 via-blue-50/30 to-white py-8 sm:py-12">
             <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between gap-3 mb-4">
+                <div class="mb-4 flex items-center justify-between gap-3">
                     <Link
                         :href="route('dashboard')"
-                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
                     >
-                        <span aria-hidden="true">←</span>
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
                         <span>Back to Dashboard</span>
                     </Link>
                 </div>
 
-                <div class="portal-card p-6 sm:p-8 lg:p-10">
+                <section class="relative overflow-hidden rounded-3xl border border-blue-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8">
+                    <div class="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-blue-200/30 blur-3xl"></div>
+                    <div class="pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-indigo-200/20 blur-3xl"></div>
+                    <div class="relative">
+                        <div class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700">
+                            Data Protection
+                        </div>
+                        <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                            Privacy Policy
+                        </h1>
+                        <p class="mt-2 max-w-3xl text-sm text-slate-600">
+                            This notice explains how the University Academic Portal collects, uses, stores, and protects personal information.
+                        </p>
+                        <div class="mt-4 inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700">
+                            Last updated: {{ policyLastUpdated }}
+                        </div>
+                    </div>
+                </section>
+
+                <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 sm:p-6 lg:p-8">
                     <div class="prose prose-slate max-w-none">
                         <div
-                            v-if="termlyHtml && termlyHtml.trim().length"
-                            class="not-prose min-h-[50vh] rounded-lg bg-white"
+                            v-if="hasTermlyContent"
+                            class="policy-shell not-prose min-h-[50vh] rounded-2xl border border-slate-100 bg-white p-4 sm:p-6"
                             v-html="termlyHtml"
                         />
 
                         <div
                             v-else
-                            class="not-prose border border-dashed border-amber-400 bg-amber-50 rounded-xl p-4 text-sm text-amber-800"
+                            class="not-prose rounded-2xl border border-dashed border-amber-400 bg-amber-50 p-4 text-sm text-amber-800"
                         >
-                            <p class="font-semibold mb-1">
+                            <p class="mb-1 font-semibold">
                                 Admin setup required
                             </p>
                             <p>
-                                In Termly, open your Privacy Policy →
+                                In Termly, open your Privacy Policy ->
                                 <span class="font-semibold"
                                     >Add to website</span
                                 >
-                                → choose
-                                <span class="font-semibold">HTML</span> → copy
+                                -> choose
+                                <span class="font-semibold">HTML</span> -> copy
                                 the full embed and paste it into the
                                 <code>termlyHtml</code> string in
                                 <code>resources/js/Pages/PrivacyPolicy.vue</code
@@ -140,39 +173,67 @@ word-break: break-word !important;
 
     <!-- Guests see full-width Termly policy (GuestLayout switches to full-width for this route) -->
     <GuestLayout v-else>
-        <div class="w-full min-h-[80vh] bg-white">
+        <div class="min-h-[80vh] w-full bg-gradient-to-b from-slate-50 via-white to-blue-50/30">
             <div
                 class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12"
             >
-                <div class="flex items-center justify-between gap-3 mb-4">
+                <div class="mb-4 flex items-center justify-between gap-3">
                     <Link
                         href="/"
-                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
                     >
-                        <span aria-hidden="true">←</span>
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
                         <span>Back to Home</span>
                     </Link>
-                    <span class="text-xs text-slate-500"
-                        >Termly Privacy Policy</span
-                    >
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
+                        Termly Privacy Policy
+                    </span>
                 </div>
 
-                <div class="prose prose-slate max-w-none">
+                <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8">
+                    <div class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-blue-100/40 blur-3xl"></div>
+                    <div class="pointer-events-none absolute -left-24 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-sky-100/40 blur-3xl"></div>
+                    <div class="relative">
+                        <div class="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-700">
+                            Legal Document
+                        </div>
+                        <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                            Privacy Policy
+                        </h1>
+                        <p class="mt-2 max-w-3xl text-sm text-slate-600">
+                            Read how personal data is handled across admissions, courses, assessments, communication, and support services.
+                        </p>
+                        <div class="mt-4 inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700">
+                            Last updated: {{ policyLastUpdated }}
+                        </div>
+                    </div>
+                </section>
+
+                <div class="prose prose-slate mt-6 max-w-none rounded-3xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 sm:p-6 lg:p-8">
                     <div
-                        v-if="termlyHtml && termlyHtml.trim().length"
-                        class="not-prose min-h-[60vh] rounded-lg"
+                        v-if="hasTermlyContent"
+                        class="policy-shell not-prose min-h-[60vh] rounded-2xl border border-slate-100 bg-white p-4 sm:p-6"
                         v-html="termlyHtml"
                     />
 
                     <div
                         v-else
-                        class="not-prose border border-dashed border-amber-400 bg-amber-50 rounded-xl p-4 text-sm text-amber-800"
+                        class="not-prose rounded-2xl border border-dashed border-amber-400 bg-amber-50 p-4 text-sm text-amber-800"
                     >
-                        <p class="font-semibold mb-1">Admin setup required</p>
+                        <p class="mb-1 font-semibold">Admin setup required</p>
                         <p>
-                            In Termly, open your Privacy Policy →
-                            <span class="font-semibold">Add to website</span> →
-                            choose <span class="font-semibold">HTML</span> →
+                            In Termly, open your Privacy Policy ->
+                            <span class="font-semibold">Add to website</span> ->
+                            choose <span class="font-semibold">HTML</span> ->
                             copy the full embed and paste it into the
                             <code>termlyHtml</code> string in
                             <code>resources/js/Pages/PrivacyPolicy.vue</code>.
@@ -183,3 +244,4 @@ word-break: break-word !important;
         </div>
     </GuestLayout>
 </template>
+
