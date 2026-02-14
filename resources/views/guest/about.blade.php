@@ -26,8 +26,8 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-xl md:px-12 md:py-20">
+<div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl"></div>
 
@@ -56,19 +56,19 @@
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="about-rise rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div class="about-rise rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Years Of Excellence</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">{{ $stats['yearsOfExcellence'] > 0 ? number_format($stats['yearsOfExcellence']) . '+' : '50+' }}</p>
         </div>
-        <div class="about-rise rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div class="about-rise rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Active Students</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">{{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) . '+' : '5,000+' }}</p>
         </div>
-        <div class="about-rise rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <div class="about-rise rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Expert Faculty</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">{{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}</p>
         </div>
-        <div class="about-rise rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div class="about-rise rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Programs Offered</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">{{ $stats['totalPrograms'] > 0 ? number_format($stats['totalPrograms']) . '+' : '100+' }}</p>
         </div>
@@ -77,7 +77,7 @@
     @include('guest.partials.quick-links-strip')
 
     <section class="grid gap-6 lg:grid-cols-2">
-        <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Our Mission</p>
             <h2 class="mt-3 text-3xl font-bold text-[color:var(--portal-navy)]">Deliver quality education for all learners</h2>
             <p class="mt-4 text-sm leading-relaxed text-slate-600">
@@ -90,7 +90,7 @@
             </ul>
         </div>
 
-        <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Our Vision</p>
             <h2 class="mt-3 text-3xl font-bold text-[color:var(--portal-navy)]">Lead innovation and global impact</h2>
             <p class="mt-4 text-sm leading-relaxed text-slate-600">
@@ -110,19 +110,19 @@
             <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Principles that guide every decision</h2>
         </div>
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Excellence</h3>
                 <p class="mt-2 text-sm text-slate-600">High standards in teaching, research, and student support.</p>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Integrity</h3>
                 <p class="mt-2 text-sm text-slate-600">Ethical leadership, accountability, and transparency.</p>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Inclusion</h3>
                 <p class="mt-2 text-sm text-slate-600">A welcoming environment where every learner can thrive.</p>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Innovation</h3>
                 <p class="mt-2 text-sm text-slate-600">Encouraging curiosity and practical solutions to real problems.</p>
             </div>
@@ -146,7 +146,7 @@
 
         <div class="grid gap-4 md:grid-cols-2">
             @foreach ($milestones as $milestone)
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                     <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-gold)]">{{ $milestone['year'] }}</p>
                     <h3 class="mt-1 text-xl font-semibold text-slate-900">{{ $milestone['title'] }}</h3>
                     <p class="mt-2 text-sm text-slate-600">{{ $milestone['description'] }}</p>
@@ -157,7 +157,7 @@
 
     @include('guest.partials.image-cards-about')
 
-    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-sm md:p-12">
+    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-md ring-1 ring-amber-200/50 md:p-12">
         <h2 class="text-3xl font-bold text-[color:var(--portal-navy)]">Ready to start your journey?</h2>
         <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-700 md:text-base">
             Join a university community focused on achievement, support, and real-world impact.

@@ -25,8 +25,8 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-xl md:px-12 md:py-20">
+<div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl"></div>
 
@@ -43,23 +43,31 @@
             <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
                 Our vision is to make academic processes simple, transparent, and reliable for students, teachers, and administrators.
             </p>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <a href="{{ route('guest.courses') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-md hover:bg-slate-100">
+                    Explore Courses
+                </a>
+                <a href="{{ route('guest.feedback') }}" class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
+                    Share Feedback
+                </a>
+            </div>
         </div>
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Portal Users</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">{{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) . '+' : '0' }}</p>
         </div>
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Enrollments</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">{{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }}</p>
         </div>
-        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">{{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }}</p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Direction</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">Future Ready</p>
         </div>
@@ -67,7 +75,7 @@
 
     @include('guest.partials.quick-links-strip')
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Our Vision</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">A trusted digital backbone for academic life</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
@@ -87,19 +95,19 @@
         </div>
 
         <div class="grid gap-4 md:grid-cols-3">
-            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Digital Innovation</h3>
                 <p class="mt-2 text-sm text-slate-600">
                     Expand secure integrations, performance analytics, and automation that simplify daily academic workflows.
                 </p>
             </div>
-            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Personalized Experience</h3>
                 <p class="mt-2 text-sm text-slate-600">
                     Deliver role-aware dashboards so students, teachers, and staff can act faster with clearer information.
                 </p>
             </div>
-            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Global Collaboration</h3>
                 <p class="mt-2 text-sm text-slate-600">
                     Support cross-campus, hybrid, and international academic partnerships with reliable digital tools.
@@ -108,7 +116,7 @@
         </div>
     </section>
 
-    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-sm md:p-12">
+    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-md ring-1 ring-amber-200/50 md:p-12">
         <h2 class="text-3xl font-bold text-[color:var(--portal-navy)]">Help us shape the next phase</h2>
         <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-700 md:text-base">
             Explore programs, share feedback, or contact our team to learn how the portal supports your academic journey.

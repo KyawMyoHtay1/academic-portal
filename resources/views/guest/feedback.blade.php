@@ -25,8 +25,8 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-xl md:px-12 md:py-20">
+<div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
 
@@ -47,19 +47,19 @@
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Submission Type</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">Open</p>
         </div>
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Response Window</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">Fast</p>
         </div>
-        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Audience</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">All Users</p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Impact</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">Continuous</p>
         </div>
@@ -68,7 +68,7 @@
     @include('guest.partials.quick-links-strip')
 
     <section class="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 md:p-8">
             <div class="mb-6">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Submit Feedback</p>
                 <h2 class="mt-2 text-2xl font-bold text-[color:var(--portal-navy)] md:text-3xl">Tell us what should improve</h2>
@@ -164,21 +164,21 @@
         </div>
 
         <div class="space-y-4">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Why It Matters</p>
                 <h3 class="mt-2 text-xl font-bold text-slate-900">Your input drives product decisions</h3>
                 <p class="mt-2 text-sm text-slate-600">We review submissions to identify high-impact improvements for students, staff, and teachers.</p>
             </div>
 
-            <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h4 class="text-lg font-semibold text-slate-900">Improve Functionality</h4>
                 <p class="mt-2 text-sm text-slate-600">Suggest features and workflow enhancements.</p>
             </div>
-            <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h4 class="text-lg font-semibold text-slate-900">Report Issues</h4>
                 <p class="mt-2 text-sm text-slate-600">Flag bugs or confusing interactions quickly.</p>
             </div>
-            <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h4 class="text-lg font-semibold text-slate-900">Shape Experience</h4>
                 <p class="mt-2 text-sm text-slate-600">Help us build a more intuitive academic platform.</p>
             </div>

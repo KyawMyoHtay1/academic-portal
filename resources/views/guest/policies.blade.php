@@ -26,8 +26,8 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-xl md:px-12 md:py-20">
+<div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
 
@@ -48,19 +48,19 @@
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Policy Scope</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">Campus Wide</p>
         </div>
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Compliance</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">Required</p>
         </div>
-        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Update Cadence</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">Termly</p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Effective Date</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">Current</p>
         </div>
@@ -68,7 +68,7 @@
 
     @include('guest.partials.quick-links-strip')
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Overview</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">A clear framework for fair academic practice</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
@@ -88,26 +88,26 @@
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Assessment Rules</h3>
                 <p class="mt-2 text-sm text-slate-600">Submission standards, timelines, moderation, and re-assessment procedures.</p>
             </div>
-            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Grading Systems</h3>
                 <p class="mt-2 text-sm text-slate-600">Grade bands, calculation methods, and result publication protocols.</p>
             </div>
-            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Attendance</h3>
                 <p class="mt-2 text-sm text-slate-600">Minimum attendance thresholds and approved absence handling.</p>
             </div>
-            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="policy-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Academic Integrity</h3>
                 <p class="mt-2 text-sm text-slate-600">Expectations for originality, referencing, and ethical conduct.</p>
             </div>
         </div>
     </section>
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Privacy And Data</p>
@@ -144,7 +144,7 @@
         </div>
     </section>
 
-    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-sm md:p-12">
+    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-md ring-1 ring-amber-200/50 md:p-12">
         <h2 class="text-3xl font-bold text-[color:var(--portal-navy)]">Need help understanding a policy?</h2>
         <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-700 md:text-base">
             Contact the academic support team for clarification on regulations, procedures, and student responsibilities.
