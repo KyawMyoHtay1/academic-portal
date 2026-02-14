@@ -237,7 +237,7 @@ const quickActions = computed(() => {
                             card.title === 'Attendance' ||
                             card.title === 'Grades' ||
                             card.title === 'Grades Recorded',
-                        'from-purple-50 to-purple-100 border border-purple-200':
+                        'from-indigo-50 to-indigo-100 border border-indigo-200':
                             card.title === 'Students Taught',
                     }"
                 >
@@ -258,7 +258,7 @@ const quickActions = computed(() => {
                                 card.title === 'Attendance' ||
                                 card.title === 'Grades' ||
                                 card.title === 'Grades Recorded',
-                            'bg-purple-600': card.title === 'Students Taught',
+                            'bg-indigo-600': card.title === 'Students Taught',
                         }"
                     >
                         <svg
@@ -306,7 +306,7 @@ const quickActions = computed(() => {
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
                                         card.title === 'Grades Recorded',
-                                    'text-purple-700':
+                                    'text-indigo-700':
                                         card.title === 'Students Taught',
                                 }"
                             >
@@ -331,7 +331,7 @@ const quickActions = computed(() => {
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
                                         card.title === 'Grades Recorded',
-                                    'text-purple-600':
+                                    'text-indigo-600':
                                         card.title === 'Students Taught',
                                 }"
                             >
@@ -399,7 +399,7 @@ const quickActions = computed(() => {
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
                                         card.title === 'Grades Recorded',
-                                    'bg-gradient-to-br from-purple-500 to-purple-600':
+                                    'bg-gradient-to-br from-indigo-500 to-indigo-600':
                                         card.title === 'Students Taught',
                                 }"
                             >
@@ -654,21 +654,21 @@ const quickActions = computed(() => {
                             <!-- Grades Card -->
                             <Link
                                 :href="route('student.grades.index')"
-                                class="group relative overflow-hidden rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                             >
                                 <div class="relative z-10">
                                     <div class="flex items-center justify-between">
-                                        <p class="text-xs font-bold uppercase tracking-wider text-purple-700">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-indigo-700">
                                             Grades
                                         </p>
-                                        <svg class="h-5 w-5 text-purple-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-5 w-5 text-indigo-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                                         </svg>
                                     </div>
-                                    <p class="mt-2 text-3xl font-bold text-purple-900">
+                                    <p class="mt-2 text-3xl font-bold text-indigo-900">
                                         {{ stats.myGrades ?? 0 }}
                                     </p>
-                                    <p class="mt-1 text-xs font-medium text-purple-600">
+                                    <p class="mt-1 text-xs font-medium text-indigo-600">
                                         Subject scores
                                     </p>
                                 </div>
@@ -710,21 +710,21 @@ const quickActions = computed(() => {
                             <!-- My Timetable Card -->
                             <Link
                                 :href="route('student.timetable.index')"
-                                class="group relative overflow-hidden rounded-xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                                class="group relative overflow-hidden rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                             >
                                 <div class="relative z-10">
                                     <div class="flex items-center justify-between">
-                                        <p class="text-xs font-bold uppercase tracking-wider text-cyan-700">
+                                        <p class="text-xs font-bold uppercase tracking-wider text-blue-700">
                                             My Timetable
                                         </p>
-                                        <svg class="h-5 w-5 text-cyan-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-5 w-5 text-blue-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <p class="mt-2 text-sm font-semibold text-cyan-900 line-clamp-2">
+                                    <p class="mt-2 text-sm font-semibold text-blue-900 line-clamp-2">
                                         Check schedule
                                     </p>
-                                    <p class="mt-4 text-xs font-medium text-cyan-600">
+                                    <p class="mt-4 text-xs font-medium text-blue-600">
                                         View upcoming classes
                                     </p>
                                 </div>
@@ -1666,23 +1666,23 @@ const quickActions = computed(() => {
 
                             <Link
                                 :href="route('admin.users.index')"
-                                class="group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                                class="group relative overflow-hidden rounded-xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-50 p-5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
                             >
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
                                         <p
-                                            class="text-xs font-bold uppercase tracking-wider text-purple-700"
+                                            class="text-xs font-bold uppercase tracking-wider text-indigo-700"
                                         >
                                             User Management
                                         </p>
                                         <p
-                                            class="mt-2 text-sm font-medium text-purple-900"
+                                            class="mt-2 text-sm font-medium text-indigo-900"
                                         >
                                             Control access rights and profiles.
                                         </p>
                                     </div>
                                     <div
-                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-purple-500 shadow-md"
+                                        class="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-indigo-500 shadow-md"
                                     >
                                         <svg
                                             class="h-6 w-6 text-white"
@@ -2299,28 +2299,28 @@ const quickActions = computed(() => {
                             </div>
 
                             <div
-                                class="group relative overflow-hidden rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 transition-all duration-300 hover:shadow-lg"
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:shadow-lg"
                             >
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p
-                                            class="text-xs font-bold uppercase tracking-wider text-purple-700"
+                                            class="text-xs font-bold uppercase tracking-wider text-indigo-700"
                                         >
                                             Students Taught
                                         </p>
                                         <p
-                                            class="mt-2 text-3xl font-bold text-purple-900"
+                                            class="mt-2 text-3xl font-bold text-indigo-900"
                                         >
                                             {{ stats.studentsTaught ?? 0 }}
                                         </p>
                                         <p
-                                            class="mt-1 text-xs font-medium text-purple-600"
+                                            class="mt-1 text-xs font-medium text-indigo-600"
                                         >
                                             Unique students
                                         </p>
                                     </div>
                                     <div
-                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500 shadow-md"
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500 shadow-md"
                                     >
                                         <svg
                                             class="h-6 w-6 text-white"
@@ -2461,20 +2461,20 @@ const quickActions = computed(() => {
 
                             <Link
                                 :href="route('messages.index')"
-                                class="group relative overflow-hidden rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                                class="group relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                             >
                                 <p
-                                    class="text-xs font-bold uppercase tracking-wider text-purple-700"
+                                    class="text-xs font-bold uppercase tracking-wider text-indigo-700"
                                 >
                                     Communication
                                 </p>
                                 <p
-                                    class="mt-2 text-xs font-medium text-purple-600"
+                                    class="mt-2 text-xs font-medium text-indigo-600"
                                 >
                                     Send messages to students and view alerts.
                                 </p>
                                 <div
-                                    class="mt-3 flex items-center gap-2 text-xs font-semibold text-purple-700"
+                                    class="mt-3 flex items-center gap-2 text-xs font-semibold text-indigo-700"
                                 >
                                     <span>Open messages</span>
                                     <span>-></span>
