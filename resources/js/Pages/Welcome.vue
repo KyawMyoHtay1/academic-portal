@@ -21,13 +21,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
-function handleImageError() {
-    document.getElementById("screenshot-container")?.classList.add("!hidden");
-    document.getElementById("docs-card")?.classList.add("!row-span-1");
-    document.getElementById("docs-card-content")?.classList.add("!flex-row");
-    document.getElementById("background")?.classList.add("!hidden");
-}
 </script>
 
 <template>
@@ -41,9 +34,7 @@ function handleImageError() {
                     <div
                         class="flex h-11 w-11 items-center justify-center rounded-xl bg-portal-gold/10 ring-1 ring-portal-gold/40"
                     >
-                        <span class="text-lg font-bold text-portal-gold">
-                            UA
-                        </span>
+                        <span class="text-lg font-bold text-portal-gold">UA</span>
                     </div>
                     <div>
                         <p
@@ -52,7 +43,7 @@ function handleImageError() {
                             University Academic Portal
                         </p>
                         <p class="text-sm font-medium text-slate-100">
-                            BSc (Hons) Computing – Final Year Project
+                            BSc (Hons) Computing - Final Year Project
                         </p>
                     </div>
                 </div>
@@ -85,8 +76,7 @@ function handleImageError() {
                 </nav>
             </header>
 
-            <main class="mt-10 space-y-10">
-                <!-- Hero -->
+            <main class="mt-12 space-y-12">
                 <section class="grid gap-10 lg:grid-cols-[3fr,2fr] lg:items-center">
                     <section>
                         <p class="portal-badge bg-portal-gold/10 text-portal-gold">
@@ -96,7 +86,9 @@ function handleImageError() {
                             Explore our university before you log in.
                         </h1>
                         <p class="mt-4 max-w-2xl text-sm text-slate-200">
-                            Browse public courses, announcements, and campus info. Log in or register to access personalised dashboards for students, teachers, and staff.
+                            Browse public courses, announcements, and campus info. Log in or
+                            register to access personalised dashboards for students,
+                            teachers, and staff.
                         </p>
                         <div class="mt-6 flex flex-wrap gap-3">
                             <Link
@@ -114,6 +106,9 @@ function handleImageError() {
                                 Register
                             </Link>
                         </div>
+                        <p class="mt-4 text-xs uppercase tracking-[0.2em] text-slate-300">
+                            Read-only guest preview
+                        </p>
                     </section>
 
                     <section class="space-y-4">
@@ -122,42 +117,46 @@ function handleImageError() {
                                 What guests can see
                             </p>
                             <ul class="mt-3 space-y-2 text-sm text-slate-700">
-                                <li>• Public course overview (read-only)</li>
-                                <li>• Latest announcements</li>
-                                <li>• Campus location & contact information</li>
-                                <li>• Clear login/register for full access</li>
+                                <li>Public course overview (read-only)</li>
+                                <li>Latest announcements</li>
+                                <li>Campus location and contact information</li>
+                                <li>Clear login/register for full access</li>
                             </ul>
                         </div>
 
                         <div class="portal-card border-0 bg-white/95 p-5 text-xs text-slate-600">
-                            <p>Laravel v{{ laravelVersion }} · PHP v{{ phpVersion }}</p>
+                            <p>Laravel v{{ laravelVersion }} | PHP v{{ phpVersion }}</p>
                             <p class="mt-1">
-                                Proposal: University Academic Portal using Vue.js and Laravel – BSc (Hons) Computing (Final Year Project).
+                                Proposal: University Academic Portal using Vue.js and Laravel -
+                                BSc (Hons) Computing (Final Year Project).
                             </p>
                         </div>
                     </section>
                 </section>
 
-                <!-- About + Location -->
                 <section class="grid gap-8 lg:grid-cols-2">
                     <div class="space-y-3">
-                        <h2 class="text-2xl font-semibold text-slate-100">About the University</h2>
-                        <p class="text-sm text-slate-200 leading-relaxed">
-                            We are committed to academic excellence, innovation, and student success. Our mission is to deliver high-quality education and foster a vibrant learning community.
+                        <h2 class="text-2xl font-semibold text-slate-100">About The University</h2>
+                        <p class="leading-relaxed text-sm text-slate-200">
+                            We are committed to academic excellence, innovation, and student
+                            success. Our mission is to deliver high-quality education and foster
+                            a vibrant learning community.
                         </p>
                         <div class="rounded-lg border border-white/10 bg-white/5 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-200">
-                                Mission & Vision
+                                Mission and Vision
                             </p>
                             <p class="mt-1 text-sm text-slate-100">
-                                Empower learners to achieve their potential through research-driven teaching and inclusive academic support.
+                                Empower learners to achieve their potential through research-driven
+                                teaching and inclusive academic support.
                             </p>
                         </div>
                     </div>
                     <div class="space-y-3">
                         <h2 class="text-2xl font-semibold text-slate-100">Location</h2>
                         <p class="text-sm text-slate-200">
-                            123 University Avenue, City, Country. Easily reachable via public transport, with nearby amenities and student services.
+                            123 University Avenue, City, Country. Easily reachable via public
+                            transport, with nearby amenities and student services.
                         </p>
                         <div class="overflow-hidden rounded-xl border border-white/10 shadow-sm">
                             <iframe
@@ -171,7 +170,6 @@ function handleImageError() {
                     </div>
                 </section>
 
-                <!-- Public Courses -->
                 <section class="space-y-4">
                     <div class="flex items-center justify-between gap-4">
                         <div>
@@ -180,7 +178,8 @@ function handleImageError() {
                                 Explore our programmes
                             </h2>
                             <p class="text-sm text-slate-200">
-                                Browse a snapshot of available courses. Log in to enrol if you are a student.
+                                Browse a snapshot of available courses. Log in to enrol if you are
+                                a student.
                             </p>
                         </div>
                     </div>
@@ -203,16 +202,18 @@ function handleImageError() {
                                 Read-only preview for guests
                             </p>
                         </div>
-                        <div v-if="!props.publicCourses.length" class="rounded-xl border border-dashed border-white/20 p-6 text-center text-sm text-slate-200">
+                        <div
+                            v-if="!props.publicCourses.length"
+                            class="rounded-xl border border-dashed border-white/20 p-6 text-center text-sm text-slate-200"
+                        >
                             No courses to display yet.
                         </div>
                     </div>
                 </section>
 
-                <!-- Public Announcements -->
                 <section class="space-y-4">
                     <p class="portal-badge bg-portal-gold/10 text-portal-gold">Announcements</p>
-                    <h2 class="text-2xl font-semibold text-slate-100">Latest updates</h2>
+                    <h2 class="text-2xl font-semibold text-slate-100">Latest Updates</h2>
                     <p class="text-sm text-slate-200">
                         Stay informed about campus news and public events.
                     </p>
@@ -234,16 +235,18 @@ function handleImageError() {
                                 {{ item.body }}
                             </p>
                         </div>
-                        <div v-if="!props.publicAnnouncements.length" class="rounded-xl border border-dashed border-white/20 p-6 text-center text-sm text-slate-200">
+                        <div
+                            v-if="!props.publicAnnouncements.length"
+                            class="rounded-xl border border-dashed border-white/20 p-6 text-center text-sm text-slate-200"
+                        >
                             No announcements to display yet.
                         </div>
                     </div>
                 </section>
 
-                <!-- Contact -->
                 <section class="rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-100 shadow-sm">
                     <div class="grid gap-6 md:grid-cols-3">
-                        <div class="md:col-span-2 space-y-2">
+                        <div class="space-y-2 md:col-span-2">
                             <h3 class="text-lg font-semibold">Contact us</h3>
                             <p class="text-sm text-slate-200">
                                 Email: info@university.edu | Phone: +123 456 7890
@@ -256,7 +259,7 @@ function handleImageError() {
                             <Link
                                 v-if="canLogin"
                                 :href="route('login')"
-                                class="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 bg-white hover:bg-slate-100"
+                                class="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100"
                             >
                                 Log in
                             </Link>
@@ -272,32 +275,31 @@ function handleImageError() {
                 </section>
             </main>
 
-            <!-- Footer -->
             <footer class="mt-12 border-t border-white/10 pt-6 text-center text-xs text-slate-300">
                 <div class="flex flex-wrap items-center justify-center gap-4">
                     <Link
                         :href="route('privacy-policy')"
-                        class="hover:text-portal-gold transition-colors"
+                        class="transition-colors hover:text-portal-gold"
                     >
                         Privacy Policy
                     </Link>
-                    <span class="text-slate-500">•</span>
+                    <span class="text-slate-500">|</span>
                     <Link
                         :href="route('guest.about')"
-                        class="hover:text-portal-gold transition-colors"
+                        class="transition-colors hover:text-portal-gold"
                     >
                         About
                     </Link>
-                    <span class="text-slate-500">•</span>
+                    <span class="text-slate-500">|</span>
                     <Link
                         :href="route('guest.contact')"
-                        class="hover:text-portal-gold transition-colors"
+                        class="transition-colors hover:text-portal-gold"
                     >
                         Contact
                     </Link>
                 </div>
                 <p class="mt-3 text-slate-400">
-                    © {{ new Date().getFullYear() }} University Academic Portal. All rights reserved.
+                    (c) {{ new Date().getFullYear() }} University Academic Portal. All rights reserved.
                 </p>
             </footer>
         </div>
