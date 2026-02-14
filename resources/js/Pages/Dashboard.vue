@@ -832,22 +832,22 @@ const quickActions = computed(() => {
                             </div>
                         </div>
 
-                        <!-- Quick actions -->
+                        <!-- Quick Actions -->
                         <div class="portal-card p-5">
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Quick actions
+                                Quick Actions
                             </p>
                             <div class="mt-3 grid gap-2">
                                 <Link
                                     v-for="a in quickActions"
                                     :key="a.href"
                                     :href="a.href"
-                                    class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    class="group flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50"
                                 >
                                     <span>{{ a.label }}</span>
-                                    <span class="text-slate-400">></span>
+                                    <span class="text-slate-400 transition-colors duration-200 group-hover:text-slate-600">></span>
                                 </Link>
                             </div>
                         </div>
@@ -862,14 +862,14 @@ const quickActions = computed(() => {
                         hasChartData(charts.attendanceLine) ||
                         hasChartData(charts.courseEnrollment)
                     "
-                    class="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-3"
+                    class="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50 to-white px-5 py-4 shadow-sm"
                 >
                     <p
-                        class="text-xs font-semibold uppercase tracking-wide text-blue-700"
+                        class="text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700"
                     >
                         Student analytics
                     </p>
-                    <p class="mt-1 text-sm text-blue-900">
+                    <p class="mt-1 text-sm font-medium text-blue-900">
                         Personal trends across fees, enrollment, grades, and attendance.
                     </p>
                 </div>
@@ -1459,14 +1459,14 @@ const quickActions = computed(() => {
                         hasChartData(charts.feesCollectedLine) ||
                         hasChartData(charts.gradeStatus)
                     "
-                    class="rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3"
+                    class="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white px-5 py-4 shadow-sm"
                 >
                     <p
-                        class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        class="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700"
                     >
                         Operations analytics
                     </p>
-                    <p class="mt-1 text-sm text-emerald-900">
+                    <p class="mt-1 text-sm font-medium text-emerald-900">
                         Institution-wide snapshots for review, enrollment, and finance.
                     </p>
                 </div>
@@ -1944,22 +1944,22 @@ const quickActions = computed(() => {
                             </div>
                         </div>
 
-                        <!-- Quick actions -->
+                        <!-- Quick Actions -->
                         <div class="portal-card p-5">
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Quick actions
+                                Quick Actions
                             </p>
                             <div class="mt-3 grid gap-2">
                                 <Link
                                     v-for="a in quickActions"
                                     :key="a.href"
                                     :href="a.href"
-                                    class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    class="group flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50"
                                 >
                                     <span>{{ a.label }}</span>
-                                    <span class="text-slate-400">></span>
+                                    <span class="text-slate-400 transition-colors duration-200 group-hover:text-slate-600">></span>
                                 </Link>
                             </div>
                         </div>
@@ -2190,14 +2190,14 @@ const quickActions = computed(() => {
                         hasChartData(charts.attendanceLine) ||
                         hasChartData(charts.assignmentsBySubject)
                     "
-                    class="rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3"
+                    class="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-white px-5 py-4 shadow-sm"
                 >
                     <p
-                        class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                        class="text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-700"
                     >
                         Teaching analytics
                     </p>
-                    <p class="mt-1 text-sm text-indigo-900">
+                    <p class="mt-1 text-sm font-medium text-indigo-900">
                         Class performance and engagement indicators for your subjects.
                     </p>
                 </div>
@@ -2484,22 +2484,22 @@ const quickActions = computed(() => {
                     </div>
 
                     <div class="space-y-4">
-                        <!-- Quick actions -->
+                        <!-- Quick Actions -->
                         <div class="portal-card p-5">
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Quick actions
+                                Quick Actions
                             </p>
                             <div class="mt-3 grid gap-2">
                                 <Link
                                     v-for="a in quickActions"
                                     :key="a.href"
                                     :href="a.href"
-                                    class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    class="group flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50"
                                 >
                                     <span>{{ a.label }}</span>
-                                    <span class="text-slate-400">></span>
+                                    <span class="text-slate-400 transition-colors duration-200 group-hover:text-slate-600">></span>
                                 </Link>
                             </div>
                         </div>
