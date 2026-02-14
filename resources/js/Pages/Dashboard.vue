@@ -869,18 +869,21 @@ const quickActions = computed(() => {
                         type="doughnut"
                         :chart-data="charts.feeStatus"
                         title="Fee status"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.courseEnrollment)"
                         type="doughnut"
                         :chart-data="charts.courseEnrollment"
                         title="Enrollment status"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.gradesBySubject)"
                         type="bar"
                         :chart-data="charts.gradesBySubject"
                         title="Scores by subject"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.attendanceLine)"
@@ -888,6 +891,8 @@ const quickActions = computed(() => {
                         :chart-data="charts.attendanceLine"
                         title="Attendance (last 6 months)"
                         :y-max="100"
+                        :variant="role"
+                        value-format="percent"
                     />
                 </div>
 
@@ -1441,24 +1446,29 @@ const quickActions = computed(() => {
                         type="doughnut"
                         :chart-data="charts.feeStatus"
                         title="Fee status (all fees)"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.gradeStatus)"
                         type="doughnut"
                         :chart-data="charts.gradeStatus"
                         title="Grade review status"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.enrollmentsByCourse)"
                         type="bar"
                         :chart-data="charts.enrollmentsByCourse"
                         title="Enrollments by course (top 8)"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.feesCollectedLine)"
                         type="line"
                         :chart-data="charts.feesCollectedLine"
                         title="Fees collected (last 6 months)"
+                        :variant="role"
+                        value-format="currency"
                     />
                 </div>
 
@@ -2149,12 +2159,14 @@ const quickActions = computed(() => {
                         type="doughnut"
                         :chart-data="charts.gradeStatus"
                         title="Grade status (my subjects)"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.gradesBySubject)"
                         type="bar"
                         :chart-data="charts.gradesBySubject"
                         title="Grades by subject (top 8)"
+                        :variant="role"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.attendanceLine)"
@@ -2162,12 +2174,15 @@ const quickActions = computed(() => {
                         :chart-data="charts.attendanceLine"
                         title="Attendance % (last 6 months)"
                         :y-max="100"
+                        :variant="role"
+                        value-format="percent"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.assignmentsBySubject)"
                         type="bar"
                         :chart-data="charts.assignmentsBySubject"
                         title="Assignments by subject"
+                        :variant="role"
                     />
                 </div>
 

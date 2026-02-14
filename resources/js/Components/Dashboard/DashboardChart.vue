@@ -44,12 +44,39 @@ const props = defineProps({
         type: Number,
         default: 280,
     },
-    /** Optional max for Y axis (e.g. 100 for percentage) */
     yMax: {
         type: Number,
         default: null,
     },
+    variant: {
+        type: String,
+        default: "student",
+        validator: (v) => ["student", "teacher", "staff"].includes(v),
+    },
+    valueFormat: {
+        type: String,
+        default: "number",
+        validator: (v) => ["number", "percent", "currency"].includes(v),
+    },
 });
+
+const formatValue = (rawValue) => {
+    const value = Number(rawValue ?? 0);
+
+    if (props.valueFormat === "percent") {
+        return `${value}%`;
+    }
+
+    if (props.valueFormat === "currency") {
+        return new Intl.NumberFormat("en-GB", {
+            style: "currency",
+            currency: "GBP",
+            maximumFractionDigits: 0,
+        }).format(value);
+    }
+
+    return new Intl.NumberFormat().format(value);
+};
 
 const options = computed(() => {
     const base = {
@@ -58,28 +85,54 @@ const options = computed(() => {
         plugins: {
             legend: {
                 position: "bottom",
+                labels: {
+                    color: "#475569",
+                },
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => {
+                        const label = context.dataset?.label
+                            ? `${context.dataset.label}: `
+                            : "";
+                        return `${label}${formatValue(context.parsed?.y ?? context.parsed)}`;
+                    },
+                },
             },
         },
     };
+
     if (props.type === "doughnut" || props.type === "pie") {
-        return { ...base };
+        return base;
     }
-    if (props.type === "line") {
-        const yScale = { beginAtZero: true };
-        if (props.yMax != null) yScale.max = props.yMax;
-        return {
-            ...base,
-            scales: {
-                y: yScale,
-            },
-        };
+
+    const yScale = {
+        beginAtZero: true,
+        grid: {
+            color: "rgba(148, 163, 184, 0.18)",
+        },
+        ticks: {
+            color: "#64748b",
+            callback: (value) => formatValue(value),
+        },
+    };
+
+    if (props.yMax != null) {
+        yScale.max = props.yMax;
     }
+
     return {
         ...base,
         scales: {
-            y: {
-                beginAtZero: true,
+            x: {
+                grid: {
+                    display: false,
+                },
+                ticks: {
+                    color: "#64748b",
+                },
             },
+            y: yScale,
         },
     };
 });
@@ -94,13 +147,37 @@ const hasData = computed(() => {
     );
 });
 
+const chartCardClass = computed(() => {
+    if (props.variant === "staff") {
+        return "border-emerald-200 bg-gradient-to-br from-emerald-50/60 to-white";
+    }
+
+    if (props.variant === "teacher") {
+        return "border-indigo-200 bg-gradient-to-br from-indigo-50/60 to-white";
+    }
+
+    return "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white";
+});
+
+const titleClass = computed(() => {
+    if (props.variant === "staff") {
+        return "text-emerald-700";
+    }
+
+    if (props.variant === "teacher") {
+        return "text-indigo-700";
+    }
+
+    return "text-blue-700";
+});
 </script>
 
 <template>
-    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="rounded-xl border p-4 shadow-sm" :class="chartCardClass">
         <h3
             v-if="title"
-            class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600"
+            class="mb-3 text-sm font-semibold uppercase tracking-wide"
+            :class="titleClass"
         >
             {{ title }}
         </h3>
