@@ -858,26 +858,41 @@ const quickActions = computed(() => {
                         hasChartData(charts.attendanceLine) ||
                         hasChartData(charts.courseEnrollment)
                     "
-                    class="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50 to-white px-5 py-4 shadow-sm"
+                    class="space-y-6 rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
-                    <p
-                        class="text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700"
+                    <div
+                        class="flex items-start gap-4 rounded-xl border border-blue-200/60 bg-white px-5 py-4 shadow-sm"
                     >
-                        Student analytics
-                    </p>
-                    <p class="mt-1 text-sm font-medium text-blue-900">
-                        Personal trends across fees, enrollment, grades, and attendance.
-                    </p>
-                </div>
-                <div
-                    v-if="
-                        hasChartData(charts.feeStatus) ||
-                        hasChartData(charts.gradesBySubject) ||
-                        hasChartData(charts.attendanceLine) ||
-                        hasChartData(charts.courseEnrollment)
-                    "
-                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
-                >
+                        <div
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600"
+                            aria-hidden="true"
+                        >
+                            <svg
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700"
+                            >
+                                Student analytics
+                            </p>
+                            <p class="mt-1 text-sm font-medium text-blue-900">
+                                Personal trends across fees, enrollment, grades, and attendance.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <DashboardChart
                         v-if="hasChartData(charts.feeStatus)"
                         type="doughnut"
@@ -910,6 +925,7 @@ const quickActions = computed(() => {
                         value-format="percent"
                         :decimals="1"
                     />
+                    </div>
                 </div>
 
                 <!-- Middle row: notifications, grades, my courses -->
@@ -1455,26 +1471,41 @@ const quickActions = computed(() => {
                         hasChartData(charts.feesCollectedLine) ||
                         hasChartData(charts.gradeStatus)
                     "
-                    class="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white px-5 py-4 shadow-sm"
+                    class="space-y-6 rounded-2xl border border-emerald-100 bg-gradient-to-b from-emerald-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
-                    <p
-                        class="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700"
+                    <div
+                        class="flex items-start gap-4 rounded-xl border border-emerald-200/60 bg-white px-5 py-4 shadow-sm"
                     >
-                        Operations analytics
-                    </p>
-                    <p class="mt-1 text-sm font-medium text-emerald-900">
-                        Institution-wide snapshots for review, enrollment, and finance.
-                    </p>
-                </div>
-                <div
-                    v-if="
-                        hasChartData(charts.feeStatus) ||
-                        hasChartData(charts.enrollmentsByCourse) ||
-                        hasChartData(charts.feesCollectedLine) ||
-                        hasChartData(charts.gradeStatus)
-                    "
-                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
-                >
+                        <div
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"
+                            aria-hidden="true"
+                        >
+                            <svg
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700"
+                            >
+                                Operations analytics
+                            </p>
+                            <p class="mt-1 text-sm font-medium text-emerald-900">
+                                Institution-wide snapshots for review, enrollment, and finance.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <DashboardChart
                         v-if="hasChartData(charts.feeStatus)"
                         type="doughnut"
@@ -1504,6 +1535,7 @@ const quickActions = computed(() => {
                         :variant="role"
                         value-format="currency"
                     />
+                    </div>
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">
@@ -2186,26 +2218,41 @@ const quickActions = computed(() => {
                         hasChartData(charts.attendanceLine) ||
                         hasChartData(charts.assignmentsBySubject)
                     "
-                    class="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-white px-5 py-4 shadow-sm"
+                    class="space-y-6 rounded-2xl border border-indigo-100 bg-gradient-to-b from-indigo-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
-                    <p
-                        class="text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-700"
+                    <div
+                        class="flex items-start gap-4 rounded-xl border border-indigo-200/60 bg-white px-5 py-4 shadow-sm"
                     >
-                        Teaching analytics
-                    </p>
-                    <p class="mt-1 text-sm font-medium text-indigo-900">
-                        Class performance and engagement indicators for your subjects.
-                    </p>
-                </div>
-                <div
-                    v-if="
-                        hasChartData(charts.gradeStatus) ||
-                        hasChartData(charts.gradesBySubject) ||
-                        hasChartData(charts.attendanceLine) ||
-                        hasChartData(charts.assignmentsBySubject)
-                    "
-                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
-                >
+                        <div
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600"
+                            aria-hidden="true"
+                        >
+                            <svg
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-700"
+                            >
+                                Teaching analytics
+                            </p>
+                            <p class="mt-1 text-sm font-medium text-indigo-900">
+                                Class performance and engagement indicators for your subjects.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <DashboardChart
                         v-if="hasChartData(charts.gradeStatus)"
                         type="doughnut"
@@ -2237,6 +2284,7 @@ const quickActions = computed(() => {
                         title="Assignments by subject"
                         :variant="role"
                     />
+                    </div>
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">

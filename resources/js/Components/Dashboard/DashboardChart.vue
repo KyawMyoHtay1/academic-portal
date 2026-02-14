@@ -158,14 +158,14 @@ const hasData = computed(() => {
 
 const chartCardClass = computed(() => {
     if (props.variant === "staff") {
-        return "border-emerald-200 bg-gradient-to-br from-emerald-50/60 to-white";
+        return "border-emerald-200/80 bg-white shadow-md ring-1 ring-slate-900/5 hover:shadow-lg hover:ring-emerald-200/50";
     }
 
     if (props.variant === "teacher") {
-        return "border-indigo-200 bg-gradient-to-br from-indigo-50/60 to-white";
+        return "border-indigo-200/80 bg-white shadow-md ring-1 ring-slate-900/5 hover:shadow-lg hover:ring-indigo-200/50";
     }
 
-    return "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white";
+    return "border-blue-200/80 bg-white shadow-md ring-1 ring-slate-900/5 hover:shadow-lg hover:ring-blue-200/50";
 });
 
 const titleClass = computed(() => {
@@ -179,18 +179,79 @@ const titleClass = computed(() => {
 
     return "text-blue-700";
 });
+
+const iconClass = computed(() => {
+    if (props.variant === "staff") return "text-emerald-500";
+    if (props.variant === "teacher") return "text-indigo-500";
+    return "text-blue-500";
+});
 </script>
 
 <template>
-    <div class="rounded-xl border p-4 shadow-sm" :class="chartCardClass">
-        <h3
+    <div
+        class="rounded-2xl border p-5 transition-all duration-300"
+        :class="chartCardClass"
+    >
+        <div
             v-if="title"
-            class="mb-3 text-sm font-semibold uppercase tracking-wide"
-            :class="titleClass"
+            class="mb-4 flex items-center gap-2.5"
         >
-            {{ title }}
-        </h3>
-        <div :style="{ height: `${height}px` }">
+            <span
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100"
+                :class="iconClass"
+                aria-hidden="true"
+            >
+                <svg
+                    v-if="type === 'doughnut' || type === 'pie'"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
+                    />
+                </svg>
+                <svg
+                    v-else-if="type === 'bar'"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                </svg>
+                <svg
+                    v-else-if="type === 'line'"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                </svg>
+            </span>
+            <h3
+                class="text-sm font-semibold uppercase tracking-[0.08em]"
+                :class="titleClass"
+            >
+                {{ title }}
+            </h3>
+        </div>
+        <div :style="{ height: `${height}px` }" class="min-h-[200px]">
             <Doughnut
                 v-if="hasData && type === 'doughnut'"
                 :data="chartData"
@@ -213,9 +274,27 @@ const titleClass = computed(() => {
             />
             <div
                 v-else
-                class="flex h-full items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500"
+                class="flex h-full min-h-[180px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/80 px-4 py-6"
             >
-                No data available
+                <svg
+                    class="h-10 w-10 text-slate-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                </svg>
+                <p class="text-center text-sm font-medium text-slate-500">
+                    No data available
+                </p>
+                <p class="text-center text-xs text-slate-400">
+                    Data will appear when available
+                </p>
             </div>
         </div>
     </div>
