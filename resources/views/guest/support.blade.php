@@ -4,233 +4,154 @@
 
 @push('styles')
 <style>
-    @keyframes fadeInUp {
+    @keyframes supportRise {
         from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(14px);
         }
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-    .animate-fade-in-up {
-        animation: fadeInUp 0.8s ease-out;
+
+    .support-rise {
+        animation: supportRise 0.6s ease-out both;
     }
+
+    .support-rise:nth-child(2) { animation-delay: 0.08s; }
+    .support-rise:nth-child(3) { animation-delay: 0.16s; }
+    .support-rise:nth-child(4) { animation-delay: 0.24s; }
 </style>
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-6 space-y-16">
-    {{-- Hero Section --}}
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 md:px-12 py-16 md:py-24 text-white shadow-2xl">
-        <div class="absolute inset-0 opacity-20">
-            <div class="absolute top-0 right-0 w-96 h-96 bg-[color:var(--portal-gold)] rounded-full mix-blend-multiply filter blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
-        </div>
-        
-        <div class="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-            <p class="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-4 py-2 text-xs font-semibold uppercase tracking-wide text-amber-200 ring-1 ring-white/20">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                </svg>
-                We're Here to Help
+<div class="container mx-auto space-y-14 px-4 py-8">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-xl md:px-12 md:py-20">
+        <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
+
+        <div class="relative z-10 mx-auto max-w-4xl text-center">
+            <p class="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-amber-200 ring-1 ring-white/20">
+                Help Desk
             </p>
-            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                Support &
-                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[color:var(--portal-gold)] to-amber-300 mt-2">
-                    Help Desk
+            <h1 class="mt-4 text-4xl font-bold leading-tight md:text-6xl">
+                Support And
+                <span class="mt-2 block text-transparent bg-gradient-to-r from-[color:var(--portal-gold)] to-amber-300 bg-clip-text">
+                    Troubleshooting
                 </span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-200 max-w-3xl mx-auto leading-relaxed">
-                The Support & Help Desk is your first stop when you have questions about the University Academic Portal, encounter technical issues, or need guidance using any of the online services.
-            </p>
-            <p class="text-sm md:text-base text-slate-200/90 max-w-3xl mx-auto leading-relaxed">
-                Here you can explore self-help resources, read step-by-step guides, and contact our support team if you need personal assistance. Whether you are logging in for the first time, troubleshooting access, or unsure where to find a feature, our goal is to resolve your request quickly and clearly so you can focus on your studies or work.
+            <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
+                Get quick answers, practical guides, and direct support for any question about the University Academic Portal.
             </p>
         </div>
     </section>
 
-    {{-- Support Highlights Slider --}}
-    <section class="space-y-4">
-        <div class="flex items-center justify-between gap-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Help Desk Highlights</p>
-                <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Support in One Place</h2>
-                <p class="text-sm md:text-base text-slate-600">Add visuals for FAQs, guides, or support workflows here.</p>
-            </div>
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Active Users</p>
+            <p class="mt-2 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalUsers', 0)) }}</p>
         </div>
-
-        <div class="portal-slider rounded-3xl border border-slate-200 bg-slate-900/90 shadow-xl overflow-hidden" data-portal-slider data-autoplay="true" data-interval="6000">
-            <div class="portal-slider-track relative">
-                <div class="portal-slide is-active" data-portal-slide>
-                    <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/support/slide1.png') }}'); background-size: cover; background-position: center;"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
-                        <div class="absolute inset-0 flex items-end">
-                            <div class="p-6 md:p-8 space-y-1 text-white">
-                                <h3 class="text-lg md:text-xl font-bold">FAQs & Guides</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Find answers to common questions, step-by-step guides, and self-help resources so you can resolve issues quickly.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="portal-slide" data-portal-slide>
-                    <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/support/slide2.png') }}'); background-size: cover; background-position: center;"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
-                        <div class="absolute inset-0 flex items-end">
-                            <div class="p-6 md:p-8 space-y-1 text-white">
-                                <h3 class="text-lg md:text-xl font-bold">Issue Reporting</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Submit tickets, track progress, and get updates until your issue is resolved by our support team.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="portal-slide" data-portal-slide>
-                    <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/support/slide3.png') }}'); background-size: cover; background-position: center;"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
-                        <div class="absolute inset-0 flex items-end">
-                            <div class="p-6 md:p-8 space-y-1 text-white">
-                                <h3 class="text-lg md:text-xl font-bold">Contact Channels</h3>
-                                <p class="text-sm md:text-base text-slate-100/90 max-w-xl">Reach us by phone, email, or in person. Office hours and live help are here when you need them.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4">
-                <div class="flex gap-2">
-                    <button type="button" class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition" data-portal-slider-prev aria-label="Previous slide">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    </button>
-                    <button type="button" class="rounded-full bg-black/40 p-2 text-white hover:bg-black/70 transition" data-portal-slider-next aria-label="Next slide">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 1"></button>
-                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 2"></button>
-                    <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 3"></button>
-                </div>
-            </div>
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Students Supported</p>
+            <p class="mt-2 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalStudents', 0)) }}</p>
+        </div>
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Support Team</p>
+            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
+        </div>
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Service Status</p>
+            <p class="mt-2 text-3xl font-bold text-amber-900">Available</p>
         </div>
     </section>
 
-    {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
-    {{-- Page-specific image + text feature cards (3 cards) --}}
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Support Overview</p>
+        <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">Fast help for portal access and academic workflows</h2>
+        <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
+            <p>
+                The Help Desk supports login issues, role access, timetable questions, grade visibility, fee pages, and service navigation.
+            </p>
+            <p>
+                Start with self-help resources when possible, then contact support for direct investigation and follow-up.
+            </p>
+        </div>
+    </section>
+
     @include('guest.partials.image-cards-support')
 
-    {{-- Main Content --}}
-    <section class="max-w-4xl mx-auto space-y-8">
-        <div class="group relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 md:p-12 shadow-xl hover:shadow-2xl transition-all duration-300">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[color:var(--portal-navy)]/5 to-transparent rounded-full blur-3xl"></div>
-            <div class="relative z-10 space-y-6">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[color:var(--portal-navy)] to-slate-700 text-white shadow-lg">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                </div>
-                
-                <div class="prose prose-lg max-w-none">
-                    <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)] mb-6">Support & Help Desk</h2>
-                    <p class="text-lg text-slate-700 leading-relaxed mb-4">
-                        The Support & Help Desk brings together the most important ways to get help with the academic portal—whether that is understanding how a feature works, resolving login or access problems, or clarifying a notification you have received.
-                    </p>
-                    <p class="text-lg text-slate-700 leading-relaxed mb-4">
-                        Many questions can be answered immediately through our FAQs and user guides, which are organised around common tasks such as viewing grades, enrolling on courses, submitting assignments, or checking your timetable. For more complex issues, you can submit a request or contact support directly so that a member of our team can investigate and respond.
-                    </p>
-                    <p class="text-lg text-slate-700 leading-relaxed">
-                        Behind the scenes, the support team works closely with academic and technical staff to track recurring issues, improve documentation, and enhance the portal based on feedback. This shared effort helps ensure that your experience of the University Academic Portal is as smooth and reliable as possible.
-                    </p>
-                </div>
-            </div>
+    <section class="space-y-6">
+        <div class="max-w-2xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Support Channels</p>
+            <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Choose the best way to get help</h2>
         </div>
 
-        {{-- Support Options --}}
-        <div class="grid gap-6 md:grid-cols-2">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">FAQs</h3>
-                        <p class="text-slate-600 mb-2">Find answers to commonly asked questions.</p>
-                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
-                            {{ $stats['totalAnnouncements'] > 0 ? number_format($stats['totalAnnouncements']) : '0' }} Announcements
-                        </div>
-                        <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-blue-600 transition-colors">
-                            Browse FAQs →
-                        </a>
-                    </div>
-                </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">FAQs</h3>
+                <p class="mt-2 text-sm text-slate-600">Quick answers for common questions and day-to-day usage.</p>
+                <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-blue-600">Browse FAQs</a>
             </div>
-            
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">User Guides</h3>
-                        <p class="text-slate-600 mb-2">Step-by-step guides for portal features.</p>
-                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
-                            {{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) : '0' }} Active Users
-                        </div>
-                        <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-green-600 transition-colors">
-                            View Guides →
-                        </a>
-                    </div>
-                </div>
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">User Guides</h3>
+                <p class="mt-2 text-sm text-slate-600">Step-by-step walkthroughs for key academic portal tasks.</p>
+                <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-emerald-600">View Guides</a>
             </div>
-            
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">Report Issues</h3>
-                        <p class="text-slate-600 mb-2">Report technical problems or bugs.</p>
-                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
-                            {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) : '0' }} Support Staff
-                        </div>
-                        <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-purple-600 transition-colors">
-                            Report Issue →
-                        </a>
-                    </div>
-                </div>
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">Report Issues</h3>
+                <p class="mt-2 text-sm text-slate-600">Submit technical problems or incorrect data reports.</p>
+                <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-purple-600">Report Issue</a>
             </div>
-            
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">Contact Support</h3>
-                        <p class="text-slate-600 mb-2">Get direct assistance from our team.</p>
-                        <div class="text-lg font-bold text-[color:var(--portal-navy)] mb-3">
-                            {{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) : '0' }} Students Supported
-                        </div>
-                        <a href="{{ route('guest.contact') }}" class="text-sm font-semibold text-[color:var(--portal-navy)] hover:text-amber-600 transition-colors">
-                            Contact Us →
-                        </a>
-                    </div>
-                </div>
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">Direct Contact</h3>
+                <p class="mt-2 text-sm text-slate-600">Reach our support desk for urgent or account-specific help.</p>
+                <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-amber-600">Contact Support</a>
             </div>
+        </div>
+    </section>
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Recommended Path</p>
+        <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How to resolve issues quickly</h2>
+        <div class="mt-6 grid gap-4 md:grid-cols-4">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">Step 1</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">Check FAQs</p>
+                <p class="mt-1 text-xs text-slate-600">Review common solutions first.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">Step 2</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">Open Guide</p>
+                <p class="mt-1 text-xs text-slate-600">Follow task-specific instructions.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">Step 3</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">Report Issue</p>
+                <p class="mt-1 text-xs text-slate-600">Share details and screenshots.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">Step 4</p>
+                <p class="mt-1 text-sm font-semibold text-slate-900">Track Resolution</p>
+                <p class="mt-1 text-xs text-slate-600">Get status updates from support.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 p-8 text-center shadow-sm md:p-12">
+        <h2 class="text-3xl font-bold text-[color:var(--portal-navy)]">Still need help?</h2>
+        <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-700 md:text-base">
+            Contact our support team and include your role, issue details, and any screenshots to speed up resolution.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <a href="{{ route('guest.contact') }}" class="inline-flex items-center rounded-full bg-[color:var(--portal-navy)] px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800">
+                Contact Support
+            </a>
+            <a href="{{ route('guest.feedback') }}" class="inline-flex items-center rounded-full border border-[color:var(--portal-navy)] bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] hover:bg-slate-50">
+                Share Feedback
+            </a>
         </div>
     </section>
 </div>
