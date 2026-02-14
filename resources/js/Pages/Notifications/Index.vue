@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     notifications: {
@@ -10,12 +11,87 @@ const props = defineProps({
     },
 });
 
+const tabs = [
+    { key: "all", label: "All" },
+    { key: "unread", label: "Unread" },
+    { key: "grade", label: "Grades" },
+    { key: "fee", label: "Fees" },
+    { key: "attendance", label: "Attendance" },
+];
+
+const activeTab = ref("all");
+const query = ref("");
+
+const isUnread = (n) => !n.read_at;
+
+const stats = computed(() => {
+    const list = props.notifications ?? [];
+    return {
+        total: list.length,
+        unread: list.filter(isUnread).length,
+        grade: list.filter((n) => n.type === "grade").length,
+        fee: list.filter((n) => n.type === "fee").length,
+        attendance: list.filter((n) => n.type === "attendance").length,
+    };
+});
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    let list = [...(props.notifications ?? [])];
+
+    if (activeTab.value === "unread") list = list.filter(isUnread);
+    if (["grade", "fee", "attendance"].includes(activeTab.value)) {
+        list = list.filter((n) => n.type === activeTab.value);
+    }
+
+    if (q) {
+        list = list.filter((n) => {
+            const title = (n.title ?? "").toLowerCase();
+            const message = (n.message ?? "").toLowerCase();
+            const type = (n.type ?? "").toLowerCase();
+            return title.includes(q) || message.includes(q) || type.includes(q);
+        });
+    }
+
+    return list;
+});
+
+const hasUnread = computed(() => (props.notifications ?? []).some((n) => !n.read_at));
+
 const markAsRead = (id) => {
     router.post(route("notifications.read", id), {}, { preserveScroll: true });
 };
 
 const markAllAsRead = () => {
     router.post(route("notifications.read-all"), {}, { preserveScroll: true });
+};
+
+const clearSearch = () => {
+    query.value = "";
+};
+
+const typeBadgeClass = (type) => {
+    if (type === "grade") return "bg-emerald-100 text-emerald-800";
+    if (type === "fee") return "bg-blue-100 text-blue-800";
+    if (type === "attendance") return "bg-amber-100 text-amber-800";
+    if (type === "timetable") return "bg-indigo-100 text-indigo-800";
+    return "bg-slate-100 text-slate-700";
+};
+
+const iconWrapperClass = (type) => {
+    if (type === "grade") return "bg-emerald-100";
+    if (type === "fee") return "bg-blue-100";
+    if (type === "attendance") return "bg-amber-100";
+    if (type === "timetable") return "bg-indigo-100";
+    return "bg-slate-100";
+};
+
+const iconClass = (type) => {
+    if (type === "grade") return "text-emerald-600";
+    if (type === "fee") return "text-blue-600";
+    if (type === "attendance") return "text-amber-600";
+    if (type === "timetable") return "text-indigo-600";
+    return "text-slate-600";
 };
 </script>
 
@@ -25,13 +101,11 @@ const markAllAsRead = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between gap-4">
-                <h2 class="text-xl font-semibold leading-tight text-slate-900">
-                    Notifications
-                </h2>
+                <h2 class="text-xl font-semibold leading-tight text-slate-900">Notifications</h2>
                 <button
-                    v-if="notifications.some((n) => !n.read_at)"
+                    v-if="hasUnread"
                     @click="markAllAsRead"
-                    class="rounded-full bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm ring-1 ring-portal-navy/60 hover:bg-portal-navy/90"
+                    class="rounded-md bg-portal-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-portal-navy-dark"
                 >
                     Mark all as read
                 </button>
@@ -44,163 +118,92 @@ const markAllAsRead = () => {
             </div>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                <!-- Header Banner -->
-                <div
-                    class="mb-6 overflow-hidden rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white shadow-lg"
-                >
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm"
-                        >
-                            <svg
-                                class="h-8 w-8"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+        <div class="py-10">
+            <div class="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                <div class="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-white p-6 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-700">Notification center</p>
+                    <h3 class="mt-2 text-2xl font-semibold text-indigo-950">Track academic updates in one place</h3>
+                    <p class="mt-2 text-sm text-indigo-900/80">Review unread alerts and quickly clear items after checking grades, fees, and attendance notices.</p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                    <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Total</p>
+                        <p class="mt-2 text-2xl font-bold text-blue-900">{{ stats.total }}</p>
+                    </div>
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Unread</p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">{{ stats.unread }}</p>
+                    </div>
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Grades</p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">{{ stats.grade }}</p>
+                    </div>
+                    <div class="rounded-xl border border-blue-200 bg-blue-50/60 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Fees</p>
+                        <p class="mt-2 text-2xl font-bold text-blue-900">{{ stats.fee }}</p>
+                    </div>
+                    <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Attendance</p>
+                        <p class="mt-2 text-2xl font-bold text-amber-900">{{ stats.attendance }}</p>
+                    </div>
+                </div>
+
+                <div class="portal-card p-4">
+                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="t in tabs"
+                                :key="t.key"
+                                type="button"
+                                class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                                :class="[
+                                    activeTab === t.key
+                                        ? 'bg-portal-navy text-white ring-portal-navy'
+                                        : 'bg-white text-slate-700 hover:bg-slate-50',
+                                ]"
+                                @click="activeTab = t.key"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                                />
-                            </svg>
+                                {{ t.label }}
+                            </button>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-bold">
-                                Notifications Center
-                            </h3>
-                            <p class="mt-1 text-sm text-white/90">
-                                Stay informed about grades, fees, timetable and
-                                attendance updates
-                            </p>
+
+                        <div class="relative w-full md:w-80">
+                            <input
+                                v-model="query"
+                                type="text"
+                                placeholder="Search notifications"
+                                class="block w-full rounded-md border-slate-300 pr-9 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <button
+                                v-if="query"
+                                type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                @click="clearSearch"
+                            >
+                                <span class="sr-only">Clear</span>
+                                X
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="portal-card overflow-hidden">
-                    <div
-                        class="border-b border-slate-200 bg-slate-50 px-6 py-4"
-                    >
-                        <p
-                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                        >
-                            Recent notifications
-                        </p>
-                        <p class="mt-1 text-sm text-slate-600">
-                            System updates about your grades, fees, timetable
-                            and attendance.
-                        </p>
+                <div class="space-y-4">
+                    <div v-if="filtered.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
+                        <h3 class="text-sm font-semibold text-slate-900">No notifications found</h3>
+                        <p class="mt-1 text-sm text-slate-500">Try changing your tab or search query.</p>
                     </div>
 
                     <div
-                        v-if="notifications.length === 0"
-                        class="p-6 text-center text-sm text-slate-500"
+                        v-for="notification in filtered"
+                        :key="notification.id"
+                        class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                        :class="{ 'ring-1 ring-emerald-200': !notification.read_at }"
                     >
-                        You have no notifications yet.
-                    </div>
-
-                    <ul v-else class="divide-y divide-slate-100">
-                        <li
-                            v-for="notification in notifications"
-                            :key="notification.id"
-                            class="flex items-start gap-4 px-6 py-5 transition-colors"
-                            :class="
-                                notification.read_at
-                                    ? 'bg-white hover:bg-slate-50'
-                                    : 'bg-portal-sky/5 hover:bg-portal-sky/10'
-                            "
-                        >
-                            <!-- Icon -->
-                            <div class="mt-1 flex-shrink-0">
-                                <div
-                                    class="flex h-10 w-10 items-center justify-center rounded-full"
-                                    :class="{
-                                        'bg-emerald-100':
-                                            notification.type === 'grade',
-                                        'bg-blue-100':
-                                            notification.type === 'fee',
-                                        'bg-indigo-100':
-                                            notification.type === 'timetable',
-                                        'bg-amber-100':
-                                            notification.type === 'attendance',
-                                        'bg-slate-100': ![
-                                            'grade',
-                                            'fee',
-                                            'timetable',
-                                            'attendance',
-                                        ].includes(notification.type),
-                                    }"
-                                >
-                                    <svg
-                                        v-if="notification.type === 'grade'"
-                                        class="h-5 w-5 text-emerald-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        v-else-if="notification.type === 'fee'"
-                                        class="h-5 w-5 text-blue-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        v-else-if="
-                                            notification.type === 'timetable'
-                                        "
-                                        class="h-5 w-5 text-indigo-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        v-else-if="
-                                            notification.type === 'attendance'
-                                        "
-                                        class="h-5 w-5 text-amber-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                                        />
-                                    </svg>
-                                    <svg
-                                        v-else
-                                        class="h-5 w-5 text-slate-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex min-w-0 flex-1 items-start gap-3">
+                                <div class="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" :class="iconWrapperClass(notification.type)">
+                                    <svg class="h-5 w-5" :class="iconClass(notification.type)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
@@ -209,81 +212,32 @@ const markAllAsRead = () => {
                                         />
                                     </svg>
                                 </div>
-                            </div>
 
-                            <!-- Content -->
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="flex items-start justify-between gap-4"
-                                >
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2">
-                                            <p
-                                                class="text-sm font-semibold text-slate-900"
-                                            >
-                                                {{ notification.title }}
-                                            </p>
-                                            <div
-                                                v-if="!notification.read_at"
-                                                class="h-2 w-2 rounded-full bg-portal-gold"
-                                            ></div>
-                                        </div>
-                                        <p
-                                            class="mt-1.5 text-sm leading-relaxed text-slate-700"
-                                        >
-                                            {{ notification.message }}
-                                        </p>
-                                        <div
-                                            class="mt-3 flex items-center gap-3"
-                                        >
-                                            <span
-                                                class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize"
-                                                :class="{
-                                                    'bg-emerald-100 text-emerald-800':
-                                                        notification.type ===
-                                                        'grade',
-                                                    'bg-blue-100 text-blue-800':
-                                                        notification.type ===
-                                                        'fee',
-                                                    'bg-indigo-100 text-indigo-800':
-                                                        notification.type ===
-                                                        'timetable',
-                                                    'bg-amber-100 text-amber-800':
-                                                        notification.type ===
-                                                        'attendance',
-                                                    'bg-slate-100 text-slate-800':
-                                                        ![
-                                                            'grade',
-                                                            'fee',
-                                                            'timetable',
-                                                            'attendance',
-                                                        ].includes(
-                                                            notification.type
-                                                        ),
-                                                }"
-                                            >
-                                                {{ notification.type }}
-                                            </span>
-                                            <button
-                                                v-if="!notification.read_at"
-                                                @click="
-                                                    markAsRead(notification.id)
-                                                "
-                                                class="text-xs font-medium text-portal-navy hover:text-portal-navy-dark hover:underline"
-                                            >
-                                                Mark as read
-                                            </button>
-                                        </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <p class="text-sm font-semibold text-slate-900">{{ notification.title }}</p>
+                                        <span v-if="!notification.read_at" class="inline-flex h-2 w-2 rounded-full bg-emerald-500" title="Unread" />
+                                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize" :class="typeBadgeClass(notification.type)">
+                                            {{ notification.type }}
+                                        </span>
                                     </div>
-                                    <p
-                                        class="flex-shrink-0 whitespace-nowrap text-xs text-slate-500"
-                                    >
-                                        {{ notification.created_at }}
-                                    </p>
+
+                                    <p class="mt-1 text-sm text-slate-700">{{ notification.message }}</p>
+                                    <p class="mt-2 text-xs text-slate-500">{{ notification.created_at }}</p>
                                 </div>
                             </div>
-                        </li>
-                    </ul>
+
+                            <button
+                                v-if="!notification.read_at"
+                                type="button"
+                                @click="markAsRead(notification.id)"
+                                class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
+                            >
+                                Mark as read
+                            </button>
+                            <span v-else class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">Read</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
