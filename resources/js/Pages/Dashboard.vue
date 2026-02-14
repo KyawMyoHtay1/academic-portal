@@ -236,8 +236,7 @@ const quickActions = computed(() => {
                         'from-indigo-50 to-indigo-100 border border-indigo-200':
                             card.title === 'Attendance' ||
                             card.title === 'Grades' ||
-                            card.title === 'Grades Recorded',
-                        'from-indigo-50 to-indigo-100 border border-indigo-200':
+                            card.title === 'Grades Recorded' ||
                             card.title === 'Students Taught',
                     }"
                 >
@@ -257,8 +256,8 @@ const quickActions = computed(() => {
                             'bg-indigo-600':
                                 card.title === 'Attendance' ||
                                 card.title === 'Grades' ||
-                                card.title === 'Grades Recorded',
-                            'bg-indigo-600': card.title === 'Students Taught',
+                                card.title === 'Grades Recorded' ||
+                                card.title === 'Students Taught',
                         }"
                     >
                         <svg
@@ -305,8 +304,7 @@ const quickActions = computed(() => {
                                     'text-indigo-700':
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
-                                        card.title === 'Grades Recorded',
-                                    'text-indigo-700':
+                                        card.title === 'Grades Recorded' ||
                                         card.title === 'Students Taught',
                                 }"
                             >
@@ -330,8 +328,7 @@ const quickActions = computed(() => {
                                     'text-indigo-600':
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
-                                        card.title === 'Grades Recorded',
-                                    'text-indigo-600':
+                                        card.title === 'Grades Recorded' ||
                                         card.title === 'Students Taught',
                                 }"
                             >
@@ -398,8 +395,7 @@ const quickActions = computed(() => {
                                     'bg-gradient-to-br from-indigo-500 to-indigo-600':
                                         card.title === 'Attendance' ||
                                         card.title === 'Grades' ||
-                                        card.title === 'Grades Recorded',
-                                    'bg-gradient-to-br from-indigo-500 to-indigo-600':
+                                        card.title === 'Grades Recorded' ||
                                         card.title === 'Students Taught',
                                 }"
                             >
