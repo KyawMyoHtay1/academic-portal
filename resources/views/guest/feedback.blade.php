@@ -40,28 +40,48 @@
                     Improve The Portal
                 </span>
             </h1>
-            <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Your suggestions and issue reports help us improve usability, performance, and academic service quality. Feedback from students, teachers, and administrative teams directly informs product priorities, workflow improvements, and support planning.
+            <p class="mx-auto max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
+                Your suggestions and issue reports help us improve usability, performance, and academic service quality. Feedback from students, teachers, and administrative teams directly informs product priorities, workflow improvements, and support planning so the portal stays aligned with real usage and institutional goals.
             </p>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <a href="{{ route('guest.contact') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-md hover:bg-slate-100">
+                    Contact Us
+                </a>
+                <a href="{{ route('guest.support') }}" class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
+                    Get Support
+                </a>
+            </div>
         </div>
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Submission Type</p>
-            <p class="mt-2 text-3xl font-bold text-blue-900">Open</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5m-4 0h5" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Submission Type</p>
+            <p class="mt-1 text-3xl font-bold text-blue-900">Open</p>
         </div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Response Window</p>
-            <p class="mt-2 text-3xl font-bold text-emerald-900">Fast</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Response Window</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">Fast</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Audience</p>
-            <p class="mt-2 text-3xl font-bold text-indigo-900">All Users</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Audience</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">All Users</p>
         </div>
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Impact</p>
-            <p class="mt-2 text-3xl font-bold text-amber-900">Continuous</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Impact</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">Continuous</p>
         </div>
     </section>
 
@@ -167,22 +187,34 @@
 
         <div class="space-y-4">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Why It Matters</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                </div>
+                <p class="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Why It Matters</p>
                 <h3 class="mt-2 text-xl font-bold text-slate-900">Your input drives product decisions</h3>
-                <p class="mt-2 text-sm text-slate-600">We review submissions to identify high-impact improvements for students, staff, and teachers.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">We review every submission to identify high-impact improvements for students, staff, and teachers. Clear feedback helps us prioritize fixes, refine workflows, and plan new features that match how you actually use the portal.</p>
             </div>
 
             <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h4 class="text-lg font-semibold text-slate-900">Improve Functionality</h4>
-                <p class="mt-2 text-sm text-slate-600">Suggest features and workflow enhancements.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <h4 class="mt-4 text-lg font-semibold text-slate-900">Improve Functionality</h4>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Suggest new features, workflow enhancements, or better ways to complete common tasks. We use these ideas when planning the next release and improving the academic experience for everyone.</p>
             </div>
             <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h4 class="text-lg font-semibold text-slate-900">Report Issues</h4>
-                <p class="mt-2 text-sm text-slate-600">Flag bugs or confusing interactions quickly.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 text-red-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                </div>
+                <h4 class="mt-4 text-lg font-semibold text-slate-900">Report Issues</h4>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Flag bugs, errors, or confusing interactions as soon as you notice them. Include the page or feature name and what you expected so we can investigate and fix issues quickly.</p>
             </div>
             <div class="feedback-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h4 class="text-lg font-semibold text-slate-900">Shape Experience</h4>
-                <p class="mt-2 text-sm text-slate-600">Help us build a more intuitive academic platform.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h4 class="mt-4 text-lg font-semibold text-slate-900">Shape Experience</h4>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Tell us what works well or what could be clearer. Your perspective helps us build a more intuitive, efficient academic platform for the whole university community.</p>
             </div>
         </div>
     </section>

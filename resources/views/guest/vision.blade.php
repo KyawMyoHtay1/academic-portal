@@ -56,20 +56,32 @@
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Portal Users</p>
-            <p class="mt-2 text-3xl font-bold text-blue-900">{{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) . '+' : '0' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Portal Users</p>
+            <p class="mt-1 text-3xl font-bold text-blue-900">{{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) . '+' : '0' }}</p>
         </div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Enrollments</p>
-            <p class="mt-2 text-3xl font-bold text-emerald-900">{{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Enrollments</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }}</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
-            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }}</p>
         </div>
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Direction</p>
-            <p class="mt-2 text-3xl font-bold text-amber-900">Future Ready</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Direction</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">Future Ready</p>
         </div>
     </section>
 
@@ -137,21 +149,30 @@
 
         <div class="grid gap-4 md:grid-cols-3">
             <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Digital Innovation</h3>
-                <p class="mt-2 text-sm text-slate-600">
-                    Expand secure integrations, performance analytics, and automation that simplify daily academic workflows.
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Digital Innovation</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                    We will expand secure integrations, performance analytics, and automation that simplify daily academic workflows so faculty and staff spend less time on manual tasks and more on teaching and student success.
                 </p>
             </div>
             <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Personalized Experience</h3>
-                <p class="mt-2 text-sm text-slate-600">
-                    Deliver role-aware dashboards so students, teachers, and staff can act faster with clearer information.
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Personalized Experience</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                    We will deliver role-aware dashboards and workflows so students, teachers, and staff can act faster with clearer, more relevant information and fewer steps to complete common tasks.
                 </p>
             </div>
             <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Global Collaboration</h3>
-                <p class="mt-2 text-sm text-slate-600">
-                    Support cross-campus, hybrid, and international academic partnerships with reliable digital tools.
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1.61a2 2 0 01.427 5.546 2 2 0 01-1.954 2.94 2 2 0 01-1.427-1.954V13a2 2 0 012-2h.945M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 0a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Global Collaboration</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                    We will support cross-campus, hybrid, and international academic partnerships with reliable digital tools so the institution can scale collaboration and mobility without sacrificing quality or security.
                 </p>
             </div>
         </div>

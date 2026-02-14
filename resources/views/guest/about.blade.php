@@ -57,20 +57,32 @@
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="about-rise rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Years Of Excellence</p>
-            <p class="mt-2 text-3xl font-bold text-blue-900">{{ $stats['yearsOfExcellence'] > 0 ? number_format($stats['yearsOfExcellence']) . '+' : '50+' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Years Of Excellence</p>
+            <p class="mt-1 text-3xl font-bold text-blue-900">{{ $stats['yearsOfExcellence'] > 0 ? number_format($stats['yearsOfExcellence']) . '+' : '50+' }}</p>
         </div>
         <div class="about-rise rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Active Students</p>
-            <p class="mt-2 text-3xl font-bold text-emerald-900">{{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) . '+' : '5,000+' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Active Students</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ $stats['totalStudents'] > 0 ? number_format($stats['totalStudents']) . '+' : '5,000+' }}</p>
         </div>
         <div class="about-rise rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Expert Faculty</p>
-            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Expert Faculty</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}</p>
         </div>
         <div class="about-rise rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Programs Offered</p>
-            <p class="mt-2 text-3xl font-bold text-amber-900">{{ $stats['totalPrograms'] > 0 ? number_format($stats['totalPrograms']) . '+' : '100+' }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Programs Offered</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">{{ $stats['totalPrograms'] > 0 ? number_format($stats['totalPrograms']) . '+' : '100+' }}</p>
         </div>
     </section>
 
@@ -152,20 +164,32 @@
         </div>
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Excellence</h3>
-                <p class="mt-2 text-sm text-slate-600">High standards in teaching, research, and student support.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Excellence</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">We hold ourselves to high standards in teaching, research, and student support so every program and service meets the expectations of learners and stakeholders.</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Integrity</h3>
-                <p class="mt-2 text-sm text-slate-600">Ethical leadership, accountability, and transparency.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Integrity</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Ethical leadership, accountability, and transparency guide how we make decisions, communicate with the community, and handle academic and administrative matters.</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Inclusion</h3>
-                <p class="mt-2 text-sm text-slate-600">A welcoming environment where every learner can thrive.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Inclusion</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">We build a welcoming environment where every learner can thrive, regardless of background, and where diverse perspectives strengthen teaching and research.</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h3 class="text-lg font-semibold text-slate-900">Innovation</h3>
-                <p class="mt-2 text-sm text-slate-600">Encouraging curiosity and practical solutions to real problems.</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Innovation</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">We encourage curiosity and practical solutions to real problems, in the classroom and in research, so our community stays at the forefront of knowledge and practice.</p>
             </div>
         </div>
     </section>
@@ -188,9 +212,9 @@
         <div class="grid gap-4 md:grid-cols-2">
             @foreach ($milestones as $milestone)
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-gold)]">{{ $milestone['year'] }}</p>
-                    <h3 class="mt-1 text-xl font-semibold text-slate-900">{{ $milestone['title'] }}</h3>
-                    <p class="mt-2 text-sm text-slate-600">{{ $milestone['description'] }}</p>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 font-bold text-sm">{{ $milestone['year'] }}</div>
+                    <h3 class="mt-4 text-xl font-semibold text-slate-900">{{ $milestone['title'] }}</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ $milestone['description'] }}</p>
                 </div>
             @endforeach
         </div>

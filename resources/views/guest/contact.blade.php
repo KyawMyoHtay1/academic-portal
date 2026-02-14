@@ -41,28 +41,48 @@
                     We Are Ready To Help
                 </span>
             </h1>
-            <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
-                Contact admissions, academics, support, or student services through one clear channel. Send us a message with context and we will route it to the right team for timely follow-up.
+            <p class="mx-auto max-w-3xl text-base leading-relaxed text-slate-200 md:text-lg">
+                Contact admissions, academics, support, or student services through one clear channel. Send us a message with context and we will route it to the right team for timely follow-up so you get accurate answers without bouncing between departments.
             </p>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <a href="{{ route('guest.support') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] shadow-md hover:bg-slate-100">
+                    Help Desk
+                </a>
+                <a href="{{ route('guest.feedback') }}" class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
+                    Share Feedback
+                </a>
+            </div>
         </div>
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Users Reached</p>
-            <p class="mt-2 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalStudents', 0) + data_get($stats, 'totalFaculty', 0)) }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Users Reached</p>
+            <p class="mt-1 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalStudents', 0) + data_get($stats, 'totalFaculty', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Faculty</p>
-            <p class="mt-2 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Faculty</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
-            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalCourses', 0)) }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalCourses', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Office Status</p>
-            <p class="mt-2 text-3xl font-bold text-amber-900">Open Hours</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Office Status</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">Open Hours</p>
         </div>
     </section>
 
@@ -76,7 +96,7 @@
             <div class="mb-6">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Send Message</p>
                 <h2 class="mt-2 text-2xl font-bold text-[color:var(--portal-navy)] md:text-3xl">Contact our team</h2>
-                <p class="mt-2 text-sm text-slate-600">Complete the form and include enough detail so we can respond effectively. Specific requests help us reduce delays and provide more accurate guidance on the first response.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Complete the form and include enough detail—such as your role, the topic (admissions, grades, support, etc.), and what you need—so we can respond effectively. Specific requests help us reduce delays and provide more accurate guidance on the first response.</p>
             </div>
 
             @if (session('success'))
@@ -191,8 +211,12 @@
 
         <div class="space-y-4">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Contact Details</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <p class="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Contact Details</p>
                 <h3 class="mt-2 text-xl font-bold text-slate-900">Reach us directly</h3>
+                <p class="mt-2 text-sm text-slate-600">Use the details below for general inquiries, or submit the form for a routed, tracked response from the right team.</p>
                 <div class="mt-4 space-y-3 text-sm text-slate-700">
                     <p><span class="font-semibold">Email:</span> info@university.edu</p>
                     <p><span class="font-semibold">Phone:</span> +123 456 7890</p>
@@ -202,16 +226,25 @@
             </div>
 
             <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h4 class="text-lg font-semibold text-slate-900">Admissions</h4>
-                <p class="mt-2 text-sm text-slate-600">admissions@university.edu</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <h4 class="mt-4 text-lg font-semibold text-slate-900">Admissions</h4>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Questions about applications, requirements, or enrollment: admissions@university.edu. We respond within 1–2 business days.</p>
             </div>
             <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h4 class="text-lg font-semibold text-slate-900">Academic Affairs</h4>
-                <p class="mt-2 text-sm text-slate-600">academics@university.edu</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                </div>
+                <h4 class="mt-4 text-lg font-semibold text-slate-900">Academic Affairs</h4>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Curriculum, programs, and academic policy: academics@university.edu. For grade or course disputes, include your student ID and course code.</p>
             </div>
             <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                <h4 class="text-lg font-semibold text-slate-900">IT Support</h4>
-                <p class="mt-2 text-sm text-slate-600">itsupport@university.edu</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                </div>
+                <h4 class="mt-4 text-lg font-semibold text-slate-900">IT Support</h4>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Login issues, portal errors, or access problems: itsupport@university.edu. For urgent access blocks, mention “urgent” in the subject line.</p>
             </div>
         </div>
     </section>
