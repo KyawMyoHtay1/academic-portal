@@ -847,7 +847,7 @@ const quickActions = computed(() => {
                                     class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                                 >
                                     <span>{{ a.label }}</span>
-                                    <span class="text-slate-400">›</span>
+                                    <span class="text-slate-400">></span>
                                 </Link>
                             </div>
                         </div>
@@ -855,6 +855,24 @@ const quickActions = computed(() => {
                 </div>
 
                 <!-- Dashboard charts - Student -->
+                <div
+                    v-if="
+                        hasChartData(charts.feeStatus) ||
+                        hasChartData(charts.gradesBySubject) ||
+                        hasChartData(charts.attendanceLine) ||
+                        hasChartData(charts.courseEnrollment)
+                    "
+                    class="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-3"
+                >
+                    <p
+                        class="text-xs font-semibold uppercase tracking-wide text-blue-700"
+                    >
+                        Student analytics
+                    </p>
+                    <p class="mt-1 text-sm text-blue-900">
+                        Personal trends across fees, enrollment, grades, and attendance.
+                    </p>
+                </div>
                 <div
                     v-if="
                         hasChartData(charts.feeStatus) ||
@@ -1140,7 +1158,7 @@ const quickActions = computed(() => {
                                         unread
                                     </span>
                                     <span v-else class="text-slate-500">
-                                        You’re all caught up
+                                        You're all caught up
                                     </span>
                                 </p>
                             </div>
@@ -1182,11 +1200,11 @@ const quickActions = computed(() => {
                                     <p
                                         class="truncate text-sm font-medium text-slate-900"
                                     >
-                                        <span v-if="a.pinned">📌 </span>
+                                        <span v-if="a.pinned">[Pinned] </span>
                                         {{ a.title }}
                                     </p>
                                     <p class="mt-0.5 text-xs text-slate-500">
-                                        {{ a.author }} · {{ a.created_at }}
+                                        {{ a.author }} | {{ a.created_at }}
                                     </p>
                                 </div>
                             </div>
@@ -1201,7 +1219,7 @@ const quickActions = computed(() => {
                         Project context
                     </p>
                     <p class="mt-2 text-sm text-slate-700">
-                        BSc (Hons) Computing final year project – University
+                        BSc (Hons) Computing final year project - University
                         Academic Portal using Vue.js and Laravel.
                     </p>
                 </div>
@@ -1434,6 +1452,24 @@ const quickActions = computed(() => {
                 </div>
 
                 <!-- Dashboard charts - Staff -->
+                <div
+                    v-if="
+                        hasChartData(charts.feeStatus) ||
+                        hasChartData(charts.enrollmentsByCourse) ||
+                        hasChartData(charts.feesCollectedLine) ||
+                        hasChartData(charts.gradeStatus)
+                    "
+                    class="rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3"
+                >
+                    <p
+                        class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                    >
+                        Operations analytics
+                    </p>
+                    <p class="mt-1 text-sm text-emerald-900">
+                        Institution-wide snapshots for review, enrollment, and finance.
+                    </p>
+                </div>
                 <div
                     v-if="
                         hasChartData(charts.feeStatus) ||
@@ -1923,7 +1959,7 @@ const quickActions = computed(() => {
                                     class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                                 >
                                     <span>{{ a.label }}</span>
-                                    <span class="text-slate-400">›</span>
+                                    <span class="text-slate-400">></span>
                                 </Link>
                             </div>
                         </div>
@@ -2019,7 +2055,7 @@ const quickActions = computed(() => {
                                         unread
                                     </span>
                                     <span v-else class="text-slate-500">
-                                        You’re all caught up
+                                        You're all caught up
                                     </span>
                                 </p>
                             </div>
@@ -2061,11 +2097,11 @@ const quickActions = computed(() => {
                                     <p
                                         class="truncate text-sm font-medium text-slate-900"
                                     >
-                                        <span v-if="a.pinned">📌 </span>
+                                        <span v-if="a.pinned">[Pinned] </span>
                                         {{ a.title }}
                                     </p>
                                     <p class="mt-0.5 text-xs text-slate-500">
-                                        {{ a.author }} · {{ a.created_at }}
+                                        {{ a.author }} | {{ a.created_at }}
                                     </p>
                                 </div>
                             </div>
@@ -2079,7 +2115,7 @@ const quickActions = computed(() => {
                             Project context
                         </p>
                         <p class="mt-2 text-sm text-slate-700">
-                            BSc (Hons) Computing final year project – University
+                            BSc (Hons) Computing final year project - University
                             Academic Portal using Vue.js and Laravel.
                         </p>
                     </div>
@@ -2101,7 +2137,7 @@ const quickActions = computed(() => {
                             <p
                                 class="text-xs font-bold uppercase tracking-wider text-indigo-800"
                             >
-                                ⚠️ Action Required
+                                 Action Required
                             </p>
                             <p class="mt-2 text-3xl font-bold text-indigo-900">
                                 {{ stats.pendingGrades ?? 0 }}
@@ -2147,6 +2183,24 @@ const quickActions = computed(() => {
                 </div>
 
                 <!-- Dashboard charts - Teacher -->
+                <div
+                    v-if="
+                        hasChartData(charts.gradeStatus) ||
+                        hasChartData(charts.gradesBySubject) ||
+                        hasChartData(charts.attendanceLine) ||
+                        hasChartData(charts.assignmentsBySubject)
+                    "
+                    class="rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3"
+                >
+                    <p
+                        class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                    >
+                        Teaching analytics
+                    </p>
+                    <p class="mt-1 text-sm text-indigo-900">
+                        Class performance and engagement indicators for your subjects.
+                    </p>
+                </div>
                 <div
                     v-if="
                         hasChartData(charts.gradeStatus) ||
@@ -2306,17 +2360,15 @@ const quickActions = computed(() => {
                                             <span
                                                 class="font-semibold text-emerald-600"
                                             >
-                                                ✓
+                                                Approved:
                                                 {{ stats.approvedGrades ?? 0 }}
-                                                approved
                                             </span>
                                             <span
                                                 v-if="stats.pendingGrades > 0"
                                                 class="font-semibold text-amber-600"
                                             >
-                                                ⏳
+                                                Pending:
                                                 {{ stats.pendingGrades }}
-                                                pending
                                             </span>
                                         </div>
                                     </div>
@@ -2360,7 +2412,7 @@ const quickActions = computed(() => {
                                     class="mt-3 flex items-center gap-2 text-xs font-semibold text-blue-700"
                                 >
                                     <span>View schedule</span>
-                                    <span>→</span>
+                                    <span>-></span>
                                 </div>
                             </Link>
 
@@ -2425,7 +2477,7 @@ const quickActions = computed(() => {
                                     class="mt-3 flex items-center gap-2 text-xs font-semibold text-purple-700"
                                 >
                                     <span>Open messages</span>
-                                    <span>→</span>
+                                    <span>-></span>
                                 </div>
                             </Link>
                         </div>
@@ -2447,7 +2499,7 @@ const quickActions = computed(() => {
                                     class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                                 >
                                     <span>{{ a.label }}</span>
-                                    <span class="text-slate-400">›</span>
+                                    <span class="text-slate-400">></span>
                                 </Link>
                             </div>
                         </div>
@@ -2543,7 +2595,7 @@ const quickActions = computed(() => {
                                         unread
                                     </span>
                                     <span v-else class="text-slate-500">
-                                        You’re all caught up
+                                        You're all caught up
                                     </span>
                                 </p>
                             </div>
@@ -2585,11 +2637,11 @@ const quickActions = computed(() => {
                                     <p
                                         class="truncate text-sm font-medium text-slate-900"
                                     >
-                                        <span v-if="a.pinned">📌 </span>
+                                        <span v-if="a.pinned">[Pinned] </span>
                                         {{ a.title }}
                                     </p>
                                     <p class="mt-0.5 text-xs text-slate-500">
-                                        {{ a.author }} · {{ a.created_at }}
+                                        {{ a.author }} | {{ a.created_at }}
                                     </p>
                                 </div>
                             </div>
@@ -2603,7 +2655,7 @@ const quickActions = computed(() => {
                             Project context
                         </p>
                         <p class="mt-2 text-sm text-slate-700">
-                            BSc (Hons) Computing final year project – University
+                            BSc (Hons) Computing final year project - University
                             Academic Portal using Vue.js and Laravel.
                         </p>
                     </div>
