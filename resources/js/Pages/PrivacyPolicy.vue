@@ -7,7 +7,26 @@ import { computed } from "vue";
 
 const page = usePage();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
-const hasTermlyContent = computed(() => !!termlyHtml && termlyHtml.trim().length > 0);
+const renderedTermlyHtml = computed(() => {
+    if (!termlyHtml) return "";
+
+    const currentOrigin =
+        typeof window !== "undefined" ? window.location.origin : "";
+
+    return termlyHtml
+        .replaceAll("http://127.0.0.1:8000", currentOrigin || "https://example.com")
+        .replaceAll("__________", "University Academic Portal")
+        .replaceAll("â†’", "->")
+        .replaceAll("â€‘", "-")
+        .replaceAll("â€™", "'")
+        .replaceAll("â€œ", "\"")
+        .replaceAll("â€", "\"")
+        .replaceAll("Â ", " ")
+        .replaceAll("Â", "");
+});
+const hasTermlyContent = computed(
+    () => !!renderedTermlyHtml.value && renderedTermlyHtml.value.trim().length > 0
+);
 const policyLastUpdated = computed(() => {
     const match = termlyHtml.match(/Last updated\s*<bdt class="question">([^<]+)<\/bdt>/i);
     return match?.[1] ?? "Recently updated";
@@ -142,7 +161,7 @@ word-break: break-word !important;
                         <div
                             v-if="hasTermlyContent"
                             class="policy-shell not-prose min-h-[50vh] rounded-2xl border border-slate-100 bg-white p-4 sm:p-6"
-                            v-html="termlyHtml"
+                            v-html="renderedTermlyHtml"
                         />
 
                         <div
@@ -222,7 +241,7 @@ word-break: break-word !important;
                     <div
                         v-if="hasTermlyContent"
                         class="policy-shell not-prose min-h-[60vh] rounded-2xl border border-slate-100 bg-white p-4 sm:p-6"
-                        v-html="termlyHtml"
+                        v-html="renderedTermlyHtml"
                     />
 
                     <div
