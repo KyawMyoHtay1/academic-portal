@@ -30,7 +30,7 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-6 space-y-8">
+<div class="container mx-auto max-w-7xl px-4 py-6 space-y-8">
     {{-- Hero Section with Search --}}
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 md:px-12 py-12 md:py-16 text-white shadow-2xl">
         <div class="absolute inset-0 opacity-20">
@@ -105,11 +105,11 @@
     {{-- Courses Showcase Slider --}}
     <section class="space-y-4">
         <div class="flex items-center justify-between gap-3">
-            <div>
+            <div class="max-w-2xl">
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Course Highlights</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Explore Programs</h2>
-                <p class="text-sm md:text-base text-slate-600">
-                    See how different programmes connect to facilities, labs, and lecturers across the university.
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                    See how different programmes connect to facilities, labs, and lecturers across the university—and use the slider below to get a visual sense of the breadth and depth of our course offerings before diving into the full catalog.
                 </p>
             </div>
         </div>
@@ -171,6 +171,9 @@
         </div>
     </section>
 
+    {{-- Icon highlights (consistent with other guest pages) --}}
+    @include('guest.partials.icon-highlights')
+
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
@@ -179,7 +182,7 @@
 
     {{-- Statistics Overview --}}
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[color:var(--portal-navy)] to-slate-700 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,11 +192,12 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ number_format($stats['totalCourses']) }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total Courses</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Programmes in the catalog</p>
                 </div>
             </div>
         </div>
         
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[color:var(--portal-gold)] to-amber-400 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,11 +207,12 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ number_format($stats['uniqueSemesters']) }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Semesters</div>
+                    <p class="text-xs text-slate-500 mt-0.5">When courses are offered</p>
                 </div>
             </div>
         </div>
         
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,11 +222,12 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ number_format($stats['totalCredits']) }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total Credits</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Credit points across all courses</p>
                 </div>
             </div>
         </div>
         
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,6 +237,7 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $stats['availabilityRate'] }}%</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Available</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Courses open for enrolment</p>
                 </div>
             </div>
         </div>
@@ -245,13 +252,13 @@
             <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)]">
                 Why Choose Our Courses
             </h2>
-            <p class="text-sm md:text-base text-slate-600 mt-2">
-                Each programme is designed to balance strong academic foundations with practical, real-world skills.
+            <p class="text-sm md:text-base text-slate-600 mt-2 leading-relaxed">
+                Each programme is designed to balance strong academic foundations with practical, real-world skills—so you graduate not only with a recognised qualification but with the competencies employers and further study programmes value.
             </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -260,11 +267,11 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Diverse Programs</h3>
-                <p class="text-sm text-slate-600">Explore a wide range of academic programs designed to meet your career goals.</p>
+                <p class="text-sm text-slate-600 leading-relaxed">Explore a wide range of academic programmes across disciplines—from sciences and humanities to professional and applied fields—designed to align with your interests and career goals.</p>
             </div>
         </div>
         
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -273,11 +280,11 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Expert Faculty</h3>
-                <p class="text-sm text-slate-600">Learn from experienced professors and industry professionals.</p>
+                <p class="text-sm text-slate-600 leading-relaxed">Learn from experienced professors, researchers, and industry professionals who bring current practice and scholarship into the classroom and support your development.</p>
             </div>
         </div>
         
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -286,7 +293,7 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Career Ready</h3>
-                <p class="text-sm text-slate-600">Gain practical skills and knowledge for your future career.</p>
+                <p class="text-sm text-slate-600 leading-relaxed">Gain practical skills, placements, and project experience that prepare you for your future career or further study—with many courses linked to professional bodies and employers.</p>
             </div>
         </div>
 

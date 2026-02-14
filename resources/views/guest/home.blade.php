@@ -26,7 +26,7 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-6 space-y-16">
+<div class="container mx-auto max-w-7xl px-4 py-6 space-y-16">
     {{-- Enhanced Hero --}}
     <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-900 to-[color:var(--portal-navy)] px-8 py-16 lg:py-24 text-white shadow-2xl">
         {{-- Animated Background Elements --}}
@@ -53,7 +53,10 @@
                 </span>
             </h1>
             <p class="text-xl md:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
-                Explore our comprehensive courses, vibrant campus life, and cutting-edge facilities. Join thousands of students shaping their future.
+                Explore our comprehensive courses, vibrant campus life, and cutting-edge facilities. Join thousands of students and a dedicated faculty committed to excellence in teaching, research, and student success.
+            </p>
+            <p class="text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                From enrolment to graduation, the University Academic Portal keeps everything in one place: courses, grades, timetables, announcements, and support—so you can focus on learning and growing.
             </p>
             <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <a href="{{ route('login') }}" class="group relative inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-[color:var(--portal-navy)] shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
@@ -78,7 +81,8 @@
                     <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">
                         {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) . '+' : '100+' }}
                     </div>
-                    <div class="text-sm text-slate-300 mt-1">Courses</div>
+                    <div class="text-sm font-semibold text-slate-300 mt-1">Courses</div>
+                    <div class="text-xs text-slate-400 mt-0.5">Programmes across disciplines</div>
                 </div>
                 <div class="text-center">
                     <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">
@@ -90,17 +94,20 @@
                             5K+
                         @endif
                     </div>
-                    <div class="text-sm text-slate-300 mt-1">Students</div>
+                    <div class="text-sm font-semibold text-slate-300 mt-1">Students</div>
+                    <div class="text-xs text-slate-400 mt-0.5">Active learners on campus</div>
                 </div>
                 <div class="text-center">
                     <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">
                         {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}
                     </div>
-                    <div class="text-sm text-slate-300 mt-1">Faculty</div>
+                    <div class="text-sm font-semibold text-slate-300 mt-1">Faculty</div>
+                    <div class="text-xs text-slate-400 mt-0.5">Expert teachers & researchers</div>
                 </div>
                 <div class="text-center">
                     <div class="text-3xl md:text-4xl font-bold text-[color:var(--portal-gold)]">{{ $stats['successRate'] }}%</div>
-                    <div class="text-sm text-slate-300 mt-1">Success Rate</div>
+                    <div class="text-sm font-semibold text-slate-300 mt-1">Success Rate</div>
+                    <div class="text-xs text-slate-400 mt-0.5">Graduation & employability</div>
                 </div>
             </div>
         </div>
@@ -109,11 +116,11 @@
     {{-- Image Slider (Hero Highlights) --}}
     <section class="space-y-4">
         <div class="flex items-center justify-between gap-3">
-            <div>
+            <div class="max-w-2xl">
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Campus Highlights</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Explore Our University</h2>
-                <p class="text-sm md:text-base text-slate-600">
-                    Get a feel for everyday life on campus—from learning spaces and labs to student activities and events.
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed mt-2">
+                    Get a feel for everyday life on campus—from modern learning spaces and labs to student activities, events, and the facilities that support teaching, research, and community engagement.
                 </p>
             </div>
         </div>
@@ -270,8 +277,11 @@
         </div>
     </section>
 
+    {{-- Icon highlights (consistent with other guest pages) --}}
+    @include('guest.partials.icon-highlights')
+
     {{-- Quick links strip --}}
-    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-900/5">
         <div class="flex flex-wrap items-center justify-center gap-4 md:gap-8">
             <a href="{{ route('guest.courses') }}" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 px-5 py-3 text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">
                 <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-[color:var(--portal-navy)]/10 text-[color:var(--portal-navy)]"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"/></svg></span>
@@ -304,7 +314,7 @@
     @include('guest.partials.image-cards-home')
 
     {{-- Statistics Section --}}
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-50 via-white to-slate-100 border border-slate-200 p-8 md:p-12 shadow-lg">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-50 via-white to-slate-100 border border-slate-200 p-8 md:p-12 shadow-lg ring-1 ring-slate-900/5">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             <div class="text-center group">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[color:var(--portal-navy)] to-slate-700 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -316,6 +326,7 @@
                     {{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) . '+' : '100+' }}
                 </div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Active Courses</div>
+                <p class="text-xs text-slate-500 mt-1 max-w-[140px] mx-auto">Programmes you can enrol in today</p>
             </div>
             <div class="text-center group">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[color:var(--portal-gold)] to-amber-400 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -333,6 +344,7 @@
                     @endif
                 </div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Students</div>
+                <p class="text-xs text-slate-500 mt-1 max-w-[140px] mx-auto">Building their future with us</p>
             </div>
             <div class="text-center group">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -344,6 +356,7 @@
                     {{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) . '+' : '200+' }}
                 </div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Expert Faculty</div>
+                <p class="text-xs text-slate-500 mt-1 max-w-[140px] mx-auto">Teaching and research excellence</p>
             </div>
             <div class="text-center group">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -353,6 +366,7 @@
                 </div>
                 <div class="text-4xl md:text-5xl font-bold text-[color:var(--portal-navy)] mb-2">{{ $stats['successRate'] }}%</div>
                 <div class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Success Rate</div>
+                <p class="text-xs text-slate-500 mt-1 max-w-[140px] mx-auto">Graduation and employability outcomes</p>
             </div>
         </div>
     </section>
@@ -369,7 +383,7 @@
                 <h2 class="text-3xl font-bold text-[color:var(--portal-navy)]">About the University</h2>
             </div>
             <p class="text-base text-slate-700 leading-relaxed">
-                Our mission is to provide quality education, foster innovation, and prepare students for a successful future. We are committed to excellence in teaching, research, and community engagement.
+                Our mission is to provide quality education, foster innovation, and prepare students for a successful future. We are committed to excellence in teaching, research, and community engagement—offering a supportive environment where learners can develop skills, build networks, and achieve their academic and career goals.
             </p>
             <p class="text-base text-slate-700 leading-relaxed mt-3">
                 As a university community, we bring together dedicated lecturers, researchers, and support teams who care deeply about student success. Whether you are the first in your family to attend university or continuing your academic journey, you will find personalised support, modern learning spaces, and programmes that are aligned with real-world careers.
@@ -378,18 +392,18 @@
                 Beyond the classroom, students can take part in clubs, leadership opportunities, internships, and community projects that help you grow as a professional and as a person. Our University Academic Portal connects all of these experiences in one place—so you can manage courses, track progress, access services, and stay informed about campus life.
             </p>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm hover:shadow-md transition-shadow ring-1 ring-slate-900/5">
                     <div class="flex items-center gap-2 mb-2">
                         <svg class="w-5 h-5 text-[color:var(--portal-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Our Mission</p>
                     </div>
-                    <p class="mt-2 text-sm text-slate-700">
-                        Empower learners through research-driven teaching and inclusive academic support.
+                    <p class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        Empower every learner through research-driven teaching, inclusive academic support, and opportunities that connect classroom learning to real-world impact and lifelong success.
                     </p>
                 </div>
-                <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm hover:shadow-md transition-shadow ring-1 ring-slate-900/5">
                     <div class="flex items-center gap-2 mb-2">
                         <svg class="w-5 h-5 text-[color:var(--portal-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -397,8 +411,8 @@
                         </svg>
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Our Vision</p>
                     </div>
-                    <p class="mt-2 text-sm text-slate-700">
-                        To be a leading institution recognized for academic excellence and innovation.
+                    <p class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        To be a leading institution recognized for academic excellence, innovation, and graduates who contribute meaningfully to their professions and communities.
                     </p>
                 </div>
             </div>
@@ -431,10 +445,10 @@
     {{-- Enhanced Courses Preview --}}
     <section class="space-y-6">
         <div class="flex items-center justify-between gap-4">
-            <div>
+            <div class="max-w-2xl">
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-2">Explore Learning</p>
                 <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)]">Featured Courses</h2>
-                <p class="text-base text-slate-600 mt-2">Discover our comprehensive range of programs designed for your success.</p>
+                <p class="text-base text-slate-600 mt-2 leading-relaxed">Discover our comprehensive range of programmes designed for your success—from core subjects and electives to specialist pathways that align with your career and further study goals.</p>
             </div>
             <a href="{{ route('guest.courses') }}" class="hidden md:flex items-center gap-2 rounded-full bg-[color:var(--portal-navy)] px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-slate-800 hover:scale-105 transition-all duration-300">
                 View All
@@ -826,10 +840,10 @@
     {{-- Enhanced News Preview --}}
     <section class="space-y-6">
         <div class="flex items-center justify-between gap-4">
-            <div>
+            <div class="max-w-2xl">
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-2">Stay Updated</p>
                 <h2 class="text-3xl md:text-4xl font-bold text-[color:var(--portal-navy)]">Latest Announcements</h2>
-                <p class="text-base text-slate-600 mt-2">Important updates, events, and news from campus.</p>
+                <p class="text-base text-slate-600 mt-2 leading-relaxed">Important updates, events, deadlines, and news from campus—so you never miss exam dates, fee reminders, scholarship opportunities, or campus life highlights.</p>
             </div>
             <a href="{{ route('guest.news') }}" class="hidden md:flex items-center gap-2 rounded-full bg-[color:var(--portal-navy)] px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-slate-800 hover:scale-105 transition-all duration-300">
                 View All

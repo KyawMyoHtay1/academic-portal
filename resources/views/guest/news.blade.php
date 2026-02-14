@@ -36,7 +36,7 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-6 space-y-8">
+<div class="container mx-auto max-w-7xl px-4 py-6 space-y-8">
     {{-- Hero Section with Search --}}
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 md:px-12 py-12 md:py-16 text-white shadow-2xl">
         <div class="absolute inset-0 opacity-20">
@@ -111,11 +111,11 @@
     {{-- News Highlights Slider --}}
     <section class="space-y-4">
         <div class="flex items-center justify-between gap-3">
-            <div>
+            <div class="max-w-2xl">
                 <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)] mb-1">Latest Highlights</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">Campus News & Events</h2>
-                <p class="text-sm md:text-base text-slate-600">
-                    Visual highlights from important announcements, events, research stories, and campus life.
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                    Visual highlights from important announcements, events, research stories, and campus life—so you can stay connected with what matters most to your studies and your community.
                 </p>
             </div>
         </div>
@@ -177,6 +177,9 @@
         </div>
     </section>
 
+    {{-- Icon highlights (consistent with other guest pages) --}}
+    @include('guest.partials.icon-highlights')
+
     {{-- Quick links strip (consistent with Home) --}}
     @include('guest.partials.quick-links-strip')
 
@@ -185,7 +188,7 @@
 
     {{-- Statistics Overview --}}
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[color:var(--portal-navy)] to-slate-700 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,11 +198,12 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $announcements->count() }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total News</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Announcements on this page</p>
                 </div>
             </div>
         </div>
         
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,11 +213,12 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $announcements->where('priority', 'urgent')->count() }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Urgent</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Require quick action</p>
                 </div>
             </div>
         </div>
         
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,11 +228,12 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $announcements->where('priority', 'important')->count() }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Important</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Worth reading soon</p>
                 </div>
             </div>
         </div>
         
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md hover:shadow-lg transition-shadow ring-1 ring-slate-900/5">
             <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[color:var(--portal-gold)] to-amber-400 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,6 +243,7 @@
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $announcements->where('pinned', true)->count() }}</div>
                     <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Pinned</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Featured at the top</p>
                 </div>
             </div>
         </div>
@@ -244,7 +251,7 @@
 
     {{-- Visual Feature Cards – Stay informed: What’s Happening on Campus --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-red-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-red-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -253,11 +260,11 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Urgent Updates</h3>
-                <p class="text-sm text-slate-600">Stay informed about critical announcements and deadlines.</p>
+                <p class="text-sm text-slate-600 leading-relaxed">Critical announcements, exam changes, and deadlines that may require immediate action—check these first so you never miss a key date or requirement.</p>
             </div>
         </div>
         
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-purple-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -266,11 +273,11 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Campus Events</h3>
-                <p class="text-sm text-slate-600">Discover workshops, seminars, and social activities.</p>
+                <p class="text-sm text-slate-600 leading-relaxed">Discover workshops, seminars, open days, and social activities—so you can get involved, build skills, and connect with peers and staff.</p>
             </div>
         </div>
         
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -279,11 +286,11 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">Research News</h3>
-                <p class="text-sm text-slate-600">Latest breakthroughs and academic achievements.</p>
+                <p class="text-sm text-slate-600 leading-relaxed">Latest breakthroughs, publications, and academic achievements from our faculty and research centres—see how our work shapes the world.</p>
             </div>
         </div>
 
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -298,7 +305,7 @@
             </div>
         </div>
 
-        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50 to-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ring-1 ring-slate-900/5">
             <div class="absolute top-0 right-0 w-32 h-32 bg-sky-200/20 rounded-full blur-2xl"></div>
             <div class="relative z-10">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
