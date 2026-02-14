@@ -188,6 +188,25 @@
                         <a href="{{ route('guest.contact') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.contact') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Contact Us</a>
                     </div>
                 </div>
+                {{-- Search everything (guest) --}}
+                <div class="relative" id="guest-search-wrapper" data-search-url="{{ route('search') }}">
+                    <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600 transition focus-within:border-[color:var(--portal-navy)] focus-within:bg-white focus-within:ring-2 focus-within:ring-[color:var(--portal-navy)]/20 sm:w-56">
+                        <svg class="h-4 w-4 shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input
+                            type="search"
+                            id="guest-search-input"
+                            placeholder="Search everything..."
+                            autocomplete="off"
+                            class="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+                            aria-label="Search courses, news, and pages"
+                        />
+                        <kbd class="hidden shrink-0 rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 sm:inline-block">⌘K</kbd>
+                    </div>
+                    <div id="guest-search-dropdown" class="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-auto rounded-lg border border-slate-200 bg-white py-2 shadow-lg hidden" role="listbox"></div>
+                </div>
+
                 {{-- Account group --}}
                 @if (Route::has('login') || Route::has('register'))
                     <div class="relative group">
@@ -434,6 +453,146 @@
     @stack('scripts')
 
     <script>
+        // Guest search: search everything (courses, news, pages)
+        document.addEventListener('DOMContentLoaded', function () {
+            var guestSearchWrapper = document.getElementById('guest-search-wrapper');
+            if (!guestSearchWrapper) return;
+            var searchUrl = guestSearchWrapper.getAttribute('data-search-url');
+            var input = document.getElementById('guest-search-input');
+            var dropdown = document.getElementById('guest-search-dropdown');
+            var minLen = 2;
+            var debounceMs = 300;
+            var debounceTimer = null;
+            var results = [];
+            var highlightIndex = -1;
+            var typeLabels = { course: 'Course', announcement: 'News', page: 'Page' };
+
+            function fetchResults() {
+                var q = (input.value || '').trim();
+                if (q.length < minLen) {
+                    results = [];
+                    dropdown.classList.add('hidden');
+                    dropdown.innerHTML = '';
+                    return;
+                }
+                dropdown.classList.remove('hidden');
+                dropdown.innerHTML = '<div class="px-4 py-8 text-center text-sm text-slate-500">Searching...</div>';
+                fetch(searchUrl + '?q=' + encodeURIComponent(q), {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        results = data.results || [];
+                        highlightIndex = -1;
+                        renderResults(q);
+                    })
+                    .catch(function () {
+                        results = [];
+                        renderResults(q);
+                    });
+            }
+
+            function renderResults(q) {
+                if (results.length === 0) {
+                    dropdown.innerHTML = '<div class="px-4 py-8 text-center text-sm text-slate-500">No results found for "' + (q || '').replace(/</g, '&lt;') + '"</div>';
+                    return;
+                }
+                var html = '<div class="space-y-1" role="listbox">';
+                results.forEach(function (r, i) {
+                    var typeLabel = typeLabels[r.type] || r.type;
+                    var subtitle = r.subtitle ? '<span class="truncate text-xs text-slate-500">' + (r.subtitle || '').replace(/</g, '&lt;') + '</span>' : '';
+                    var bg = i === highlightIndex ? ' bg-[color:var(--portal-navy)]/5' : '';
+                    html += '<button type="button" class="guest-search-result flex w-full flex-col items-start gap-0.5 px-4 py-2.5 text-left transition hover:bg-slate-50' + bg + '" data-index="' + i + '" data-url="' + (r.url || '').replace(/"/g, '&quot;') + '">';
+                    html += '<div class="flex w-full items-center justify-between gap-2"><span class="truncate text-sm font-medium text-slate-900">' + (r.title || '').replace(/</g, '&lt;') + '</span>';
+                    html += '<span class="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">' + typeLabel + '</span></div>';
+                    if (subtitle) html += subtitle;
+                    html += '</button>';
+                });
+                html += '</div>';
+                dropdown.innerHTML = html;
+                dropdown.querySelectorAll('.guest-search-result').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var url = btn.getAttribute('data-url');
+                        if (url) window.location.href = url;
+                    });
+                });
+            }
+
+            function openDropdown() {
+                var q = (input.value || '').trim();
+                if (q.length >= minLen && results.length > 0) {
+                    dropdown.classList.remove('hidden');
+                    renderResults(q);
+                } else if (q.length >= minLen) {
+                    fetchResults();
+                }
+            }
+
+            function closeDropdown() {
+                dropdown.classList.add('hidden');
+                highlightIndex = -1;
+            }
+
+            function selectHighlighted() {
+                if (highlightIndex >= 0 && results[highlightIndex] && results[highlightIndex].url) {
+                    window.location.href = results[highlightIndex].url;
+                }
+            }
+
+            input.addEventListener('input', function () {
+                if (debounceTimer) clearTimeout(debounceTimer);
+                var q = (input.value || '').trim();
+                if (q.length < minLen) {
+                    results = [];
+                    dropdown.classList.add('hidden');
+                    dropdown.innerHTML = '';
+                    return;
+                }
+                debounceTimer = setTimeout(fetchResults, debounceMs);
+            });
+
+            input.addEventListener('focus', openDropdown);
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeDropdown();
+                    input.blur();
+                    return;
+                }
+                if (!dropdown.classList.contains('hidden') && results.length > 0) {
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        highlightIndex = Math.min(highlightIndex + 1, results.length - 1);
+                        renderResults((input.value || '').trim());
+                        return;
+                    }
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        highlightIndex = Math.max(highlightIndex - 1, 0);
+                        renderResults((input.value || '').trim());
+                        return;
+                    }
+                    if (e.key === 'Enter' && highlightIndex >= 0) {
+                        e.preventDefault();
+                        selectHighlighted();
+                    }
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (guestSearchWrapper && !guestSearchWrapper.contains(e.target)) closeDropdown();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    input.focus();
+                    openDropdown();
+                }
+            });
+        });
+
         // Lightweight, reusable slider for guest pages
         document.addEventListener('DOMContentLoaded', function () {
             const sliders = document.querySelectorAll('[data-portal-slider]');

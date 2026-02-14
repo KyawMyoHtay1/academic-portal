@@ -302,6 +302,10 @@ Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
 
 // Guest feedback form submission (stores into feedback_messages)
 Route::post('/guest/feedback', [FeedbackController::class, 'store'])->name('guest.feedback.store');
+
+// Global search (guest + authenticated): same URL, controller branches by auth
+Route::get('/search', SearchController::class)->name('search');
+
 Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
 })->name('privacy-policy');
@@ -315,8 +319,6 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth', 'nocache'])->group(function () {
-    Route::get('/search', SearchController::class)->name('search');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -23,15 +23,18 @@ class SearchController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $q = trim((string) $request->input('q', ''));
-        $user = Auth::user();
-
         if (strlen($q) < self::MIN_QUERY_LENGTH) {
             return response()->json(['results' => []]);
         }
 
         $term = '%' . $q . '%';
-        $results = [];
 
+        if (Auth::guest()) {
+            return response()->json(['results' => $this->searchGuest($term, $q)]);
+        }
+
+        $user = Auth::user();
+        $results = [];
         if ($user->isStaff()) {
             $results = $this->searchStaff($term);
         } elseif ($user->isTeacher()) {
@@ -41,6 +44,85 @@ class SearchController extends Controller
         }
 
         return response()->json(['results' => $results]);
+    }
+
+    /**
+     * Guest search: public courses, public announcements (news), and static guest pages.
+     */
+    private function searchGuest(string $term, string $rawQuery): array
+    {
+        $results = [];
+        $q = strtolower($rawQuery);
+
+        // Public courses
+        $courses = Course::where(function ($query) use ($term) {
+            $query->where('course_code', 'like', $term)->orWhere('title', 'like', $term);
+        })
+            ->limit(self::LIMIT_PER_TYPE)
+            ->get(['id', 'course_code', 'title']);
+
+        foreach ($courses as $c) {
+            $results[] = [
+                'type' => 'course',
+                'id' => 'course-' . $c->id,
+                'title' => $c->title,
+                'subtitle' => $c->course_code,
+                'url' => route('guest.courses') . '#course-' . $c->id,
+            ];
+        }
+
+        // Public announcements (News)
+        $announcements = Announcement::query()
+            ->currentlyVisible()
+            ->visibleToUser(null)
+            ->where(function ($query) use ($term) {
+                $query->where('title', 'like', $term)->orWhere('body', 'like', $term);
+            })
+            ->orderByDesc('pinned')
+            ->orderByDesc('created_at')
+            ->limit(self::LIMIT_PER_TYPE)
+            ->get(['id', 'title']);
+
+        foreach ($announcements as $a) {
+            $results[] = [
+                'type' => 'announcement',
+                'id' => 'announcement-' . $a->id,
+                'title' => $a->title,
+                'subtitle' => 'News',
+                'url' => route('guest.news') . '#announcement-' . $a->id,
+            ];
+        }
+
+        // Static guest pages (match by title or keywords)
+        $pages = [
+            ['title' => 'Home', 'url' => route('guest.home'), 'keywords' => ['home', 'main', 'welcome']],
+            ['title' => 'Courses', 'url' => route('guest.courses'), 'keywords' => ['courses', 'programs', 'curriculum']],
+            ['title' => 'News', 'url' => route('guest.news'), 'keywords' => ['news', 'announcements', 'updates']],
+            ['title' => 'About Us', 'url' => route('guest.about'), 'keywords' => ['about', 'us', 'university']],
+            ['title' => 'Our Vision', 'url' => route('guest.vision'), 'keywords' => ['vision', 'mission', 'goals']],
+            ['title' => 'Policies & Guidelines', 'url' => route('guest.policies'), 'keywords' => ['policies', 'guidelines', 'rules']],
+            ['title' => 'Feedback', 'url' => route('guest.feedback'), 'keywords' => ['feedback', 'suggestions']],
+            ['title' => 'Academic Services', 'url' => route('guest.services'), 'keywords' => ['academic', 'services']],
+            ['title' => 'Support & Help Desk', 'url' => route('guest.support'), 'keywords' => ['support', 'help', 'desk', 'faq']],
+            ['title' => 'Contact Us', 'url' => route('guest.contact'), 'keywords' => ['contact', 'us', 'email', 'phone']],
+        ];
+
+        foreach ($pages as $i => $page) {
+            $titleLower = strtolower($page['title']);
+            $matchTitle = str_contains($titleLower, $q);
+            $matchKeyword = collect($page['keywords'])->contains(fn ($k) => str_contains($k, $q));
+            if ($matchTitle || $matchKeyword) {
+                $results[] = [
+                    'type' => 'page',
+                    'id' => 'page-' . $i,
+                    'title' => $page['title'],
+                    'subtitle' => 'Page',
+                    'url' => $page['url'],
+                ];
+            }
+        }
+
+        return $results;
     }
 
     private function searchStaff(string $term): array

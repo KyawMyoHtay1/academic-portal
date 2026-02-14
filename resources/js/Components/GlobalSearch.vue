@@ -31,6 +31,7 @@ const typeLabels = {
     subject: "Subject",
     announcement: "Announcement",
     assignment: "Assignment",
+    page: "Page",
 };
 
 function fetchResults() {
