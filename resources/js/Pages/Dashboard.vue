@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeroBanner from "@/Components/Dashboard/HeroBanner.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import DashboardChart from "@/Components/Dashboard/DashboardChart.vue";
 import { Head, Link, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 
@@ -13,6 +14,10 @@ const props = defineProps({
     stats: {
         type: Object,
         required: true,
+    },
+    charts: {
+        type: Object,
+        default: () => ({}),
     },
     alertSystemStatus: {
         type: Object,
@@ -840,6 +845,38 @@ const quickActions = computed(() => {
                     </div>
                 </div>
 
+                <!-- Dashboard charts - Student -->
+                <div
+                    v-if="charts.feeStatus || charts.gradesBySubject || charts.attendanceLine || charts.courseEnrollment"
+                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+                >
+                    <DashboardChart
+                        v-if="charts.feeStatus"
+                        type="doughnut"
+                        :chart-data="charts.feeStatus"
+                        title="Fee status"
+                    />
+                    <DashboardChart
+                        v-if="charts.courseEnrollment"
+                        type="doughnut"
+                        :chart-data="charts.courseEnrollment"
+                        title="Enrollment status"
+                    />
+                    <DashboardChart
+                        v-if="charts.gradesBySubject"
+                        type="bar"
+                        :chart-data="charts.gradesBySubject"
+                        title="Scores by subject"
+                    />
+                    <DashboardChart
+                        v-if="charts.attendanceLine"
+                        type="line"
+                        :chart-data="charts.attendanceLine"
+                        title="Attendance (last 6 months)"
+                        :y-max="100"
+                    />
+                </div>
+
                 <!-- Middle row: notifications, grades, my courses -->
                 <div class="grid gap-6 lg:grid-cols-3">
                     <!-- Notifications overview -->
@@ -1373,6 +1410,37 @@ const quickActions = computed(() => {
                             ></div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Dashboard charts - Staff -->
+                <div
+                    v-if="charts.feeStatus || charts.enrollmentsByCourse || charts.feesCollectedLine || charts.gradeStatus"
+                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+                >
+                    <DashboardChart
+                        v-if="charts.feeStatus"
+                        type="doughnut"
+                        :chart-data="charts.feeStatus"
+                        title="Fee status (all fees)"
+                    />
+                    <DashboardChart
+                        v-if="charts.gradeStatus"
+                        type="doughnut"
+                        :chart-data="charts.gradeStatus"
+                        title="Grade review status"
+                    />
+                    <DashboardChart
+                        v-if="charts.enrollmentsByCourse"
+                        type="bar"
+                        :chart-data="charts.enrollmentsByCourse"
+                        title="Enrollments by course (top 8)"
+                    />
+                    <DashboardChart
+                        v-if="charts.feesCollectedLine"
+                        type="line"
+                        :chart-data="charts.feesCollectedLine"
+                        title="Fees collected (last 6 months)"
+                    />
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">
@@ -2045,6 +2113,38 @@ const quickActions = computed(() => {
                             }"
                         ></div>
                     </div>
+                </div>
+
+                <!-- Dashboard charts - Teacher -->
+                <div
+                    v-if="charts.gradeStatus || charts.gradesBySubject || charts.attendanceLine || charts.assignmentsBySubject"
+                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+                >
+                    <DashboardChart
+                        v-if="charts.gradeStatus"
+                        type="doughnut"
+                        :chart-data="charts.gradeStatus"
+                        title="Grade status (my subjects)"
+                    />
+                    <DashboardChart
+                        v-if="charts.gradesBySubject"
+                        type="bar"
+                        :chart-data="charts.gradesBySubject"
+                        title="Grades by subject (top 8)"
+                    />
+                    <DashboardChart
+                        v-if="charts.attendanceLine"
+                        type="line"
+                        :chart-data="charts.attendanceLine"
+                        title="Attendance % (last 6 months)"
+                        :y-max="100"
+                    />
+                    <DashboardChart
+                        v-if="charts.assignmentsBySubject"
+                        type="bar"
+                        :chart-data="charts.assignmentsBySubject"
+                        title="Assignments by subject"
+                    />
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">

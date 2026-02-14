@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assignment;
 use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Student;
-use App\Models\Enrollment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Queue;
+use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -73,6 +73,92 @@ class DashboardController extends Controller
             $paidFees = Fee::where('status', 'paid')->sum('amount');
             $pendingFees = Fee::where('status', 'pending')->sum('amount');
 
+            // Chart data: Fee status (doughnut)
+            $feeStatusCounts = Fee::select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+            $chartsFeeStatus = [
+                'labels' => ['Pending', 'Payment Pending', 'Paid'],
+                'datasets' => [[
+                    'data' => [
+                        $feeStatusCounts['pending'] ?? 0,
+                        $feeStatusCounts['payment_pending'] ?? 0,
+                        $feeStatusCounts['paid'] ?? 0,
+                    ],
+                    'backgroundColor' => ['#f59e0b', '#10b981', '#3b82f6'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
+            // Chart data: Enrollments by course (bar) – top 8 courses
+            $enrollmentsByCourse = DB::table('course_student')
+                ->join('courses', 'courses.id', '=', 'course_student.course_id')
+                ->where('course_student.status', 'approved')
+                ->select('courses.course_code', DB::raw('count(*) as total'))
+                ->groupBy('courses.id', 'courses.course_code')
+                ->orderByDesc('total')
+                ->limit(8)
+                ->get();
+            $chartsEnrollmentsByCourse = [
+                'labels' => $enrollmentsByCourse->pluck('course_code')->toArray(),
+                'datasets' => [[
+                    'label' => 'Enrolled students',
+                    'data' => $enrollmentsByCourse->pluck('total')->toArray(),
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.7)',
+                    'borderColor' => '#3b82f6',
+                    'borderWidth' => 1,
+                ]],
+            ];
+
+            // Chart data: Fees collected by month (line) – last 6 months
+            $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
+            $feesByMonth = Fee::where('status', 'paid')
+                ->whereNotNull('paid_date')
+                ->where('paid_date', '>=', $sixMonthsAgo)
+                ->selectRaw('YEAR(paid_date) as y, MONTH(paid_date) as m, SUM(amount) as total')
+                ->groupBy('y', 'm')
+                ->orderBy('y')
+                ->orderBy('m')
+                ->get();
+            $monthLabels = [];
+            $monthTotals = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $d = Carbon::now()->subMonths($i);
+                $monthLabels[] = $d->format('M Y');
+                $found = $feesByMonth->first(fn ($r) => (int) $r->y === (int) $d->year && (int) $r->m === (int) $d->month);
+                $monthTotals[] = $found ? (float) $found->total : 0;
+            }
+            $chartsFeesCollectedLine = [
+                'labels' => $monthLabels,
+                'datasets' => [[
+                    'label' => 'Fees collected (£)',
+                    'data' => $monthTotals,
+                    'borderColor' => '#10b981',
+                    'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
+                    'fill' => true,
+                    'tension' => 0.3,
+                ]],
+            ];
+
+            // Chart data: Grade status (doughnut)
+            $gradeStatusCounts = Grade::select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+            $chartsGradeStatus = [
+                'labels' => ['Pending', 'Approved', 'Rejected'],
+                'datasets' => [[
+                    'data' => [
+                        $gradeStatusCounts['pending'] ?? 0,
+                        $gradeStatusCounts['approved'] ?? 0,
+                        $gradeStatusCounts['rejected'] ?? 0,
+                    ],
+                    'backgroundColor' => ['#8b5cf6', '#22c55e', '#ef4444'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
             return Inertia::render('Dashboard', [
                 'role' => 'staff',
                 'stats' => [
@@ -86,6 +172,12 @@ class DashboardController extends Controller
                     'pendingPayments' => $pendingPayments,
                     'paidFees' => $paidFees,
                     'pendingFees' => $pendingFees,
+                ],
+                'charts' => [
+                    'feeStatus' => $chartsFeeStatus,
+                    'enrollmentsByCourse' => $chartsEnrollmentsByCourse,
+                    'feesCollectedLine' => $chartsFeesCollectedLine,
+                    'gradeStatus' => $chartsGradeStatus,
                 ],
                 'alertSystemStatus' => $alertSystemStatus,
             ]);
@@ -119,6 +211,92 @@ class DashboardController extends Controller
                 ->where('status', 'approved')
                 ->count();
 
+            // Chart data: Grade status for my subjects (doughnut)
+            $myGradeStatusCounts = Grade::whereIn('subject_id', $subjectIds)
+                ->select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+            $chartsGradeStatus = [
+                'labels' => ['Pending', 'Approved', 'Rejected'],
+                'datasets' => [[
+                    'data' => [
+                        $myGradeStatusCounts['pending'] ?? 0,
+                        $myGradeStatusCounts['approved'] ?? 0,
+                        $myGradeStatusCounts['rejected'] ?? 0,
+                    ],
+                    'backgroundColor' => ['#8b5cf6', '#22c55e', '#ef4444'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
+            // Chart data: Grades count by subject (bar)
+            $gradesBySubject = Grade::whereIn('subject_id', $subjectIds)
+                ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
+                ->select('subjects.subject_code', DB::raw('count(*) as total'))
+                ->groupBy('subjects.id', 'subjects.subject_code')
+                ->orderByDesc('total')
+                ->limit(8)
+                ->get();
+            $chartsGradesBySubject = [
+                'labels' => $gradesBySubject->pluck('subject_code')->toArray(),
+                'datasets' => [[
+                    'label' => 'Grades recorded',
+                    'data' => $gradesBySubject->pluck('total')->toArray(),
+                    'backgroundColor' => 'rgba(139, 92, 246, 0.7)',
+                    'borderColor' => '#8b5cf6',
+                    'borderWidth' => 1,
+                ]],
+            ];
+
+            // Chart data: Attendance rate by month (line) – last 6 months for my subjects
+            $attendanceByMonth = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $start = Carbon::now()->subMonths($i)->startOfMonth();
+                $end = Carbon::now()->subMonths($i)->endOfMonth();
+                $total = Attendance::whereIn('subject_id', $subjectIds)
+                    ->whereBetween('date', [$start, $end])
+                    ->count();
+                $present = Attendance::whereIn('subject_id', $subjectIds)
+                    ->whereBetween('date', [$start, $end])
+                    ->where('status', 'present')
+                    ->count();
+                $attendanceByMonth[] = [
+                    'label' => $start->format('M Y'),
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                ];
+            }
+            $chartsAttendanceLine = [
+                'labels' => array_column($attendanceByMonth, 'label'),
+                'datasets' => [[
+                    'label' => 'Attendance %',
+                    'data' => array_column($attendanceByMonth, 'rate'),
+                    'borderColor' => '#06b6d4',
+                    'backgroundColor' => 'rgba(6, 182, 212, 0.1)',
+                    'fill' => true,
+                    'tension' => 0.3,
+                ]],
+            ];
+
+            // Chart data: Assignments by subject (bar) – my subjects
+            $assignmentsBySubject = Assignment::whereIn('subject_id', $subjectIds)
+                ->join('subjects', 'subjects.id', '=', 'assignments.subject_id')
+                ->select('subjects.subject_code', DB::raw('count(*) as total'))
+                ->groupBy('subjects.id', 'subjects.subject_code')
+                ->orderByDesc('total')
+                ->limit(8)
+                ->get();
+            $chartsAssignmentsBySubject = [
+                'labels' => $assignmentsBySubject->pluck('subject_code')->toArray(),
+                'datasets' => [[
+                    'label' => 'Assignments',
+                    'data' => $assignmentsBySubject->pluck('total')->toArray(),
+                    'backgroundColor' => 'rgba(16, 185, 129, 0.7)',
+                    'borderColor' => '#10b981',
+                    'borderWidth' => 1,
+                ]],
+            ];
+
             return Inertia::render('Dashboard', [
                 'role' => 'teacher',
                 'stats' => [
@@ -128,6 +306,12 @@ class DashboardController extends Controller
                     'attendanceRate' => $attendanceRate,
                     'pendingGrades' => $pendingGrades,
                     'approvedGrades' => $approvedGrades,
+                ],
+                'charts' => [
+                    'gradeStatus' => $chartsGradeStatus,
+                    'gradesBySubject' => $chartsGradesBySubject,
+                    'attendanceLine' => $chartsAttendanceLine,
+                    'assignmentsBySubject' => $chartsAssignmentsBySubject,
                 ],
             ]);
         }
@@ -163,6 +347,76 @@ class DashboardController extends Controller
                 ->count()
             : 0;
 
+        // Chart data for student dashboard
+        $chartsFeeStatus = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#f59e0b', '#10b981'], 'borderWidth' => 0]]];
+        $chartsGradesBySubject = ['labels' => [], 'datasets' => [['label' => 'Score', 'data' => [], 'backgroundColor' => 'rgba(139, 92, 246, 0.7)', 'borderColor' => '#8b5cf6', 'borderWidth' => 1]]];
+        $chartsAttendanceLine = ['labels' => [], 'datasets' => [['label' => 'Attendance %', 'data' => [], 'borderColor' => '#06b6d4', 'backgroundColor' => 'rgba(6, 182, 212, 0.1)', 'fill' => true, 'tension' => 0.3]]];
+        $chartsCourseEnrollment = ['labels' => ['Enrolled', 'Pending'], 'datasets' => [['data' => [0, 0], 'backgroundColor' => ['#3b82f6', '#f59e0b'], 'borderWidth' => 0]]];
+
+        if ($student) {
+            $feePendingCount = $student->fees()->where('status', 'pending')->count();
+            $feePaidCount = $student->fees()->where('status', 'paid')->count();
+            $chartsFeeStatus = [
+                'labels' => ['Pending', 'Paid'],
+                'datasets' => [[
+                    'data' => [$feePendingCount, $feePaidCount],
+                    'backgroundColor' => ['#f59e0b', '#10b981'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
+            $gradesBySubject = $student->grades()
+                ->where('status', Grade::STATUS_APPROVED)
+                ->whereNotNull('score')
+                ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
+                ->select('subjects.subject_code', DB::raw('ROUND(AVG(grades.score), 1) as avg_score'))
+                ->groupBy('subjects.id', 'subjects.subject_code')
+                ->orderBy('subjects.subject_code')
+                ->get();
+            $chartsGradesBySubject = [
+                'labels' => $gradesBySubject->pluck('subject_code')->toArray(),
+                'datasets' => [[
+                    'label' => 'Avg score',
+                    'data' => $gradesBySubject->pluck('avg_score')->map(fn ($s) => (float) $s)->toArray(),
+                    'backgroundColor' => 'rgba(139, 92, 246, 0.7)',
+                    'borderColor' => '#8b5cf6',
+                    'borderWidth' => 1,
+                ]],
+            ];
+
+            $attendanceByMonth = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $start = Carbon::now()->subMonths($i)->startOfMonth();
+                $end = Carbon::now()->subMonths($i)->endOfMonth();
+                $total = Attendance::where('student_id', $student->id)->whereBetween('date', [$start, $end])->count();
+                $present = Attendance::where('student_id', $student->id)->whereBetween('date', [$start, $end])->where('status', 'present')->count();
+                $attendanceByMonth[] = [
+                    'label' => $start->format('M Y'),
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                ];
+            }
+            $chartsAttendanceLine = [
+                'labels' => array_column($attendanceByMonth, 'label'),
+                'datasets' => [[
+                    'label' => 'Attendance %',
+                    'data' => array_column($attendanceByMonth, 'rate'),
+                    'borderColor' => '#06b6d4',
+                    'backgroundColor' => 'rgba(6, 182, 212, 0.1)',
+                    'fill' => true,
+                    'tension' => 0.3,
+                ]],
+            ];
+
+            $chartsCourseEnrollment = [
+                'labels' => ['Enrolled', 'Pending'],
+                'datasets' => [[
+                    'data' => [$approvedEnrollments, $pendingEnrollments],
+                    'backgroundColor' => ['#3b82f6', '#f59e0b'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+        }
+
         return Inertia::render('Dashboard', [
             'role' => 'student',
             'stats' => [
@@ -173,6 +427,12 @@ class DashboardController extends Controller
                 'gpa' => $gpa,
                 'pendingEnrollments' => $pendingEnrollments,
                 'approvedEnrollments' => $approvedEnrollments,
+            ],
+            'charts' => [
+                'feeStatus' => $chartsFeeStatus,
+                'gradesBySubject' => $chartsGradesBySubject,
+                'attendanceLine' => $chartsAttendanceLine,
+                'courseEnrollment' => $chartsCourseEnrollment,
             ],
         ]);
     }
