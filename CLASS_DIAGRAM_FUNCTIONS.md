@@ -281,25 +281,37 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 
 ---
 
-## **Assignment** (if included)
-*Attributes: id, subject_id, title, description, due_date, max_score, etc.*
+## **Assignment**
+*Attributes: id, subject_id, course_id, created_by, title, description, due_date, due_time, max_score, status, allowed_file_types, max_file_size, timestamps*
 
 - +FillGetData()
 - +CreateAssignment()
 - +UpdateAssignment()
 - +DeleteAssignment()
+- +PublishAssignment()
 - +GetSubmissions()
-- +SearchAssignment()
+- +Subject()
+- +Course()
+- +Creator()
+- +Submissions()
+- +IsOverdue()
+- +CanSubmit()
 - +AutoID()
 
 ---
 
-## **AssignmentSubmission** (if included)
-*Attributes: id, assignment_id, student_id, submitted_at, file_path, score, etc.*
+## **AssignmentSubmission**
+*Attributes: id, assignment_id, student_id, file_path, original_filename, comments, score, feedback, graded_by, graded_at, status, timestamps*
 
 - +FillGetData()
 - +Submit()
 - +GradeSubmission()
+- +UpdateScore()
+- +Assignment()
+- +Student()
+- +Grader()
+- +IsGraded()
+- +GetPercentage()
 - +GetByStudent()
 - +GetByAssignment()
 - +AutoID()
@@ -329,6 +341,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 | **ContactMessage** | SubmitContact, MarkAsRead, Reply |
 | **FeedbackMessage** | SubmitFeedback, MarkAsRead, MarkAsReplied |
 | **LowAttendanceAlertState** | UpdateState, CheckThreshold, SendAlert |
+| **Assignment** | Create/Update/Delete, Publish, GetSubmissions, IsOverdue, CanSubmit |
+| **AssignmentSubmission** | Submit, GradeSubmission, IsGraded, GetPercentage |
 
 ---
 
@@ -539,5 +553,56 @@ class LowAttendanceAlertState {
   +CheckThreshold()
   +SendAlert()
 }
+
+class Assignment {
+  +id: int
+  +subject_id: int
+  +course_id: int
+  +created_by: int
+  +title: string
+  +description: text
+  +due_date: date
+  +due_time: time
+  +max_score: int
+  +status: enum (draft, published, closed)
+  +allowed_file_types: json
+  +max_file_size: int
+  --
+  +FillGetData()
+  +CreateAssignment()
+  +UpdateAssignment()
+  +DeleteAssignment()
+  +PublishAssignment()
+  +GetSubmissions()
+  +IsOverdue()
+  +CanSubmit()
+}
+
+class AssignmentSubmission {
+  +id: int
+  +assignment_id: int
+  +student_id: int
+  +file_path: string
+  +original_filename: string
+  +comments: text
+  +score: decimal
+  +feedback: text
+  +graded_by: int
+  +graded_at: datetime
+  +status: enum (submitted, graded, returned)
+  --
+  +FillGetData()
+  +Submit()
+  +GradeSubmission()
+  +IsGraded()
+  +GetPercentage()
+}
+
+Subject "1" --> "*" Assignment : has many
+Course "1" --> "*" Assignment : has many
+User "1" --> "*" Assignment : created_by
+Assignment "1" --> "*" AssignmentSubmission : has many
+Student "1" --> "*" AssignmentSubmission : has many
+User "1" --> "*" AssignmentSubmission : graded_by
 @enduml
 ```
