@@ -27,7 +27,7 @@
 
 @section('content')
 <div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-900 via-[color:var(--portal-navy)] to-amber-900 px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
 
@@ -48,19 +48,19 @@
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Active Users</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalUsers', 0)) }}</p>
         </div>
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Students Supported</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalStudents', 0)) }}</p>
         </div>
-        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Support Team</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Service Status</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">Available</p>
         </div>
@@ -68,7 +68,9 @@
 
     @include('guest.partials.quick-links-strip')
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+    @include('guest.partials.icon-highlights')
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Support Overview</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">Fast help for portal access and academic workflows</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
@@ -90,22 +92,22 @@
         </div>
 
         <div class="grid gap-4 md:grid-cols-2">
-            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">FAQs</h3>
                 <p class="mt-2 text-sm text-slate-600">Quick answers for common questions and day-to-day usage.</p>
                 <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-blue-600">Browse FAQs</a>
             </div>
-            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">User Guides</h3>
                 <p class="mt-2 text-sm text-slate-600">Step-by-step walkthroughs for key academic portal tasks.</p>
                 <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-emerald-600">View Guides</a>
             </div>
-            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Report Issues</h3>
                 <p class="mt-2 text-sm text-slate-600">Submit technical problems or incorrect data reports.</p>
                 <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-purple-600">Report Issue</a>
             </div>
-            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Direct Contact</h3>
                 <p class="mt-2 text-sm text-slate-600">Reach our support desk for urgent or account-specific help.</p>
                 <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-amber-600">Contact Support</a>
@@ -113,7 +115,7 @@
         </div>
     </section>
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-10">
         <div class="max-w-3xl">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Issue Priorities</p>
             <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How requests are triaged and resolved</h2>
@@ -140,7 +142,7 @@
         </div>
     </section>
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Recommended Path</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">How to resolve issues quickly</h2>
         <div class="mt-6 grid gap-4 md:grid-cols-4">
@@ -183,3 +185,7 @@
     </section>
 </div>
 @endsection
+
+
+
+

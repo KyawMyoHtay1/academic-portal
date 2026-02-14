@@ -26,7 +26,7 @@
 
 @section('content')
 <div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 via-[color:var(--portal-navy)] to-violet-900 px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl"></div>
 
@@ -55,19 +55,19 @@
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Portal Users</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">{{ $stats['totalUsers'] > 0 ? number_format($stats['totalUsers']) . '+' : '0' }}</p>
         </div>
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Enrollments</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">{{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }}</p>
         </div>
-        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">{{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '0' }}</p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Direction</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">Future Ready</p>
         </div>
@@ -75,7 +75,9 @@
 
     @include('guest.partials.quick-links-strip')
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+    @include('guest.partials.icon-highlights')
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-10">
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Our Vision</p>
         <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)] md:text-4xl">A trusted digital backbone for academic life</h2>
         <div class="mt-5 space-y-4 text-sm leading-relaxed text-slate-600 md:text-base">
@@ -97,7 +99,7 @@
             </p>
         </div>
         <div class="grid gap-4 md:grid-cols-3">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h8m0 0l-3-3m3 3l-3 3M7 7h10a4 4 0 014 4v6a2 2 0 01-2 2H7a4 4 0 01-4-4V9a2 2 0 012-2z" />
@@ -106,7 +108,7 @@
                 <h3 class="mt-4 text-lg font-semibold text-slate-900">Reliable Access</h3>
                 <p class="mt-2 text-sm text-slate-600">Stable service delivery with predictable performance during peak periods such as enrollment and results release.</p>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
@@ -115,7 +117,7 @@
                 <h3 class="mt-4 text-lg font-semibold text-slate-900">Transparent Records</h3>
                 <p class="mt-2 text-sm text-slate-600">Role-based visibility of grades, attendance, enrollments, and fees to reduce confusion and repetitive support requests.</p>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -134,19 +136,19 @@
         </div>
 
         <div class="grid gap-4 md:grid-cols-3">
-            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Digital Innovation</h3>
                 <p class="mt-2 text-sm text-slate-600">
                     Expand secure integrations, performance analytics, and automation that simplify daily academic workflows.
                 </p>
             </div>
-            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Personalized Experience</h3>
                 <p class="mt-2 text-sm text-slate-600">
                     Deliver role-aware dashboards so students, teachers, and staff can act faster with clearer information.
                 </p>
             </div>
-            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="vision-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h3 class="text-lg font-semibold text-slate-900">Global Collaboration</h3>
                 <p class="mt-2 text-sm text-slate-600">
                     Support cross-campus, hybrid, and international academic partnerships with reliable digital tools.
@@ -171,3 +173,7 @@
     </section>
 </div>
 @endsection
+
+
+
+

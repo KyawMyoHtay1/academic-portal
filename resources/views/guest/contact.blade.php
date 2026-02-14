@@ -27,7 +27,7 @@
 
 @section('content')
 <div class="container mx-auto max-w-7xl space-y-14 px-4 py-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[color:var(--portal-navy)] via-slate-800 to-[color:var(--portal-navy)] px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-900 via-[color:var(--portal-navy)] to-cyan-900 px-6 py-14 text-white shadow-2xl ring-2 ring-white/10 md:px-12 md:py-20">
         <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--portal-gold)]/25 blur-3xl"></div>
         <div class="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
 
@@ -48,25 +48,27 @@
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Users Reached</p>
             <p class="mt-2 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalStudents', 0) + data_get($stats, 'totalFaculty', 0)) }}</p>
         </div>
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Faculty</p>
             <p class="mt-2 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
         </div>
-        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
             <p class="mt-2 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalCourses', 0)) }}</p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Office Status</p>
             <p class="mt-2 text-3xl font-bold text-amber-900">Open Hours</p>
         </div>
     </section>
 
     @include('guest.partials.quick-links-strip')
+
+    @include('guest.partials.icon-highlights')
     @include('guest.partials.image-cards-contact')
 
     <section class="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
@@ -188,7 +190,7 @@
         </div>
 
         <div class="space-y-4">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Contact Details</p>
                 <h3 class="mt-2 text-xl font-bold text-slate-900">Reach us directly</h3>
                 <div class="mt-4 space-y-3 text-sm text-slate-700">
@@ -199,22 +201,22 @@
                 </div>
             </div>
 
-            <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h4 class="text-lg font-semibold text-slate-900">Admissions</h4>
                 <p class="mt-2 text-sm text-slate-600">admissions@university.edu</p>
             </div>
-            <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h4 class="text-lg font-semibold text-slate-900">Academic Affairs</h4>
                 <p class="mt-2 text-sm text-slate-600">academics@university.edu</p>
             </div>
-            <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+            <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <h4 class="text-lg font-semibold text-slate-900">IT Support</h4>
                 <p class="mt-2 text-sm text-slate-600">itsupport@university.edu</p>
             </div>
         </div>
     </section>
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md md:p-10">
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-10">
         <div class="max-w-3xl">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Before You Submit</p>
             <h2 class="mt-2 text-3xl font-bold text-[color:var(--portal-navy)]">Send clearer requests for faster responses</h2>
@@ -254,3 +256,7 @@
     </section>
 </div>
 @endsection
+
+
+
+
