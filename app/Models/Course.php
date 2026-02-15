@@ -37,11 +37,11 @@ class Course extends Model
     }
 
     /**
-     * The attendance records for this course.
+     * The attendance records for this course (via subjects). Attendance has subject_id only.
      */
     public function attendances()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasManyThrough(Attendance::class, Subject::class, 'course_id', 'subject_id', 'id', 'id');
     }
 
     /**
@@ -53,11 +53,11 @@ class Course extends Model
     }
 
     /**
-     * The timetable entries for this course.
+     * The timetable entries for this course (via subjects). Timetable has subject_id only.
      */
     public function timetables()
     {
-        return $this->hasMany(Timetable::class);
+        return $this->hasManyThrough(Timetable::class, Subject::class, 'course_id', 'subject_id', 'id', 'id');
     }
 
     /**

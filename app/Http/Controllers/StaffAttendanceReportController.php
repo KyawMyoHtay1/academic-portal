@@ -106,14 +106,12 @@ class StaffAttendanceReportController extends Controller
             });
 
         // Recent attendance records (last 30 days)
-        $recentRecords = Attendance::with(['student', 'subject.course', 'course'])
+        $recentRecords = Attendance::with(['student', 'subject.course'])
             ->where('date', '>=', now()->subDays(30))
             ->orderBy('date', 'desc')
             ->paginate(20)
             ->through(function ($attendance) {
-                $courseCode = $attendance->subject?->course?->course_code 
-                    ?? $attendance->course?->course_code 
-                    ?? 'N/A';
+                $courseCode = $attendance->subject?->course?->course_code ?? 'N/A';
                 return [
                     'id' => $attendance->id,
                     'date' => $attendance->date->format('Y-m-d'),
