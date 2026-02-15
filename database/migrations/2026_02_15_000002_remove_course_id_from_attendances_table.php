@@ -19,6 +19,11 @@ return new class extends Migration
                 $table->dropColumn('course_id');
             }
         });
+
+        // Index for common queries: filter by date (e.g. recent records, reports)
+        Schema::table('attendances', function (Blueprint $table) {
+            $table->index('date');
+        });
     }
 
     /**
@@ -27,10 +32,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('attendances', function (Blueprint $table) {
+            $table->dropIndex(['date']);
+        });
+
+        // Add column nullable first so backfill can run; then enforce NOT NULL
+        Schema::table('attendances', function (Blueprint $table) {
             $table->foreignId('course_id')->nullable()->after('id')->constrained()->cascadeOnDelete();
         });
 
-        // Backfill course_id from subject (only rows with subject_id)
+        // Backfill before making NOT NULL (rows with subject_id get course_id from subject)
         DB::statement('UPDATE attendances a INNER JOIN subjects s ON a.subject_id = s.id SET a.course_id = s.course_id');
 
         Schema::table('attendances', function (Blueprint $table) {

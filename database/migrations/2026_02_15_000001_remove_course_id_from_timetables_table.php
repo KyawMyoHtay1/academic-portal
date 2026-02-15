@@ -24,11 +24,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Add column nullable first so backfill can run; then enforce NOT NULL
         Schema::table('timetables', function (Blueprint $table) {
             $table->foreignId('course_id')->nullable()->after('id')->constrained()->cascadeOnDelete();
         });
 
-        // Backfill course_id from subject (one subject belongs to one course)
+        // Backfill before making NOT NULL (subject_id → subjects.course_id)
         DB::statement('UPDATE timetables t INNER JOIN subjects s ON t.subject_id = s.id SET t.course_id = s.course_id');
 
         Schema::table('timetables', function (Blueprint $table) {
