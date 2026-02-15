@@ -27,6 +27,7 @@ rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Commun
     usecase "Manage Attendance" as UC_Attendance
     usecase "View Attendance" as UC_ViewAttendance
     usecase "Attendance Report" as UC_AttendanceReport
+    usecase "Low Attendance Alert" as UC_LowAttendanceAlert
   }
 
   rectangle "Manage Announcement" #F5F5F4 {
@@ -74,6 +75,7 @@ Teacher -[#CA8A04]-> UC_ManageNotif
 Staff -[#16A34A]-> UC_Timetable
 Staff -[#16A34A]-> UC_ViewTimetable
 Staff -[#16A34A]-> UC_AttendanceReport
+Staff -[#16A34A]-> UC_LowAttendanceAlert
 Staff -[#16A34A]-> UC_Announcement
 Staff -[#16A34A]-> UC_ViewAnnouncement
 Staff -[#16A34A]-> UC_SendMessage
