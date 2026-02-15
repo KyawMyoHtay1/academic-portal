@@ -108,14 +108,13 @@ class StudentAttendanceController extends Controller
 
         // Recent attendance records (last 30 days)
         $recentRecords = Attendance::where('student_id', $student->id)
-            ->with(['subject.course', 'course'])
+            ->with('subject.course')
             ->where('date', '>=', now()->subDays(30))
             ->orderBy('date', 'desc')
             ->limit(50)
             ->get()
             ->map(function ($attendance) {
                 $courseCode = $attendance->subject?->course?->course_code 
-                    ?? $attendance->course?->course_code 
                     ?? 'N/A';
                 return [
                     'id' => $attendance->id,
