@@ -1,119 +1,86 @@
-@startuml Timebox3_UseCaseDiagram
+@startuml Timebox3_Core_UseCaseDiagram
 left to right direction
-scale 1.6
-skinparam dpi 300
 skinparam packageStyle rectangle
 skinparam shadowing false
+skinparam dpi 300
 
-actor "Student" as Student #LightBlue
-actor "Teacher" as Teacher #LightYellow
-actor "Staff" as Staff #LightGreen
+' Make it compact
+scale 0.9
+skinparam defaultFontSize 10
+skinparam ranksep 10
+skinparam nodesep 10
+skinparam RectanglePadding 6
 
-rectangle "University Academic Portal\n(Timebox 3: Timetable, Attendance & Communication)" #White {
+' Actor colours
+actor "Student" as Student #BFDBFE
+actor "Teacher" as Teacher #FEF9C3
+actor "Staff" as Staff #BBF7D0
 
-  rectangle "Manage Timetable" #AliceBlue {
-    usecase "Register Timetable" as UC_RegisterTimetable
-    usecase "Update Timetable" as UC_UpdateTimetable
-    usecase "Delete Timetable" as UC_DeleteTimetable
+rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Communication" #FFFFFF {
+
+  rectangle "Manage Timetable" #E0F2FE {
+    usecase "Manage Timetable" as UC_Timetable
     usecase "View Timetable" as UC_ViewTimetable
   }
 
-  rectangle "Manage Attendance" #MintCream {
-    usecase "Record Attendance" as UC_RecordAttendance
+  rectangle "Manage Attendance" #DCFCE7 {
+    usecase "Manage Attendance" as UC_Attendance
     usecase "View Attendance" as UC_ViewAttendance
-    usecase "Search Attendance" as UC_SearchAttendance
-    usecase "Report Attendance" as UC_ReportAttendance
-    usecase "Low Attendance Alert" as UC_LowAttendanceAlert
+    usecase "Attendance Report" as UC_AttendanceReport
   }
 
-  rectangle "Manage Announcement" #Honeydew {
-    usecase "Register Announcement" as UC_RegisterAnnouncement
-    usecase "Update Announcement" as UC_UpdateAnnouncement
-    usecase "Delete Announcement" as UC_DeleteAnnouncement
+  rectangle "Manage Announcement" #F5F5F4 {
+    usecase "Manage Announcement" as UC_Announcement
     usecase "View Announcement" as UC_ViewAnnouncement
-    usecase "Mark Announcement as Read" as UC_MarkAnnouncementRead
-    usecase "Acknowledge Announcement" as UC_AcknowledgeAnnouncement
-    usecase "Search Announcement" as UC_SearchAnnouncement
   }
 
-  rectangle "Manage Message" #LavenderBlush {
+  rectangle "Manage Communication" #FCE7F3 {
     usecase "Send Message" as UC_SendMessage
-    usecase "View Inbox" as UC_ViewInbox
-    usecase "Compose Message" as UC_ComposeMessage
-    usecase "Mark Message as Read" as UC_MarkMessageRead
+    usecase "View Messages" as UC_ViewMessages
   }
 
-  rectangle "Manage Contact Message" #Beige {
-    usecase "View Contact Message" as UC_ViewContactMessage
-    usecase "Mark Contact Message as Read" as UC_MarkContactRead
+  rectangle "Manage Contact & Feedback" #FEF9C3 {
+    usecase "View Contact Messages" as UC_ViewContact
+    usecase "View Feedback Messages" as UC_ViewFeedback
   }
 
-  rectangle "Manage Feedback Message" #Beige {
-    usecase "View Feedback Message" as UC_ViewFeedbackMessage
-    usecase "Mark Feedback Message as Read" as UC_MarkFeedbackRead
-  }
-
-  rectangle "Manage Notification" #WhiteSmoke {
-    usecase "View Notification" as UC_ViewNotification
-    usecase "Mark Notification as Read" as UC_MarkNotificationRead
-    usecase "Mark All Notifications as Read" as UC_MarkAllNotificationsRead
+  rectangle "Manage Notification" #EDE9FE {
+    usecase "View Notifications" as UC_ViewNotif
+    usecase "Manage Notification Status" as UC_ManageNotif
   }
 }
 
-Student --> UC_ViewTimetable
-Student --> UC_ViewAttendance
-Student --> UC_ViewAnnouncement
-Student --> UC_MarkAnnouncementRead
-Student --> UC_AcknowledgeAnnouncement
-Student --> UC_SendMessage
-Student --> UC_ViewInbox
-Student --> UC_ComposeMessage
-Student --> UC_MarkMessageRead
-Student --> UC_ViewNotification
-Student --> UC_MarkNotificationRead
-Student --> UC_MarkAllNotificationsRead
+' Student links
+Student -[#2563EB]-> UC_ViewTimetable
+Student -[#2563EB]-> UC_ViewAttendance
+Student -[#2563EB]-> UC_ViewAnnouncement
+Student -[#2563EB]-> UC_SendMessage
+Student -[#2563EB]-> UC_ViewMessages
+Student -[#2563EB]-> UC_ViewNotif
+Student -[#2563EB]-> UC_ManageNotif
 
-Teacher --> UC_ViewTimetable
-Teacher --> UC_RecordAttendance
-Teacher --> UC_ViewAttendance
-Teacher --> UC_SearchAttendance
-Teacher --> UC_RegisterAnnouncement
-Teacher --> UC_UpdateAnnouncement
-Teacher --> UC_DeleteAnnouncement
-Teacher --> UC_ViewAnnouncement
-Teacher --> UC_MarkAnnouncementRead
-Teacher --> UC_AcknowledgeAnnouncement
-Teacher --> UC_SendMessage
-Teacher --> UC_ViewInbox
-Teacher --> UC_ComposeMessage
-Teacher --> UC_MarkMessageRead
-Teacher --> UC_ViewNotification
-Teacher --> UC_MarkNotificationRead
-Teacher --> UC_MarkAllNotificationsRead
+' Teacher links
+Teacher -[#CA8A04]-> UC_ViewTimetable
+Teacher -[#CA8A04]-> UC_Attendance
+Teacher -[#CA8A04]-> UC_ViewAttendance
+Teacher -[#CA8A04]-> UC_Announcement
+Teacher -[#CA8A04]-> UC_ViewAnnouncement
+Teacher -[#CA8A04]-> UC_SendMessage
+Teacher -[#CA8A04]-> UC_ViewMessages
+Teacher -[#CA8A04]-> UC_ViewNotif
+Teacher -[#CA8A04]-> UC_ManageNotif
 
-Staff --> UC_RegisterTimetable
-Staff --> UC_UpdateTimetable
-Staff --> UC_DeleteTimetable
-Staff --> UC_ViewTimetable
-Staff --> UC_ReportAttendance
-Staff --> UC_LowAttendanceAlert
-Staff --> UC_RegisterAnnouncement
-Staff --> UC_UpdateAnnouncement
-Staff --> UC_DeleteAnnouncement
-Staff --> UC_SearchAnnouncement
-Staff --> UC_ViewAnnouncement
-Staff --> UC_MarkAnnouncementRead
-Staff --> UC_AcknowledgeAnnouncement
-Staff --> UC_SendMessage
-Staff --> UC_ViewInbox
-Staff --> UC_ComposeMessage
-Staff --> UC_MarkMessageRead
-Staff --> UC_ViewContactMessage
-Staff --> UC_MarkContactRead
-Staff --> UC_ViewFeedbackMessage
-Staff --> UC_MarkFeedbackRead
-Staff --> UC_ViewNotification
-Staff --> UC_MarkNotificationRead
-Staff --> UC_MarkAllNotificationsRead
+' Staff links
+Staff -[#16A34A]-> UC_Timetable
+Staff -[#16A34A]-> UC_ViewTimetable
+Staff -[#16A34A]-> UC_AttendanceReport
+Staff -[#16A34A]-> UC_Announcement
+Staff -[#16A34A]-> UC_ViewAnnouncement
+Staff -[#16A34A]-> UC_SendMessage
+Staff -[#16A34A]-> UC_ViewMessages
+Staff -[#16A34A]-> UC_ViewContact
+Staff -[#16A34A]-> UC_ViewFeedback
+Staff -[#16A34A]-> UC_ViewNotif
+Staff -[#16A34A]-> UC_ManageNotif
 
 @enduml
