@@ -1,88 +1,121 @@
-@startuml Timebox3_Core_UseCaseDiagram
+@startuml Timebox3_UseCaseDiagram
 left to right direction
 skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam dpi 300
 
-' Make it compact
-scale 0.9
-skinparam defaultFontSize 10
-skinparam ranksep 10
-skinparam nodesep 10
-skinparam RectanglePadding 6
+' Detailed diagram - covers full FR list 5.3.1 (ML level)
+scale 0.85
+skinparam defaultFontSize 9
+skinparam ranksep 8
+skinparam nodesep 8
+skinparam RectanglePadding 5
 
-' Actor colours
 actor "Student" as Student #BFDBFE
 actor "Teacher" as Teacher #FEF9C3
 actor "Staff" as Staff #BBF7D0
 
-rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Communication" #FFFFFF {
+rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Communication (Detailed)" #FFFFFF {
 
   rectangle "Manage Timetable" #E0F2FE {
-    usecase "Manage Timetable" as UC_Timetable
-    usecase "View Timetable" as UC_ViewTimetable
+    usecase "Register Timetable" as UC_T1
+    usecase "Update Timetable" as UC_T2
+    usecase "Delete Timetable" as UC_T3
+    usecase "View Timetable" as UC_T4
   }
 
   rectangle "Manage Attendance" #DCFCE7 {
-    usecase "Manage Attendance" as UC_Attendance
-    usecase "View Attendance" as UC_ViewAttendance
-    usecase "Attendance Report" as UC_AttendanceReport
-    usecase "Low Attendance Alert" as UC_LowAttendanceAlert
+    usecase "Record Attendance" as UC_A1
+    usecase "View Attendance" as UC_A2
+    usecase "Search Attendance" as UC_A3
+    usecase "Report Attendance" as UC_A4
+    usecase "Low Attendance Alert" as UC_A5
   }
 
   rectangle "Manage Announcement" #F5F5F4 {
-    usecase "Manage Announcement" as UC_Announcement
-    usecase "View Announcement" as UC_ViewAnnouncement
+    usecase "Register Announcement" as UC_N1
+    usecase "Update Announcement" as UC_N2
+    usecase "Delete Announcement" as UC_N3
+    usecase "View Announcement" as UC_N4
+    usecase "Mark Announcement as Read" as UC_N5
+    usecase "Acknowledge Announcement" as UC_N6
+    usecase "Search Announcement" as UC_N7
   }
 
-  rectangle "Manage Communication" #FCE7F3 {
-    usecase "Send Message" as UC_SendMessage
-    usecase "View Messages" as UC_ViewMessages
+  rectangle "Manage Message" #FCE7F3 {
+    usecase "Send Message" as UC_M1
+    usecase "View Messages" as UC_M2
+    usecase "Mark Message as Read" as UC_M3
   }
 
   rectangle "Manage Contact & Feedback" #FEF9C3 {
-    usecase "View Contact Messages" as UC_ViewContact
-    usecase "View Feedback Messages" as UC_ViewFeedback
+    usecase "View Contact Messages" as UC_C1
+    usecase "Mark Contact as Read" as UC_C2
+    usecase "View Feedback Messages" as UC_F1
+    usecase "Mark Feedback as Read" as UC_F2
   }
 
   rectangle "Manage Notification" #EDE9FE {
-    usecase "View Notifications" as UC_ViewNotif
-    usecase "Manage Notification Status" as UC_ManageNotif
+    usecase "View Notifications" as UC_O1
+    usecase "Mark Notification as Read" as UC_O2
+    usecase "Mark All Notifications as Read" as UC_O3
   }
 }
 
-' Student links
-Student -[#2563EB]-> UC_ViewTimetable
-Student -[#2563EB]-> UC_ViewAttendance
-Student -[#2563EB]-> UC_ViewAnnouncement
-Student -[#2563EB]-> UC_SendMessage
-Student -[#2563EB]-> UC_ViewMessages
-Student -[#2563EB]-> UC_ViewNotif
-Student -[#2563EB]-> UC_ManageNotif
+' Student
+Student -[#2563EB]-> UC_T4
+Student -[#2563EB]-> UC_A2
+Student -[#2563EB]-> UC_N4
+Student -[#2563EB]-> UC_N5
+Student -[#2563EB]-> UC_N6
+Student -[#2563EB]-> UC_M1
+Student -[#2563EB]-> UC_M2
+Student -[#2563EB]-> UC_M3
+Student -[#2563EB]-> UC_O1
+Student -[#2563EB]-> UC_O2
+Student -[#2563EB]-> UC_O3
 
-' Teacher links
-Teacher -[#CA8A04]-> UC_ViewTimetable
-Teacher -[#CA8A04]-> UC_Attendance
-Teacher -[#CA8A04]-> UC_ViewAttendance
-Teacher -[#CA8A04]-> UC_Announcement
-Teacher -[#CA8A04]-> UC_ViewAnnouncement
-Teacher -[#CA8A04]-> UC_SendMessage
-Teacher -[#CA8A04]-> UC_ViewMessages
-Teacher -[#CA8A04]-> UC_ViewNotif
-Teacher -[#CA8A04]-> UC_ManageNotif
+' Teacher
+Teacher -[#CA8A04]-> UC_T4
+Teacher -[#CA8A04]-> UC_A1
+Teacher -[#CA8A04]-> UC_A2
+Teacher -[#CA8A04]-> UC_A3
+Teacher -[#CA8A04]-> UC_N1
+Teacher -[#CA8A04]-> UC_N2
+Teacher -[#CA8A04]-> UC_N3
+Teacher -[#CA8A04]-> UC_N4
+Teacher -[#CA8A04]-> UC_N5
+Teacher -[#CA8A04]-> UC_N6
+Teacher -[#CA8A04]-> UC_M1
+Teacher -[#CA8A04]-> UC_M2
+Teacher -[#CA8A04]-> UC_M3
+Teacher -[#CA8A04]-> UC_O1
+Teacher -[#CA8A04]-> UC_O2
+Teacher -[#CA8A04]-> UC_O3
 
-' Staff links
-Staff -[#16A34A]-> UC_Timetable
-Staff -[#16A34A]-> UC_ViewTimetable
-Staff -[#16A34A]-> UC_AttendanceReport
-Staff -[#16A34A]-> UC_LowAttendanceAlert
-Staff -[#16A34A]-> UC_Announcement
-Staff -[#16A34A]-> UC_ViewAnnouncement
-Staff -[#16A34A]-> UC_SendMessage
-Staff -[#16A34A]-> UC_ViewMessages
-Staff -[#16A34A]-> UC_ViewContact
-Staff -[#16A34A]-> UC_ViewFeedback
-Staff -[#16A34A]-> UC_ViewNotif
-Staff -[#16A34A]-> UC_ManageNotif
+' Staff
+Staff -[#16A34A]-> UC_T1
+Staff -[#16A34A]-> UC_T2
+Staff -[#16A34A]-> UC_T3
+Staff -[#16A34A]-> UC_T4
+Staff -[#16A34A]-> UC_A4
+Staff -[#16A34A]-> UC_A5
+Staff -[#16A34A]-> UC_N1
+Staff -[#16A34A]-> UC_N2
+Staff -[#16A34A]-> UC_N3
+Staff -[#16A34A]-> UC_N7
+Staff -[#16A34A]-> UC_N4
+Staff -[#16A34A]-> UC_N5
+Staff -[#16A34A]-> UC_N6
+Staff -[#16A34A]-> UC_M1
+Staff -[#16A34A]-> UC_M2
+Staff -[#16A34A]-> UC_M3
+Staff -[#16A34A]-> UC_C1
+Staff -[#16A34A]-> UC_C2
+Staff -[#16A34A]-> UC_F1
+Staff -[#16A34A]-> UC_F2
+Staff -[#16A34A]-> UC_O1
+Staff -[#16A34A]-> UC_O2
+Staff -[#16A34A]-> UC_O3
 
 @enduml
