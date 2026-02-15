@@ -168,6 +168,7 @@ const statusBadge = (status) => {
                                         <span>Due: {{ assignment.due_date }}{{ assignment.due_time ? ` at ${assignment.due_time}` : "" }}</span>
                                         <span>Max score: {{ assignment.max_score }}</span>
                                         <span>Submissions: {{ assignment.submissions_count }} ({{ assignment.graded_count }} graded)</span>
+                                        <span v-if="assignment.creator_name">Created by: {{ assignment.creator_name }}</span>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">

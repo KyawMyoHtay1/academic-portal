@@ -26,6 +26,7 @@ class TeacherAssignmentController extends Controller
                 'course:id,course_code,title',
                 'assignments' => function ($query) {
                     $query->orderBy('due_date', 'desc')
+                        ->with('creator:id,name')
                         ->withCount('submissions')
                         ->withCount([
                             'submissions as graded_submissions_count' => function ($q) {
@@ -58,6 +59,7 @@ class TeacherAssignmentController extends Controller
                             'status' => $assignment->status,
                             'submissions_count' => $assignment->submissions_count ?? 0,
                             'graded_count' => $assignment->graded_submissions_count ?? 0,
+                            'creator_name' => $assignment->creator?->name ?? null,
                         ];
                     }),
                 ];
@@ -80,6 +82,7 @@ class TeacherAssignmentController extends Controller
         }
 
         $assignments = Assignment::where('subject_id', $subject->id)
+            ->with('creator:id,name')
             ->withCount('submissions')
             ->withCount([
                 'submissions as graded_submissions_count' => function ($q) {
@@ -100,6 +103,7 @@ class TeacherAssignmentController extends Controller
                     'submissions_count' => $assignment->submissions_count ?? 0,
                     'graded_count' => $assignment->graded_submissions_count ?? 0,
                     'is_overdue' => $assignment->isOverdue(),
+                    'creator_name' => $assignment->creator?->name ?? null,
                 ];
             });
 
