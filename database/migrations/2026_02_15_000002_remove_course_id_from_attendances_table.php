@@ -35,16 +35,12 @@ return new class extends Migration
             $table->dropIndex(['date']);
         });
 
-        // Add column nullable first so backfill can run; then enforce NOT NULL
+        // Re-add course_id as nullable (safer rollback; rows without subject match stay NULL)
         Schema::table('attendances', function (Blueprint $table) {
             $table->foreignId('course_id')->nullable()->after('id')->constrained()->cascadeOnDelete();
         });
 
-        // Backfill before making NOT NULL (rows with subject_id get course_id from subject)
+        // Backfill from subject; do not enforce NOT NULL (consistent with derived/optional course)
         DB::statement('UPDATE attendances a INNER JOIN subjects s ON a.subject_id = s.id SET a.course_id = s.course_id');
-
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->foreignId('course_id')->nullable(false)->change();
-        });
     }
 };

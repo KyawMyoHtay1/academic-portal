@@ -19,10 +19,11 @@ class Timetable extends Model
 
     /**
      * The course this timetable entry belongs to (via subject). Subject → Course.
+     * Access via subject to avoid hasOneThrough key mapping; eager load subject.course to avoid N+1.
      */
-    public function course()
+    public function getCourseAttribute(): ?Course
     {
-        return $this->hasOneThrough(Course::class, Subject::class, 'id', 'id', 'subject_id', 'course_id');
+        return $this->subject?->course;
     }
 
     /**
