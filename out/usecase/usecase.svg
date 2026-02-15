@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="2557px" preserveAspectRatio="none" style="width:716px;height:2557px;" version="1.1" viewBox="0 0 716 2557" width="716px" zoomAndPan="magnify"><defs><filter height="300%" id="fnps6f2968wps" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[b07e33efea0abb1775a6ec615e2a5964]
+cluster University Academic Portal\n(Timebox 1)--><rect fill="#FFFFFF" filter="url(#fnps6f2968wps)" height="2538" style="stroke:#000000;stroke-width:1.5;" width="598" x="106" y="7"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="187" x="311.5" y="23.5332">University Academic Portal</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="81" x="364.5" y="41.1426">(Timebox 1)</text><!--MD5=[669ffbe244fb641535368be69a430f75]
+cluster Manage User--><rect fill="#FFFFFF" filter="url(#fnps6f2968wps)" height="654" style="stroke:#000000;stroke-width:1.5;" width="520" x="160" y="69"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="93" x="373.5" y="85.5332">Manage User</text><!--MD5=[f58e02aa189eb807767879b583103d7e]
+cluster Manage Student--><rect fill="#FFFFFF" filter="url(#fnps6f2968wps)" height="478" style="stroke:#000000;stroke-width:1.5;" width="264" x="149" y="747"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="115" x="223.5" y="763.5332">Manage Student</text><!--MD5=[aadc717b11792bd21e21dcaa8d8fc5e0]
+cluster Manage Course--><rect fill="#FFFFFF" filter="url(#fnps6f2968wps)" height="296" style="stroke:#000000;stroke-width:1.5;" width="183" x="189.5" y="1249"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="111" x="225.5" y="1265.5332">Manage Course</text><!--MD5=[43214cbd1e0197b8cc4cca57b33ad98c]
+cluster Manage Subject--><rect fill="#FFFFFF" filter="url(#fnps6f2968wps)" height="307" style="stroke:#000000;stroke-width:1.5;" width="237" x="162.5" y="1569"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="113" x="224.5" y="1585.5332">Manage Subject</text><!--MD5=[3682ce3e3b24e24108c4d8eabb725c9f]
+cluster Manage Course Registration--><rect fill="#FFFFFF" filter="url(#fnps6f2968wps)" height="621" style="stroke:#000000;stroke-width:1.5;" width="302" x="130" y="1900"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="201" x="180.5" y="1916.5332">Manage Course Registration</text><ellipse cx="280.957" cy="121.7914" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="69.457" ry="16.2914" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86" x="234.957" y="126.308">Register User</text><ellipse cx="599.602" cy="123.1136" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="64.602" ry="15.6136" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="74" x="559.602" y="127.6302">Verify Email</text><ellipse cx="281.234" cy="398.9517" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="36.234" ry="15.4517" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="35" x="263.734" y="402.6802">Login</text><ellipse cx="281.1203" cy="191.8241" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="77.1203" ry="17.8241" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="107" x="225.2783" y="196.1856">Forgot Password</text><ellipse cx="281.2256" cy="262.9451" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="75.2256" ry="17.4451" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="102" x="227.2256" y="267.4617">Reset Password</text><ellipse cx="280.7537" cy="556.7507" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="66.7537" ry="15.7507" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="78" x="238.7537" y="561.2673">Update User</text><ellipse cx="281.102" cy="624.1136" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="64.602" ry="15.6136" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="74" x="241.102" y="628.6302">Delete User</text><ellipse cx="281.1119" cy="691.2224" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="69.1119" ry="16.2224" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="85" x="235.6119" y="695.739">Search Users</text><ellipse cx="281.0754" cy="477.9651" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="105.0754" ry="27.9651" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="132" x="212.0754" y="473.677">Manage Preferences</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="88" x="234.0754" y="491.2863">(View/Update)</text><ellipse cx="280.8567" cy="332.0713" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="70.8567" ry="16.5713" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="90" x="232.8567" y="336.5879">Global Search</text><ellipse cx="281.2363" cy="1053.2473" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="76.7363" ry="17.7473" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="106" x="225.7006" y="1057.6555">Register Student</text><ellipse cx="281.2427" cy="1123.1485" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="73.7427" ry="17.1485" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="98" x="229.2427" y="1127.6651">Update Student</text><ellipse cx="280.7859" cy="1191.8572" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="72.2859" ry="16.8572" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="94" x="230.7859" y="1196.3738">Delete Student</text><ellipse cx="280.855" cy="983.171" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="76.355" ry="17.671" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="105" x="225.6233" y="987.6255">Search Students</text><ellipse cx="281.1604" cy="810.9034" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="78.6604" ry="27.9034" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="95" x="233.6604" y="805.8272">View My Profile</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="51" x="255.6604" y="823.4366">(+ GPA)</text><ellipse cx="281.1371" cy="901.9034" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="116.1371" ry="27.9034" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="120" x="221.1371" y="896.8272">Update My Contact</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="148" x="207.1371" y="914.4366">(Address/Phone/Photo)</text><ellipse cx="281.1002" cy="1303.02" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="75.6002" ry="17.52" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="103" x="226.6002" y="1307.5366">Register Course</text><ellipse cx="281.1476" cy="1372.9295" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="72.6476" ry="16.9295" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="95" x="230.6476" y="1377.4461">Update Course</text><ellipse cx="281.2113" cy="1442.1423" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="71.2113" ry="16.6423" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91" x="232.7113" y="1446.6589">Delete Course</text><ellipse cx="281.2256" cy="1510.9451" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="75.2256" ry="17.4451" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="102" x="227.2256" y="1515.4617">Search Courses</text><ellipse cx="280.9763" cy="1623.0953" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="75.9763" ry="17.5953" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="104" x="226.0467" y="1627.5957">Register Subject</text><ellipse cx="281.0109" cy="1693.0022" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="73.0109" ry="17.0022" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96" x="230.0109" y="1697.5188">Update Subject</text><ellipse cx="281.0677" cy="1762.2135" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="71.5677" ry="16.7135" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="92" x="232.0677" y="1766.7301">Delete Subject</text><ellipse cx="280.7928" cy="1836.8586" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="102.2928" ry="22.8586" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="166" x="197.7928" y="1840.5871">Assign Teacher to Subject</text><ellipse cx="280.7516" cy="1954.9503" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="82.7516" ry="18.9503" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="121" x="220.2516" y="1958.6788">Request Enrolment</text><ellipse cx="280.8478" cy="2028.8696" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="84.8478" ry="19.3696" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126" x="217.8478" y="2032.5981">Request Withdrawal</text><ellipse cx="280.7516" cy="2485.9503" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="82.7516" ry="18.9503" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="121" x="220.2516" y="2489.6788">Approve Enrolment</text><ellipse cx="281.0069" cy="2172.9014" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="77.5069" ry="17.9014" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="108" x="224.8567" y="2177.216">Reject Enrolment</text><ellipse cx="280.8478" cy="2245.8696" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="84.8478" ry="19.3696" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126" x="217.8478" y="2249.5981">Approve Withdrawal</text><ellipse cx="280.9775" cy="2318.7955" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="79.4775" ry="18.2955" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="113" x="223.256" y="2322.8709">Reject Withdrawal</text><ellipse cx="281.0069" cy="2101.9014" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="77.5069" ry="17.9014" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="108" x="224.8567" y="2106.216">View My Courses</text><ellipse cx="280.8784" cy="2401.8757" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="134.8784" ry="29.3757" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="183" x="186.3784" y="2397.5876">Manage Enrolment Requests</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="161" x="197.3784" y="2415.197">(Pending Enrol/Withdraw)</text><!--MD5=[9eecb807d8a7c1ba44cb916f191401d3]
+entity Guest--><ellipse cx="32.5" cy="194" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="8" ry="8" style="stroke:#A80036;stroke-width:1.5;"/><path d="M32.5,202 L32.5,229 M19.5,210 L45.5,210 M32.5,229 L19.5,244 M32.5,229 L45.5,244 " fill="none" filter="url(#fnps6f2968wps)" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="38" x="13.5" y="264.0332">Guest</text><!--MD5=[494c489cc4328319247ec2e1625e02a3]
+entity Student--><ellipse cx="32.5" cy="842" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="8" ry="8" style="stroke:#A80036;stroke-width:1.5;"/><path d="M32.5,850 L32.5,877 M19.5,858 L45.5,858 M32.5,877 L19.5,892 M32.5,877 L45.5,892 " fill="none" filter="url(#fnps6f2968wps)" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="49" x="8" y="912.0332">Student</text><!--MD5=[e64da02f5594507ded6bc1fdafafe102]
+entity Teacher--><ellipse cx="32.5" cy="440" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="8" ry="8" style="stroke:#A80036;stroke-width:1.5;"/><path d="M32.5,448 L32.5,475 M19.5,456 L45.5,456 M32.5,475 L19.5,490 M32.5,475 L45.5,490 " fill="none" filter="url(#fnps6f2968wps)" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="53" x="6" y="510.0332">Teacher</text><!--MD5=[75bcab72e22e3bde62d8cef4f1a817de]
+entity Staff--><ellipse cx="32.5" cy="1341" fill="#FEFECE" filter="url(#fnps6f2968wps)" rx="8" ry="8" style="stroke:#A80036;stroke-width:1.5;"/><path d="M32.5,1349 L32.5,1376 M19.5,1357 L45.5,1357 M32.5,1376 L19.5,1391 M32.5,1376 L45.5,1391 " fill="none" filter="url(#fnps6f2968wps)" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="29" x="18" y="1411.0332">Staff</text><!--MD5=[5a687e50496296cab0d8668916607e76]
+link Guest to UC_Register--><path d="M51.6,199.03 C63.12,184.02 79.35,166.32 98,156 C131.11,137.68 172.25,129.02 207.03,125.01 " fill="none" id="Guest-to-UC_Register" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="212.12,124.45,202.739,121.4506,207.1495,124.9928,203.6074,129.4033,212.12,124.45" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[a0b9cd09cc67441be80fb366e5b2a356]
+link Guest to UC_Login--><path d="M41.8,267.75 C50.37,299.61 67.01,341.99 98,366 C138.81,397.62 200.15,402.54 240.13,401.83 " fill="none" id="Guest-to-UC_Login" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="245.39,401.7,236.2902,397.9327,240.3917,401.8285,236.4958,405.93,245.39,401.7" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[e3097ab7c0e6cfd965e8a5c5d867a5af]
+link Guest to UC_Forgot--><path d="M51.68,218.48 C62.36,214.39 76.23,209.64 89,207 C124.7,199.61 164.85,195.8 199.08,193.86 " fill="none" id="Guest-to-UC_Forgot" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="204.09,193.58,194.8859,190.0752,199.0974,193.8518,195.3208,198.0633,204.09,193.58" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[7369f13411d5fa2444c964c1a6369c8c]
+link Guest to UC_Reset--><path d="M51.63,228.72 C85.02,233.73 157.81,244.66 212.29,252.84 " fill="none" id="Guest-to-UC_Reset" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="217.5,253.62,209.1944,248.3268,212.5555,252.8769,208.0055,256.238,217.5,253.62" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[31c7ed8942aacf0651d041a30dedce1d]
+link Guest to UC_GlobalSearch--><path d="M51.59,246.12 C62.69,258.48 77.18,274.64 90,289 C93.56,292.99 93.34,295.37 98,298 C130.54,316.39 171.07,325.09 205.62,329.11 " fill="none" id="Guest-to-UC_GlobalSearch" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="210.67,329.67,202.1589,324.714,205.6997,329.1257,201.288,332.6665,210.67,329.67" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[aeb458f9fd1f4ed00f440cfbb2e5500f]
+link Student to UC_Login--><path d="M38.92,832.41 C53.16,723.75 91.03,439.22 98,432 C134.8,393.91 199.74,391.2 241.27,394.1 " fill="none" id="Student-to-UC_Login" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="246.47,394.5,237.8053,389.8177,241.4849,394.1143,237.1883,397.7939,246.47,394.5" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[4cc8203ef7c9714eb34c34237f554605]
+link Student to UC_Prefs--><path d="M35.61,832.48 C40.69,749.48 56.39,567.22 98,523 C117.42,502.36 144.69,490.55 172.22,483.96 " fill="none" id="Student-to-UC_Prefs" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="177.36,482.79,167.6959,480.8914,172.4852,483.9018,169.4748,488.6911,177.36,482.79" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[e22dc5da38ae3fc2349c0a52131bd0e2]
+link Student to UC_GlobalSearch--><path d="M35.9,832.41 C42.78,718.81 63.64,409.13 89,371 C114.89,332.06 168.48,323.79 212.32,324.43 " fill="none" id="Student-to-UC_GlobalSearch" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="217.34,324.55,208.4338,320.3454,212.3413,324.4357,208.2509,328.3433,217.34,324.55" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[fc3d17649009a18116d16ac86733227d]
+link Student to UC_ViewProfile--><path d="M57.04,867.25 C69.24,863.8 84.4,859.58 98,856 C135.05,846.25 176.51,835.95 210.49,827.67 " fill="none" id="Student-to-UC_ViewProfile" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="215.45,826.47,205.7581,824.7185,210.5926,827.6558,207.6554,832.4903,215.45,826.47" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[02c7c1f51fdaa872df6f3f83aa2dba20]
+link Student to UC_UpdateProfile--><path d="M57.14,876.68 C83.54,879.68 128.15,884.75 170.56,889.57 " fill="none" id="Student-to-UC_UpdateProfile" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="175.72,890.15,167.2356,885.1484,170.7527,889.579,166.3221,893.0961,175.72,890.15" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[b4c3716e164c115674ab46c7fda4f977]
+link Student to UC_RequestEnrol--><path d="M35.89,915.64 C46.71,1103.8 90.97,1866 98,1876 C123.31,1912 168.69,1931.75 207.8,1942.49 " fill="none" id="Student-to-UC_RequestEnrol" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="213.03,1943.89,205.3623,1937.7089,208.1984,1942.6035,203.3038,1945.4396,213.03,1943.89" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[746b7b6bc055b563954b94e9cee0fdd5]
+link Student to UC_RequestWithdraw--><path d="M35.91,915.55 C40.45,993.62 50.54,1167.52 59,1314 C63.35,1389.22 48.81,1933.92 98,1991 C121.1,2017.8 157.78,2028.62 192.18,2032.23 " fill="none" id="Student-to-UC_RequestWithdraw" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="197.24,2032.71,188.6703,2027.8562,192.2636,2032.2252,187.8946,2035.8185,197.24,2032.71" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[1150c9293c3f4aa020bfec3643e57444]
+link Student to UC_ViewMyCourses--><path d="M36.09,915.54 C40.92,993.59 51.47,1167.47 59,1314 C61.15,1355.78 69.72,2035.18 98,2066 C123.63,2093.94 164.17,2103.79 200.49,2106.29 " fill="none" id="Student-to-UC_ViewMyCourses" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="205.82,2106.61,197.0757,2102.0782,200.829,2106.3105,196.5966,2110.0638,205.82,2106.61" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[38799a8cd0385d0a7a7001827408c022]
+link Teacher to UC_Login--><path d="M59.21,466.58 C69.8,463.27 81.55,458.07 90,450 C96.33,443.96 91.12,437.41 98,432 C138.6,400.1 199.99,395.25 240.04,396.06 " fill="none" id="Teacher-to-UC_Login" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="245.31,396.2,236.4158,391.97,240.3117,396.0715,236.2102,399.9673,245.31,396.2" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[43a5f7d2790c03a4449a3ac2269f1e8e]
+link Teacher to UC_Prefs--><path d="M59.2,486.9 C68.3,491.39 78.82,495.73 89,498 C124.67,505.94 164.81,503.42 199.05,497.93 " fill="none" id="Teacher-to-UC_Prefs" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="204.06,497.1,194.5214,494.6475,199.1292,497.9289,195.8477,502.5367,204.06,497.1" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[493b14cfe391d8d81957ce5412743558]
+link Teacher to UC_GlobalSearch--><path d="M37.36,430.31 C42.88,396.99 56.32,352.31 89,330 C131.11,301.25 191.53,307.75 233.08,317.54 " fill="none" id="Teacher-to-UC_GlobalSearch" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="238.05,318.74,230.2513,312.725,233.1918,317.5575,228.3593,320.4981,238.05,318.74" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[52237892b839b3016fbcdf48bdcfabd5]
+link Staff to UC_Login--><path d="M36,1331.46 C46.95,1150.61 90.38,440.52 98,432 C133.6,392.22 199.71,390.19 241.7,393.65 " fill="none" id="Staff-to-UC_Login" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="246.69,394.1,238.0792,389.3194,241.7096,393.6576,237.3714,397.288,246.69,394.1" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[48e8f8e86b71f1a43ea6836a589a3acb]
+link Staff to UC_Prefs--><path d="M35.99,1331.42 C46.19,1162.85 84.78,538.63 98,523 C116.4,501.24 143.51,489.1 171.2,482.55 " fill="none" id="Staff-to-UC_Prefs" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="176.38,481.39,166.72,479.4706,171.5028,482.4913,168.4821,487.2741,176.38,481.39" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[99507c0d2980c779b536870cc85ca1c1]
+link Staff to UC_GlobalSearch--><path d="M36,1331.22 C47.39,1141.56 93.91,370.58 98,366 C125.46,335.25 171.08,326.78 209.77,325.98 " fill="none" id="Staff-to-UC_GlobalSearch" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="214.94,325.92,205.8949,322.0231,209.9403,325.9771,205.9863,330.0226,214.94,325.92" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[af65572695d51aedc0c84f472d67b074]
+link Staff to UC_UpdateUser--><path d="M37.09,1331.47 C46.2,1225.67 70.88,937.38 90,697 C90.94,685.23 90.12,599.8 98,591 C126.44,559.27 174.22,551.28 213.69,550.96 " fill="none" id="Staff-to-UC_UpdateUser" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="218.95,550.96,209.95,546.96,213.95,550.96,209.95,554.96,218.95,550.96" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[961baaaf1ae0946b6dcc9ebcadeb94bb]
+link Staff to UC_DeleteUser--><path d="M37.2,1331.46 C50.8,1178.83 97.28,657.79 98,657 C127.34,624.91 176.57,617.53 216.43,617.71 " fill="none" id="Staff-to-UC_DeleteUser" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="221.74,617.77,212.7981,613.6418,216.7405,617.6986,212.6838,621.641,221.74,617.77" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[1feb8f8d2f770a5fc820b99ee3a0207e]
+link Staff to UC_SearchUser--><path d="M35.5,1331.27 C42.04,1201.69 64.33,812.17 98,767 C126.12,729.28 176.49,710.15 217.13,700.53 " fill="none" id="Staff-to-UC_SearchUser" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="222.03,699.4,212.3594,697.5345,217.159,700.5285,214.165,705.328,222.03,699.4" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[8a6794a27be46f982e3a8e192ca8750a]
+link Staff to UC_RegStudent--><path d="M37.39,1331.22 C44.86,1260.43 63.6,1121.3 98,1088 C124.99,1061.87 165.22,1052.3 201,1049.61 " fill="none" id="Staff-to-UC_RegStudent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="206.24,1049.26,196.9964,1045.8605,201.2508,1049.5888,197.5225,1053.8432,206.24,1049.26" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[2cea0c7536c780b56c95a5492b95b895]
+link Staff to UC_UpdStudent--><path d="M33.7,1331.31 C36.33,1282.15 48.54,1201.5 98,1157 C126.36,1131.49 167.53,1122.32 203.54,1119.83 " fill="none" id="Staff-to-UC_UpdStudent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="208.82,1119.51,199.596,1116.0578,203.829,1119.8103,200.0765,1124.0433,208.82,1119.51" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[148ee37c2ea461ff7c93cdb68b2d284a]
+link Staff to UC_DelStudent--><path d="M47.08,1340.69 C57.99,1318.05 75.24,1288.48 98,1269 C134.67,1237.61 186,1217.47 224.8,1205.69 " fill="none" id="Staff-to-UC_DelStudent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="229.95,1204.15,220.1819,1202.8914,225.1589,1205.5802,222.4702,1210.5572,229.95,1204.15" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[fa0a7bcd613294747ea8ea1ecc8ee3ba]
+link Staff to UC_SearchStudent--><path d="M35.32,1331.47 C39.87,1247.49 54.71,1061.74 98,1018 C124.64,991.08 165.26,981.52 201.38,979.04 " fill="none" id="Staff-to-UC_SearchStudent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="206.67,978.73,197.446,975.2778,201.679,979.0303,197.9265,983.2633,206.67,978.73" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[808a8a17654ff2736de6ebee483cbca5]
+link Staff to UC_RegCourse--><path d="M47.26,1363.91 C59.94,1355.93 79.53,1344.61 98,1338 C133.23,1325.4 174,1317.02 208.02,1311.63 " fill="none" id="Staff-to-UC_RegCourse" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="212.99,1310.86,203.4808,1308.2957,208.0498,1311.631,204.7145,1316.2,212.99,1310.86" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[71ad0bdb7940c88286be24a472e09cdb]
+link Staff to UC_UpdCourse--><path d="M47.1,1373 C76.4,1373 147.32,1373 203.26,1373 " fill="none" id="Staff-to-UC_UpdCourse" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="208.28,1373,199.28,1369,203.28,1373,199.28,1377,208.28,1373" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[3f07103926d819fef87216dd282e0729]
+link Staff to UC_DelCourse--><path d="M47.3,1381.82 C60,1389.55 79.61,1400.54 98,1407 C134.75,1419.9 177.44,1428.42 212.23,1433.83 " fill="none" id="Staff-to-UC_DelCourse" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="217.31,1434.6,209.0194,1429.2834,212.3676,1433.8429,207.8081,1437.1912,217.31,1434.6" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[f7676c35914794779750d7b5ba9060b4]
+link Staff to UC_SearchCourse--><path d="M47.13,1408.99 C57.6,1431.73 74.33,1459.78 98,1476 C127.85,1496.45 166.6,1505.69 200.67,1509.62 " fill="none" id="Staff-to-UC_SearchCourse" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="205.66,1510.16,197.1474,1505.2067,200.6895,1509.6172,196.279,1513.1594,205.66,1510.16" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[18f53df9f3463257871ccb9c18431af8]
+link Staff to UC_RegSubject--><path d="M39.61,1414.76 C47.21,1453.02 63.64,1509.02 98,1545 C130.26,1578.79 179.56,1598.68 218.72,1609.91 " fill="none" id="Staff-to-UC_RegSubject" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="223.93,1611.38,216.3356,1605.109,219.1138,1610.0366,214.1862,1612.8148,223.93,1611.38" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[1b9e781b39329ae1ddd590d1275f04f3]
+link Staff to UC_UpdSubject--><path d="M37.39,1414.78 C44.86,1485.57 63.6,1624.7 98,1658 C125.88,1684.98 167.86,1694.31 204.49,1696.63 " fill="none" id="Staff-to-UC_UpdSubject" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="209.85,1696.92,201.0929,1692.4131,204.8581,1696.6348,200.6365,1700.4,209.85,1696.92" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[05fa927f5fb3076520a90844d331abec]
+link Staff to UC_DelSubject--><path d="M35.35,1414.73 C39.96,1498.63 54.87,1683.44 98,1727 C126.06,1755.34 169.61,1764.44 207.07,1766.29 " fill="none" id="Staff-to-UC_DelSubject" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="212.08,1766.5,203.2471,1762.1435,207.084,1766.3002,202.9273,1770.1371,212.08,1766.5" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[974cb0a0c32ca4d11496a4873643468e]
+link Staff to UC_AssignTeacher--><path d="M34.08,1414.55 C36.29,1510.05 46.91,1741.18 98,1796 C117.54,1816.97 145.32,1828.34 173.31,1834.24 " fill="none" id="Staff-to-UC_AssignTeacher" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="178.53,1835.28,170.4797,1829.6062,173.6255,1834.3077,168.924,1837.4534,178.53,1835.28" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[340f5068092f8c8a0621cbd4de9b8ecb]
+link Staff to UC_ApproveEnrol--><path d="M34.56,1414.79 C39.67,1608.32 62.88,2409.79 98,2449 C121.99,2475.78 159.62,2486.25 194.44,2489.54 " fill="none" id="Staff-to-UC_ApproveEnrol" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="199.56,2489.97,190.9356,2485.2139,194.5784,2489.5418,190.2505,2493.1845,199.56,2489.97" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[d69a5545be6492b468b2cb985c40806a]
+link Staff to UC_RejectEnrol--><path d="M33.92,1414.62 C35.85,1566.68 46.24,2086.05 98,2137 C124.47,2163.06 164.03,2172.94 199.51,2175.94 " fill="none" id="Staff-to-UC_RejectEnrol" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="204.71,2176.33,196.032,2171.6724,199.7238,2175.9585,195.4377,2179.6503,204.71,2176.33" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[604947da632844cc45a51cd47eb536eb]
+link Staff to UC_ApproveWithdraw--><path d="M33.77,1414.67 C35.19,1575.4 44.03,2149.06 98,2208 C121.58,2233.75 157.73,2244.53 191.62,2248.38 " fill="none" id="Staff-to-UC_ApproveWithdraw" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="196.6,2248.9,188.0594,2243.9951,191.6265,2248.3855,187.2362,2251.9527,196.6,2248.9" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[cbd02ae8a194788f319fbdeba74e6f3e]
+link Staff to UC_RejectWithdraw--><path d="M33.47,1414.61 C33.73,1584.33 38.71,2218.38 98,2283 C123.11,2310.37 162.54,2320.39 198.28,2323.13 " fill="none" id="Staff-to-UC_RejectWithdraw" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="203.52,2323.48,194.8025,2318.8968,198.5308,2323.1512,194.2764,2326.8795,203.52,2323.48" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[49b0fc07971769a731c21223492c6166]
+link Staff to UC_ManageRequests--><path d="M33.32,1414.76 C32.94,1592.89 35.52,2283.25 98,2355 C111.99,2371.06 130.67,2381.99 150.75,2389.36 " fill="none" id="Staff-to-UC_ManageRequests" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="155.61,2391.06,148.4458,2384.3017,150.8929,2389.4019,145.7928,2391.849,155.61,2391.06" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[4e5c9b1ec9f1be3e0831137d3ac8a446]
+link UC_Register to UC_EmailVerify--><path d="M350.68,122.22 C403.69,122.38 476.7,122.62 529.74,122.78 " fill="none" id="UC_Register-to-UC_EmailVerify" style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#A80036" points="534.81,122.8,525.8215,118.7743,529.81,122.7857,525.7986,126.7743,534.81,122.8" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="55" x="449" y="119.4951">«include»</text><!--MD5=[fd564a1ccbcc4798448714224d368a62]
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Guest
+actor Student
+actor Teacher
+actor Staff
+
+rectangle "University Academic Portal\n(Timebox 1)" {
+
+  package "Manage User" {
+    usecase "Register User" as UC_Register
+    usecase "Verify Email" as UC_EmailVerify
+    usecase "Login" as UC_Login
+    usecase "Forgot Password" as UC_Forgot
+    usecase "Reset Password" as UC_Reset
+    usecase "Update User" as UC_UpdateUser
+    usecase "Delete User" as UC_DeleteUser
+    usecase "Search Users" as UC_SearchUser
+    usecase "Manage Preferences\n(View/Update)" as UC_Prefs
+    usecase "Global Search" as UC_GlobalSearch
+  }
+
+  package "Manage Student" {
+    usecase "Register Student" as UC_RegStudent
+    usecase "Update Student" as UC_UpdStudent
+    usecase "Delete Student" as UC_DelStudent
+    usecase "Search Students" as UC_SearchStudent
+    usecase "View My Profile\n(+ GPA)" as UC_ViewProfile
+    usecase "Update My Contact\n(Address/Phone/Photo)" as UC_UpdateProfile
+  }
+
+  package "Manage Course" {
+    usecase "Register Course" as UC_RegCourse
+    usecase "Update Course" as UC_UpdCourse
+    usecase "Delete Course" as UC_DelCourse
+    usecase "Search Courses" as UC_SearchCourse
+  }
+
+  package "Manage Subject" {
+    usecase "Register Subject" as UC_RegSubject
+    usecase "Update Subject" as UC_UpdSubject
+    usecase "Delete Subject" as UC_DelSubject
+    usecase "Assign Teacher to Subject" as UC_AssignTeacher
+  }
+
+  package "Manage Course Registration" {
+    usecase "Request Enrolment" as UC_RequestEnrol
+    usecase "Request Withdrawal" as UC_RequestWithdraw
+    usecase "Approve Enrolment" as UC_ApproveEnrol
+    usecase "Reject Enrolment" as UC_RejectEnrol
+    usecase "Approve Withdrawal" as UC_ApproveWithdraw
+    usecase "Reject Withdrawal" as UC_RejectWithdraw
+    usecase "View My Courses" as UC_ViewMyCourses
+    usecase "Manage Enrolment Requests\n(Pending Enrol/Withdraw)" as UC_ManageRequests
+  }
+
+  ' - - - Relationships / actors - - -
+  Guest - -> UC_Register
+  Guest - -> UC_Login
+  Guest - -> UC_Forgot
+  Guest - -> UC_Reset
+  Guest - -> UC_GlobalSearch
+
+  Student - -> UC_Login
+  Student - -> UC_Prefs
+  Student - -> UC_GlobalSearch
+  Student - -> UC_ViewProfile
+  Student - -> UC_UpdateProfile
+  Student - -> UC_RequestEnrol
+  Student - -> UC_RequestWithdraw
+  Student - -> UC_ViewMyCourses
+
+  Teacher - -> UC_Login
+  Teacher - -> UC_Prefs
+  Teacher - -> UC_GlobalSearch
+
+  Staff - -> UC_Login
+  Staff - -> UC_Prefs
+  Staff - -> UC_GlobalSearch
+  Staff - -> UC_UpdateUser
+  Staff - -> UC_DeleteUser
+  Staff - -> UC_SearchUser
+  Staff - -> UC_RegStudent
+  Staff - -> UC_UpdStudent
+  Staff - -> UC_DelStudent
+  Staff - -> UC_SearchStudent
+  Staff - -> UC_RegCourse
+  Staff - -> UC_UpdCourse
+  Staff - -> UC_DelCourse
+  Staff - -> UC_SearchCourse
+  Staff - -> UC_RegSubject
+  Staff - -> UC_UpdSubject
+  Staff - -> UC_DelSubject
+  Staff - -> UC_AssignTeacher
+  Staff - -> UC_ApproveEnrol
+  Staff - -> UC_RejectEnrol
+  Staff - -> UC_ApproveWithdraw
+  Staff - -> UC_RejectWithdraw
+  Staff - -> UC_ManageRequests
+
+  ' - - - Includes (optional but nice for diagram clarity) - - -
+  UC_Register ..> UC_EmailVerify : <<include>>
+}
+
+@enduml
+
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Guest
+actor Student
+actor Teacher
+actor Staff
+
+rectangle "University Academic Portal\n(Timebox 1)" {
+
+  package "Manage User" {
+    usecase "Register User" as UC_Register
+    usecase "Verify Email" as UC_EmailVerify
+    usecase "Login" as UC_Login
+    usecase "Forgot Password" as UC_Forgot
+    usecase "Reset Password" as UC_Reset
+    usecase "Update User" as UC_UpdateUser
+    usecase "Delete User" as UC_DeleteUser
+    usecase "Search Users" as UC_SearchUser
+    usecase "Manage Preferences\n(View/Update)" as UC_Prefs
+    usecase "Global Search" as UC_GlobalSearch
+  }
+
+  package "Manage Student" {
+    usecase "Register Student" as UC_RegStudent
+    usecase "Update Student" as UC_UpdStudent
+    usecase "Delete Student" as UC_DelStudent
+    usecase "Search Students" as UC_SearchStudent
+    usecase "View My Profile\n(+ GPA)" as UC_ViewProfile
+    usecase "Update My Contact\n(Address/Phone/Photo)" as UC_UpdateProfile
+  }
+
+  package "Manage Course" {
+    usecase "Register Course" as UC_RegCourse
+    usecase "Update Course" as UC_UpdCourse
+    usecase "Delete Course" as UC_DelCourse
+    usecase "Search Courses" as UC_SearchCourse
+  }
+
+  package "Manage Subject" {
+    usecase "Register Subject" as UC_RegSubject
+    usecase "Update Subject" as UC_UpdSubject
+    usecase "Delete Subject" as UC_DelSubject
+    usecase "Assign Teacher to Subject" as UC_AssignTeacher
+  }
+
+  package "Manage Course Registration" {
+    usecase "Request Enrolment" as UC_RequestEnrol
+    usecase "Request Withdrawal" as UC_RequestWithdraw
+    usecase "Approve Enrolment" as UC_ApproveEnrol
+    usecase "Reject Enrolment" as UC_RejectEnrol
+    usecase "Approve Withdrawal" as UC_ApproveWithdraw
+    usecase "Reject Withdrawal" as UC_RejectWithdraw
+    usecase "View My Courses" as UC_ViewMyCourses
+    usecase "Manage Enrolment Requests\n(Pending Enrol/Withdraw)" as UC_ManageRequests
+  }
+
+  Guest - -> UC_Register
+  Guest - -> UC_Login
+  Guest - -> UC_Forgot
+  Guest - -> UC_Reset
+  Guest - -> UC_GlobalSearch
+
+  Student - -> UC_Login
+  Student - -> UC_Prefs
+  Student - -> UC_GlobalSearch
+  Student - -> UC_ViewProfile
+  Student - -> UC_UpdateProfile
+  Student - -> UC_RequestEnrol
+  Student - -> UC_RequestWithdraw
+  Student - -> UC_ViewMyCourses
+
+  Teacher - -> UC_Login
+  Teacher - -> UC_Prefs
+  Teacher - -> UC_GlobalSearch
+
+  Staff - -> UC_Login
+  Staff - -> UC_Prefs
+  Staff - -> UC_GlobalSearch
+  Staff - -> UC_UpdateUser
+  Staff - -> UC_DeleteUser
+  Staff - -> UC_SearchUser
+  Staff - -> UC_RegStudent
+  Staff - -> UC_UpdStudent
+  Staff - -> UC_DelStudent
+  Staff - -> UC_SearchStudent
+  Staff - -> UC_RegCourse
+  Staff - -> UC_UpdCourse
+  Staff - -> UC_DelCourse
+  Staff - -> UC_SearchCourse
+  Staff - -> UC_RegSubject
+  Staff - -> UC_UpdSubject
+  Staff - -> UC_DelSubject
+  Staff - -> UC_AssignTeacher
+  Staff - -> UC_ApproveEnrol
+  Staff - -> UC_RejectEnrol
+  Staff - -> UC_ApproveWithdraw
+  Staff - -> UC_RejectWithdraw
+  Staff - -> UC_ManageRequests
+
+  UC_Register ..> UC_EmailVerify : <<include>>
+}
+
+@enduml
+
+PlantUML version 1.2021.00(Sun Jan 10 16:55:05 MMT 2021)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
