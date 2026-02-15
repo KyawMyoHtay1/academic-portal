@@ -54,6 +54,7 @@ rectangle "University Academic Portal\n(Timebox 2: Grades, Fee Payment & Assignm
 Student --> UC_ViewGrade
 Student --> UC_SearchGrade
 Student --> UC_ViewFee
+Student --> UC_SearchFee
 Student --> UC_SubmitPayment
 Student --> UC_StripePayment
 Student --> UC_ViewAssignments
@@ -73,6 +74,7 @@ Teacher --> UC_ViewSubmissions
 Teacher --> UC_GradeSubmission
 Teacher --> UC_DownloadSubmission
 
+Staff --> UC_ViewGrade
 Staff --> UC_ApproveGrade
 Staff --> UC_RejectGrade
 Staff --> UC_SearchGrade
