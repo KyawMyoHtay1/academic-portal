@@ -48,6 +48,7 @@ use App\Http\Controllers\StaffFeedbackMessageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
 // Guest-facing public pages (read-only)
@@ -320,6 +321,26 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth', 'nocache'])->group(function () {
+    // Testing only (local): one-click email verification – visit this URL to verify without opening email
+    if (app()->environment('local')) {
+        Route::get('/dev/verify-email-now', function () {
+            $user = auth()->user();
+            if (! $user) {
+                return redirect()->route('login');
+            }
+            if ($user->hasVerifiedEmail()) {
+                return redirect()->route('dashboard');
+            }
+            $url = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->id, 'hash' => sha1($user->email)]
+            );
+
+            return redirect($url);
+        })->name('dev.verify-email-now');
+    }
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
