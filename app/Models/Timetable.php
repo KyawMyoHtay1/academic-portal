@@ -15,6 +15,7 @@ class Timetable extends Model
         'start_time',
         'end_time',
         'location',
+        'created_by',
     ];
 
     /**
@@ -32,5 +33,13 @@ class Timetable extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    /**
+     * The user (staff) who created this timetable entry. User 1 – Timetable 0..*
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

@@ -114,6 +114,7 @@ class StaffTimetableController extends Controller
             'start_time' => $data['start_time'],
             'end_time' => $data['end_time'],
             'location' => $data['location'] ?? null,
+            'created_by' => $request->user()->id,
         ]);
 
         // Notify enrolled students and assigned teachers

@@ -154,8 +154,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Timetable**
-*Attributes: id, subject_id, day_of_week, start_time, end_time, location*  
-*(Course is derived via Subject → Course; no course_id column.)*
+*Attributes: id, subject_id, created_by, day_of_week, start_time, end_time, location*  
+*(Course is derived via Subject → Course; no course_id column. User 1 – Timetable 0..* via created_by.)*
 
 - +FillGetData()
 - +AddTimetable()
@@ -167,6 +167,7 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 - +GetBySubject()
 - +GetByStudent()
 - +GetByTeacher()
+- +GetCreator()
 - +AutoID()
 
 ---
@@ -335,7 +336,7 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 | **Grade** | SubmitGrade, ApproveGrade, RejectGrade, GetLetterGrade |
 | **GradeReviewLog** | LogAction, GetByGrade |
 | **Fee** | Create/Update/Delete, ApprovePayment, RejectPayment, GenerateReceipt |
-| **Timetable** | Add/Update/Delete, CheckConflict, GetByCourse/Subject/Student |
+| **Timetable** | Add/Update/Delete, CheckConflict, GetByCourse/Subject/Student, GetCreator |
 | **Attendance** | RecordAttendance, MarkPresent/MarkAbsent, CalculateRate |
 | **Announcement** | Create/Update/Delete, Publish, GetVisibleToUser |
 | **AnnouncementRead** | MarkAsRead, MarkAsAcknowledged |
@@ -462,6 +463,7 @@ class Fee {
 class Timetable {
   +id: int
   +subject_id: int
+  +created_by: int
   +day_of_week: string
   +start_time: time
   +end_time: time
@@ -471,7 +473,8 @@ class Timetable {
   +AddTimetable()
   +UpdateTimetable()
   +CheckConflict()
-  note right: course via Subject
+  +GetCreator()
+  note right: course via Subject\nUser 1 → * created_by
 }
 
 class Attendance {
@@ -610,5 +613,6 @@ User "1" --> "*" Assignment : created_by
 Assignment "1" --> "*" AssignmentSubmission : has many
 Student "1" --> "*" AssignmentSubmission : has many
 User "1" --> "*" AssignmentSubmission : graded_by
+User "1" --> "*" Timetable : created_by
 @enduml
 ```
