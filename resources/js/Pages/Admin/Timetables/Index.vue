@@ -200,6 +200,11 @@ export default {
                                         Location
                                     </th>
                                     <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Created by
+                                    </th>
+                                    <th
                                         class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
                                         Actions
@@ -209,7 +214,7 @@ export default {
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="filteredEntries.length === 0">
                                     <td
-                                        colspan="6"
+                                        colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No timetable entries match your filters.
@@ -306,6 +311,11 @@ export default {
                                         class="px-4 py-4 text-sm text-slate-700"
                                     >
                                         {{ entry.location || "-" }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-4 text-sm text-slate-600"
+                                    >
+                                        {{ entry.creator_name || "—" }}
                                     </td>
                                     <td class="px-4 py-4 text-right text-sm">
                                         <div

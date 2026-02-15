@@ -19,14 +19,14 @@ class StaffTimetableController extends Controller
      */
     public function index(): Response
     {
-        $timetables = Timetable::with('subject.course')
+        $timetables = Timetable::with(['subject.course', 'creator:id,name,email'])
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->paginate(15)
             ->through(function (Timetable $entry) {
                 $subject = $entry->subject;
                 $course = $subject?->course;
-                
+
                 return [
                     'id' => $entry->id,
                     'subject_id' => $entry->subject_id,
@@ -40,6 +40,8 @@ class StaffTimetableController extends Controller
                     'start_time' => $entry->start_time,
                     'end_time' => $entry->end_time,
                     'location' => $entry->location,
+                    'created_by' => $entry->created_by,
+                    'creator_name' => $entry->creator?->name ?? null,
                 ];
             });
 
