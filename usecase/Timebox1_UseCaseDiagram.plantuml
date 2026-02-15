@@ -58,8 +58,11 @@ rectangle "University Academic Portal\n(Timebox 1: Student Registration & Course
   }
 }
 
+Guest --> UC_RegisterUser
+Guest --> UC_Login
+Guest --> UC_PasswordMgmt
 Guest --> UC_GlobalSearch
-Student --> UC_RegisterUser
+
 Student --> UC_Login
 Student --> UC_PasswordMgmt
 Student --> UC_ViewSettings
