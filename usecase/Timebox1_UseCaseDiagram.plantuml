@@ -1,0 +1,100 @@
+@startuml Timebox1_UseCaseDiagram
+left to right direction
+scale 1.6
+skinparam dpi 300
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Guest" as Guest #LightGray
+actor "Student" as Student #LightBlue
+actor "Staff" as Staff #LightGreen
+
+rectangle "University Academic Portal\n(Timebox 1: Student Registration & Course Registration)" #White {
+
+  rectangle "Manage User" #AliceBlue {
+    usecase "Register User" as UC_RegisterUser
+    usecase "Login" as UC_Login
+    usecase "Update User" as UC_UpdateUser
+    usecase "Delete User" as UC_DeleteUser
+    usecase "Search User" as UC_SearchUser
+    usecase "Password Management" as UC_PasswordMgmt
+    usecase "View Settings" as UC_ViewSettings
+    usecase "Update Preferences" as UC_UpdatePreferences
+    usecase "Global Search" as UC_GlobalSearch
+  }
+
+  rectangle "Manage Student" #MintCream {
+    usecase "Register Student" as UC_RegisterStudent
+    usecase "Update Student" as UC_UpdateStudent
+    usecase "Delete Student" as UC_DeleteStudent
+    usecase "Search Student" as UC_SearchStudent
+    usecase "View Profile (with GPA)" as UC_ViewProfile
+    usecase "Update Self Profile" as UC_UpdateSelfProfile
+  }
+
+  rectangle "Manage Course" #Honeydew {
+    usecase "Register Course" as UC_RegisterCourse
+    usecase "Update Course" as UC_UpdateCourse
+    usecase "Delete Course" as UC_DeleteCourse
+    usecase "Search Course" as UC_SearchCourse
+  }
+
+  rectangle "Manage Subject" #LavenderBlush {
+    usecase "Register Subject" as UC_RegisterSubject
+    usecase "Update Subject" as UC_UpdateSubject
+    usecase "Delete Subject" as UC_DeleteSubject
+    usecase "Assign Teacher to Subject" as UC_AssignTeacher
+  }
+
+  rectangle "Manage Course Registration" #Beige {
+    usecase "Request Enrolment" as UC_RequestEnrolment
+    usecase "Request Withdrawal" as UC_RequestWithdrawal
+    usecase "View My Courses" as UC_ViewMyCourses
+    usecase "Approve Enrolment" as UC_ApproveEnrolment
+    usecase "Reject Enrolment" as UC_RejectEnrolment
+    usecase "Approve Withdrawal" as UC_ApproveWithdrawal
+    usecase "Reject Withdrawal" as UC_RejectWithdrawal
+    usecase "Search & Manage Enrolments" as UC_ManageEnrolments
+  }
+}
+
+Guest --> UC_GlobalSearch
+Student --> UC_RegisterUser
+Student --> UC_Login
+Student --> UC_PasswordMgmt
+Student --> UC_ViewSettings
+Student --> UC_UpdatePreferences
+Student --> UC_GlobalSearch
+Student --> UC_ViewProfile
+Student --> UC_UpdateSelfProfile
+Student --> UC_RequestEnrolment
+Student --> UC_RequestWithdrawal
+Student --> UC_ViewMyCourses
+
+Staff --> UC_Login
+Staff --> UC_UpdateUser
+Staff --> UC_DeleteUser
+Staff --> UC_SearchUser
+Staff --> UC_PasswordMgmt
+Staff --> UC_ViewSettings
+Staff --> UC_UpdatePreferences
+Staff --> UC_GlobalSearch
+Staff --> UC_RegisterStudent
+Staff --> UC_UpdateStudent
+Staff --> UC_DeleteStudent
+Staff --> UC_SearchStudent
+Staff --> UC_RegisterCourse
+Staff --> UC_UpdateCourse
+Staff --> UC_DeleteCourse
+Staff --> UC_SearchCourse
+Staff --> UC_RegisterSubject
+Staff --> UC_UpdateSubject
+Staff --> UC_DeleteSubject
+Staff --> UC_AssignTeacher
+Staff --> UC_ApproveEnrolment
+Staff --> UC_RejectEnrolment
+Staff --> UC_ApproveWithdrawal
+Staff --> UC_RejectWithdrawal
+Staff --> UC_ManageEnrolments
+
+@enduml
