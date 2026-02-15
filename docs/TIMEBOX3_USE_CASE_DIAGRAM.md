@@ -125,89 +125,19 @@ Staff --> UC_MarkAllNotificationsRead
 
 ---
 
-## Use Case Descriptions
+## Section A: Use Case Descriptions
 
-### Manage Timetable
-
-| Use Case Name | Actor | Flow of Event |
-|---------------|-------|----------------|
-| Register Timetable | Staff | Select a subject. Enter day of week, start time (H:i), end time (H:i), and location (max 255 chars). Click "Add" or "Save". System validates subject exists, derives course from subject, ensures end time is after start time, checks for schedule conflicts (same course/day, overlapping time), stores the timetable, and notifies enrolled students and assigned teachers via TimetableUpdated. |
-| Update Timetable | Staff | Select a timetable entry and choose "Edit". Modify day, start/end time, or location. Click "Update". System validates (same as Register), checks conflicts excluding the current entry, saves, and notifies students and teachers. |
-| Delete Timetable | Staff | Select a timetable entry and choose "Delete". Confirm. System deletes the record (cascade handled by database). |
-| View Timetable | Staff | Open the Timetable management page. System shows all timetables paginated (15 per page), ordered by day of week then start time, with subject and course details. |
-| View Timetable | Teacher | Open "My Timetable". System shows timetables for subjects assigned to the teacher, grouped by course, ordered by day and time, in a week grid format. |
-| View Timetable | Student | Open "My Timetable". System shows timetables for enrolled courses only, grouped by course, ordered by day and time, in a week grid format. |
-
----
-
-### Manage Attendance
+**Timebox 3: Manage Timetable, Attendance & Communication Process**
 
 | Use Case Name | Actor | Flow of Event |
 |---------------|-------|----------------|
-| Record Attendance | Teacher | Select a subject assigned to the teacher and a date. For each enrolled student, set status (present/absent). Click "Save". System validates date, attendance array, student IDs exist, students are enrolled in the subject’s course, uses updateOrCreate (one record per subject/student/date), and notifies students via AttendanceAlert. |
-| View Attendance | Teacher | Open the Attendance section. System lists subjects assigned to the teacher, shows enrolled students per subject, and displays per-student summary (total, present, percentage) and total distinct sessions for the subject. |
-| View Attendance | Student | Open "My Attendance". System shows overall statistics (total, present, absent, rate), breakdown by course and by subject, and recent records (last 30 days, limit 50). |
-| Search Attendance | Teacher | Select a subject and/or filter by date. System shows the enrolled students list and related attendance data. |
-| Report Attendance | Staff | Open the Attendance Report. System shows overall statistics, breakdown by course and subject, identifies low attendance students (below 75% threshold), lists top 20 low attendance students, and shows recent records (paginated, last 30 days, limit 50). |
-| Low Attendance Alert | Staff | On the attendance report or dashboard, choose "Run Low Attendance Alerts" (or trigger via scheduled job). System dispatches SendLowAttendanceAlertsJob: uses configured threshold (default 75%) and cooldown (default 7 days), tracks alert state per student, sends alert when newly below threshold or still below after cooldown, and notifies via database and email (LowAttendanceAlert). |
-
----
-
-### Manage Announcement
-
-| Use Case Name | Actor | Flow of Event |
-|---------------|-------|----------------|
-| Register Announcement | Staff | Enter title (required), body (required), priority (info/important/urgent), pinned (boolean), require acknowledgment (boolean), audience (all/student/teacher/staff), publish at and expires at dates. Click "Create". System sets default audience to all, sets author to current user, and stores the announcement. |
-| Register Announcement | Teacher | Same as Staff; system sets default audience to students only and author to current teacher. |
-| Update Announcement | Staff | Select an announcement and choose "Edit". Modify fields (same validations as Register). Click "Update". System saves. |
-| Update Announcement | Teacher | Select an announcement owned by the teacher and choose "Edit". Modify fields. System returns 403 if not owner; otherwise saves. |
-| Delete Announcement | Staff | Select an announcement and choose "Delete". Confirm. System deletes the announcement. |
-| Delete Announcement | Teacher | Select an announcement owned by the teacher and choose "Delete". Confirm. System returns 403 if not owner; otherwise deletes. |
-| View Announcement | Student, Teacher, Staff | Open the Announcements page. System filters by currently visible (published and not expired) and visible to the user’s role (audience), orders by pinned desc, priority, created at desc, and includes read/acknowledged status per user. |
-| Mark Announcement as Read | Student, Teacher, Staff | Open an announcement. System creates or updates an AnnouncementRead record and sets read_at. |
-| Acknowledge Announcement | Student, Teacher, Staff | For an announcement that requires acknowledgment, choose "Acknowledge". System validates require_ack is true and sets read_at and acknowledged_at. |
-| Search Announcement | Staff | Open the Announcements management page. System shows all announcements ordered by pinned, priority, created at, with author info. |
-
----
-
-### Manage Message
-
-| Use Case Name | Actor | Flow of Event |
-|---------------|-------|----------------|
-| Send Message | Student, Teacher, Staff | Open "Compose Message". Select a receiver (list shows all users except current user, ordered by role then name). Enter body (required). Click "Send". System validates receiver exists, prevents sending to self, sets sender_role and receiver_role, sets read to false, and stores the message. |
-| View Inbox | Student, Teacher, Staff | Open "Messages". System shows sent and received messages ordered by created at desc, with sender/receiver info and read status. |
-| Compose Message | Student, Teacher, Staff | Open the compose view. System lists all users except the current user, ordered by role then name, for selection as receiver. |
-| Mark Message as Read | Student, Teacher, Staff | Open a received message. System validates the receiver is the current user and updates read status to true. |
-
----
-
-### Manage Contact Message
-
-| Use Case Name | Actor | Flow of Event |
-|---------------|-------|----------------|
-| View Contact Message | Staff | Open the Contact Messages (inbox) page. System shows messages paginated (20 per page), searchable by first name, last name, email, phone, subject, message, and displays unread count. |
-| Mark Contact Message as Read | Staff | Select a contact message and choose "Mark as Read". System updates is_read to true. |
-
----
-
-### Manage Feedback Message
-
-| Use Case Name | Actor | Flow of Event |
-|---------------|-------|----------------|
-| View Feedback Message | Staff | Open the Feedback Messages (inbox) page. System shows messages paginated (20 per page), searchable by name, email, type, message, and displays unread count. |
-| Mark Feedback Message as Read | Staff | Select a feedback message and choose "Mark as Read". System updates is_read to true. |
-
----
-
-### Manage Notification
-
-| Use Case Name | Actor | Flow of Event |
-|---------------|-------|----------------|
-| View Notification | Student, Teacher, Staff | Open the Notifications page. System shows the last 50 notifications ordered by created at desc, with read status. |
-| Mark Notification as Read | Student, Teacher, Staff | Select a notification and choose "Mark as Read". System sets read_at for that notification. |
-| Mark All Notifications as Read | Student, Teacher, Staff | On the Notifications page, choose "Mark All as Read". System marks all unread notifications as read (batch update read_at). |
-
-*System notification types (automatic, no direct user use case): TimetableUpdated, AttendanceAlert, LowAttendanceAlert, FeeStatusUpdated, GradeReviewRequested, GradePublished.*
+| Register Timetable | Staff | Enter the timetable details (day, start time, end time, location) in the timetable's form. Then, click the "Add" or "Save" button to store the timetable records. |
+| Record Attendance | Teacher | Select a subject and date, then mark each student as present or absent. Click the "Save" button to store the attendance records. |
+| Report Attendance | Staff | Open the Attendance Report page to view overall statistics and low attendance students. |
+| Register Announcement | Staff, Teacher | Enter the announcement details (title, body, priority) in the announcement's form. Then, click the "Create" button to store the announcement records. |
+| Send Message | Student, Teacher, Staff | Select a receiver and enter the message in the compose form. Then, click the "Send" button to store the message. |
+| View Contact Message | Staff | Open the Contact Messages page to view and manage contact form submissions from the guest page. |
+| View Feedback Message | Staff | Open the Feedback Messages page to view and manage feedback form submissions from the guest page. |
 
 ---
 
