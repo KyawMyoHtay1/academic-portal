@@ -1,90 +1,66 @@
-@startuml Timebox2_UseCaseDiagram
+@startuml
 left to right direction
-scale 1.6
-skinparam dpi 300
 skinparam packageStyle rectangle
 skinparam shadowing false
+skinparam dpi 300
 
-actor "Student" as Student #LightBlue
-actor "Teacher" as Teacher #LightYellow
-actor "Staff" as Staff #LightGreen
+' Make it compact
+scale 0.9
+skinparam defaultFontSize 10
+skinparam ranksep 10
+skinparam nodesep 10
+skinparam RectanglePadding 6
 
-rectangle "University Academic Portal\n(Timebox 2: Grades, Fee Payment & Assignment)" #White {
+actor Student #LightBlue
+actor Teacher #LightYellow
+actor Staff   #LightGreen
+
+rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignment" #White {
 
   rectangle "Manage Grade" #AliceBlue {
-    usecase "Record Grade" as UC_RecordGrade
-    usecase "Approve Grade" as UC_ApproveGrade
-    usecase "Reject Grade" as UC_RejectGrade
-    usecase "View Grade" as UC_ViewGrade
-    usecase "Search Grade" as UC_SearchGrade
+    usecase "Record Grade" as UC1
+    usecase "Review Grade" as UC2
+    usecase "View Grades" as UC3
+    usecase "Search Grades" as UC4
   }
 
-  rectangle "Manage Fee" #MintCream {
-    usecase "Register Fee" as UC_RegisterFee
-    usecase "Update Fee" as UC_UpdateFee
-    usecase "Delete Fee" as UC_DeleteFee
-    usecase "Search Fee" as UC_SearchFee
-    usecase "View Fee" as UC_ViewFee
-    usecase "Track Late Payment" as UC_TrackLatePayment
-  }
-
-  rectangle "Manage Payment" #Honeydew {
-    usecase "Submit Payment Confirmation" as UC_SubmitPayment
-    usecase "Approve Payment" as UC_ApprovePayment
-    usecase "Reject Payment" as UC_RejectPayment
-    usecase "Process Stripe Payment" as UC_StripePayment
-    usecase "Generate Receipt" as UC_GenerateReceipt
+  rectangle "Manage Fee & Payment" #MintCream {
+    usecase "View Fees" as UC5
+    usecase "Make Payment" as UC6
+    usecase "Manage Fees" as UC7
+    usecase "Approve / Reject Payment" as UC8
+    usecase "Generate Receipt" as UC9
   }
 
   rectangle "Manage Assignment" #LavenderBlush {
-    usecase "Create Assignment" as UC_CreateAssignment
-    usecase "Update Assignment" as UC_UpdateAssignment
-    usecase "Delete Assignment" as UC_DeleteAssignment
-    usecase "Publish Assignment" as UC_PublishAssignment
-    usecase "View Assignments" as UC_ViewAssignments
-    usecase "View Submissions" as UC_ViewSubmissions
-    usecase "Grade Submission" as UC_GradeSubmission
-    usecase "Download Submission" as UC_DownloadSubmission
-    usecase "View Assignment Detail" as UC_ViewAssignmentDetail
-    usecase "Submit Assignment" as UC_SubmitAssignment
-    usecase "Download Own Submission" as UC_DownloadOwnSubmission
+    usecase "Manage Assignments" as UC10
+    usecase "Submit Assignment" as UC11
+    usecase "Grade Assignment" as UC12
+    usecase "View Assignments" as UC13
   }
 }
 
-Student --> UC_ViewGrade
-Student --> UC_SearchGrade
-Student --> UC_ViewFee
-Student --> UC_SearchFee
-Student --> UC_SubmitPayment
-Student --> UC_StripePayment
-Student --> UC_ViewAssignments
-Student --> UC_ViewAssignmentDetail
-Student --> UC_SubmitAssignment
-Student --> UC_DownloadOwnSubmission
+' Student
+Student -[#2563EB]-> UC3
+Student -[#2563EB]-> UC4
+Student -[#2563EB]-> UC5
+Student -[#2563EB]-> UC6
+Student -[#2563EB]-> UC11
+Student -[#2563EB]-> UC13
 
-Teacher --> UC_RecordGrade
-Teacher --> UC_ViewGrade
-Teacher --> UC_SearchGrade
-Teacher --> UC_CreateAssignment
-Teacher --> UC_UpdateAssignment
-Teacher --> UC_DeleteAssignment
-Teacher --> UC_PublishAssignment
-Teacher --> UC_ViewAssignments
-Teacher --> UC_ViewSubmissions
-Teacher --> UC_GradeSubmission
-Teacher --> UC_DownloadSubmission
+' Teacher
+Teacher -[#CA8A04]-> UC1
+Teacher -[#CA8A04]-> UC3
+Teacher -[#CA8A04]-> UC4
+Teacher -[#CA8A04]-> UC10
+Teacher -[#CA8A04]-> UC12
+Teacher -[#CA8A04]-> UC13
 
-Staff --> UC_ViewGrade
-Staff --> UC_ApproveGrade
-Staff --> UC_RejectGrade
-Staff --> UC_SearchGrade
-Staff --> UC_RegisterFee
-Staff --> UC_UpdateFee
-Staff --> UC_DeleteFee
-Staff --> UC_SearchFee
-Staff --> UC_TrackLatePayment
-Staff --> UC_ApprovePayment
-Staff --> UC_RejectPayment
-Staff --> UC_GenerateReceipt
+' Staff
+Staff -[#16A34A]-> UC2
+Staff -[#16A34A]-> UC4
+Staff -[#16A34A]-> UC7
+Staff -[#16A34A]-> UC8
+Staff -[#16A34A]-> UC9
 
 @enduml
