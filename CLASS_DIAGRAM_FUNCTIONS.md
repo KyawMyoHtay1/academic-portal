@@ -1,6 +1,7 @@
 # Class Diagram Functions for University Academic Portal
 
-Each class lists its suggested functions in the format: **+FunctionName()** — suitable for use in a class diagram (PlantUML, draw.io, StarUML, etc.).
+Each class lists its suggested functions in the format: **+FunctionName()** — suitable for use in a class diagram (PlantUML, draw.io, StarUML, etc.).  
+**Schema note:** *Timetable* and *Attendance* have no `course_id`; course is derived via Subject → Course (normalized schema). Use this document for both class diagram and ERD/entity-attribute lists.
 
 ---
 
@@ -153,7 +154,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Timetable**
-*Attributes: id, course_id, subject_id, day_of_week, start_time, end_time, location*
+*Attributes: id, subject_id, day_of_week, start_time, end_time, location*  
+*(Course is derived via Subject → Course; no course_id column.)*
 
 - +FillGetData()
 - +AddTimetable()
@@ -170,7 +172,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Attendance**
-*Attributes: id, course_id, subject_id, student_id, date, status*
+*Attributes: id, subject_id, student_id, date, status*  
+*(Course is derived via Subject → Course; no course_id column.)*
 
 - +FillGetData()
 - +RecordAttendance()
@@ -458,15 +461,17 @@ class Fee {
 
 class Timetable {
   +id: int
-  +course_id: int
   +subject_id: int
   +day_of_week: string
+  +start_time: time
+  +end_time: time
   +location: string
   --
   +FillGetData()
   +AddTimetable()
   +UpdateTimetable()
   +CheckConflict()
+  note right: course via Subject
 }
 
 class Attendance {
@@ -481,6 +486,7 @@ class Attendance {
   +MarkPresent()
   +MarkAbsent()
   +CalculateRate()
+  note right: course via Subject
 }
 
 class Announcement {
