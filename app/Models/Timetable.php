@@ -10,7 +10,6 @@ class Timetable extends Model
     use HasFactory;
 
     protected $fillable = [
-        'course_id',
         'subject_id',
         'day_of_week',
         'start_time',
@@ -19,11 +18,11 @@ class Timetable extends Model
     ];
 
     /**
-     * The course this timetable entry belongs to (derived from subject).
+     * The course this timetable entry belongs to (via subject). Subject → Course.
      */
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->hasOneThrough(Course::class, Subject::class, 'id', 'id', 'subject_id', 'course_id');
     }
 
     /**

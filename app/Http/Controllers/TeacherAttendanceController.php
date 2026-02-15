@@ -153,7 +153,6 @@ class TeacherAttendanceController extends Controller
                     'date' => $data['date'],
                 ],
                 [
-                    'course_id' => $subject->course_id,
                     'status' => $record['status'],
                 ]
             );

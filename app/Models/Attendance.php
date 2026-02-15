@@ -11,7 +11,6 @@ class Attendance extends Model
 
     protected $fillable = [
         'subject_id',
-        'course_id',
         'student_id',
         'date',
         'status',
@@ -22,11 +21,11 @@ class Attendance extends Model
     ];
 
     /**
-     * The course this attendance record belongs to.
+     * The course this attendance record belongs to (via subject). Subject → Course.
      */
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->hasOneThrough(Course::class, Subject::class, 'id', 'id', 'subject_id', 'course_id');
     }
 
     /**

@@ -64,10 +64,14 @@ class CourseRegistrationController extends Controller
 
             if (!empty($enrolledCourseIds)) {
                 // Get timetables for the new course
-                $newCourseTimetables = Timetable::where('course_id', $course->id)->get();
-                
+                $newCourseTimetables = Timetable::with('subject.course')
+                    ->whereHas('subject', fn ($q) => $q->where('course_id', $course->id))
+                    ->get();
+
                 // Get timetables for already enrolled courses
-                $existingTimetables = Timetable::whereIn('course_id', $enrolledCourseIds)->get();
+                $existingTimetables = Timetable::with('subject.course')
+                    ->whereHas('subject', fn ($q) => $q->whereIn('course_id', $enrolledCourseIds))
+                    ->get();
 
                 // Check for conflicts (same day + overlapping time)
                 foreach ($newCourseTimetables as $newTimetable) {
@@ -80,7 +84,7 @@ class CourseRegistrationController extends Controller
                             $existingEnd = strtotime($existingTimetable->end_time);
 
                             if (($newStart < $existingEnd && $newEnd > $existingStart)) {
-                                $conflictingCourse = Course::find($existingTimetable->course_id);
+                                $conflictingCourse = $existingTimetable->subject->course;
                                 return Redirect::route('courses.index')
                                     ->with('error', "Schedule conflict detected! This course conflicts with {$conflictingCourse->course_code} on {$newTimetable->day_of_week} ({$newTimetable->start_time} - {$newTimetable->end_time}). Please choose a different course or contact administration.");
                             }

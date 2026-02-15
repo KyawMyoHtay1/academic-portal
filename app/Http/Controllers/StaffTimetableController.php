@@ -19,13 +19,13 @@ class StaffTimetableController extends Controller
      */
     public function index(): Response
     {
-        $timetables = Timetable::with(['subject.course', 'course'])
+        $timetables = Timetable::with('subject.course')
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->paginate(15)
             ->through(function (Timetable $entry) {
                 $subject = $entry->subject;
-                $course = $subject ? $subject->course : $entry->course;
+                $course = $subject?->course;
                 
                 return [
                     'id' => $entry->id,
@@ -84,13 +84,11 @@ class StaffTimetableController extends Controller
             'location' => ['nullable', 'string', 'max:255'],
         ]);
 
-        // Get subject and derive course_id
         $subject = Subject::findOrFail($data['subject_id']);
-        $data['course_id'] = $subject->course_id;
 
-        // Basic conflict detection (same course + same day + overlapping time)
+        // Basic conflict detection (same course + same day + overlapping time) via subject
         $overlap = Timetable::query()
-            ->where('course_id', $data['course_id'])
+            ->whereHas('subject', fn ($q) => $q->where('course_id', $subject->course_id))
             ->where('day_of_week', $data['day_of_week'])
             ->where(function ($q) use ($data) {
                 $q->whereBetween('start_time', [$data['start_time'], $data['end_time']])
@@ -110,7 +108,13 @@ class StaffTimetableController extends Controller
                 ->withInput();
         }
 
-        $timetable = Timetable::create($data);
+        $timetable = Timetable::create([
+            'subject_id' => $data['subject_id'],
+            'day_of_week' => $data['day_of_week'],
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+            'location' => $data['location'] ?? null,
+        ]);
 
         // Notify enrolled students and assigned teachers
         $course = $subject->course;
@@ -175,13 +179,11 @@ class StaffTimetableController extends Controller
             'location' => ['nullable', 'string', 'max:255'],
         ]);
 
-        // Get subject and derive course_id
         $subject = Subject::findOrFail($data['subject_id']);
-        $data['course_id'] = $subject->course_id;
 
         $overlap = Timetable::query()
             ->where('id', '!=', $timetable->id)
-            ->where('course_id', $data['course_id'])
+            ->whereHas('subject', fn ($q) => $q->where('course_id', $subject->course_id))
             ->where('day_of_week', $data['day_of_week'])
             ->where(function ($q) use ($data) {
                 $q->whereBetween('start_time', [$data['start_time'], $data['end_time']])
@@ -201,7 +203,13 @@ class StaffTimetableController extends Controller
                 ->withInput();
         }
 
-        $timetable->update($data);
+        $timetable->update([
+            'subject_id' => $data['subject_id'],
+            'day_of_week' => $data['day_of_week'],
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+            'location' => $data['location'] ?? null,
+        ]);
 
         // Notify enrolled students and assigned teachers
         $course = $subject->course;
