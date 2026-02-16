@@ -1,0 +1,152 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 3 - Class Diagram (Timetable, Attendance, Communication)
+
+class User {
+  +id: int
+  +name: string
+  +email: string
+  +role: enum
+}
+
+class Student {
+  +id: int
+  +user_id: int
+  +student_no: string
+}
+
+class Subject {
+  +id: int
+  +course_id: int
+  +subject_code: string
+  +title: string
+}
+
+class Timetable {
+  +id: int
+  +subject_id: int
+  +created_by: int
+  +day_of_week: string
+  +start_time: time
+  +end_time: time
+  +location: string
+  --
+  +AddTimetable()
+  +UpdateTimetable()
+  +DeleteTimetable()
+  +CheckConflict()
+}
+
+class Attendance {
+  +id: int
+  +subject_id: int
+  +student_id: int
+  +date: date
+  +status: enum
+  --
+  +RecordAttendance()
+  +UpdateAttendance()
+  +CalculateRate()
+}
+
+class LowAttendanceAlertState {
+  +id: int
+  +student_id: int
+  +last_rate: float
+  +is_below_threshold: bool
+  --
+  +UpdateState()
+  +CheckThreshold()
+  +SendAlert()
+}
+
+class Announcement {
+  +id: int
+  +user_id: int
+  +title: string
+  +body: text
+  +priority: enum
+  +require_ack: bool
+  --
+  +CreateAnnouncement()
+  +UpdateAnnouncement()
+  +DeleteAnnouncement()
+  +Publish()
+}
+
+class AnnouncementRead {
+  +id: int
+  +announcement_id: int
+  +user_id: int
+  +read_at: datetime
+  +acknowledged_at: datetime
+  --
+  +MarkAsRead()
+  +MarkAsAcknowledged()
+}
+
+class Message {
+  +id: int
+  +sender_id: int
+  +receiver_id: int
+  +body: text
+  +read: bool
+  --
+  +SendMessage()
+  +MarkAsRead()
+}
+
+class Notification {
+  +id: int
+  +notifiable_id: int
+  +type: string
+  +data: json
+  +read_at: datetime
+  --
+  +MarkAsRead()
+  +GetUnread()
+}
+
+class ContactMessage {
+  +id: int
+  +first_name: string
+  +last_name: string
+  +email: string
+  +subject: string
+  +message: text
+  --
+  +SubmitContact()
+  +MarkAsRead()
+}
+
+class FeedbackMessage {
+  +id: int
+  +name: string
+  +email: string
+  +type: string
+  +message: text
+  +is_read: bool
+  --
+  +SubmitFeedback()
+  +MarkAsRead()
+}
+
+' Relationships
+Subject "1" -- "*" Timetable
+User "1" -- "*" Timetable : created_by
+
+Subject "1" -- "*" Attendance
+Student "1" -- "*" Attendance
+Student "1" -- "1" LowAttendanceAlertState
+
+User "1" -- "*" Announcement
+Announcement "1" -- "*" AnnouncementRead
+User "1" -- "*" AnnouncementRead
+
+User "1" -- "*" Message : sender
+User "1" -- "*" Message : receiver
+
+User "1" -- "*" Notification
+
+@enduml

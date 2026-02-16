@@ -1,0 +1,104 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 1 - Class Diagram (User, Student, Course, Subject, Enrollment)
+
+class User {
+  +id: int
+  +name: string
+  +email: string
+  +password: string
+  +role: enum
+  --
+  +Login()
+  +Logout()
+  +Register()
+  +UpdateProfile()
+  +ResetPassword()
+}
+
+class Student {
+  +id: int
+  +user_id: int
+  +student_no: string
+  +full_name: string
+  +programme: string
+  +intake_year: int
+  +status: enum
+  --
+  +AddStudent()
+  +UpdateStudent()
+  +DeleteStudent()
+  +SearchStudent()
+  +GetEnrollments()
+}
+
+class Course {
+  +id: int
+  +course_code: string
+  +title: string
+  +credits: int
+  +semester: string
+  --
+  +AddCourse()
+  +UpdateCourse()
+  +DeleteCourse()
+  +SearchCourse()
+  +GetSubjects()
+}
+
+class Subject {
+  +id: int
+  +course_id: int
+  +subject_code: string
+  +title: string
+  +credits: int
+  --
+  +AddSubject()
+  +UpdateSubject()
+  +DeleteSubject()
+  +SearchSubject()
+}
+
+class Enrollment {
+  +id: int
+  +course_id: int
+  +student_id: int
+  +status: enum
+  --
+  +RequestEnrollment()
+  +ApproveEnrollment()
+  +RejectEnrollment()
+  +RequestWithdrawal()
+  +ApproveWithdrawal()
+  +RejectWithdrawal()
+}
+
+class course_teacher {
+  +id: int
+  +course_id: int
+  +user_id: int
+  --
+  +AssignTeacher()
+  +RemoveTeacher()
+}
+
+class subject_teacher {
+  +id: int
+  +subject_id: int
+  +user_id: int
+  --
+  +AssignTeacher()
+  +RemoveTeacher()
+}
+
+User "1" -- "1" Student : has profile >
+Course "1" -- "*" Subject : has >
+Course "1" -- "*" Enrollment
+Student "1" -- "*" Enrollment
+Course "1" -- "*" course_teacher
+User "1" -- "*" course_teacher : teaches
+Subject "1" -- "*" subject_teacher
+User "1" -- "*" subject_teacher : teaches
+
+@enduml

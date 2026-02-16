@@ -1,0 +1,122 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 2 - Class Diagram (Grades, Fees, Assignments)
+
+class Student {
+  +id: int
+  +user_id: int
+  +student_no: string
+}
+
+class User {
+  +id: int
+  +name: string
+  +email: string
+  +role: enum
+}
+
+class Course {
+  +id: int
+  +course_code: string
+  +title: string
+}
+
+class Subject {
+  +id: int
+  +course_id: int
+  +subject_code: string
+  +title: string
+}
+
+class Grade {
+  +id: int
+  +subject_id: int
+  +course_id: int
+  +student_id: int
+  +graded_by: int
+  +reviewed_by: int
+  +score: decimal
+  +status: enum
+  --
+  +SubmitGrade()
+  +ApproveGrade()
+  +RejectGrade()
+  +GetLetterGrade()
+}
+
+class GradeReviewLog {
+  +id: int
+  +grade_id: int
+  +performed_by: int
+  +action: string
+  +reason: string
+  --
+  +LogAction()
+  +GetByGrade()
+}
+
+class Fee {
+  +id: int
+  +student_id: int
+  +amount: decimal
+  +description: string
+  +status: enum
+  +due_date: date
+  +paid_date: date
+  --
+  +CreateFee()
+  +UpdateFee()
+  +ApprovePayment()
+  +RejectPayment()
+  +GenerateReceipt()
+}
+
+class Assignment {
+  +id: int
+  +subject_id: int
+  +course_id: int
+  +created_by: int
+  +title: string
+  +due_date: date
+  +max_score: int
+  +status: enum
+  --
+  +CreateAssignment()
+  +UpdateAssignment()
+  +PublishAssignment()
+  +GetSubmissions()
+}
+
+class AssignmentSubmission {
+  +id: int
+  +assignment_id: int
+  +student_id: int
+  +file_path: string
+  +score: decimal
+  +feedback: string
+  +graded_by: int
+  +status: enum
+  --
+  +Submit()
+  +GradeSubmission()
+  +IsGraded()
+}
+
+' Relationships
+Course "1" -- "*" Subject
+Subject "1" -- "*" Grade
+Student "1" -- "*" Grade
+User "1" -- "*" Grade : graded_by / reviewed_by
+Grade "1" -- "*" GradeReviewLog
+
+Student "1" -- "*" Fee
+
+Subject "1" -- "*" Assignment
+Course "1" -- "*" Assignment
+User "1" -- "*" Assignment : created_by
+Assignment "1" -- "*" AssignmentSubmission
+Student "1" -- "*" AssignmentSubmission
+User "1" -- "*" AssignmentSubmission : graded_by
+
+@enduml
