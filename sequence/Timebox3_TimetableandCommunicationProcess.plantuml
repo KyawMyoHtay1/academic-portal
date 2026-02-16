@@ -1,0 +1,37 @@
+@startuml
+title Timebox 3 - Timetable and Communication Process
+
+actor Staff as "Staff/Admin"
+actor Teacher
+actor Student
+
+participant "Subject" as Subject
+participant "Timetable" as Timetable
+participant "Notification" as Notification
+
+' --- Staff creates or updates timetable ---
+
+Staff -> Subject: View subjects and courses
+Subject --> Staff: Show subject list
+
+Staff -> Timetable: Register / update timetable\n(subjectId, day, startTime, endTime, location)
+Timetable -> Timetable: Validate subject exists
+Timetable -> Timetable: Check schedule conflicts
+Timetable -> Timetable: Save timetable entry
+Timetable --> Staff: Confirm timetable saved
+
+' --- System communicates changes ---
+
+Timetable -> Notification: Send TimetableUpdated\n(to assigned teachers and enrolled students)
+Notification -> Teacher: Notify timetable updated
+Notification -> Student: Notify timetable updated
+
+' --- Users view timetable ---
+
+Teacher -> Timetable: View my timetable
+Timetable --> Teacher: Show week grid\nfor assigned subjects
+
+Student -> Timetable: View my timetable
+Timetable --> Student: Show week grid\nfor enrolled courses
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+title Timebox 1 - Student Registration Process
+
+actor Staff as "Staff/Admin"
+
+participant "User" as User
+participant "Student" as Student
+
+Staff -> User: Register user\n(name, email, password)
+User -> User: Validate fields\n& email uniqueness
+User -> User: Hash password
+User -> User: Assign role = student
+User --> Staff: Confirm user created\n(userId)
+
+Staff -> Student: Register student profile\n(userId, personal details)
+Student -> Student: Validate email/phone\nDOB, gender, status
+Student -> Student: Store photo & documents
+Student --> Staff: Confirm student registered\n(student_no)
+
+@enduml
