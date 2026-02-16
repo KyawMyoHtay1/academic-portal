@@ -159,6 +159,43 @@ class DashboardController extends Controller
                 ]],
             ];
 
+            // Extra chart data: Attendance status (doughnut)
+            $attendanceStatusCounts = Attendance::select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+            $chartsAttendanceStatus = [
+                'labels' => ['Present', 'Absent'],
+                'datasets' => [[
+                    'data' => [
+                        $attendanceStatusCounts['present'] ?? 0,
+                        $attendanceStatusCounts['absent'] ?? 0,
+                    ],
+                    'backgroundColor' => ['#10b981', '#ef4444'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
+            // Extra chart data: Enrollment status (doughnut)
+            $enrollmentStatusCounts = DB::table('course_student')
+                ->select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+            $chartsEnrollmentStatus = [
+                'labels' => ['Pending', 'Approved', 'Rejected', 'Withdrawal Pending'],
+                'datasets' => [[
+                    'data' => [
+                        $enrollmentStatusCounts['pending'] ?? 0,
+                        $enrollmentStatusCounts['approved'] ?? 0,
+                        $enrollmentStatusCounts['rejected'] ?? 0,
+                        $enrollmentStatusCounts['withdrawal_pending'] ?? 0,
+                    ],
+                    'backgroundColor' => ['#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
             return Inertia::render('Dashboard', [
                 'role' => 'staff',
                 'stats' => [
@@ -178,6 +215,8 @@ class DashboardController extends Controller
                     'enrollmentsByCourse' => $chartsEnrollmentsByCourse,
                     'feesCollectedLine' => $chartsFeesCollectedLine,
                     'gradeStatus' => $chartsGradeStatus,
+                    'attendanceStatus' => $chartsAttendanceStatus,
+                    'enrollmentStatus' => $chartsEnrollmentStatus,
                 ],
                 'alertSystemStatus' => $alertSystemStatus,
             ]);
@@ -297,6 +336,55 @@ class DashboardController extends Controller
                 ]],
             ];
 
+            // Extra chart data: Attendance status for my subjects (doughnut)
+            $teacherAttendanceStatusCounts = Attendance::whereIn('subject_id', $subjectIds)
+                ->select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+            $chartsAttendanceStatus = [
+                'labels' => ['Present', 'Absent'],
+                'datasets' => [[
+                    'data' => [
+                        $teacherAttendanceStatusCounts['present'] ?? 0,
+                        $teacherAttendanceStatusCounts['absent'] ?? 0,
+                    ],
+                    'backgroundColor' => ['#10b981', '#ef4444'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
+            // Extra chart data: Score distribution for approved grades (bar)
+            $scoreDistribution = Grade::whereIn('subject_id', $subjectIds)
+                ->where('status', Grade::STATUS_APPROVED)
+                ->whereNotNull('score')
+                ->selectRaw("
+                    SUM(CASE WHEN score >= 80 THEN 1 ELSE 0 END) as grade_a,
+                    SUM(CASE WHEN score >= 70 AND score < 80 THEN 1 ELSE 0 END) as grade_b,
+                    SUM(CASE WHEN score >= 60 AND score < 70 THEN 1 ELSE 0 END) as grade_c,
+                    SUM(CASE WHEN score >= 50 AND score < 60 THEN 1 ELSE 0 END) as grade_d,
+                    SUM(CASE WHEN score >= 40 AND score < 50 THEN 1 ELSE 0 END) as grade_e,
+                    SUM(CASE WHEN score < 40 THEN 1 ELSE 0 END) as grade_f
+                ")
+                ->first();
+            $chartsScoreDistribution = [
+                'labels' => ['A (80-100)', 'B (70-79)', 'C (60-69)', 'D (50-59)', 'E (40-49)', 'F (<40)'],
+                'datasets' => [[
+                    'label' => 'Grade entries',
+                    'data' => [
+                        (int) ($scoreDistribution?->grade_a ?? 0),
+                        (int) ($scoreDistribution?->grade_b ?? 0),
+                        (int) ($scoreDistribution?->grade_c ?? 0),
+                        (int) ($scoreDistribution?->grade_d ?? 0),
+                        (int) ($scoreDistribution?->grade_e ?? 0),
+                        (int) ($scoreDistribution?->grade_f ?? 0),
+                    ],
+                    'backgroundColor' => 'rgba(79, 70, 229, 0.7)',
+                    'borderColor' => '#4f46e5',
+                    'borderWidth' => 1,
+                ]],
+            ];
+
             return Inertia::render('Dashboard', [
                 'role' => 'teacher',
                 'stats' => [
@@ -312,6 +400,8 @@ class DashboardController extends Controller
                     'gradesBySubject' => $chartsGradesBySubject,
                     'attendanceLine' => $chartsAttendanceLine,
                     'assignmentsBySubject' => $chartsAssignmentsBySubject,
+                    'attendanceStatus' => $chartsAttendanceStatus,
+                    'scoreDistribution' => $chartsScoreDistribution,
                 ],
             ]);
         }
@@ -352,6 +442,8 @@ class DashboardController extends Controller
         $chartsGradesBySubject = ['labels' => [], 'datasets' => [['label' => 'Score', 'data' => [], 'backgroundColor' => 'rgba(139, 92, 246, 0.7)', 'borderColor' => '#8b5cf6', 'borderWidth' => 1]]];
         $chartsAttendanceLine = ['labels' => [], 'datasets' => [['label' => 'Attendance %', 'data' => [], 'borderColor' => '#06b6d4', 'backgroundColor' => 'rgba(6, 182, 212, 0.1)', 'fill' => true, 'tension' => 0.3]]];
         $chartsCourseEnrollment = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#3b82f6', '#f59e0b'], 'borderWidth' => 0]]];
+        $chartsAttendanceStatus = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#10b981', '#ef4444'], 'borderWidth' => 0]]];
+        $chartsGradeTrendLine = ['labels' => [], 'datasets' => [['label' => 'Avg score', 'data' => [], 'borderColor' => '#8b5cf6', 'backgroundColor' => 'rgba(139, 92, 246, 0.12)', 'fill' => true, 'tension' => 0.3]]];
 
         if ($student) {
             $feePendingCount = $student->fees()->where('status', 'pending')->count();
@@ -415,6 +507,44 @@ class DashboardController extends Controller
                     'borderWidth' => 0,
                 ]],
             ];
+
+            $chartsAttendanceStatus = [
+                'labels' => ['Present', 'Absent'],
+                'datasets' => [[
+                    'data' => [$attendancePresent, max($attendanceTotal - $attendancePresent, 0)],
+                    'backgroundColor' => ['#10b981', '#ef4444'],
+                    'borderWidth' => 0,
+                ]],
+            ];
+
+            $gradeTrendRows = Grade::where('student_id', $student->id)
+                ->where('status', Grade::STATUS_APPROVED)
+                ->whereNotNull('score')
+                ->where('created_at', '>=', Carbon::now()->subMonths(5)->startOfMonth())
+                ->selectRaw('YEAR(created_at) as y, MONTH(created_at) as m, ROUND(AVG(score), 1) as avg_score')
+                ->groupBy('y', 'm')
+                ->orderBy('y')
+                ->orderBy('m')
+                ->get();
+            $gradeTrendLabels = [];
+            $gradeTrendValues = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $d = Carbon::now()->subMonths($i);
+                $gradeTrendLabels[] = $d->format('M Y');
+                $found = $gradeTrendRows->first(fn ($r) => (int) $r->y === (int) $d->year && (int) $r->m === (int) $d->month);
+                $gradeTrendValues[] = $found ? (float) $found->avg_score : 0;
+            }
+            $chartsGradeTrendLine = [
+                'labels' => $gradeTrendLabels,
+                'datasets' => [[
+                    'label' => 'Avg score',
+                    'data' => $gradeTrendValues,
+                    'borderColor' => '#8b5cf6',
+                    'backgroundColor' => 'rgba(139, 92, 246, 0.12)',
+                    'fill' => true,
+                    'tension' => 0.3,
+                ]],
+            ];
         }
 
         return Inertia::render('Dashboard', [
@@ -433,8 +563,9 @@ class DashboardController extends Controller
                 'gradesBySubject' => $chartsGradesBySubject,
                 'attendanceLine' => $chartsAttendanceLine,
                 'courseEnrollment' => $chartsCourseEnrollment,
+                'attendanceStatus' => $chartsAttendanceStatus,
+                'gradeTrendLine' => $chartsGradeTrendLine,
             ],
         ]);
     }
 }
-

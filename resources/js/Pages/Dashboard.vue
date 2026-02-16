@@ -856,7 +856,9 @@ const quickActions = computed(() => {
                         hasChartData(charts.feeStatus) ||
                         hasChartData(charts.gradesBySubject) ||
                         hasChartData(charts.attendanceLine) ||
-                        hasChartData(charts.courseEnrollment)
+                        hasChartData(charts.courseEnrollment) ||
+                        hasChartData(charts.attendanceStatus) ||
+                        hasChartData(charts.gradeTrendLine)
                     "
                     class="space-y-6 rounded-2xl border border-blue-100 border-l-4 border-l-blue-500 bg-gradient-to-b from-blue-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
@@ -926,6 +928,38 @@ const quickActions = computed(() => {
                         :decimals="1"
                     />
                     </div>
+
+                    <details
+                        v-if="
+                            hasChartData(charts.attendanceStatus) ||
+                            hasChartData(charts.gradeTrendLine)
+                        "
+                        class="rounded-xl border border-blue-200/70 bg-white/90 p-4"
+                    >
+                        <summary
+                            class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-blue-700"
+                        >
+                            More analytics
+                        </summary>
+                        <div class="mt-4 grid gap-5 md:grid-cols-2">
+                            <DashboardChart
+                                v-if="hasChartData(charts.attendanceStatus)"
+                                type="doughnut"
+                                :chart-data="charts.attendanceStatus"
+                                title="Attendance status split"
+                                :variant="role"
+                            />
+                            <DashboardChart
+                                v-if="hasChartData(charts.gradeTrendLine)"
+                                type="line"
+                                :chart-data="charts.gradeTrendLine"
+                                title="Average score trend (last 6 months)"
+                                :y-max="100"
+                                :variant="role"
+                                :decimals="1"
+                            />
+                        </div>
+                    </details>
                 </div>
 
                 <!-- Middle row: notifications, grades, my courses -->
@@ -1469,7 +1503,9 @@ const quickActions = computed(() => {
                         hasChartData(charts.feeStatus) ||
                         hasChartData(charts.enrollmentsByCourse) ||
                         hasChartData(charts.feesCollectedLine) ||
-                        hasChartData(charts.gradeStatus)
+                        hasChartData(charts.gradeStatus) ||
+                        hasChartData(charts.attendanceStatus) ||
+                        hasChartData(charts.enrollmentStatus)
                     "
                     class="space-y-6 rounded-2xl border border-emerald-100 border-l-4 border-l-emerald-500 bg-gradient-to-b from-emerald-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
@@ -1536,6 +1572,36 @@ const quickActions = computed(() => {
                         value-format="currency"
                     />
                     </div>
+
+                    <details
+                        v-if="
+                            hasChartData(charts.attendanceStatus) ||
+                            hasChartData(charts.enrollmentStatus)
+                        "
+                        class="rounded-xl border border-emerald-200/70 bg-white/90 p-4"
+                    >
+                        <summary
+                            class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            More analytics
+                        </summary>
+                        <div class="mt-4 grid gap-5 md:grid-cols-2">
+                            <DashboardChart
+                                v-if="hasChartData(charts.attendanceStatus)"
+                                type="doughnut"
+                                :chart-data="charts.attendanceStatus"
+                                title="Attendance status split"
+                                :variant="role"
+                            />
+                            <DashboardChart
+                                v-if="hasChartData(charts.enrollmentStatus)"
+                                type="doughnut"
+                                :chart-data="charts.enrollmentStatus"
+                                title="Enrollment request status"
+                                :variant="role"
+                            />
+                        </div>
+                    </details>
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">
@@ -2216,7 +2282,9 @@ const quickActions = computed(() => {
                         hasChartData(charts.gradeStatus) ||
                         hasChartData(charts.gradesBySubject) ||
                         hasChartData(charts.attendanceLine) ||
-                        hasChartData(charts.assignmentsBySubject)
+                        hasChartData(charts.assignmentsBySubject) ||
+                        hasChartData(charts.attendanceStatus) ||
+                        hasChartData(charts.scoreDistribution)
                     "
                     class="space-y-6 rounded-2xl border border-indigo-100 border-l-4 border-l-indigo-500 bg-gradient-to-b from-indigo-50/50 to-white p-6 shadow-sm ring-1 ring-slate-900/5"
                 >
@@ -2285,6 +2353,36 @@ const quickActions = computed(() => {
                         :variant="role"
                     />
                     </div>
+
+                    <details
+                        v-if="
+                            hasChartData(charts.attendanceStatus) ||
+                            hasChartData(charts.scoreDistribution)
+                        "
+                        class="rounded-xl border border-indigo-200/70 bg-white/90 p-4"
+                    >
+                        <summary
+                            class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                        >
+                            More analytics
+                        </summary>
+                        <div class="mt-4 grid gap-5 md:grid-cols-2">
+                            <DashboardChart
+                                v-if="hasChartData(charts.attendanceStatus)"
+                                type="doughnut"
+                                :chart-data="charts.attendanceStatus"
+                                title="Attendance status split"
+                                :variant="role"
+                            />
+                            <DashboardChart
+                                v-if="hasChartData(charts.scoreDistribution)"
+                                type="bar"
+                                :chart-data="charts.scoreDistribution"
+                                title="Score distribution (approved grades)"
+                                :variant="role"
+                            />
+                        </div>
+                    </details>
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">
