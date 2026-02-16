@@ -15,7 +15,7 @@ class StaffAnnouncementController extends Controller
     {
         $announcements = Announcement::with('author')
             ->orderByDesc('pinned')
-            ->orderByRaw("FIELD(priority,'urgent','important','info')")
+            ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'important' THEN 2 WHEN 'info' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($a) {
