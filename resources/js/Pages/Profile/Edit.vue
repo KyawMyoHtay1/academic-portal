@@ -131,7 +131,7 @@ const formattedLastLogin = computed(() => {
                             </p>
                         </div>
                     </div>
-                    <div class="text-xs text-slate-500 sm:text-right space-y-2">
+                        <div class="text-xs text-slate-500 sm:text-right space-y-2">
                         <div>
                             <p class="font-semibold text-slate-600">
                                 Portal access
@@ -141,7 +141,7 @@ const formattedLastLogin = computed(() => {
                             </p>
                         </div>
                         <div
-                            class="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3"
+                            class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3"
                         >
                             <div v-if="formattedCreatedAt">
                                 <p class="font-semibold text-slate-500">
