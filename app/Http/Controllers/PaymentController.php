@@ -7,6 +7,7 @@ use App\Notifications\FeeStatusUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -213,7 +214,7 @@ class PaymentController extends Controller
     private function handlePaymentSuccess($paymentIntent): void
     {
         $feeId = $paymentIntent->metadata->fee_id ?? null;
-        
+
         if (!$feeId) {
             Log::warning('Payment Intent missing fee_id metadata', ['payment_intent_id' => $paymentIntent->id]);
             return;
@@ -225,23 +226,52 @@ class PaymentController extends Controller
             return;
         }
 
-        // Update fee status
-        $fee->update([
-            'status' => 'paid',
-            'paid_date' => now(),
-            'payment_method' => $paymentIntent->payment_method_types[0] ?? 'card',
-            'payment_processed_at' => now(),
-        ]);
+        $paymentIntentId = $paymentIntent->id ?? null;
 
-        // Notify student
-        if ($fee->student && $fee->student->user) {
-            $fee->student->user->notify(new FeeStatusUpdated($fee));
-        }
+        DB::transaction(function () use ($fee, $paymentIntent, $paymentIntentId): void {
+            // Reload latest state inside the transaction
+            $fee->refresh();
 
-        Log::info('Payment processed successfully via webhook', [
-            'fee_id' => $fee->id,
-            'payment_intent_id' => $paymentIntent->id,
-        ]);
+            // Idempotency guard: if already paid, do nothing
+            if ($fee->status === 'paid') {
+                Log::info('Payment already processed, skipping duplicate success handler', [
+                    'fee_id' => $fee->id,
+                    'payment_intent_id' => $paymentIntentId,
+                ]);
+
+                return;
+            }
+
+            // Safety guard: if a different intent is already linked, don't overwrite
+            if ($fee->payment_intent_id && $fee->payment_intent_id !== $paymentIntentId) {
+                Log::warning('Payment intent mismatch on success handler, aborting update', [
+                    'fee_id' => $fee->id,
+                    'existing_payment_intent_id' => $fee->payment_intent_id,
+                    'incoming_payment_intent_id' => $paymentIntentId,
+                ]);
+
+                return;
+            }
+
+            // Update fee status atomically
+            $fee->update([
+                'status' => 'paid',
+                'paid_date' => now(),
+                'payment_method' => $paymentIntent->payment_method_types[0] ?? 'card',
+                'payment_processed_at' => now(),
+                'payment_intent_id' => $paymentIntentId,
+            ]);
+
+            Log::info('Payment processed successfully via webhook', [
+                'fee_id' => $fee->id,
+                'payment_intent_id' => $paymentIntentId,
+            ]);
+
+            // Notify student
+            if ($fee->student && $fee->student->user) {
+                $fee->student->user->notify(new FeeStatusUpdated($fee));
+            }
+        });
     }
 
     /**
