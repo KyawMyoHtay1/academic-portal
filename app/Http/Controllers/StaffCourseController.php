@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Courses\StoreCourseRequest;
+use App\Http\Requests\Staff\Courses\UpdateCourseRequest;
 use App\Models\Course;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -44,15 +45,9 @@ class StaffCourseController extends Controller
     /**
      * Store a newly created course.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreCourseRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'course_code' => ['required', 'string', 'max:50', 'unique:courses,course_code'],
-            'title' => ['required', 'string', 'max:255'],
-            'credits' => ['required', 'integer', 'min:1', 'max:10'],
-            'semester' => ['required', 'string', 'max:50'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('photo')) {
             $data['photo'] = ImageService::store($request->file('photo'), 'courses');
@@ -87,15 +82,9 @@ class StaffCourseController extends Controller
     /**
      * Update the specified course.
      */
-    public function update(Request $request, Course $course): RedirectResponse
+    public function update(UpdateCourseRequest $request, Course $course): RedirectResponse
     {
-        $data = $request->validate([
-            'course_code' => ['required', 'string', 'max:50', 'unique:courses,course_code,'.$course->id],
-            'title' => ['required', 'string', 'max:255'],
-            'credits' => ['required', 'integer', 'min:1', 'max:10'],
-            'semester' => ['required', 'string', 'max:50'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('photo')) {
             // Delete old photo if it exists

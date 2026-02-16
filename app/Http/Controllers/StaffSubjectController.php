@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Subjects\StoreSubjectRequest;
+use App\Http\Requests\Staff\Subjects\UpdateSubjectRequest;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -73,16 +74,9 @@ class StaffSubjectController extends Controller
     /**
      * Store a newly created subject.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreSubjectRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'course_id' => ['required', 'exists:courses,id'],
-            'subject_code' => ['required', 'string', 'max:50', 'unique:subjects,subject_code'],
-            'title' => ['required', 'string', 'max:255'],
-            'credits' => ['nullable', 'integer', 'min:1', 'max:10'],
-            'description' => ['nullable', 'string'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('photo')) {
             $data['photo'] = ImageService::store($request->file('photo'), 'subjects');
@@ -122,16 +116,9 @@ class StaffSubjectController extends Controller
     /**
      * Update the specified subject.
      */
-    public function update(Request $request, Subject $subject): RedirectResponse
+    public function update(UpdateSubjectRequest $request, Subject $subject): RedirectResponse
     {
-        $data = $request->validate([
-            'course_id' => ['required', 'exists:courses,id'],
-            'subject_code' => ['required', 'string', 'max:50', 'unique:subjects,subject_code,'.$subject->id],
-            'title' => ['required', 'string', 'max:255'],
-            'credits' => ['nullable', 'integer', 'min:1', 'max:10'],
-            'description' => ['nullable', 'string'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('photo')) {
             // Delete old photo if it exists

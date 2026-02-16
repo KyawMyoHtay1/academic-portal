@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Teacher\Attendance\StoreAttendanceRequest;
 use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\AttendanceAlert;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -118,7 +118,7 @@ class TeacherAttendanceController extends Controller
     /**
      * Store attendance records for a subject.
      */
-    public function store(Request $request, Subject $subject): RedirectResponse
+    public function store(StoreAttendanceRequest $request, Subject $subject): RedirectResponse
     {
         $user = Auth::user();
 
@@ -127,12 +127,7 @@ class TeacherAttendanceController extends Controller
             abort(403, 'You are not assigned to this subject.');
         }
 
-        $data = $request->validate([
-            'date' => ['required', 'date'],
-            'attendance' => ['required', 'array'],
-            'attendance.*.student_id' => ['required', 'exists:students,id'],
-            'attendance.*.status' => ['required', 'in:present,absent'],
-        ]);
+        $data = $request->validated();
 
         // Verify all students are enrolled in the subject's course
         $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();

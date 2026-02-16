@@ -2,30 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Public\StoreFeedbackMessageRequest;
 use App\Models\FeedbackMessage;
 use App\Services\RecaptchaService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
 {
     /**
      * Store feedback form message.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreFeedbackMessageRequest $request): RedirectResponse
     {
-        $rules = [
-            'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'email', 'max:255'],
-            'type' => ['required', 'string', 'max:50'],
-            'message' => ['required', 'string', 'max:5000'],
-        ];
-
-        if (config('recaptcha.site_key')) {
-            $rules['recaptcha_token'] = ['required', 'string'];
-        }
-
-        $validated = $request->validate($rules);
+        $validated = $request->validated();
 
         if (config('recaptcha.site_key') && isset($validated['recaptcha_token'])) {
             /** @var RecaptchaService $recaptcha */

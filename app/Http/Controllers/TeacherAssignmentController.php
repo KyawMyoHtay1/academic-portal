@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Teacher\Assignments\GradeSubmissionRequest;
+use App\Http\Requests\Teacher\Assignments\StoreAssignmentRequest;
+use App\Http\Requests\Teacher\Assignments\UpdateAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -144,7 +146,7 @@ class TeacherAssignmentController extends Controller
     /**
      * Store a new assignment.
      */
-    public function store(Request $request, Subject $subject): RedirectResponse
+    public function store(StoreAssignmentRequest $request, Subject $subject): RedirectResponse
     {
         $user = Auth::user();
 
@@ -152,17 +154,7 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You are not assigned to this subject.');
         }
 
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'due_date' => ['required', 'date', 'after_or_equal:today'],
-            'due_time' => ['nullable', 'date_format:H:i'],
-            'max_score' => ['required', 'integer', 'min:1', 'max:1000'],
-            'status' => ['required', 'in:draft,published,closed'],
-            'allowed_file_types' => ['nullable', 'array'],
-            'allowed_file_types.*' => ['string', 'in:pdf,doc,docx,txt,zip,rar'],
-            'max_file_size' => ['nullable', 'integer', 'min:1', 'max:10240'], // Max 10MB in KB
-        ]);
+        $data = $request->validated();
 
         Assignment::create([
             ...$data,
@@ -211,7 +203,7 @@ class TeacherAssignmentController extends Controller
     /**
      * Update an assignment.
      */
-    public function update(Request $request, Assignment $assignment): RedirectResponse
+    public function update(UpdateAssignmentRequest $request, Assignment $assignment): RedirectResponse
     {
         $user = Auth::user();
 
@@ -219,17 +211,7 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You can only update your own assignments.');
         }
 
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'due_date' => ['required', 'date'],
-            'due_time' => ['nullable', 'date_format:H:i'],
-            'max_score' => ['required', 'integer', 'min:1', 'max:1000'],
-            'status' => ['required', 'in:draft,published,closed'],
-            'allowed_file_types' => ['nullable', 'array'],
-            'allowed_file_types.*' => ['string', 'in:pdf,doc,docx,txt,zip,rar'],
-            'max_file_size' => ['nullable', 'integer', 'min:1', 'max:10240'],
-        ]);
+        $data = $request->validated();
 
         $assignment->update($data);
 
@@ -338,7 +320,7 @@ class TeacherAssignmentController extends Controller
     /**
      * Grade a submission.
      */
-    public function grade(Request $request, AssignmentSubmission $submission): RedirectResponse
+    public function grade(GradeSubmissionRequest $request, AssignmentSubmission $submission): RedirectResponse
     {
         $user = Auth::user();
 
@@ -346,10 +328,7 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You can only grade submissions for your own assignments.');
         }
 
-        $data = $request->validate([
-            'score' => ['required', 'numeric', 'min:0'],
-            'feedback' => ['nullable', 'string', 'max:5000'],
-        ]);
+        $data = $request->validated();
 
         // Ensure score doesn't exceed max_score
         $maxScore = $submission->assignment->max_score;

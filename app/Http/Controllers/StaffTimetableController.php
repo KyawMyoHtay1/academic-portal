@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Timetables\StoreTimetableRequest;
+use App\Http\Requests\Staff\Timetables\UpdateTimetableRequest;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\Timetable;
 use App\Notifications\TimetableUpdated;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -76,15 +77,9 @@ class StaffTimetableController extends Controller
     /**
      * Store a newly created timetable entry.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreTimetableRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'subject_id' => ['required', 'exists:subjects,id'],
-            'day_of_week' => ['required', 'string', 'max:255'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-            'location' => ['nullable', 'string', 'max:255'],
-        ]);
+        $data = $request->validated();
 
         $subject = Subject::findOrFail($data['subject_id']);
 
@@ -172,15 +167,9 @@ class StaffTimetableController extends Controller
     /**
      * Update the specified timetable entry.
      */
-    public function update(Request $request, Timetable $timetable): RedirectResponse
+    public function update(UpdateTimetableRequest $request, Timetable $timetable): RedirectResponse
     {
-        $data = $request->validate([
-            'subject_id' => ['required', 'exists:subjects,id'],
-            'day_of_week' => ['required', 'string', 'max:255'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-            'location' => ['nullable', 'string', 'max:255'],
-        ]);
+        $data = $request->validated();
 
         $subject = Subject::findOrFail($data['subject_id']);
 

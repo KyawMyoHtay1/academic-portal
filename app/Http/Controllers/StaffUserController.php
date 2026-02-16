@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Users\StoreUserRequest;
+use App\Http\Requests\Staff\Users\UpdateUserRequest;
 use App\Models\User;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -99,14 +100,9 @@ class StaffUserController extends Controller
     /**
      * Store a newly created user.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['required', 'in:student,teacher,staff'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         // Simple initial password for demonstration; in a real system you would trigger a reset.
         $password = 'Password123!';
@@ -132,14 +128,9 @@ class StaffUserController extends Controller
     /**
      * Update the specified user.
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'role' => ['required', 'in:student,teacher,staff'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('photo')) {
             // Delete old photo if it exists

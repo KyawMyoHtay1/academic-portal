@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Settings\UpdateSettingsRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,13 +38,9 @@ class SettingsController extends Controller
     /**
      * Update the user's settings/preferences.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateSettingsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'email_announcements' => ['sometimes', 'boolean'],
-            'email_messages' => ['sometimes', 'boolean'],
-            'email_notifications' => ['sometimes', 'boolean'],
-        ]);
+        $validated = $request->validated();
 
         $user = Auth::user();
         $preferences = array_merge(self::DEFAULTS, $user->preferences ?? [], $validated);

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Announcements\UpsertAnnouncementRequest;
 use App\Models\Announcement;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -52,20 +52,9 @@ class TeacherAnnouncementController extends Controller
         return Inertia::render('Teacher/Announcements/Create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(UpsertAnnouncementRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'body' => ['required', 'string'],
-            'priority' => ['required', 'in:info,important,urgent'],
-            'pinned' => ['nullable', 'boolean'],
-            'require_ack' => ['nullable', 'boolean'],
-            'audience' => ['nullable', 'array'],
-            'audience.roles' => ['nullable', 'array'],
-            'audience.roles.*' => ['in:all,student,teacher,staff'],
-            'publish_at' => ['nullable', 'date'],
-            'expires_at' => ['nullable', 'date', 'after:publish_at'],
-        ]);
+        $data = $request->validated();
 
         Announcement::create([
             ...$data,
@@ -101,24 +90,13 @@ class TeacherAnnouncementController extends Controller
         ]);
     }
 
-    public function update(Request $request, Announcement $announcement): RedirectResponse
+    public function update(UpsertAnnouncementRequest $request, Announcement $announcement): RedirectResponse
     {
         if ($announcement->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'body' => ['required', 'string'],
-            'priority' => ['required', 'in:info,important,urgent'],
-            'pinned' => ['nullable', 'boolean'],
-            'require_ack' => ['nullable', 'boolean'],
-            'audience' => ['nullable', 'array'],
-            'audience.roles' => ['nullable', 'array'],
-            'audience.roles.*' => ['in:all,student,teacher,staff'],
-            'publish_at' => ['nullable', 'date'],
-            'expires_at' => ['nullable', 'date', 'after:publish_at'],
-        ]);
+        $data = $request->validated();
 
         $announcement->update([
             ...$data,

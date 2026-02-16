@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Subjects\UpdateSubjectTeachersRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -43,12 +43,9 @@ class StaffSubjectTeacherController extends Controller
     /**
      * Update teacher assignments for a subject.
      */
-    public function update(Request $request, Subject $subject): RedirectResponse
+    public function update(UpdateSubjectTeachersRequest $request, Subject $subject): RedirectResponse
     {
-        $data = $request->validate([
-            'teacher_ids' => ['required', 'array'],
-            'teacher_ids.*' => ['exists:users,id'],
-        ]);
+        $data = $request->validated();
 
         // Sync teachers (this will add/remove as needed)
         $subject->teachers()->sync($data['teacher_ids']);

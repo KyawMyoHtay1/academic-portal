@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Courses\UpdateCourseTeachersRequest;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,12 +38,9 @@ class StaffCourseTeacherController extends Controller
     /**
      * Update teacher assignments for a course.
      */
-    public function update(Request $request, Course $course): RedirectResponse
+    public function update(UpdateCourseTeachersRequest $request, Course $course): RedirectResponse
     {
-        $data = $request->validate([
-            'teacher_ids' => ['required', 'array'],
-            'teacher_ids.*' => ['exists:users,id'],
-        ]);
+        $data = $request->validated();
 
         // Sync teachers (this will add/remove as needed)
         $course->teachers()->sync($data['teacher_ids']);

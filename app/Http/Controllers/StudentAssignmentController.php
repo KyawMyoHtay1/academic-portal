@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Student\Assignments\SubmitAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -155,7 +155,7 @@ class StudentAssignmentController extends Controller
     /**
      * Submit an assignment.
      */
-    public function submit(Request $request, Assignment $assignment): RedirectResponse
+    public function submit(SubmitAssignmentRequest $request, Assignment $assignment): RedirectResponse
     {
         $user = Auth::user();
         $student = $user->student;
@@ -184,10 +184,7 @@ class StudentAssignmentController extends Controller
             ->where('student_id', $student->id)
             ->first();
 
-        $data = $request->validate([
-            'file' => ['required', 'file'],
-            'comments' => ['nullable', 'string', 'max:2000'],
-        ]);
+        $data = $request->validated();
 
         $file = $request->file('file');
         $extension = strtolower($file->getClientOriginalExtension());
