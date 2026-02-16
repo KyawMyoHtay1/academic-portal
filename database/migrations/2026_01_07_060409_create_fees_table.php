@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
             $table->string('description')->nullable();
-            $table->enum('status', ['pending', 'paid'])->default('pending');
+            $table->enum('status', ['pending', 'payment_pending', 'paid'])->default('pending');
             $table->date('due_date');
             $table->date('paid_date')->nullable();
             $table->timestamps();

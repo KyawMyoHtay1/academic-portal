@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fee;
+use App\Models\StripeWebhookEvent;
 use App\Notifications\FeeStatusUpdated;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -184,26 +186,69 @@ class PaymentController extends Controller
             return response('Webhook signature verification failed', 400);
         }
 
-        // Handle the event
-        switch ($event->type) {
-            case 'checkout.session.completed':
-                $session = $event->data->object;
-                $this->handleCheckoutCompleted($session);
-                break;
-
-            case 'payment_intent.succeeded':
-                $paymentIntent = $event->data->object;
-                $this->handlePaymentSuccess($paymentIntent);
-                break;
-
-            case 'payment_intent.payment_failed':
-                $paymentIntent = $event->data->object;
-                $this->handlePaymentFailure($paymentIntent);
-                break;
-
-            default:
-                Log::info('Unhandled Stripe webhook event: ' . $event->type);
+        $eventId = $event->id ?? null;
+        if (!$eventId) {
+            Log::warning('Stripe webhook payload missing event id');
+            return response('Webhook event id missing', 400);
         }
+
+        try {
+            $webhookEvent = StripeWebhookEvent::create([
+                'event_id' => $eventId,
+                'event_type' => $event->type,
+                'payload' => json_decode($payload, true),
+            ]);
+        } catch (QueryException $e) {
+            $message = strtolower($e->getMessage());
+
+            if ((string) $e->getCode() === '23000' || str_contains($message, 'unique')) {
+                Log::info('Duplicate Stripe webhook event ignored', [
+                    'event_id' => $eventId,
+                    'event_type' => $event->type,
+                ]);
+
+                return response('Webhook already processed', 200);
+            }
+
+            throw $e;
+        }
+
+        try {
+            DB::transaction(function () use ($event) {
+                // Handle the event
+                switch ($event->type) {
+                    case 'checkout.session.completed':
+                        $session = $event->data->object;
+                        $this->handleCheckoutCompleted($session);
+                        break;
+
+                    case 'payment_intent.succeeded':
+                        $paymentIntent = $event->data->object;
+                        $this->handlePaymentSuccess($paymentIntent);
+                        break;
+
+                    case 'payment_intent.payment_failed':
+                        $paymentIntent = $event->data->object;
+                        $this->handlePaymentFailure($paymentIntent);
+                        break;
+
+                    default:
+                        Log::info('Unhandled Stripe webhook event', [
+                            'event_type' => $event->type,
+                        ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::error('Stripe webhook processing failed', [
+                'event_id' => $eventId,
+                'event_type' => $event->type,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response('Webhook processing failed', 500);
+        }
+
+        $webhookEvent->update(['processed_at' => now()]);
 
         return response('Webhook received', 200);
     }
@@ -220,29 +265,21 @@ class PaymentController extends Controller
             return;
         }
 
-        $fee = Fee::find($feeId);
-        if (!$fee) {
-            Log::warning('Fee not found for payment', ['fee_id' => $feeId, 'payment_intent_id' => $paymentIntent->id]);
-            return;
-        }
-
         $paymentIntentId = $paymentIntent->id ?? null;
 
-        DB::transaction(function () use ($fee, $paymentIntent, $paymentIntentId): void {
-            // Reload latest state inside the transaction
-            $fee->refresh();
+        $result = DB::transaction(function () use ($feeId, $paymentIntent, $paymentIntentId) {
+            $fee = Fee::query()->lockForUpdate()->find($feeId);
 
-            // Idempotency guard: if already paid, do nothing
-            if ($fee->status === 'paid') {
-                Log::info('Payment already processed, skipping duplicate success handler', [
-                    'fee_id' => $fee->id,
+            if (!$fee) {
+                Log::warning('Fee not found for payment', [
+                    'fee_id' => $feeId,
                     'payment_intent_id' => $paymentIntentId,
                 ]);
 
-                return;
+                return null;
             }
 
-            // Safety guard: if a different intent is already linked, don't overwrite
+            // Safety guard: if a different intent is already linked, do not overwrite.
             if ($fee->payment_intent_id && $fee->payment_intent_id !== $paymentIntentId) {
                 Log::warning('Payment intent mismatch on success handler, aborting update', [
                     'fee_id' => $fee->id,
@@ -250,10 +287,17 @@ class PaymentController extends Controller
                     'incoming_payment_intent_id' => $paymentIntentId,
                 ]);
 
-                return;
+                return null;
             }
 
-            // Update fee status atomically
+            // Idempotency guard: if already paid, no further changes or notifications.
+            if ($fee->status === 'paid') {
+                return [
+                    'newly_paid' => false,
+                    'fee' => $fee->fresh(['student.user']),
+                ];
+            }
+
             $fee->update([
                 'status' => 'paid',
                 'paid_date' => now(),
@@ -262,16 +306,36 @@ class PaymentController extends Controller
                 'payment_intent_id' => $paymentIntentId,
             ]);
 
-            Log::info('Payment processed successfully via webhook', [
+            return [
+                'newly_paid' => true,
+                'fee' => $fee->fresh(['student.user']),
+            ];
+        });
+
+        if (!$result) {
+            return;
+        }
+
+        /** @var \App\Models\Fee $fee */
+        $fee = $result['fee'];
+
+        if (!$result['newly_paid']) {
+            Log::info('Payment already processed, skipping duplicate success handler', [
                 'fee_id' => $fee->id,
                 'payment_intent_id' => $paymentIntentId,
             ]);
 
-            // Notify student
-            if ($fee->student && $fee->student->user) {
-                $fee->student->user->notify(new FeeStatusUpdated($fee));
-            }
-        });
+            return;
+        }
+
+        if ($fee->student?->user) {
+            $fee->student->user->notify(new FeeStatusUpdated($fee));
+        }
+
+        Log::info('Payment processed successfully via webhook', [
+            'fee_id' => $fee->id,
+            'payment_intent_id' => $paymentIntentId,
+        ]);
     }
 
     /**
@@ -285,15 +349,38 @@ class PaymentController extends Controller
             return;
         }
 
-        $fee = Fee::find($feeId);
-        if ($fee && $fee->status === 'payment_pending') {
+        $updated = DB::transaction(function () use ($feeId, $paymentIntent) {
+            $fee = Fee::query()->lockForUpdate()->find($feeId);
+
+            if (!$fee || $fee->status === 'paid') {
+                return false;
+            }
+
+            if ($fee->payment_intent_id && $fee->payment_intent_id !== $paymentIntent->id) {
+                Log::warning('Payment failure webhook ignored due to payment intent mismatch', [
+                    'fee_id' => $fee->id,
+                    'stored_payment_intent_id' => $fee->payment_intent_id,
+                    'incoming_payment_intent_id' => $paymentIntent->id,
+                ]);
+
+                return false;
+            }
+
+            if ($fee->status !== 'payment_pending') {
+                return false;
+            }
+
             $fee->update([
                 'status' => 'pending',
                 'payment_intent_id' => null,
             ]);
 
+            return true;
+        });
+
+        if ($updated) {
             Log::info('Payment failed via webhook', [
-                'fee_id' => $fee->id,
+                'fee_id' => $feeId,
                 'payment_intent_id' => $paymentIntent->id,
             ]);
         }

@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('course_student', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending')->after('student_id');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'withdrawal_pending'])->default('pending')->after('student_id');
         });
 
         // Set all existing enrollments to 'approved'

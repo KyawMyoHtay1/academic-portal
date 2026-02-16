@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         // Modify the enum to include withdrawal_pending
         DB::statement("ALTER TABLE course_student MODIFY COLUMN status ENUM('pending', 'approved', 'rejected', 'withdrawal_pending') DEFAULT 'pending'");
     }
@@ -21,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         // Revert to original enum values
         // First, update any withdrawal_pending to approved
         DB::table('course_student')
