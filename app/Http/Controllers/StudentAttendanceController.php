@@ -45,6 +45,9 @@ class StudentAttendanceController extends Controller
 
         // Attendance by course
         $attendanceByCourse = $student->courses()
+            ->whereHas('attendances', function ($query) use ($student) {
+                $query->where('student_id', $student->id);
+            })
             ->withCount([
                 'attendances as total_attendances' => function ($query) use ($student) {
                     $query->where('student_id', $student->id);
@@ -54,7 +57,6 @@ class StudentAttendanceController extends Controller
                         ->where('status', 'present');
                 },
             ])
-            ->having('total_attendances', '>', 0)
             ->orderBy('course_code')
             ->get()
             ->map(function ($course) {
@@ -79,15 +81,14 @@ class StudentAttendanceController extends Controller
         })
             ->with('course')
             ->withCount([
-            'attendances as total_attendances' => function ($query) use ($student) {
-                $query->where('student_id', $student->id);
-            },
-            'attendances as present_attendances' => function ($query) use ($student) {
-                $query->where('student_id', $student->id)
-                    ->where('status', 'present');
-            },
-        ])
-            ->having('total_attendances', '>', 0)
+                'attendances as total_attendances' => function ($query) use ($student) {
+                    $query->where('student_id', $student->id);
+                },
+                'attendances as present_attendances' => function ($query) use ($student) {
+                    $query->where('student_id', $student->id)
+                        ->where('status', 'present');
+                },
+            ])
             ->orderBy('subject_code')
             ->get()
             ->map(function ($subject) {
