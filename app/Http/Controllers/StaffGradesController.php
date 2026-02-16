@@ -118,12 +118,7 @@ class StaffGradesController extends Controller
             return back()->with('info', 'Grade is not pending review.');
         }
 
-        $grade->update([
-            'status' => Grade::STATUS_APPROVED,
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-            'rejection_reason' => null,
-        ]);
+        $grade->approve(Auth::id());
 
         GradeReviewLog::create([
             'grade_id' => $grade->id,
@@ -158,12 +153,7 @@ class StaffGradesController extends Controller
             return back()->with('info', 'Grade is not pending review.');
         }
 
-        $grade->update([
-            'status' => Grade::STATUS_REJECTED,
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-            'rejection_reason' => $data['reason'] ?? null,
-        ]);
+        $grade->reject(Auth::id(), $data['reason'] ?? null);
 
         GradeReviewLog::create([
             'grade_id' => $grade->id,

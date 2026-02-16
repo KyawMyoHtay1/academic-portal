@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+
+echo "Running pre-commit checks..."
+
+composer check
+npm run check:frontend
+
+echo "Pre-commit checks passed."

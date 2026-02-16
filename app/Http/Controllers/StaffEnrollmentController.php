@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
-use App\Models\Student;
+use App\Services\EnrollmentService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class StaffEnrollmentController extends Controller
 {
+    public function __construct(private readonly EnrollmentService $enrollmentService) {}
+
     /**
      * Display a listing of pending enrollments and withdrawal requests.
      */
@@ -74,114 +74,48 @@ class StaffEnrollmentController extends Controller
     /**
      * Approve a pending enrollment.
      */
-    public function approve(Request $request, $enrollment): RedirectResponse
+    public function approve($enrollment): RedirectResponse
     {
-        $enrollmentRecord = DB::table('course_student')
-            ->where('id', $enrollment)
-            ->where('course_student.status', 'pending')
-            ->first();
-
-        if (! $enrollmentRecord) {
-            return redirect()
-                ->route('admin.enrollments.index')
-                ->with('error', 'Enrollment not found or already processed.');
-        }
-
-        DB::table('course_student')
-            ->where('id', $enrollment)
-            ->update(['status' => 'approved']);
-
-        $course = Course::find($enrollmentRecord->course_id);
-        $student = Student::find($enrollmentRecord->student_id);
+        $result = $this->enrollmentService->approveEnrollment($enrollment);
 
         return redirect()
             ->route('admin.enrollments.index')
-            ->with('success', "Enrollment approved for {$student->full_name} in {$course->course_code}.");
+            ->with($result['level'], $result['message']);
     }
 
     /**
      * Reject a pending enrollment.
      */
-    public function reject(Request $request, $enrollment): RedirectResponse
+    public function reject($enrollment): RedirectResponse
     {
-        $enrollmentRecord = DB::table('course_student')
-            ->where('id', $enrollment)
-            ->where('course_student.status', 'pending')
-            ->first();
-
-        if (! $enrollmentRecord) {
-            return redirect()
-                ->route('admin.enrollments.index')
-                ->with('error', 'Enrollment not found or already processed.');
-        }
-
-        DB::table('course_student')
-            ->where('id', $enrollment)
-            ->update(['status' => 'rejected']);
-
-        $course = Course::find($enrollmentRecord->course_id);
-        $student = Student::find($enrollmentRecord->student_id);
+        $result = $this->enrollmentService->rejectEnrollment($enrollment);
 
         return redirect()
             ->route('admin.enrollments.index')
-            ->with('success', "Enrollment rejected for {$student->full_name} in {$course->course_code}.");
+            ->with($result['level'], $result['message']);
     }
 
     /**
      * Approve a withdrawal request (removes the enrollment).
      */
-    public function approveWithdrawal(Request $request, $enrollment): RedirectResponse
+    public function approveWithdrawal($enrollment): RedirectResponse
     {
-        $enrollmentRecord = DB::table('course_student')
-            ->where('id', $enrollment)
-            ->where('course_student.status', 'withdrawal_pending')
-            ->first();
-
-        if (! $enrollmentRecord) {
-            return redirect()
-                ->route('admin.enrollments.index')
-                ->with('error', 'Withdrawal request not found or already processed.');
-        }
-
-        $course = Course::find($enrollmentRecord->course_id);
-        $student = Student::find($enrollmentRecord->student_id);
-
-        // Remove the enrollment
-        DB::table('course_student')
-            ->where('id', $enrollment)
-            ->delete();
+        $result = $this->enrollmentService->approveWithdrawal($enrollment);
 
         return redirect()
             ->route('admin.enrollments.index')
-            ->with('success', "Withdrawal approved for {$student->full_name} from {$course->course_code}.");
+            ->with($result['level'], $result['message']);
     }
 
     /**
      * Reject a withdrawal request (keeps the enrollment as approved).
      */
-    public function rejectWithdrawal(Request $request, $enrollment): RedirectResponse
+    public function rejectWithdrawal($enrollment): RedirectResponse
     {
-        $enrollmentRecord = DB::table('course_student')
-            ->where('id', $enrollment)
-            ->where('course_student.status', 'withdrawal_pending')
-            ->first();
-
-        if (! $enrollmentRecord) {
-            return redirect()
-                ->route('admin.enrollments.index')
-                ->with('error', 'Withdrawal request not found or already processed.');
-        }
-
-        // Revert to approved status
-        DB::table('course_student')
-            ->where('id', $enrollment)
-            ->update(['status' => 'approved']);
-
-        $course = Course::find($enrollmentRecord->course_id);
-        $student = Student::find($enrollmentRecord->student_id);
+        $result = $this->enrollmentService->rejectWithdrawal($enrollment);
 
         return redirect()
             ->route('admin.enrollments.index')
-            ->with('success', "Withdrawal rejected for {$student->full_name} from {$course->course_code}. Student remains enrolled.");
+            ->with($result['level'], $result['message']);
     }
 }

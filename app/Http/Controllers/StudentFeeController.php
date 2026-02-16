@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StudentFeeResource;
 use App\Models\Fee;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,28 +32,19 @@ class StudentFeeController extends Controller
             ]);
         }
 
-        $fees = Fee::where('student_id', $student->id)
-            ->orderBy('due_date', 'desc')
-            ->get([
-                'id',
-                'amount',
-                'description',
-                'status',
-                'due_date',
-                'paid_date',
-                'created_at',
-            ])
-            ->map(function ($fee) {
-                return [
-                    'id' => $fee->id,
-                    'amount' => $fee->amount,
-                    'description' => $fee->description,
-                    'status' => $fee->status,
-                    'due_date' => $fee->due_date->format('Y-m-d'),
-                    'paid_date' => $fee->paid_date?->format('Y-m-d'),
-                    'created_at' => $fee->created_at->format('Y-m-d'),
-                ];
-            });
+        $fees = StudentFeeResource::collection(
+            Fee::where('student_id', $student->id)
+                ->orderBy('due_date', 'desc')
+                ->get([
+                    'id',
+                    'amount',
+                    'description',
+                    'status',
+                    'due_date',
+                    'paid_date',
+                    'created_at',
+                ])
+        )->resolve();
 
         return Inertia::render('Student/Fees/Index', [
             'fees' => $fees,
@@ -97,7 +89,7 @@ class StudentFeeController extends Controller
         }
 
         // Update fee status to payment_pending
-        $fee->update(['status' => 'payment_pending']);
+        $fee->markAsPaymentPending($fee->payment_intent_id);
 
         return redirect()
             ->route('student.fees.index')

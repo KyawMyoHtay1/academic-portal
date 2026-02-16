@@ -55,6 +55,13 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+        "check": [
+            "@php artisan config:clear --ansi",
+            "@php ./vendor/bin/pint --test",
+            "@php artisan test"
+        ],
+        "hooks:install": "git config core.hooksPath .githooks",
+        "hooks:status": "git config --get core.hooksPath",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

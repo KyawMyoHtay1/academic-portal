@@ -213,6 +213,171 @@ class EnrollmentService
     }
 
     /**
+     * Approve a pending enrollment request.
+     *
+     * @param  int|string  $enrollmentId
+     * @return array{level: string, message: string}
+     */
+    public function approveEnrollment(int|string $enrollmentId): array
+    {
+        return DB::transaction(function () use ($enrollmentId): array {
+            $enrollment = DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $enrollment || $enrollment->status !== 'pending') {
+                return $this->result('error', 'Enrollment not found or already processed.');
+            }
+
+            DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->update([
+                    'status' => 'approved',
+                    'updated_at' => now(),
+                ]);
+
+            $course = Course::find($enrollment->course_id);
+            $student = Student::find($enrollment->student_id);
+
+            Log::info('enrollment.review_decision', [
+                'enrollment_id' => $enrollmentId,
+                'student_id' => $enrollment->student_id,
+                'course_id' => $enrollment->course_id,
+                'decision' => 'approved',
+            ]);
+
+            return $this->result(
+                'success',
+                "Enrollment approved for {$this->studentLabel($student)} in {$this->courseLabel($course)}."
+            );
+        });
+    }
+
+    /**
+     * Reject a pending enrollment request.
+     *
+     * @param  int|string  $enrollmentId
+     * @return array{level: string, message: string}
+     */
+    public function rejectEnrollment(int|string $enrollmentId): array
+    {
+        return DB::transaction(function () use ($enrollmentId): array {
+            $enrollment = DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $enrollment || $enrollment->status !== 'pending') {
+                return $this->result('error', 'Enrollment not found or already processed.');
+            }
+
+            DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->update([
+                    'status' => 'rejected',
+                    'updated_at' => now(),
+                ]);
+
+            $course = Course::find($enrollment->course_id);
+            $student = Student::find($enrollment->student_id);
+
+            Log::info('enrollment.review_decision', [
+                'enrollment_id' => $enrollmentId,
+                'student_id' => $enrollment->student_id,
+                'course_id' => $enrollment->course_id,
+                'decision' => 'rejected',
+            ]);
+
+            return $this->result(
+                'success',
+                "Enrollment rejected for {$this->studentLabel($student)} in {$this->courseLabel($course)}."
+            );
+        });
+    }
+
+    /**
+     * Approve a pending withdrawal request by deleting the enrollment row.
+     *
+     * @param  int|string  $enrollmentId
+     * @return array{level: string, message: string}
+     */
+    public function approveWithdrawal(int|string $enrollmentId): array
+    {
+        return DB::transaction(function () use ($enrollmentId): array {
+            $enrollment = DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $enrollment || $enrollment->status !== 'withdrawal_pending') {
+                return $this->result('error', 'Withdrawal request not found or already processed.');
+            }
+
+            DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->delete();
+
+            $course = Course::find($enrollment->course_id);
+            $student = Student::find($enrollment->student_id);
+
+            Log::info('enrollment.withdrawal_decision', [
+                'enrollment_id' => $enrollmentId,
+                'student_id' => $enrollment->student_id,
+                'course_id' => $enrollment->course_id,
+                'decision' => 'approved',
+            ]);
+
+            return $this->result(
+                'success',
+                "Withdrawal approved for {$this->studentLabel($student)} from {$this->courseLabel($course)}."
+            );
+        });
+    }
+
+    /**
+     * Reject a pending withdrawal request by restoring approved status.
+     *
+     * @param  int|string  $enrollmentId
+     * @return array{level: string, message: string}
+     */
+    public function rejectWithdrawal(int|string $enrollmentId): array
+    {
+        return DB::transaction(function () use ($enrollmentId): array {
+            $enrollment = DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $enrollment || $enrollment->status !== 'withdrawal_pending') {
+                return $this->result('error', 'Withdrawal request not found or already processed.');
+            }
+
+            DB::table('course_student')
+                ->where('id', $enrollmentId)
+                ->update([
+                    'status' => 'approved',
+                    'updated_at' => now(),
+                ]);
+
+            $course = Course::find($enrollment->course_id);
+            $student = Student::find($enrollment->student_id);
+
+            Log::info('enrollment.withdrawal_decision', [
+                'enrollment_id' => $enrollmentId,
+                'student_id' => $enrollment->student_id,
+                'course_id' => $enrollment->course_id,
+                'decision' => 'rejected',
+            ]);
+
+            return $this->result(
+                'success',
+                "Withdrawal rejected for {$this->studentLabel($student)} from {$this->courseLabel($course)}. Student remains enrolled."
+            );
+        });
+    }
+
+    /**
      * @return array{level: string, message: string}
      */
     private function result(string $level, string $message): array
@@ -221,5 +386,19 @@ class EnrollmentService
             'level' => $level,
             'message' => $message,
         ];
+    }
+
+    private function studentLabel(?Student $student): string
+    {
+        return $student?->full_name ?? 'student';
+    }
+
+    private function courseLabel(?Course $course): string
+    {
+        if (! $course) {
+            return 'the course';
+        }
+
+        return "{$course->course_code} - {$course->title}";
     }
 }

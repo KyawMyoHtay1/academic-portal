@@ -87,6 +87,26 @@ Attendance alerts:
 
 ## Testing and Quality
 
+Run repository quality checks (backend tests + Pint):
+
+```bash
+composer check
+```
+
+Run full local pre-submission gate:
+
+Windows (PowerShell):
+
+```powershell
+./check.ps1
+```
+
+Linux / macOS:
+
+```bash
+./check.sh
+```
+
 Run backend tests:
 
 ```bash
@@ -104,6 +124,25 @@ Build frontend assets:
 ```bash
 npm run build
 ```
+
+## Pre-commit Hooks
+
+Enable repository-managed hooks once per clone:
+
+```bash
+composer hooks:install
+```
+
+Check active hooks path:
+
+```bash
+composer hooks:status
+```
+
+Current pre-commit checks:
+
+- `composer check`
+- `npm run check:frontend`
 
 ## CI
 

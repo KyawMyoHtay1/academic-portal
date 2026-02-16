@@ -206,12 +206,11 @@ class StaffFeeController extends Controller
                 ->with('error', 'Fee payment confirmation not found or already processed.');
         }
 
-        $fee->update([
-            'status' => 'paid',
-            'paid_date' => now()->format('Y-m-d'),
-            'payment_processed_at' => now(),
-            'processed_by' => Auth::id(),
-        ]);
+        $fee->markAsPaid(
+            $fee->payment_method,
+            $fee->payment_intent_id,
+            Auth::id()
+        );
 
         // Notify the student
         $student = $fee->student;
@@ -237,10 +236,7 @@ class StaffFeeController extends Controller
                 ->with('error', 'Fee payment confirmation not found or already processed.');
         }
 
-        $fee->update([
-            'status' => 'pending',
-            'paid_date' => null,
-        ]);
+        $fee->markAsPending();
 
         // Notify the student
         $student = $fee->student;
