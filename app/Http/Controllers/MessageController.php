@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,15 +20,16 @@ class MessageController extends Controller
     {
         $user = Auth::user();
 
-        // Get both received and sent messages
+        // Get both received and sent messages (paginated to avoid loading large inboxes).
         $messages = Message::with(['sender', 'receiver'])
             ->where(function ($query) use ($user) {
                 $query->where('receiver_id', $user->id)
                     ->orWhere('sender_id', $user->id);
             })
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($m) use ($user) {
+            ->paginate(20)
+            ->withQueryString()
+            ->through(function ($m) use ($user) {
                 $isSent = $m->sender_id === $user->id;
                 
                 return [
@@ -76,7 +78,7 @@ class MessageController extends Controller
 
         $data = $request->validate([
             'receiver_id' => ['required', 'exists:users,id'],
-            'body' => ['required', 'string'],
+            'body' => ['required', 'string', 'max:2000'],
         ]);
 
         // Prevent sending to self
@@ -97,6 +99,12 @@ class MessageController extends Controller
             'read' => false,
         ]);
 
+        Log::info('message.sent', [
+            'sender_id' => $user->id,
+            'receiver_id' => (int) $data['receiver_id'],
+            'sender_role' => $user->role,
+        ]);
+
         return redirect()
             ->route('messages.index')
             ->with('success', 'Message sent successfully.');
@@ -115,6 +123,11 @@ class MessageController extends Controller
 
         if (! $message->read) {
             $message->update(['read' => true]);
+
+            Log::info('message.read', [
+                'message_id' => $message->id,
+                'reader_id' => $user->id,
+            ]);
         }
 
         return back();

@@ -19,6 +19,8 @@ class StaffFeeController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', Fee::class);
+
         // Get late payments (due_date < today and status = pending)
         $latePayments = Fee::with('student')
             ->where('status', 'pending')
@@ -72,6 +74,8 @@ class StaffFeeController extends Controller
      */
     public function create(): Response
     {
+        $this->authorize('create', Fee::class);
+
         $students = Student::orderBy('full_name')
             ->get(['id', 'student_no', 'full_name', 'photo']);
 
@@ -85,6 +89,8 @@ class StaffFeeController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Fee::class);
+
         $data = $request->validate([
             'student_id' => ['required', 'exists:students,id'],
             'amount' => ['required', 'numeric', 'min:0', 'max:999999.99'],
@@ -113,6 +119,8 @@ class StaffFeeController extends Controller
      */
     public function edit(Fee $fee): Response
     {
+        $this->authorize('update', $fee);
+
         $students = Student::orderBy('full_name')
             ->get(['id', 'student_no', 'full_name']);
 
@@ -135,6 +143,8 @@ class StaffFeeController extends Controller
      */
     public function update(Request $request, Fee $fee): RedirectResponse
     {
+        $this->authorize('update', $fee);
+
         $data = $request->validate([
             'student_id' => ['required', 'exists:students,id'],
             'amount' => ['required', 'numeric', 'min:0', 'max:999999.99'],
@@ -184,6 +194,8 @@ class StaffFeeController extends Controller
      */
     public function destroy(Fee $fee): RedirectResponse
     {
+        $this->authorize('delete', $fee);
+
         $fee->delete();
 
         return redirect()
@@ -196,6 +208,8 @@ class StaffFeeController extends Controller
      */
     public function approvePayment(Request $request, Fee $fee): RedirectResponse
     {
+        $this->authorize('approvePayment', $fee);
+
         if ($fee->status !== 'payment_pending') {
             return redirect()
                 ->route('admin.fees.index')
@@ -225,6 +239,8 @@ class StaffFeeController extends Controller
      */
     public function rejectPayment(Request $request, Fee $fee): RedirectResponse
     {
+        $this->authorize('rejectPayment', $fee);
+
         if ($fee->status !== 'payment_pending') {
             return redirect()
                 ->route('admin.fees.index')
@@ -252,6 +268,8 @@ class StaffFeeController extends Controller
      */
     public function receipt(Fee $fee)
     {
+        $this->authorize('receipt', $fee);
+
         // Only generate receipts for paid fees
         if ($fee->status !== 'paid') {
             return redirect()

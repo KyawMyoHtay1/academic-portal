@@ -20,6 +20,8 @@ class StaffGradesController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', Grade::class);
+
         $subjects = Subject::query()
             ->whereHas('grades', function ($q) {
                 $q->where('status', Grade::STATUS_PENDING);
@@ -51,6 +53,8 @@ class StaffGradesController extends Controller
      */
     public function show(Subject $subject): Response
     {
+        $this->authorize('viewAny', Grade::class);
+
         $students = $subject->course->students()
             ->orderBy('students.full_name')
             ->get([
@@ -103,6 +107,8 @@ class StaffGradesController extends Controller
 
     public function approve(Request $request, Grade $grade): RedirectResponse
     {
+        $this->authorize('review', $grade);
+
         $request->validate([
             'redirect_subject_id' => ['nullable', 'integer'],
         ]);
@@ -135,6 +141,8 @@ class StaffGradesController extends Controller
 
     public function reject(Request $request, Grade $grade): RedirectResponse
     {
+        $this->authorize('review', $grade);
+
         $data = $request->validate([
             'reason' => ['nullable', 'string', 'max:255'],
         ]);
@@ -160,4 +168,3 @@ class StaffGradesController extends Controller
         return back()->with('success', 'Grade rejected.');
     }
 }
-

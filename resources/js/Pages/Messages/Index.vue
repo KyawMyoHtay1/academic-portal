@@ -1,12 +1,13 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import Pagination from "@/Components/Pagination.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 
 const props = defineProps({
     messages: {
-        type: Array,
+        type: Object,
         required: true,
     },
 });
@@ -21,6 +22,9 @@ const activeTab = ref("all");
 const expandedMessages = ref(new Set());
 const query = ref("");
 const unreadOnly = ref(false);
+
+const messagesData = computed(() => props.messages?.data ?? []);
+const messageLinks = computed(() => props.messages?.links ?? []);
 
 const markAsRead = (id) => {
     router.post(route("messages.read", id), {}, { preserveScroll: true });
@@ -37,7 +41,7 @@ const toggleExpand = (id) => {
 const filteredMessages = computed(() => {
     const q = query.value.trim().toLowerCase();
 
-    let list = props.messages ?? [];
+    let list = messagesData.value;
     if (activeTab.value === "inbox") list = list.filter((m) => !m.is_sent);
     if (activeTab.value === "sent") list = list.filter((m) => m.is_sent);
 
@@ -67,12 +71,12 @@ const filteredMessages = computed(() => {
 });
 
 const stats = computed(() => {
-    const inbox = (props.messages ?? []).filter((m) => !m.is_sent);
+    const inbox = messagesData.value.filter((m) => !m.is_sent);
     const unread = inbox.filter((m) => !m.read);
     return {
-        total: (props.messages ?? []).length,
+        total: props.messages?.total ?? messagesData.value.length,
         inbox: inbox.length,
-        sent: (props.messages ?? []).filter((m) => m.is_sent).length,
+        sent: messagesData.value.filter((m) => m.is_sent).length,
         unread: unread.length,
     };
 });
@@ -300,6 +304,10 @@ const clearSearch = () => {
                             <span v-else class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">Read</span>
                         </div>
                     </div>
+                </div>
+
+                <div class="flex justify-center pt-2" v-if="messageLinks.length">
+                    <Pagination :links="messageLinks" />
                 </div>
             </div>
         </div>

@@ -17,6 +17,8 @@ class CourseRegistrationController extends Controller
      */
     public function enroll(Request $request, Course $course)
     {
+        $this->authorize('enroll', $course);
+
         $user = Auth::user();
         $student = $user->student;
 
@@ -142,6 +144,8 @@ class CourseRegistrationController extends Controller
      */
     public function unenroll(Request $request, Course $course)
     {
+        $this->authorize('unenroll', $course);
+
         $user = Auth::user();
         $student = $user->student;
 
@@ -178,4 +182,3 @@ class CourseRegistrationController extends Controller
             ->with('success', "Withdrawal request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
     }
 }
-

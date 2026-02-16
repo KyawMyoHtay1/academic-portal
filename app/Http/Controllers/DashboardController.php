@@ -8,9 +8,10 @@ use App\Models\Course;
 use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Student;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,15 +20,16 @@ class DashboardController extends Controller
     public function __invoke(): Response
     {
         $user = Auth::user();
+        $cacheTtl = now()->addMinutes(2);
 
         // Staff/admin view: global stats
         if ($user?->isStaff()) {
-            $studentCount = Student::count();
-            $courseCount = Course::count();
-            $feeTotal = Fee::sum('amount');
+            $studentCount = Cache::remember('dashboard:staff:student_count', $cacheTtl, fn () => Student::count());
+            $courseCount = Cache::remember('dashboard:staff:course_count', $cacheTtl, fn () => Course::count());
+            $feeTotal = Cache::remember('dashboard:staff:fee_total', $cacheTtl, fn () => Fee::sum('amount'));
 
-            $attendanceTotal = Attendance::count();
-            $attendancePresent = Attendance::where('status', 'present')->count();
+            $attendanceTotal = Cache::remember('dashboard:staff:attendance_total', $cacheTtl, fn () => Attendance::count());
+            $attendancePresent = Cache::remember('dashboard:staff:attendance_present', $cacheTtl, fn () => Attendance::where('status', 'present')->count());
             $attendanceRate = $attendanceTotal > 0
                 ? round(($attendancePresent / $attendanceTotal) * 100, 1)
                 : 0;
@@ -62,16 +64,20 @@ class DashboardController extends Controller
             ];
 
             // Additional stats for staff dashboard
-            $pendingEnrollments = DB::table('course_student')
-                ->where('status', 'pending')
-                ->count();
-            $pendingWithdrawals = DB::table('course_student')
-                ->where('status', 'withdrawal_pending')
-                ->count();
-            $pendingGrades = Grade::where('status', 'pending')->count();
-            $pendingPayments = Fee::where('status', 'payment_pending')->count();
-            $paidFees = Fee::where('status', 'paid')->sum('amount');
-            $pendingFees = Fee::where('status', 'pending')->sum('amount');
+            $pendingEnrollments = Cache::remember('dashboard:staff:pending_enrollments', $cacheTtl, function () {
+                return DB::table('course_student')
+                    ->where('status', 'pending')
+                    ->count();
+            });
+            $pendingWithdrawals = Cache::remember('dashboard:staff:pending_withdrawals', $cacheTtl, function () {
+                return DB::table('course_student')
+                    ->where('status', 'withdrawal_pending')
+                    ->count();
+            });
+            $pendingGrades = Cache::remember('dashboard:staff:pending_grades', $cacheTtl, fn () => Grade::where('status', 'pending')->count());
+            $pendingPayments = Cache::remember('dashboard:staff:pending_payments', $cacheTtl, fn () => Fee::where('status', 'payment_pending')->count());
+            $paidFees = Cache::remember('dashboard:staff:paid_fees_total', $cacheTtl, fn () => Fee::where('status', 'paid')->sum('amount'));
+            $pendingFees = Cache::remember('dashboard:staff:pending_fees_total', $cacheTtl, fn () => Fee::where('status', 'pending')->sum('amount'));
 
             // Chart data: Fee status (doughnut)
             $feeStatusCounts = Fee::select('status', DB::raw('count(*) as count'))

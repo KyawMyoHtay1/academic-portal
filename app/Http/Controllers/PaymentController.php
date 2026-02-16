@@ -31,6 +31,8 @@ class PaymentController extends Controller
      */
     public function checkout(Request $request, Fee $fee)
     {
+        $this->authorize('checkout', $fee);
+
         $user = Auth::user();
         $student = $user->student;
     
@@ -95,6 +97,8 @@ class PaymentController extends Controller
      */
     public function success(Request $request, Fee $fee): RedirectResponse
     {
+        $this->authorize('view', $fee);
+
         $user = Auth::user();
         $student = $user->student;
 
@@ -150,6 +154,8 @@ class PaymentController extends Controller
      */
     public function cancel(Request $request, Fee $fee): RedirectResponse
     {
+        $this->authorize('view', $fee);
+
         $user = Auth::user();
         $student = $user->student;
 

@@ -297,16 +297,22 @@ Route::get('/guest/contact', function () {
 })->name('guest.contact');
 
 // Guest contact form submission (stores into contact_messages)
-Route::post('/guest/contact', [ContactController::class, 'store'])->name('guest.contact.store');
+Route::post('/guest/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('guest.contact.store');
 
 Route::view('/guest/policies', 'guest.policies')->name('guest.policies');
 Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
 
 // Guest feedback form submission (stores into feedback_messages)
-Route::post('/guest/feedback', [FeedbackController::class, 'store'])->name('guest.feedback.store');
+Route::post('/guest/feedback', [FeedbackController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('guest.feedback.store');
 
 // Global search (guest + authenticated): same URL, controller branches by auth
-Route::get('/search', SearchController::class)->name('search');
+Route::get('/search', SearchController::class)
+    ->middleware('throttle:90,1')
+    ->name('search');
 
 Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
@@ -399,8 +405,12 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     // Messaging (all roles can send)
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
-    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+    Route::post('/messages', [MessageController::class, 'store'])
+        ->middleware('throttle:20,1')
+        ->name('messages.store');
+    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])
+        ->middleware('throttle:120,1')
+        ->name('messages.read');
 
     // Timebox 2: Staff Admin Features (staff only)
     Route::middleware('role:staff')->group(function () {

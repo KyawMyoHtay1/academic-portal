@@ -17,6 +17,11 @@ class StudentFeeController extends Controller
     public function index(): Response
     {
         $user = Auth::user();
+
+        if (! $user->isStudent()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $student = $user->student;
 
         if (!$student) {
@@ -60,6 +65,8 @@ class StudentFeeController extends Controller
      */
     public function submitPayment(Request $request, Fee $fee): RedirectResponse
     {
+        $this->authorize('submitPayment', $fee);
+
         $user = Auth::user();
         $student = $user->student;
 
