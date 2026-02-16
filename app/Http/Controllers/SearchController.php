@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SearchResultResource;
 use App\Models\Announcement;
 use App\Models\Assignment;
 use App\Models\Course;
@@ -31,7 +32,9 @@ class SearchController extends Controller
         $term = '%'.$q.'%';
 
         if (Auth::guest()) {
-            return response()->json(['results' => $this->searchGuest($term, $q)]);
+            return response()->json([
+                'results' => SearchResultResource::collection($this->searchGuest($term, $q))->resolve(),
+            ]);
         }
 
         $user = Auth::user();
@@ -44,7 +47,9 @@ class SearchController extends Controller
             $results = $this->searchStudent($user, $term);
         }
 
-        return response()->json(['results' => $results]);
+        return response()->json([
+            'results' => SearchResultResource::collection($results)->resolve(),
+        ]);
     }
 
     /**

@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Fee extends Model
 {
     use HasFactory;
+
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_PAYMENT_PENDING = 'payment_pending';
+
+    public const STATUS_PAID = 'paid';
 
     protected $fillable = [
         'student_id',
@@ -43,5 +50,59 @@ class Fee extends Model
     public function processor()
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_PENDING);
+    }
+
+    public function scopePaymentPending(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_PAYMENT_PENDING);
+    }
+
+    public function scopePaid(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_PAID);
+    }
+
+    public function scopeOverdue(Builder $query): Builder
+    {
+        return $query
+            ->pending()
+            ->where('due_date', '<', now()->toDateString());
+    }
+
+    public function markAsPaymentPending(?string $paymentIntentId = null): void
+    {
+        $this->update([
+            'status' => self::STATUS_PAYMENT_PENDING,
+            'payment_intent_id' => $paymentIntentId ?? $this->payment_intent_id,
+        ]);
+    }
+
+    public function markAsPending(): void
+    {
+        $this->update([
+            'status' => self::STATUS_PENDING,
+            'paid_date' => null,
+            'payment_intent_id' => null,
+            'payment_method' => null,
+            'payment_processed_at' => null,
+            'processed_by' => null,
+        ]);
+    }
+
+    public function markAsPaid(?string $paymentMethod = null, ?string $paymentIntentId = null, ?int $processedBy = null): void
+    {
+        $this->update([
+            'status' => self::STATUS_PAID,
+            'paid_date' => now()->toDateString(),
+            'payment_method' => $paymentMethod,
+            'payment_processed_at' => now(),
+            'payment_intent_id' => $paymentIntentId ?? $this->payment_intent_id,
+            'processed_by' => $processedBy,
+        ]);
     }
 }

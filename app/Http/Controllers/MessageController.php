@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Messages\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -72,14 +72,11 @@ class MessageController extends Controller
     /**
      * Store a newly created message.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreMessageRequest $request): RedirectResponse
     {
         $user = Auth::user();
 
-        $data = $request->validate([
-            'receiver_id' => ['required', 'exists:users,id'],
-            'body' => ['required', 'string', 'max:2000'],
-        ]);
+        $data = $request->validated();
 
         // Prevent sending to self
         if ((int) $data['receiver_id'] === $user->id) {

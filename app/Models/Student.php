@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -99,5 +100,23 @@ class Student extends Model
         $count = $grades->count();
 
         return $count > 0 ? round($totalScore / $count, 2) : null;
+    }
+
+    public function requestEnrollment(Course $course): void
+    {
+        $this->courses()->syncWithoutDetaching([
+            $course->id => [
+                'status' => 'pending',
+                'updated_at' => now(),
+            ],
+        ]);
+    }
+
+    public function requestWithdrawal(Course $course): void
+    {
+        $this->courses()->updateExistingPivot($course->id, [
+            'status' => 'withdrawal_pending',
+            'updated_at' => now(),
+        ]);
     }
 }

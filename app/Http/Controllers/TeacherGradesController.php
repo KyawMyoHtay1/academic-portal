@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Teacher\StoreSubjectGradesRequest;
 use App\Models\Course;
 use App\Models\Grade;
 use App\Models\GradeReviewLog;
@@ -10,7 +11,6 @@ use App\Models\Subject;
 use App\Models\User;
 use App\Notifications\GradeReviewRequested;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -106,7 +106,7 @@ class TeacherGradesController extends Controller
     /**
      * Store or update grades for students in a subject.
      */
-    public function store(Request $request, Subject $subject): RedirectResponse
+    public function store(StoreSubjectGradesRequest $request, Subject $subject): RedirectResponse
     {
         $user = Auth::user();
 
@@ -115,11 +115,7 @@ class TeacherGradesController extends Controller
             abort(403, 'You are not assigned to this subject.');
         }
 
-        $data = $request->validate([
-            'grades' => ['required', 'array'],
-            'grades.*.student_id' => ['required', 'exists:students,id'],
-            'grades.*.score' => ['nullable', 'numeric', 'min:0', 'max:100'],
-        ]);
+        $data = $request->validated();
 
         // Verify all students are enrolled in the subject's course
         $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();

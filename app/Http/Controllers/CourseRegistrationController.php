@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Courses\EnrollCourseRequest;
+use App\Http\Requests\Courses\UnenrollCourseRequest;
 use App\Models\Course;
 use App\Models\Timetable;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,7 @@ class CourseRegistrationController extends Controller
      * Request enrollment in a course (creates pending enrollment).
      * Enrollment requires admin approval.
      */
-    public function enroll(Request $request, Course $course)
+    public function enroll(EnrollCourseRequest $request, Course $course)
     {
         $this->authorize('enroll', $course);
 
@@ -182,7 +183,7 @@ class CourseRegistrationController extends Controller
      * Request withdrawal from a course (creates withdrawal request).
      * Withdrawal requires admin approval.
      */
-    public function unenroll(Request $request, Course $course)
+    public function unenroll(UnenrollCourseRequest $request, Course $course)
     {
         $this->authorize('unenroll', $course);
 

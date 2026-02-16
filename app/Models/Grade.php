@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Grade extends Model
@@ -67,6 +68,54 @@ class Grade extends Model
     public function reviewLogs()
     {
         return $this->hasMany(GradeReviewLog::class);
+    }
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_PENDING);
+    }
+
+    public function scopeApproved(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_APPROVED);
+    }
+
+    public function scopeRejected(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_REJECTED);
+    }
+
+    public function submitForReview(float $score, int $gradedBy, int $courseId): void
+    {
+        $this->update([
+            'course_id' => $courseId,
+            'graded_by' => $gradedBy,
+            'score' => $score,
+            'status' => self::STATUS_PENDING,
+            'reviewed_by' => null,
+            'reviewed_at' => null,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    public function approve(int $reviewedBy): void
+    {
+        $this->update([
+            'status' => self::STATUS_APPROVED,
+            'reviewed_by' => $reviewedBy,
+            'reviewed_at' => now(),
+            'rejection_reason' => null,
+        ]);
+    }
+
+    public function reject(int $reviewedBy, ?string $reason = null): void
+    {
+        $this->update([
+            'status' => self::STATUS_REJECTED,
+            'reviewed_by' => $reviewedBy,
+            'reviewed_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
     }
 
     public function isApproved(): bool
