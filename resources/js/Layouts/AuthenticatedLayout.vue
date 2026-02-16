@@ -929,26 +929,12 @@ const headerStatus = computed(() => {
                             >
                                 University Academic Portal
                             </p>
-                            <div
-                                v-if="$slots.header"
-                                class="mt-0.5 text-lg font-semibold leading-tight text-slate-900"
-                            >
-                                <slot name="header" />
-                            </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
                         <!-- Global search -->
                         <GlobalSearch />
-
-                        <!-- Status pill -->
-                        <div
-                            class="hidden items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 sm:flex"
-                        >
-                            <span class="h-2 w-2 rounded-full bg-emerald-500" />
-                            {{ headerStatus }}
-                        </div>
 
                         <!-- Google Translate -->
                         <GoogleTranslate />
@@ -1052,7 +1038,35 @@ const headerStatus = computed(() => {
 
                 <!-- Page Content -->
                 <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="breadcrumb" />
+                    <!-- Page header & context -->
+                    <div
+                        v-if="$slots.header || $slots.breadcrumb"
+                        class="mb-4 space-y-2"
+                    >
+                        <div
+                            v-if="$slots.header || headerStatus"
+                            class="flex flex-wrap items-center justify-between gap-3"
+                        >
+                            <div
+                                v-if="$slots.header"
+                                class="text-lg font-semibold leading-tight text-slate-900"
+                            >
+                                <slot name="header" />
+                            </div>
+                            <div
+                                v-if="headerStatus"
+                                class="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                            >
+                                <span
+                                    class="h-2 w-2 rounded-full bg-emerald-500"
+                                />
+                                {{ headerStatus }}
+                            </div>
+                        </div>
+
+                        <slot name="breadcrumb" />
+                    </div>
+
                     <slot />
                 </main>
 
