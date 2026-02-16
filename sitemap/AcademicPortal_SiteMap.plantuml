@@ -1,0 +1,133 @@
+@startuml
+title University Academic Portal - Site Map
+
+skinparam rectangle {
+  BackgroundColor<<area>> #EFEFEF
+  BorderColor<<area>> #666666
+}
+
+rectangle "Public" <<area>> {
+  [Home / Landing]
+  [Login]
+  [Register (Student)]
+  [Contact Us]
+  [Feedback]
+}
+
+rectangle "Student" <<area>> {
+  [Student Dashboard]
+  [Student Profile]
+
+  rectangle "Courses" {
+    [Browse Courses]
+    [My Courses (Enrolments)]
+  }
+
+  rectangle "Grades" {
+    [View Grades & GPA]
+  }
+
+  rectangle "Fees" {
+    [My Fees & Payments]
+  }
+
+  rectangle "Timetable" {
+    [Weekly Timetable]
+  }
+
+  rectangle "Attendance" {
+    [My Attendance Summary]
+  }
+
+  rectangle "Assignments" {
+    [My Assignments]
+    [Submit Assignment]
+  }
+
+  rectangle "Communication" {
+    [Student Announcements]
+    [Student Messages]
+    [Student Notifications]
+  }
+}
+
+rectangle "Teacher" <<area>> {
+  [Teacher Dashboard]
+  [Teacher Profile]
+
+  rectangle "Teaching" {
+    [My Subjects]
+    [Class List]
+  }
+
+  rectangle "Grades" {
+    [Record / Update Grades]
+  }
+
+  rectangle "Assignments" {
+    [Create / Manage Assignments]
+    [View Submissions]
+  }
+
+  rectangle "Timetable" {
+    [Teaching Timetable]
+  }
+
+  rectangle "Attendance" {
+    [Record Attendance]
+    [Attendance Summary]
+  }
+
+  rectangle "Communication" {
+    [Teacher Announcements]
+    [Teacher Messages]
+    [Teacher Notifications]
+  }
+}
+
+rectangle "Staff/Admin" <<area>> {
+  [Admin Dashboard]
+
+  rectangle "User & Student Management" {
+    [Manage Users]
+    [Manage Students]
+  }
+
+  rectangle "Academic Management" {
+    [Manage Courses]
+    [Manage Subjects]
+    [Manage Enrolments]
+  }
+
+  rectangle "Grades" {
+    [Review & Approve Grades]
+  }
+
+  rectangle "Fees & Payments" {
+    [Manage Fees]
+    [Payment Confirmations]
+    [Generate Receipts]
+  }
+
+  rectangle "Timetable & Attendance" {
+    [Manage Timetables]
+    [Attendance Reports]
+    [Low Attendance Alerts]
+  }
+
+  rectangle "Communication" {
+    [Admin Announcements]
+    [Admin Messages]
+    [Contact Messages]
+    [Feedback Messages]
+    [Admin Notifications]
+  }
+}
+
+[Home / Landing] --> [Login]
+[Home / Landing] --> [Register (Student)]
+[Login] --> [Student Dashboard]
+[Login] --> [Teacher Dashboard]
+[Login] --> [Admin Dashboard]
+
+@enduml
