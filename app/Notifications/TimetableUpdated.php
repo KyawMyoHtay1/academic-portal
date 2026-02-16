@@ -4,9 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Timetable;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class TimetableUpdated extends Notification
+class TimetableUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Grades\ApproveGradeRequest;
+use App\Http\Requests\Staff\Grades\RejectGradeRequest;
 use App\Models\Grade;
 use App\Models\GradeReviewLog;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\GradePublished;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -107,13 +108,11 @@ class StaffGradesController extends Controller
         ]);
     }
 
-    public function approve(Request $request, Grade $grade): RedirectResponse
+    public function approve(ApproveGradeRequest $request, Grade $grade): RedirectResponse
     {
         $this->authorize('review', $grade);
 
-        $request->validate([
-            'redirect_subject_id' => ['nullable', 'integer'],
-        ]);
+        $request->validated();
 
         if ($grade->status !== Grade::STATUS_PENDING) {
             return back()->with('info', 'Grade is not pending review.');
@@ -149,13 +148,11 @@ class StaffGradesController extends Controller
         return back()->with('success', 'Grade approved and published.');
     }
 
-    public function reject(Request $request, Grade $grade): RedirectResponse
+    public function reject(RejectGradeRequest $request, Grade $grade): RedirectResponse
     {
         $this->authorize('review', $grade);
 
-        $data = $request->validate([
-            'reason' => ['nullable', 'string', 'max:255'],
-        ]);
+        $data = $request->validated();
 
         if ($grade->status !== Grade::STATUS_PENDING) {
             return back()->with('info', 'Grade is not pending review.');

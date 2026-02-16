@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Staff\Fees\StoreFeeRequest;
+use App\Http\Requests\Staff\Fees\UpdateFeeRequest;
 use App\Models\Fee;
 use App\Models\Student;
 use App\Notifications\FeeStatusUpdated;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -88,16 +89,11 @@ class StaffFeeController extends Controller
     /**
      * Store a newly created fee.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreFeeRequest $request): RedirectResponse
     {
         $this->authorize('create', Fee::class);
 
-        $data = $request->validate([
-            'student_id' => ['required', 'exists:students,id'],
-            'amount' => ['required', 'numeric', 'min:0', 'max:999999.99'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'due_date' => ['required', 'date'],
-        ]);
+        $data = $request->validated();
 
         $fee = Fee::create([
             ...$data,
@@ -142,18 +138,11 @@ class StaffFeeController extends Controller
     /**
      * Update the specified fee.
      */
-    public function update(Request $request, Fee $fee): RedirectResponse
+    public function update(UpdateFeeRequest $request, Fee $fee): RedirectResponse
     {
         $this->authorize('update', $fee);
 
-        $data = $request->validate([
-            'student_id' => ['required', 'exists:students,id'],
-            'amount' => ['required', 'numeric', 'min:0', 'max:999999.99'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'due_date' => ['required', 'date'],
-            'status' => ['required', 'in:pending,payment_pending,paid'],
-            'paid_date' => ['nullable', 'date', 'required_if:status,paid'],
-        ]);
+        $data = $request->validated();
 
         // If status changed to paid and no paid_date, set to today
         if ($data['status'] === 'paid' && empty($data['paid_date'])) {
@@ -207,7 +196,7 @@ class StaffFeeController extends Controller
     /**
      * Approve a payment confirmation (marks fee as paid).
      */
-    public function approvePayment(Request $request, Fee $fee): RedirectResponse
+    public function approvePayment(Fee $fee): RedirectResponse
     {
         $this->authorize('approvePayment', $fee);
 
@@ -238,7 +227,7 @@ class StaffFeeController extends Controller
     /**
      * Reject a payment confirmation (reverts to pending).
      */
-    public function rejectPayment(Request $request, Fee $fee): RedirectResponse
+    public function rejectPayment(Fee $fee): RedirectResponse
     {
         $this->authorize('rejectPayment', $fee);
 

@@ -3,33 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fee;
-use App\Models\StripeWebhookEvent;
-use App\Notifications\FeeStatusUpdated;
-use Illuminate\Database\QueryException;
+use App\Services\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
-use Stripe\PaymentIntent;
-use Stripe\Stripe;
-use Stripe\Webhook;
 
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
-    }
+    public function __construct(private readonly PaymentService $paymentService) {}
 
     /**
      * Create a Stripe checkout session for a fee payment.
      */
-    public function checkout(Request $request, Fee $fee)
+    public function checkout(Fee $fee)
     {
         $this->authorize('checkout', $fee);
 
@@ -49,36 +39,8 @@ class PaymentController extends Controller
         }
 
         try {
-            $checkoutSession = Session::create([
-                'line_items' => [[
-                    'price_data' => [
-                        'currency' => 'gbp',
-                        'product_data' => [
-                            'name' => $fee->description ?? 'Fee Payment',
-                        ],
-                        'unit_amount' => (int) ($fee->amount * 100),
-                    ],
-                    'quantity' => 1,
-                ]],
-                'mode' => 'payment',
-                'payment_intent_data' => [
-                    'metadata' => [
-                        'fee_id' => $fee->id,
-                        'student_id' => $student->id,
-                    ],
-                ],
-                'success_url' => route('payment.success', $fee).'?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('payment.cancel', $fee),
-                'customer_email' => $student->email,
-            ]);
-
-            $fee->markAsPaymentPending($checkoutSession->payment_intent);
-
-            Log::info('payment.checkout_started', [
-                'fee_id' => $fee->id,
-                'student_id' => $student->id,
-                'payment_intent_id' => $checkoutSession->payment_intent,
-            ]);
+            $checkoutSession = $this->paymentService->createCheckoutSession($fee, $student);
+            $this->paymentService->markCheckoutStarted($fee, (string) $checkoutSession->payment_intent, $student->id);
 
             return Inertia::location($checkoutSession->url);
 
@@ -109,40 +71,26 @@ class PaymentController extends Controller
 
         $sessionId = $request->query('session_id');
 
-        // Verify payment via webhook or session
         if ($sessionId) {
             try {
-                $session = Session::retrieve($sessionId);
+                $paid = $this->paymentService->confirmPaymentFromSession($fee, (string) $sessionId);
+                if ($paid) {
+                    Log::info('payment.success_redirect_confirmed', [
+                        'fee_id' => $fee->id,
+                        'student_id' => $student->id,
+                        'payment_intent_id' => $fee->fresh()->payment_intent_id,
+                    ]);
 
-                // If Stripe confirms payment, verify the intent one more time
-                if ($session->payment_status === 'paid' && $session->payment_intent) {
-                    $paymentIntent = PaymentIntent::retrieve($session->payment_intent);
-                    if ($paymentIntent->status === 'succeeded') {
-                        $this->handlePaymentSuccess($paymentIntent);
-
-                        Log::info('payment.success_redirect_confirmed', [
-                            'fee_id' => $fee->id,
-                            'student_id' => $student->id,
-                            'payment_intent_id' => $paymentIntent->id ?? null,
-                        ]);
-
-                        return redirect()
-                            ->route('student.fees.index')
-                            ->with('success', "Payment of GBP {$fee->amount} completed successfully!");
-                    }
-                }
-
-                // If user left checkout without paying, reset the fee so they can try again
-                if ($session->payment_status !== 'paid' && $fee->status === Fee::STATUS_PAYMENT_PENDING) {
-                    $fee->markAsPending();
+                    return redirect()
+                        ->route('student.fees.index')
+                        ->with('success', "Payment of GBP {$fee->amount} completed successfully!");
                 }
             } catch (ApiErrorException $e) {
                 Log::error('Stripe Session verification failed: '.$e->getMessage());
             }
         }
 
-        // If webhook already processed, just show success
-        if ($fee->status === Fee::STATUS_PAID) {
+        if ($fee->fresh()->status === Fee::STATUS_PAID) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('success', "Payment of GBP {$fee->amount} completed successfully!");
@@ -156,7 +104,7 @@ class PaymentController extends Controller
     /**
      * Handle cancelled payment.
      */
-    public function cancel(Request $request, Fee $fee): RedirectResponse
+    public function cancel(Fee $fee): RedirectResponse
     {
         $this->authorize('view', $fee);
 
@@ -167,10 +115,7 @@ class PaymentController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        // Reset payment intent if payment was cancelled
-        if ($fee->status === Fee::STATUS_PAYMENT_PENDING && $fee->payment_intent_id) {
-            $fee->markAsPending();
-
+        if ($this->paymentService->resetPendingPayment($fee)) {
             Log::info('payment.checkout_cancelled', [
                 'fee_id' => $fee->id,
                 'student_id' => $student->id,
@@ -189,10 +134,10 @@ class PaymentController extends Controller
     {
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = config('services.stripe.webhook.secret');
+        $endpointSecret = (string) config('services.stripe.webhook.secret');
 
         try {
-            $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+            $event = $this->paymentService->constructWebhookEvent($payload, $sigHeader, $endpointSecret);
         } catch (\Exception $e) {
             Log::error('Stripe webhook signature verification failed: '.$e->getMessage());
 
@@ -206,52 +151,29 @@ class PaymentController extends Controller
             return response('Webhook event id missing', 400);
         }
 
+        $decodedPayload = json_decode($payload, true) ?? [];
+
         try {
-            $webhookEvent = StripeWebhookEvent::create([
-                'event_id' => $eventId,
-                'event_type' => $event->type,
-                'payload' => json_decode($payload, true),
-            ]);
-        } catch (QueryException $e) {
-            $message = strtolower($e->getMessage());
-
-            if ((string) $e->getCode() === '23000' || str_contains($message, 'unique')) {
-                Log::info('Duplicate Stripe webhook event ignored', [
-                    'event_id' => $eventId,
-                    'event_type' => $event->type,
-                ]);
-
+            $webhookEvent = $this->paymentService->recordWebhookEvent(
+                $eventId,
+                (string) $event->type,
+                $decodedPayload
+            );
+            if (! $webhookEvent) {
                 return response('Webhook already processed', 200);
             }
+        } catch (\Throwable $e) {
+            Log::error('Stripe webhook event logging failed', [
+                'event_id' => $eventId,
+                'event_type' => $event->type,
+                'error' => $e->getMessage(),
+            ]);
 
-            throw $e;
+            return response('Webhook event logging failed', 500);
         }
 
         try {
-            DB::transaction(function () use ($event) {
-                // Handle the event
-                switch ($event->type) {
-                    case 'checkout.session.completed':
-                        $session = $event->data->object;
-                        $this->handleCheckoutCompleted($session);
-                        break;
-
-                    case 'payment_intent.succeeded':
-                        $paymentIntent = $event->data->object;
-                        $this->handlePaymentSuccess($paymentIntent);
-                        break;
-
-                    case 'payment_intent.payment_failed':
-                        $paymentIntent = $event->data->object;
-                        $this->handlePaymentFailure($paymentIntent);
-                        break;
-
-                    default:
-                        Log::info('Unhandled Stripe webhook event', [
-                            'event_type' => $event->type,
-                        ]);
-                }
-            });
+            $this->paymentService->processWebhookEvent($event);
         } catch (\Throwable $e) {
             Log::error('Stripe webhook processing failed', [
                 'event_id' => $eventId,
@@ -265,163 +187,5 @@ class PaymentController extends Controller
         $webhookEvent->update(['processed_at' => now()]);
 
         return response('Webhook received', 200);
-    }
-
-    /**
-     * Handle successful payment from webhook.
-     */
-    private function handlePaymentSuccess($paymentIntent): void
-    {
-        $feeId = $paymentIntent->metadata->fee_id ?? null;
-
-        if (! $feeId) {
-            Log::warning('Payment Intent missing fee_id metadata', ['payment_intent_id' => $paymentIntent->id]);
-
-            return;
-        }
-
-        $paymentIntentId = $paymentIntent->id ?? null;
-
-        $result = DB::transaction(function () use ($feeId, $paymentIntent, $paymentIntentId) {
-            $fee = Fee::query()->lockForUpdate()->find($feeId);
-
-            if (! $fee) {
-                Log::warning('Fee not found for payment', [
-                    'fee_id' => $feeId,
-                    'payment_intent_id' => $paymentIntentId,
-                ]);
-
-                return null;
-            }
-
-            // Safety guard: if a different intent is already linked, do not overwrite.
-            if ($fee->payment_intent_id && $fee->payment_intent_id !== $paymentIntentId) {
-                Log::warning('Payment intent mismatch on success handler, aborting update', [
-                    'fee_id' => $fee->id,
-                    'existing_payment_intent_id' => $fee->payment_intent_id,
-                    'incoming_payment_intent_id' => $paymentIntentId,
-                ]);
-
-                return null;
-            }
-
-            // Idempotency guard: if already paid, no further changes or notifications.
-            if ($fee->status === Fee::STATUS_PAID) {
-                return [
-                    'newly_paid' => false,
-                    'fee' => $fee->fresh(['student.user']),
-                ];
-            }
-
-            $fee->markAsPaid(
-                $paymentIntent->payment_method_types[0] ?? 'card',
-                $paymentIntentId
-            );
-
-            return [
-                'newly_paid' => true,
-                'fee' => $fee->fresh(['student.user']),
-            ];
-        });
-
-        if (! $result) {
-            return;
-        }
-
-        /** @var \App\Models\Fee $fee */
-        $fee = $result['fee'];
-
-        if (! $result['newly_paid']) {
-            Log::info('Payment already processed, skipping duplicate success handler', [
-                'fee_id' => $fee->id,
-                'payment_intent_id' => $paymentIntentId,
-            ]);
-
-            return;
-        }
-
-        if ($fee->student?->user) {
-            $fee->student->user->notify(new FeeStatusUpdated($fee));
-        }
-
-        Log::info('Payment processed successfully via webhook', [
-            'fee_id' => $fee->id,
-            'payment_intent_id' => $paymentIntentId,
-        ]);
-    }
-
-    /**
-     * Handle failed payment from webhook.
-     */
-    private function handlePaymentFailure($paymentIntent): void
-    {
-        $feeId = $paymentIntent->metadata->fee_id ?? null;
-
-        if (! $feeId) {
-            return;
-        }
-
-        $updated = DB::transaction(function () use ($feeId, $paymentIntent) {
-            $fee = Fee::query()->lockForUpdate()->find($feeId);
-
-            if (! $fee || $fee->status === Fee::STATUS_PAID) {
-                return false;
-            }
-
-            if ($fee->payment_intent_id && $fee->payment_intent_id !== $paymentIntent->id) {
-                Log::warning('Payment failure webhook ignored due to payment intent mismatch', [
-                    'fee_id' => $fee->id,
-                    'stored_payment_intent_id' => $fee->payment_intent_id,
-                    'incoming_payment_intent_id' => $paymentIntent->id,
-                ]);
-
-                return false;
-            }
-
-            if ($fee->status !== Fee::STATUS_PAYMENT_PENDING) {
-                return false;
-            }
-
-            $fee->markAsPending();
-
-            return true;
-        });
-
-        if ($updated) {
-            Log::info('Payment failed via webhook', [
-                'fee_id' => $feeId,
-                'payment_intent_id' => $paymentIntent->id,
-            ]);
-        }
-    }
-
-    /**
-     * Handle checkout.session.completed webhook.
-     */
-    private function handleCheckoutCompleted($session): void
-    {
-        // When a checkout session completes, Stripe includes the payment_intent id
-        $paymentIntentId = $session->payment_intent ?? null;
-
-        if (! $paymentIntentId) {
-            Log::warning('Checkout completed without payment_intent id', ['session_id' => $session->id]);
-
-            return;
-        }
-
-        try {
-            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
-
-            if ($paymentIntent->status === 'succeeded') {
-                $this->handlePaymentSuccess($paymentIntent);
-            } elseif ($paymentIntent->status === 'requires_payment_method') {
-                $this->handlePaymentFailure($paymentIntent);
-            }
-        } catch (ApiErrorException $e) {
-            Log::error('Failed to retrieve payment intent after checkout completion', [
-                'session_id' => $session->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 }

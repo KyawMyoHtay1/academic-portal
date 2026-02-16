@@ -5,16 +5,41 @@ namespace App\Jobs;
 use App\Models\LowAttendanceAlertState;
 use App\Models\Student;
 use App\Notifications\LowAttendanceAlert;
+use DateTimeInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SendLowAttendanceAlertsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * Number of attempts before failing permanently.
+     */
+    public int $tries = 5;
+
+    /**
+     * Maximum unhandled exceptions before failing.
+     */
+    public int $maxExceptions = 3;
+
+    /**
+     * Exponential-ish retry backoff in seconds.
+     *
+     * @var array<int>
+     */
+    public array $backoff = [60, 300, 900, 1800];
+
+    /**
+     * Timeout in seconds for a single attempt.
+     */
+    public int $timeout = 120;
 
     public function handle(): void
     {
@@ -85,5 +110,17 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
                     );
                 }
             });
+    }
+
+    public function retryUntil(): DateTimeInterface
+    {
+        return now()->addHours(6);
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        Log::error('attendance.low_alerts_job_failed', [
+            'exception' => $exception->getMessage(),
+        ]);
     }
 }
