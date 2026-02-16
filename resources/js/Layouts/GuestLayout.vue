@@ -144,7 +144,7 @@ const quickStats = [
             <main class="relative z-10 flex flex-1 items-stretch">
                 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-7 sm:px-6 sm:pb-10 lg:flex-row lg:items-center lg:gap-8 lg:px-8">
                     <section
-                        class="guest-hero-panel w-full rounded-3xl border border-white/20 bg-slate-950/35 p-6 text-slate-100 shadow-2xl backdrop-blur-xl lg:w-1/2 lg:p-8"
+                        class="guest-hero-panel order-2 w-full rounded-3xl border border-white/20 bg-slate-950/35 p-6 text-slate-100 shadow-2xl backdrop-blur-xl lg:order-1 lg:w-1/2 lg:p-8"
                     >
                         <Link
                             href="/"
@@ -194,21 +194,21 @@ const quickStats = [
                         </div>
                     </section>
 
-                    <section class="w-full lg:w-1/2">
+                    <section class="order-1 w-full lg:order-2 lg:w-1/2">
                         <div class="guest-form-shell overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 p-6 shadow-2xl ring-1 ring-slate-100 backdrop-blur-md sm:p-8">
                             <slot />
                         </div>
 
-                        <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-100/90">
+                        <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-100/95">
                             <Link
                                 :href="route('privacy-policy')"
-                                class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 font-semibold transition hover:bg-white/20"
+                                class="rounded-full border border-white/35 bg-white/15 px-3 py-1.5 font-semibold transition hover:bg-white/25"
                             >
                                 Privacy Policy
                             </Link>
                             <Link
                                 :href="route('terms-and-conditions')"
-                                class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 font-semibold transition hover:bg-white/20"
+                                class="rounded-full border border-white/35 bg-white/15 px-3 py-1.5 font-semibold transition hover:bg-white/25"
                             >
                                 Terms and Conditions
                             </Link>
@@ -299,6 +299,11 @@ const quickStats = [
     animation: riseIn 0.5s ease-out;
 }
 
+.guest-form-shell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 28px 56px rgba(15, 23, 42, 0.22);
+}
+
 .guest-hero-panel {
     animation: riseIn 0.55s ease-out;
 }
@@ -313,6 +318,7 @@ const quickStats = [
 .guest-form-shell :deep(textarea) {
     border-radius: 0.8rem;
     border-color: #cbd5e1;
+    background-color: #fdfefe;
     box-shadow: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
@@ -322,12 +328,55 @@ const quickStats = [
 .guest-form-shell :deep(textarea:focus) {
     border-color: rgba(11, 31, 58, 0.65);
     box-shadow: 0 0 0 3px rgba(11, 31, 58, 0.16);
+    background-color: #ffffff;
 }
 
 .guest-form-shell :deep(button[type="submit"]),
 .guest-form-shell :deep(a[class*="bg-"]),
 .guest-form-shell :deep(button[class*="bg-"]) {
     border-radius: 999px;
+}
+
+.guest-form-shell :deep(input::placeholder),
+.guest-form-shell :deep(textarea::placeholder) {
+    color: #94a3b8;
+}
+
+.guest-form-shell :deep(button[type="submit"]) {
+    min-height: 2.6rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.guest-form-shell :deep(button[type="submit"]:hover) {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+}
+
+.guest-form-shell :deep(a:focus-visible),
+.guest-form-shell :deep(button:focus-visible),
+.guest-form-shell :deep(input:focus-visible),
+.guest-form-shell :deep(textarea:focus-visible),
+.guest-form-shell :deep(select:focus-visible) {
+    outline: 2px solid rgba(11, 31, 58, 0.5);
+    outline-offset: 2px;
+}
+
+.guest-hero-panel li {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.guest-hero-panel li:hover {
+    transform: translateX(2px);
+    color: #ffffff;
+}
+
+.guest-hero-panel .grid > div {
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.guest-hero-panel .grid > div:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 @keyframes drift {
@@ -354,12 +403,33 @@ const quickStats = [
     .guest-grid {
         opacity: 0.15;
     }
+
+    .guest-hero-panel {
+        padding: 1.25rem;
+    }
+
+    .guest-title {
+        font-size: 1.95rem;
+    }
 }
 
 @media (max-width: 640px) {
     .guest-orb {
         filter: blur(50px);
         opacity: 0.33;
+    }
+
+    .guest-title {
+        font-size: 1.65rem;
+    }
+
+    .guest-form-shell {
+        padding: 1.1rem;
+    }
+
+    .guest-form-shell:hover {
+        transform: none;
+        box-shadow: inherit;
     }
 }
 

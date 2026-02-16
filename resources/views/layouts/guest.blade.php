@@ -107,6 +107,27 @@
             box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
             backdrop-filter: blur(12px);
         }
+        .guest-nav-cluster {
+            scrollbar-width: none;
+        }
+        .guest-nav-cluster::-webkit-scrollbar {
+            display: none;
+        }
+        .guest-progress-track {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            z-index: 40;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .guest-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, rgba(11, 31, 58, 0.95), rgba(31, 122, 140, 0.9), rgba(244, 180, 0, 0.95));
+            transition: width 120ms linear;
+        }
         @keyframes guestFloat {
             0%, 100% {
                 transform: translateY(0) scale(1);
@@ -114,6 +135,14 @@
             50% {
                 transform: translateY(-22px) scale(1.04);
             }
+        }
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid rgba(11, 31, 58, 0.55);
+            outline-offset: 2px;
         }
         #google_translate_element select.goog-te-combo {
             display: none;
@@ -176,6 +205,13 @@
             .guest-grid-overlay {
                 opacity: 0.14;
             }
+            .guest-nav-cluster {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 0.3rem;
+            }
         }
         @media (prefers-reduced-motion: reduce) {
             .guest-orb,
@@ -209,6 +245,9 @@
         <span class="guest-orb guest-orb-b"></span>
         <span class="guest-orb guest-orb-c"></span>
         <span class="guest-grid-overlay"></span>
+    </div>
+    <div class="guest-progress-track" aria-hidden="true">
+        <span id="guest-scroll-progress" class="guest-progress-bar"></span>
     </div>
     @php
         $guestRouteName = Route::currentRouteName();
@@ -247,7 +286,7 @@
                 @include('guest.partials.portal-logo', ['variant' => 'nav'])
                 <span class="tracking-tight">University Academic <span class="text-[color:var(--portal-gold)]">Portal</span></span>
             </a>
-            <div class="flex flex-wrap items-center gap-2 text-sm">
+            <div class="guest-nav-cluster flex flex-wrap items-center gap-2 text-sm lg:w-auto">
                 {{-- Main links --}}
                 <a href="{{ route('guest.home') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.home') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.home')) aria-current="page" @endif>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,7 +344,7 @@
                     </div>
                 </div>
                 {{-- Search everything (guest) --}}
-                <div class="relative" id="guest-search-wrapper" data-search-url="{{ route('search') }}">
+                <div class="relative min-w-[12.5rem] flex-1 sm:flex-none" id="guest-search-wrapper" data-search-url="{{ route('search') }}">
                     <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600 transition focus-within:border-[color:var(--portal-navy)] focus-within:bg-white focus-within:ring-2 focus-within:ring-[color:var(--portal-navy)]/20 sm:w-56">
                         <svg class="h-4 w-4 shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -569,6 +608,24 @@
     @stack('scripts')
 
     <script>
+        // Reading progress indicator for long guest pages.
+        document.addEventListener('DOMContentLoaded', function () {
+            var progressBar = document.getElementById('guest-scroll-progress');
+            if (!progressBar) return;
+
+            function updateProgress() {
+                var doc = document.documentElement;
+                var scrollTop = doc.scrollTop || document.body.scrollTop;
+                var scrollHeight = Math.max(1, doc.scrollHeight - doc.clientHeight);
+                var percent = Math.min(100, Math.max(0, (scrollTop / scrollHeight) * 100));
+                progressBar.style.width = percent + '%';
+            }
+
+            updateProgress();
+            window.addEventListener('scroll', updateProgress, { passive: true });
+            window.addEventListener('resize', updateProgress);
+        });
+
         // Guest search: search everything (courses, news, pages)
         document.addEventListener('DOMContentLoaded', function () {
             var guestSearchWrapper = document.getElementById('guest-search-wrapper');
