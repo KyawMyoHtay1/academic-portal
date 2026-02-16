@@ -1,0 +1,30 @@
+@startuml
+title Timebox 3 - Attendance Recording and Reporting Process
+
+actor Teacher
+actor Student
+actor Staff as "Staff/Admin"
+
+participant "Subject" as Subject
+participant "Attendance" as Attendance
+participant "LowAttendanceAlert" as Alert
+
+Teacher -> Subject: View timetable and sessions
+Subject --> Teacher: Show session list
+
+Teacher -> Attendance: Record attendance\n(subjectId, date, statuses[])
+Attendance -> Attendance: Validate teacher assignment
+Attendance -> Attendance: Validate enrolled students
+Attendance -> Attendance: Save / update records
+Attendance --> Teacher: Confirm attendance saved
+
+Attendance -> Alert: Check low attendance\nper student
+Alert -> Student: Send alert\n(if below threshold)
+
+Student -> Attendance: View my attendance
+Attendance --> Student: Show overall and per-course stats
+
+Staff -> Attendance: View attendance report
+Attendance --> Staff: Show statistics and\nlow attendance list
+
+@enduml

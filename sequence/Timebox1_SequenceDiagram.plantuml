@@ -1,0 +1,27 @@
+@startuml
+title Timebox 1 - Course Registration Process
+
+actor Student
+actor Staff as "Staff/Admin"
+
+participant "Course" as Course
+participant "Enrolment" as Enrolment
+
+Student -> Course: Browse available courses
+Course --> Student: Show course list
+
+Student -> Enrolment: Request enrolment\n(studentId, courseId)
+Enrolment -> Enrolment: Check existing enrolment\nand pending requests
+Enrolment -> Enrolment: Check schedule conflicts
+Enrolment --> Student: Show status = pending
+
+Staff -> Enrolment: View pending enrolment requests
+Enrolment --> Staff: Display pending list
+
+Staff -> Enrolment: Approve enrolment\n(enrolmentId)
+Enrolment -> Enrolment: Update status\npending -> approved
+Enrolment --> Staff: Confirm approval
+
+Enrolment --> Student: Notify enrolment approved
+
+@enduml

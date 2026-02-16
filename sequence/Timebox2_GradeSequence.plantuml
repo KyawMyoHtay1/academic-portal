@@ -1,0 +1,35 @@
+@startuml
+title Timebox 2 - Grade Submission and Approval Process
+
+actor Teacher
+actor Staff as "Staff/Admin"
+actor Student
+
+participant "Subject" as Subject
+participant "Grade" as Grade
+participant "GradeReviewLog" as GradeLog
+
+Teacher -> Subject: View assigned subjects
+Subject --> Teacher: Show subject list
+
+Teacher -> Grade: Submit grades\n(subjectId, studentId, score)
+Grade -> Grade: Validate teacher assignment
+Grade -> Grade: Validate student enrolment
+Grade -> Grade: Save grade\nstatus = pending
+Grade -> GradeLog: Record action 'submitted'
+Grade --> Teacher: Confirm grade submission
+
+Staff -> Grade: View pending grades
+Grade --> Staff: Show pending grade list
+
+Staff -> Grade: Approve grade\n(gradeId)
+Grade -> Grade: Update status\npending -> approved
+Grade -> GradeLog: Record action 'approved'
+Grade --> Staff: Confirm approval
+
+Grade --> Student: Notify grade published
+
+Student -> Grade: View approved grades
+Grade --> Student: Show grades and GPA
+
+@enduml
