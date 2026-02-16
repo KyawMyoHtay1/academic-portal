@@ -12,9 +12,14 @@
     @endif
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
         :root {
             --portal-navy: #0b1f3a;
             --portal-gold: #f4b400;
+            --portal-ink: #081326;
+            --portal-teal: #1f7a8c;
+            --portal-cream: #f8fafc;
         }
         /* Hide Google Translate's default UI */
         .goog-te-banner-frame,
@@ -24,6 +29,91 @@
         }
         body {
             top: 0 !important;
+            font-family: "Source Sans 3", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(75rem 75rem at -20% -20%, rgba(31, 122, 140, 0.2), transparent 55%),
+                radial-gradient(62rem 62rem at 120% -15%, rgba(244, 180, 0, 0.16), transparent 50%),
+                linear-gradient(180deg, #f8fbff 0%, #f4f8ff 42%, #f7f9fc 100%);
+            color: #0f172a;
+        }
+        h1, h2, h3, h4 {
+            font-family: "Space Grotesk", "Source Sans 3", sans-serif;
+            letter-spacing: -0.01em;
+        }
+        .guest-shell-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .guest-orb {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(70px);
+            opacity: 0.4;
+            animation: guestFloat 16s ease-in-out infinite;
+        }
+        .guest-orb-a {
+            width: 24rem;
+            height: 24rem;
+            background: rgba(11, 31, 58, 0.22);
+            left: -6rem;
+            top: 4rem;
+        }
+        .guest-orb-b {
+            width: 22rem;
+            height: 22rem;
+            background: rgba(244, 180, 0, 0.2);
+            right: -4rem;
+            top: 10rem;
+            animation-delay: 2.5s;
+        }
+        .guest-orb-c {
+            width: 18rem;
+            height: 18rem;
+            background: rgba(31, 122, 140, 0.2);
+            left: 46%;
+            bottom: -6rem;
+            animation-delay: 4s;
+        }
+        .guest-grid-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.2;
+            background-image:
+                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+            background-size: 34px 34px;
+            mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.75), transparent 72%);
+            -webkit-mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.75), transparent 72%);
+        }
+        .portal-main {
+            position: relative;
+            z-index: 1;
+        }
+        .guest-reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .guest-reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .guest-glass-nav {
+            background: rgba(255, 255, 255, 0.78);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+        }
+        @keyframes guestFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-22px) scale(1.04);
+            }
         }
         #google_translate_element select.goog-te-combo {
             display: none;
@@ -76,7 +166,27 @@
             transform: scale(1.06);
             box-shadow: 0 4px 14px rgba(11, 31, 58, 0.2), 0 0 0 1px rgba(244, 180, 0, 0.15);
         }
+        @media (max-width: 640px) {
+            .guest-orb-a,
+            .guest-orb-b,
+            .guest-orb-c {
+                opacity: 0.3;
+                filter: blur(56px);
+            }
+            .guest-grid-overlay {
+                opacity: 0.14;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .guest-orb,
+            .guest-reveal,
+            .portal-slide {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
     </style>
+    @stack('styles')
     <!-- Google Translate -->
     <script type="text/javascript">
         window.googleTranslateElementInit = function() {
@@ -93,7 +203,13 @@
     </script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
-<body class="bg-gradient-to-b from-slate-50 via-white to-slate-100 font-sans text-slate-900">
+<body class="text-slate-900">
+    <div class="guest-shell-bg" aria-hidden="true">
+        <span class="guest-orb guest-orb-a"></span>
+        <span class="guest-orb guest-orb-b"></span>
+        <span class="guest-orb guest-orb-c"></span>
+        <span class="guest-grid-overlay"></span>
+    </div>
     @php
         $guestRouteName = Route::currentRouteName();
 
@@ -125,7 +241,7 @@
         $guestInactiveLinkClass = 'text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100 transition-colors';
     @endphp
 
-    <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
+    <nav class="guest-glass-nav sticky top-0 z-30">
         <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
             <a href="{{ route('guest.home') }}" class="portal-logo-link flex items-center gap-3 text-xl font-bold text-[color:var(--portal-navy)]">
                 @include('guest.partials.portal-logo', ['variant' => 'nav'])
@@ -202,7 +318,7 @@
                             class="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
                             aria-label="Search courses, news, and pages"
                         />
-                        <kbd class="hidden shrink-0 rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 sm:inline-block">⌘K</kbd>
+                        <kbd class="hidden shrink-0 rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 sm:inline-block">Ctrl+K</kbd>
                     </div>
                     <div id="guest-search-dropdown" class="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-auto rounded-lg border border-slate-200 bg-white py-2 shadow-lg hidden" role="listbox"></div>
                 </div>
@@ -348,7 +464,7 @@
         </div>
     @endif
 
-    <main>
+    <main class="portal-main">
         @yield('content')
     </main>
 
@@ -670,6 +786,37 @@
             });
         });
 
+        // Reveal major content blocks with a small stagger on scroll.
+        document.addEventListener('DOMContentLoaded', function () {
+            const revealTargets = Array.from(
+                document.querySelectorAll('main section, main article, main .portal-card, main [data-guest-reveal]'),
+            );
+
+            revealTargets.forEach((target, index) => {
+                target.classList.add('guest-reveal');
+                target.style.transitionDelay = `${Math.min(index * 35, 320)}ms`;
+            });
+
+            if (!('IntersectionObserver' in window)) {
+                revealTargets.forEach((target) => target.classList.add('is-visible'));
+                return;
+            }
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+            );
+
+            revealTargets.forEach((target) => observer.observe(target));
+        });
+
         // Google Translate Functions
         function toggleTranslateDropdown() {
             const dropdown = document.getElementById('translate-dropdown');
@@ -749,4 +896,3 @@
     </script>
 </body>
 </html>
-
