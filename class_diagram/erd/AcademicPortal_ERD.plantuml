@@ -1,0 +1,304 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+title University Academic Portal - Overall ERD
+
+entity "users" as User {
+  *id : int <<PK>>
+  --
+  name : string
+  email : string <<UK>>
+  password : string
+  role : enum
+  photo : string
+  email_verified_at : datetime
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "students" as Student {
+  *id : int <<PK>>
+  user_id : int <<FK>>
+  student_no : string <<UK>>
+  full_name : string
+  dob : date
+  gender : enum
+  email : string
+  phone : string
+  address : string
+  programme : string
+  intake_year : int
+  status : enum
+  photo : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "courses" as Course {
+  *id : int <<PK>>
+  course_code : string <<UK>>
+  title : string
+  credits : int
+  semester : string
+  photo : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "subjects" as Subject {
+  *id : int <<PK>>
+  course_id : int <<FK>>
+  subject_code : string <<UK>>
+  title : string
+  credits : int
+  description : text
+  photo : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "enrollments" as Enrollment {
+  *id : int <<PK>>
+  course_id : int <<FK>>
+  student_id : int <<FK>>
+  status : enum        ' pending, approved, rejected, withdrawal_pending
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "course_teacher" as CourseTeacher {
+  *id : int <<PK>>
+  course_id : int <<FK>>
+  user_id : int <<FK>>  ' teacher
+}
+
+entity "subject_teacher" as SubjectTeacher {
+  *id : int <<PK>>
+  subject_id : int <<FK>>
+  user_id : int <<FK>>  ' teacher
+}
+
+entity "grades" as Grade {
+  *id : int <<PK>>
+  subject_id : int <<FK>>
+  course_id : int <<FK>>
+  student_id : int <<FK>>
+  graded_by : int <<FK>>   ' user
+  reviewed_by : int <<FK>> ' staff
+  score : decimal
+  status : enum        ' pending, approved, rejected
+  reviewed_at : datetime
+  rejection_reason : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "grade_review_logs" as GradeLog {
+  *id : int <<PK>>
+  grade_id : int <<FK>>
+  performed_by : int <<FK>>  ' user
+  action : string             ' submitted, approved, rejected
+  reason : string
+  meta : json
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "fees" as Fee {
+  *id : int <<PK>>
+  student_id : int <<FK>>
+  amount : decimal
+  description : string
+  status : enum         ' pending, payment_pending, paid
+  due_date : date
+  paid_date : date
+  payment_intent_id : string
+  payment_method : string
+  payment_processed_at : datetime
+  processed_by : int <<FK>>   ' staff user
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "timetables" as Timetable {
+  *id : int <<PK>>
+  subject_id : int <<FK>>
+  created_by : int <<FK>>   ' staff
+  day_of_week : string
+  start_time : time
+  end_time : time
+  location : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "attendances" as Attendance {
+  *id : int <<PK>>
+  subject_id : int <<FK>>
+  student_id : int <<FK>>
+  date : date
+  status : enum      ' present, absent
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "low_attendance_alert_states" as LowAlert {
+  *id : int <<PK>>
+  student_id : int <<FK>>
+  last_rate : float
+  is_below_threshold : bool
+  last_alert_sent_at : datetime
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "announcements" as Announcement {
+  *id : int <<PK>>
+  user_id : int <<FK>>   ' author
+  title : string
+  body : text
+  priority : enum        ' info, important, urgent
+  pinned : bool
+  require_ack : bool
+  audience : json        ' roles
+  publish_at : datetime
+  expires_at : datetime
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "announcement_reads" as AnnouncementRead {
+  *id : int <<PK>>
+  announcement_id : int <<FK>>
+  user_id : int <<FK>>
+  read_at : datetime
+  acknowledged_at : datetime
+}
+
+entity "messages" as Message {
+  *id : int <<PK>>
+  sender_id : int <<FK>>    ' user
+  receiver_id : int <<FK>>  ' user
+  body : text
+  read : bool
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "notifications" as Notification {
+  *id : int <<PK>>
+  notifiable_type : string   ' User model
+  notifiable_id : int <<FK>>
+  type : string
+  data : json
+  read_at : datetime
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "contact_messages" as ContactMessage {
+  *id : int <<PK>>
+  first_name : string
+  last_name : string
+  email : string
+  phone : string
+  subject : string
+  message : text
+  is_read : bool
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "feedback_messages" as FeedbackMessage {
+  *id : int <<PK>>
+  name : string
+  email : string
+  type : string
+  message : text
+  is_read : bool
+  replied_at : datetime
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "assignments" as Assignment {
+  *id : int <<PK>>
+  subject_id : int <<FK>>
+  course_id : int <<FK>>
+  created_by : int <<FK>>   ' teacher
+  title : string
+  description : text
+  due_date : date
+  due_time : time
+  max_score : int
+  status : enum             ' draft, published, closed
+  allowed_file_types : json
+  max_file_size : int
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "assignment_submissions" as Submission {
+  *id : int <<PK>>
+  assignment_id : int <<FK>>
+  student_id : int <<FK>>
+  file_path : string
+  original_filename : string
+  comments : text
+  score : decimal
+  feedback : text
+  graded_by : int <<FK>>
+  graded_at : datetime
+  status : enum            ' submitted, graded
+  created_at : datetime
+  updated_at : datetime
+}
+
+'----------------------------------------------------
+' Relationships
+'----------------------------------------------------
+
+User ||--o{ Student        : has 0..1 profile
+Course ||--o{ Subject       : has >
+Course ||--o{ Enrollment
+Student ||--o{ Enrollment
+
+Course ||--o{ CourseTeacher
+User   ||--o{ CourseTeacher : teaches
+
+Subject ||--o{ SubjectTeacher
+User    ||--o{ SubjectTeacher : teaches
+
+Subject ||--o{ Grade
+Course  ||--o{ Grade
+Student ||--o{ Grade
+User    ||--o{ Grade : graded_by / reviewed_by
+Grade   ||--o{ GradeLog
+
+Student ||--o{ Fee
+User    ||--o{ Fee  : processed_by
+
+Subject ||--o{ Timetable
+User    ||--o{ Timetable : created_by
+
+Subject ||--o{ Attendance
+Student ||--o{ Attendance
+Student ||--o| LowAlert
+
+Student ||--o{ AssignmentSubmission
+Assignment ||--o{ Submission
+Subject ||--o{ Assignment
+Course  ||--o{ Assignment
+User    ||--o{ Assignment : created_by
+User    ||--o{ Submission : graded_by
+
+User ||--o{ Announcement
+Announcement ||--o{ AnnouncementRead
+User ||--o{ AnnouncementRead
+
+User ||--o{ Message : sender
+User ||--o{ Message : receiver
+
+User ||--o{ Notification
+
+@enduml
