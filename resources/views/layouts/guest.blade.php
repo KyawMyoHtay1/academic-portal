@@ -12,7 +12,7 @@
     @endif
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
 
         :root {
             --portal-navy: #0b1f3a;
@@ -20,6 +20,7 @@
             --portal-ink: #081326;
             --portal-teal: #1f7a8c;
             --portal-cream: #f8fafc;
+            --portal-stone: #8b7c5a;
         }
         /* Hide Google Translate's default UI */
         .goog-te-banner-frame,
@@ -31,14 +32,14 @@
             top: 0 !important;
             font-family: "Source Sans 3", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background:
-                radial-gradient(75rem 75rem at -20% -20%, rgba(31, 122, 140, 0.2), transparent 55%),
-                radial-gradient(62rem 62rem at 120% -15%, rgba(244, 180, 0, 0.16), transparent 50%),
-                linear-gradient(180deg, #f8fbff 0%, #f4f8ff 42%, #f7f9fc 100%);
+                radial-gradient(66rem 66rem at -18% -18%, rgba(56, 93, 128, 0.18), transparent 58%),
+                radial-gradient(52rem 52rem at 115% -12%, rgba(141, 124, 92, 0.14), transparent 52%),
+                linear-gradient(180deg, #f7f9fc 0%, #f4f7fb 45%, #f8fafd 100%);
             color: #0f172a;
         }
         h1, h2, h3, h4 {
-            font-family: "Space Grotesk", "Source Sans 3", sans-serif;
-            letter-spacing: -0.01em;
+            font-family: "Merriweather", "Source Sans 3", serif;
+            letter-spacing: 0;
         }
         .guest-shell-bg {
             position: fixed;
@@ -50,21 +51,21 @@
         .guest-orb {
             position: absolute;
             border-radius: 999px;
-            filter: blur(70px);
-            opacity: 0.4;
-            animation: guestFloat 16s ease-in-out infinite;
+            filter: blur(76px);
+            opacity: 0.26;
+            animation: guestFloat 20s ease-in-out infinite;
         }
         .guest-orb-a {
             width: 24rem;
             height: 24rem;
-            background: rgba(11, 31, 58, 0.22);
+            background: rgba(49, 80, 118, 0.24);
             left: -6rem;
             top: 4rem;
         }
         .guest-orb-b {
             width: 22rem;
             height: 22rem;
-            background: rgba(244, 180, 0, 0.2);
+            background: rgba(141, 124, 92, 0.2);
             right: -4rem;
             top: 10rem;
             animation-delay: 2.5s;
@@ -72,7 +73,7 @@
         .guest-orb-c {
             width: 18rem;
             height: 18rem;
-            background: rgba(31, 122, 140, 0.2);
+            background: rgba(91, 112, 136, 0.18);
             left: 46%;
             bottom: -6rem;
             animation-delay: 4s;
@@ -80,10 +81,10 @@
         .guest-grid-overlay {
             position: absolute;
             inset: 0;
-            opacity: 0.2;
+            opacity: 0.11;
             background-image:
-                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+                linear-gradient(rgba(15, 23, 42, 0.032) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.032) 1px, transparent 1px);
             background-size: 34px 34px;
             mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.75), transparent 72%);
             -webkit-mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.75), transparent 72%);
@@ -94,18 +95,18 @@
         }
         .guest-reveal {
             opacity: 0;
-            transform: translateY(22px);
-            transition: opacity 0.55s ease, transform 0.55s ease;
+            transform: translateY(14px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
         }
         .guest-reveal.is-visible {
             opacity: 1;
             transform: translateY(0);
         }
         .guest-glass-nav {
-            background: rgba(255, 255, 255, 0.78);
-            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
-            box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
-            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+            backdrop-filter: blur(10px);
         }
         .guest-nav-cluster {
             scrollbar-width: none;
@@ -120,12 +121,12 @@
             top: 0;
             z-index: 40;
             height: 2px;
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(11, 31, 58, 0.08);
         }
         .guest-progress-bar {
             height: 100%;
             width: 0;
-            background: linear-gradient(90deg, rgba(11, 31, 58, 0.95), rgba(31, 122, 140, 0.9), rgba(244, 180, 0, 0.95));
+            background: linear-gradient(90deg, rgba(11, 31, 58, 0.92), rgba(31, 73, 118, 0.88));
             transition: width 120ms linear;
         }
         @keyframes guestFloat {
@@ -141,7 +142,7 @@
         input:focus-visible,
         select:focus-visible,
         textarea:focus-visible {
-            outline: 2px solid rgba(11, 31, 58, 0.55);
+            outline: 2px solid rgba(11, 31, 58, 0.48);
             outline-offset: 2px;
         }
         #google_translate_element select.goog-te-combo {
@@ -203,7 +204,7 @@
                 filter: blur(56px);
             }
             .guest-grid-overlay {
-                opacity: 0.14;
+                opacity: 0.09;
             }
             .guest-nav-cluster {
                 display: flex;

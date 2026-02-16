@@ -156,7 +156,7 @@ const quickStats = [
                             </span>
                         </Link>
 
-                        <p class="guest-badge inline-flex items-center rounded-full border border-amber-300/40 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-200">
+                        <p class="guest-badge inline-flex items-center rounded-full border border-slate-300/40 bg-slate-200/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-100">
                             {{ scene.badge }}
                         </p>
 
@@ -188,7 +188,7 @@ const quickStats = [
                                 :key="metric.label"
                                 class="rounded-2xl border border-white/15 bg-white/5 px-3 py-3 text-center"
                             >
-                                <p class="text-lg font-semibold text-amber-200">{{ metric.value }}</p>
+                                <p class="text-lg font-semibold text-slate-100">{{ metric.value }}</p>
                                 <p class="text-[11px] uppercase tracking-[0.1em] text-slate-300">{{ metric.label }}</p>
                             </div>
                         </div>
@@ -225,14 +225,14 @@ const quickStats = [
 </template>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
 
 .guest-shell {
     font-family: "Source Sans 3", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background:
-        radial-gradient(70rem 70rem at -18% -18%, rgba(44, 114, 176, 0.26), transparent 54%),
-        radial-gradient(64rem 64rem at 112% -20%, rgba(244, 180, 0, 0.2), transparent 50%),
-        linear-gradient(145deg, #091a35 0%, #102a4f 32%, #0f253e 100%);
+        radial-gradient(64rem 64rem at -16% -20%, rgba(53, 85, 122, 0.24), transparent 56%),
+        radial-gradient(54rem 54rem at 112% -16%, rgba(141, 124, 92, 0.17), transparent 52%),
+        linear-gradient(150deg, #0f223f 0%, #173158 40%, #203b61 100%);
 }
 
 .guest-ambient {
@@ -246,9 +246,9 @@ const quickStats = [
 .guest-orb {
     position: absolute;
     border-radius: 999px;
-    filter: blur(68px);
-    opacity: 0.42;
-    animation: drift 15s ease-in-out infinite;
+    filter: blur(74px);
+    opacity: 0.3;
+    animation: drift 20s ease-in-out infinite;
 }
 
 .guest-orb--a {
@@ -256,7 +256,7 @@ const quickStats = [
     top: -4rem;
     height: 21rem;
     width: 21rem;
-    background: rgba(31, 122, 140, 0.36);
+    background: rgba(44, 82, 124, 0.32);
 }
 
 .guest-orb--b {
@@ -264,7 +264,7 @@ const quickStats = [
     top: 10rem;
     height: 19rem;
     width: 19rem;
-    background: rgba(244, 180, 0, 0.34);
+    background: rgba(148, 124, 82, 0.26);
     animation-delay: 2.5s;
 }
 
@@ -273,17 +273,17 @@ const quickStats = [
     bottom: -8rem;
     height: 20rem;
     width: 20rem;
-    background: rgba(59, 130, 246, 0.3);
+    background: rgba(76, 106, 138, 0.24);
     animation-delay: 4.5s;
 }
 
 .guest-grid {
     position: absolute;
     inset: 0;
-    opacity: 0.2;
+    opacity: 0.12;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
     background-size: 34px 34px;
     mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.72), transparent 70%);
     -webkit-mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.72), transparent 70%);
@@ -292,16 +292,11 @@ const quickStats = [
 .guest-title,
 .guest-brand,
 .guest-badge {
-    font-family: "Space Grotesk", "Source Sans 3", sans-serif;
+    font-family: "Merriweather", "Source Sans 3", serif;
 }
 
 .guest-form-shell {
     animation: riseIn 0.5s ease-out;
-}
-
-.guest-form-shell:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 28px 56px rgba(15, 23, 42, 0.22);
 }
 
 .guest-hero-panel {
@@ -349,7 +344,7 @@ const quickStats = [
 
 .guest-form-shell :deep(button[type="submit"]:hover) {
     transform: translateY(-1px);
-    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+    box-shadow: 0 7px 14px rgba(15, 23, 42, 0.14);
 }
 
 .guest-form-shell :deep(a:focus-visible),
@@ -361,22 +356,12 @@ const quickStats = [
     outline-offset: 2px;
 }
 
-.guest-hero-panel li {
-    transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.guest-hero-panel li:hover {
-    transform: translateX(2px);
-    color: #ffffff;
-}
-
 .guest-hero-panel .grid > div {
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .guest-hero-panel .grid > div:hover {
-    transform: translateY(-2px);
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: rgba(255, 255, 255, 0.11);
 }
 
 @keyframes drift {
@@ -401,7 +386,7 @@ const quickStats = [
 
 @media (max-width: 1024px) {
     .guest-grid {
-        opacity: 0.15;
+        opacity: 0.1;
     }
 
     .guest-hero-panel {
@@ -415,8 +400,8 @@ const quickStats = [
 
 @media (max-width: 640px) {
     .guest-orb {
-        filter: blur(50px);
-        opacity: 0.33;
+        filter: blur(56px);
+        opacity: 0.23;
     }
 
     .guest-title {
@@ -427,10 +412,6 @@ const quickStats = [
         padding: 1.1rem;
     }
 
-    .guest-form-shell:hover {
-        transform: none;
-        box-shadow: inherit;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
