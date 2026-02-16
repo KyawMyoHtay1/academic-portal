@@ -25,13 +25,27 @@ const highlightedResult = computed(() => {
 });
 
 const typeLabels = {
-    student: "Student",
-    user: "User",
+    student: "Student record",
+    user: "User account",
     course: "Course",
     subject: "Subject",
     announcement: "Announcement",
     assignment: "Assignment",
-    page: "Page",
+    page: "Portal page",
+};
+
+const typeIcons = {
+    student: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+    user: "M5.121 17.804A9 9 0 1119 10.5a4.5 4.5 0 01-7.879 3.181A5.5 5.5 0 015.12 17.804z",
+    course:
+        "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+    subject:
+        "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+    announcement:
+        "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z",
+    assignment:
+        "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+    page: "M8 4h8a2 2 0 012 2v12l-4-3-4 3-4-3-4 3V6a2 2 0 012-2h4z",
 };
 
 function fetchResults() {
@@ -226,28 +240,46 @@ onUnmounted(() => {
                         v-for="(result, idx) in results"
                         :key="`${result.type}-${result.id}`"
                         type="button"
-                        class="flex w-full flex-col items-start gap-0.5 px-4 py-2.5 text-left transition hover:bg-slate-50"
+                        class="flex w-full items-start gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50"
                         :class="{
                             'bg-portal-navy/5': idx === highlightIndex,
                         }"
                         @click="selectResult(result)"
                     >
-                        <div class="flex w-full items-center justify-between gap-2">
-                            <span class="truncate text-sm font-medium text-slate-900">
-                                {{ result.title }}
-                            </span>
-                            <span
-                                class="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
+                        <div class="mt-0.5">
+                            <svg
+                                class="h-4 w-4 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
                             >
-                                {{ typeLabels[result.type] ?? result.type }}
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    :d="typeIcons[result.type] || 'M4 6h16M4 12h16M4 18h16'"
+                                />
+                            </svg>
+                        </div>
+                        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <div class="flex items-center gap-2">
+                                <span class="truncate text-sm font-medium text-slate-900">
+                                    {{ result.title }}
+                                </span>
+                                <span
+                                    class="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
+                                >
+                                    {{ typeLabels[result.type] ?? result.type }}
+                                </span>
+                            </div>
+                            <span
+                                v-if="result.subtitle"
+                                class="truncate text-xs text-slate-500"
+                            >
+                                {{ result.subtitle }}
                             </span>
                         </div>
-                        <span
-                            v-if="result.subtitle"
-                            class="truncate text-xs text-slate-500"
-                        >
-                            {{ result.subtitle }}
-                        </span>
                     </button>
                 </div>
             </div>
