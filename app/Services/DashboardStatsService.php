@@ -54,23 +54,36 @@ class DashboardStatsService
         $queueConfigured = $queueConnection !== 'sync';
 
         $pendingJobs = 0;
+        $failedJobs = 0;
         if ($queueConnection === 'database') {
             try {
                 $pendingJobs = DB::table('jobs')->count();
             } catch (\Exception $e) {
                 // Jobs table might not exist.
             }
+
+            try {
+                $failedJobs = DB::table('failed_jobs')->count();
+            } catch (\Exception $e) {
+                // Failed jobs table might not exist.
+            }
         }
 
         $schedulerConfigured = true;
+        $queueHealthy = $queueConfigured && $schedulerConfigured && $failedJobs === 0;
         $alertSystemStatus = [
             'queueConfigured' => $queueConfigured,
             'queueConnection' => $queueConnection,
             'pendingJobs' => $pendingJobs,
+            'failedJobs' => $failedJobs,
             'schedulerConfigured' => $schedulerConfigured,
-            'status' => $queueConfigured && $schedulerConfigured ? 'ready' : 'warning',
+            'status' => $queueHealthy ? 'ready' : 'warning',
             'message' => $queueConfigured
-                ? ($pendingJobs > 10 ? 'Queue worker may need attention (many pending jobs)' : 'System ready for automatic alerts')
+                ? ($failedJobs > 0
+                    ? 'Failed jobs detected - review queue failures'
+                    : ($pendingJobs > 10
+                        ? 'Queue worker may need attention (many pending jobs)'
+                        : 'System ready for automatic alerts'))
                 : 'Queue is set to sync mode - configure QUEUE_CONNECTION for automatic alerts',
         ];
 

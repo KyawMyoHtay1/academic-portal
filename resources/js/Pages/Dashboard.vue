@@ -2021,6 +2021,18 @@ const quickActions = computed(() => {
                                                     }}
                                                     job(s) in queue
                                                 </div>
+                                                <div
+                                                    v-if="
+                                                        alertSystemStatus.failedJobs >
+                                                        0
+                                                    "
+                                                    class="mt-1 text-xs text-red-700"
+                                                >
+                                                    {{
+                                                        alertSystemStatus.failedJobs
+                                                    }}
+                                                    failed job(s) require attention
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
