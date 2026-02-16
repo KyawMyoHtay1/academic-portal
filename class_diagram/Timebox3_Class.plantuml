@@ -133,20 +133,22 @@ class FeedbackMessage {
 }
 
 ' Relationships
-Subject "1" -- "*" Timetable
-User "1" -- "*" Timetable : created_by
+Subject "1" -- "0..*" Timetable
+User    "1" -- "0..*" Timetable : created_by
 
-Subject "1" -- "*" Attendance
-Student "1" -- "*" Attendance
-Student "1" -- "1" LowAttendanceAlertState
+Subject "1" -- "0..*" Attendance
+Student "1" -- "0..*" Attendance
 
-User "1" -- "*" Announcement
-Announcement "1" -- "*" AnnouncementRead
-User "1" -- "*" AnnouncementRead
+' Each Student can have 0 or 1 alert state; each state belongs to 1 Student.
+Student "1" -- "0..1" LowAttendanceAlertState
 
-User "1" -- "*" Message : sender
-User "1" -- "*" Message : receiver
+User "1" -- "0..*" Announcement
+Announcement "1" -- "0..*" AnnouncementRead
+User "1" -- "0..*" AnnouncementRead
 
-User "1" -- "*" Notification
+User "1" -- "0..*" Message : sender
+User "1" -- "0..*" Message : receiver
+
+User "1" -- "0..*" Notification
 
 @enduml

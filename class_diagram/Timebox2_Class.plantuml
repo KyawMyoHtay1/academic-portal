@@ -104,19 +104,19 @@ class AssignmentSubmission {
 }
 
 ' Relationships
-Course "1" -- "*" Subject
-Subject "1" -- "*" Grade
-Student "1" -- "*" Grade
-User "1" -- "*" Grade : graded_by / reviewed_by
-Grade "1" -- "*" GradeReviewLog
+Course  "1" -- "0..*" Subject
+Subject "1" -- "0..*" Grade
+Student "1" -- "0..*" Grade
+User    "1" -- "0..*" Grade : graded_by / reviewed_by
+Grade   "1" -- "0..*" GradeReviewLog
 
-Student "1" -- "*" Fee
+Student "1" -- "0..*" Fee
 
-Subject "1" -- "*" Assignment
-Course "1" -- "*" Assignment
-User "1" -- "*" Assignment : created_by
-Assignment "1" -- "*" AssignmentSubmission
-Student "1" -- "*" AssignmentSubmission
-User "1" -- "*" AssignmentSubmission : graded_by
+Subject "1" -- "0..*" Assignment
+Course  "1" -- "0..*" Assignment
+User    "1" -- "0..*" Assignment : created_by
+Assignment "1" -- "0..*" AssignmentSubmission
+Student    "1" -- "0..*" AssignmentSubmission
+User       "1" -- "0..*" AssignmentSubmission : graded_by
 
 @enduml

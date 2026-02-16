@@ -92,13 +92,27 @@ class subject_teacher {
   +RemoveTeacher()
 }
 
-User "1" -- "1" Student : has profile >
-Course "1" -- "*" Subject : has >
-Course "1" -- "*" Enrollment
-Student "1" -- "*" Enrollment
-Course "1" -- "*" course_teacher
-User "1" -- "*" course_teacher : teaches
-Subject "1" -- "*" subject_teacher
-User "1" -- "*" subject_teacher : teaches
+' Relationships
+
+' One User may or may not be a Student (0 or 1),
+' but each Student must have exactly one User.
+User "0..1" -- "1" Student : has profile >
+
+' One Course has many Subjects, each Subject belongs to one Course.
+Course "1" -- "0..*" Subject : has >
+
+' One Course has many Enrollments, each Enrollment belongs to one Course.
+Course "1" -- "0..*" Enrollment
+
+' One Student has many Enrollments, each Enrollment belongs to one Student.
+Student "1" -- "0..*" Enrollment
+
+' Many-to-many Course–Teacher via course_teacher pivot.
+Course "1" -- "0..*" course_teacher
+User  "1"  -- "0..*" course_teacher : teaches
+
+' Many-to-many Subject–Teacher via subject_teacher pivot.
+Subject "1" -- "0..*" subject_teacher
+User    "1" -- "0..*" subject_teacher : teaches
 
 @enduml
