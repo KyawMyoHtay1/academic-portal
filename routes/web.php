@@ -20,6 +20,7 @@ use App\Http\Controllers\StaffContactMessageController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffEnrollmentController;
+use App\Http\Controllers\StaffFailedJobController;
 use App\Http\Controllers\StaffFeeController;
 use App\Http\Controllers\StaffFeedbackMessageController;
 use App\Http\Controllers\StaffGradesController;
@@ -522,6 +523,13 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Attendance Alerts (staff only)
         Route::post('/admin/attendance/alerts/run', StaffAttendanceAlertsController::class)->name('admin.attendance.alerts.run');
+
+        // Queue Failed Jobs (staff only)
+        Route::get('/admin/failed-jobs', [StaffFailedJobController::class, 'index'])->name('admin.failed-jobs.index');
+        Route::post('/admin/failed-jobs/retry-all', [StaffFailedJobController::class, 'retryAll'])->name('admin.failed-jobs.retry-all');
+        Route::post('/admin/failed-jobs/flush', [StaffFailedJobController::class, 'flush'])->name('admin.failed-jobs.flush');
+        Route::post('/admin/failed-jobs/{failedJobId}/retry', [StaffFailedJobController::class, 'retry'])->name('admin.failed-jobs.retry');
+        Route::delete('/admin/failed-jobs/{failedJobId}', [StaffFailedJobController::class, 'destroy'])->name('admin.failed-jobs.destroy');
     });
 
     // Timebox 3: Teacher Features (teacher only)

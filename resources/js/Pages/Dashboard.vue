@@ -164,6 +164,10 @@ const quickActions = computed(() => {
                 label: "Announcements",
                 href: route("admin.announcements.index"),
             },
+            {
+                label: "Failed Jobs",
+                href: route("admin.failed-jobs.index"),
+            },
         ];
     }
     if (role === "teacher") {

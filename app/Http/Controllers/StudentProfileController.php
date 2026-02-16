@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
+use App\Http\Requests\StudentProfile\UpdateStudentProfileRequest;
 use App\Services\ImageService;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -58,7 +58,7 @@ class StudentProfileController extends Controller
      * Update the authenticated student's profile (limited fields only).
      * Students can only update phone and address-like fields, not core academic data.
      */
-    public function update(Request $request)
+    public function update(UpdateStudentProfileRequest $request): RedirectResponse
     {
         $user = Auth::user();
         $student = $user->student;
@@ -69,13 +69,7 @@ class StudentProfileController extends Controller
                 ->with('error', 'Student record not found.');
         }
 
-        $data = $request->validate([
-            'phone' => ['nullable', 'string', 'max:50'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-            'address' => ['nullable', 'string', 'max:2000'],
-            // Add more editable fields here as needed (e.g., emergency contacts)
-            // Core fields like student_no, programme, intake_year are NOT editable by student
-        ]);
+        $data = $request->validated();
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
@@ -96,7 +90,7 @@ class StudentProfileController extends Controller
     /**
      * Remove the authenticated student's profile photo.
      */
-    public function removePhoto()
+    public function removePhoto(): RedirectResponse
     {
         $user = Auth::user();
         $student = $user->student;

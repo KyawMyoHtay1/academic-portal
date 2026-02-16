@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Students\StoreStudentRequest;
+use App\Http\Requests\Students\UpdateStudentRequest;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -50,30 +51,9 @@ class StudentController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'user_id' => ['required', 'exists:users,id', 'unique:students,user_id'],
-            'student_no' => ['nullable', 'string', 'max:50', 'unique:students,student_no'],
-            'full_name' => ['required', 'string', 'max:255'],
-            'dob' => ['required', 'date', 'before:today'],
-            'gender' => ['nullable', 'in:Male,Female,Other'],
-            'nationality' => ['nullable', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:255', 'unique:students,email'],
-            'phone' => ['required', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'address' => ['nullable', 'string', 'max:2000'],
-            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
-            'emergency_contact_phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'programme' => ['required', 'string', 'max:255'],
-            'intake_year' => ['required', 'string', 'max:10'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-            'id_card' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
-            'transcript' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
-            'previous_institution' => ['required', 'string', 'max:255'],
-            'previous_qualification' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'in:active,suspended,graduated'],
-            'notes' => ['nullable', 'string', 'max:5000'],
-        ]);
+        $data = $request->validated();
 
         // Auto-generate student number if not provided
         $data['student_no'] = $data['student_no'] ?? $this->generateStudentNo();
@@ -133,29 +113,9 @@ class StudentController extends Controller
         ]);
     }
 
-    public function update(Request $request, Student $student): RedirectResponse
+    public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
     {
-        $data = $request->validate([
-            'student_no' => ['required', 'string', 'max:50', 'unique:students,student_no,'.$student->id],
-            'full_name' => ['required', 'string', 'max:255'],
-            'dob' => ['required', 'date', 'before:today'],
-            'gender' => ['nullable', 'in:Male,Female,Other'],
-            'nationality' => ['nullable', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:255', 'unique:students,email,'.$student->id],
-            'phone' => ['required', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'address' => ['nullable', 'string', 'max:2000'],
-            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
-            'emergency_contact_phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
-            'programme' => ['required', 'string', 'max:255'],
-            'intake_year' => ['required', 'string', 'max:10'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
-            'id_card' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
-            'transcript' => ['nullable', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'],
-            'previous_institution' => ['required', 'string', 'max:255'],
-            'previous_qualification' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'in:active,suspended,graduated'],
-            'notes' => ['nullable', 'string', 'max:5000'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('photo')) {
             // Delete old photo if it exists

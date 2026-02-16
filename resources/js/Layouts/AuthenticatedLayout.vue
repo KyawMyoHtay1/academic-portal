@@ -90,6 +90,8 @@ const getMenuIcon = (name) => {
             "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
         "Attendance Report":
             "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+        "Failed Jobs":
+            "M12 8v4m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z",
         Student:
             "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
         Teaching:
@@ -328,6 +330,12 @@ const navigation = computed(() => {
                     href: route("admin.attendance.report"),
                     active: route().current("admin.attendance.*"),
                     icon: getMenuIcon("Attendance Report"),
+                },
+                {
+                    name: "Failed Jobs",
+                    href: route("admin.failed-jobs.index"),
+                    active: route().current("admin.failed-jobs.*"),
+                    icon: getMenuIcon("Failed Jobs"),
                 },
             ]),
             createGroup("People", [
