@@ -40,10 +40,22 @@ const roleDescription = computed(() => {
     if (role === "teacher") {
         return "Access to teaching tools such as timetables, attendance, and grading.";
     }
-    if (role === "staff" || role === "admin") {
+    if (role === "staff") {
         return "Access to administrative tools for managing courses, users, and academic data.";
     }
+    if (role === "admin") {
+        return "Full administrative access to platform management, users, and academic operations.";
+    }
     return "Standard user profile.";
+});
+
+const accessTitle = computed(() => {
+    const role = page.props.auth?.user?.role;
+    if (role === "student") return "Student access";
+    if (role === "teacher") return "Teaching access";
+    if (role === "staff") return "Staff access";
+    if (role === "admin") return "Administrator access";
+    return "Portal access";
 });
 
 const formattedCreatedAt = computed(() => {
@@ -59,6 +71,19 @@ const formattedCreatedAt = computed(() => {
 
 const formattedLastLogin = computed(() => {
     const value = page.props.auth?.user?.last_login_at;
+    if (!value) return null;
+    const d = new Date(value);
+    return d.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+});
+
+const formattedUpdatedAt = computed(() => {
+    const value = page.props.auth?.user?.updated_at;
     if (!value) return null;
     const d = new Date(value);
     return d.toLocaleString(undefined, {
@@ -134,7 +159,7 @@ const formattedLastLogin = computed(() => {
                     <div class="text-xs text-slate-500 sm:text-right space-y-1">
                         <div>
                             <p class="font-semibold text-slate-600">
-                                Portal access
+                                {{ accessTitle }}
                             </p>
                             <p class="mt-1">
                                 {{ roleDescription }}
@@ -157,6 +182,14 @@ const formattedLastLogin = computed(() => {
                                 </p>
                                 <p class="mt-0.5 text-slate-800">
                                     {{ formattedLastLogin }}
+                                </p>
+                            </div>
+                            <div v-if="formattedUpdatedAt">
+                                <p class="font-semibold text-slate-500">
+                                    Profile updated
+                                </p>
+                                <p class="mt-0.5 text-slate-800">
+                                    {{ formattedUpdatedAt }}
                                 </p>
                             </div>
                         </div>

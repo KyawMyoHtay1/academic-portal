@@ -84,6 +84,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->role,
                     'photo' => $user->photo,
                     'created_at' => $user->created_at?->toIso8601String(),
+                    'updated_at' => $user->updated_at?->toIso8601String(),
                     'last_login_at' => $user->last_login_at?->toIso8601String() ?? null,
                 ] : null,
             ],
