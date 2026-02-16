@@ -1,0 +1,50 @@
+@startuml
+title Timebox 2 - Assignment Management Process
+
+actor Teacher
+actor Student
+
+participant "Subject" as Subject
+participant "Assignment" as Assignment
+participant "Submission" as Submission
+
+' --- Create & publish assignment ---
+
+Teacher -> Subject: View assigned subjects
+Subject --> Teacher: Show subject list
+
+Teacher -> Assignment: Create assignment\n(subjectId, title, dueDate, maxScore, settings)
+Assignment -> Assignment: Validate teacher assignment\nand input fields
+Assignment --> Teacher: Confirm assignment saved\nstatus = draft
+
+Teacher -> Assignment: Publish assignment\n(assignmentId)
+Assignment -> Assignment: Update status\ndraft -> published
+Assignment --> Teacher: Confirm published
+Assignment --> Student: Assignment available\n(for enrolled students)
+
+' --- Student submits work ---
+
+Student -> Assignment: View assignment details
+Assignment --> Student: Show details and\nsubmission status
+
+Student -> Submission: Submit assignment\n(assignmentId, file, comments)
+Submission -> Submission: Validate enrolment, file type\nand file size
+Submission -> Submission: Create or update submission\nstatus = submitted
+Submission --> Student: Confirm submission
+
+' --- Teacher grades submission ---
+
+Teacher -> Submission: View submissions\n(assignmentId)
+Submission --> Teacher: List submissions\nwith students and files
+
+Teacher -> Submission: Grade submission\n(submissionId, score, feedback)
+Submission -> Submission: Validate score\n(0..maxScore)
+Submission -> Submission: Save grade\nstatus = graded, set graded_at
+Submission --> Teacher: Confirm graded
+
+' --- Student views feedback ---
+
+Student -> Submission: View my submission\nand feedback
+Submission --> Student: Show file, score\nand feedback
+
+@enduml
