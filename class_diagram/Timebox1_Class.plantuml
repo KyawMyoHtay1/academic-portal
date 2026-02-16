@@ -9,12 +9,18 @@ class User {
   +email: string
   +password: string
   +role: enum
+  +photo: string
+  +email_verified_at: datetime
   --
+  +FillGetData()
   +Login()
   +Logout()
   +Register()
   +UpdateProfile()
   +ResetPassword()
+  +VerifyEmail()
+  +GetRole()
+  +AutoID()
 }
 
 class Student {
@@ -22,15 +28,27 @@ class Student {
   +user_id: int
   +student_no: string
   +full_name: string
+  +dob: date
+  +gender: enum
+  +email: string
+  +phone: string
+  +address: string
   +programme: string
   +intake_year: int
   +status: enum
+  +photo: string
   --
+  +FillGetData()
   +AddStudent()
   +UpdateStudent()
   +DeleteStudent()
   +SearchStudent()
   +GetEnrollments()
+  +GetGrades()
+  +GetFees()
+  +GetAttendance()
+  +CalculateGPA()
+  +AutoID()
 }
 
 class Course {
@@ -39,12 +57,18 @@ class Course {
   +title: string
   +credits: int
   +semester: string
+  +photo: string
   --
+  +FillGetData()
   +AddCourse()
   +UpdateCourse()
   +DeleteCourse()
   +SearchCourse()
   +GetSubjects()
+  +GetEnrollments()
+  +GetTimetables()
+  +ValidateCourseCode()
+  +AutoID()
 }
 
 class Subject {
@@ -53,11 +77,19 @@ class Subject {
   +subject_code: string
   +title: string
   +credits: int
+  +description: text
+  +photo: string
   --
+  +FillGetData()
   +AddSubject()
   +UpdateSubject()
   +DeleteSubject()
   +SearchSubject()
+  +GetGrades()
+  +GetTimetables()
+  +GetAttendances()
+  +ValidateSubjectCode()
+  +AutoID()
 }
 
 class Enrollment {
@@ -66,12 +98,17 @@ class Enrollment {
   +student_id: int
   +status: enum
   --
+  +FillGetData()
   +RequestEnrollment()
   +ApproveEnrollment()
   +RejectEnrollment()
   +RequestWithdrawal()
   +ApproveWithdrawal()
   +RejectWithdrawal()
+  +SearchEnrollment()
+  +GetByStudent()
+  +GetByCourse()
+  +AutoID()
 }
 
 class course_teacher {
@@ -79,8 +116,12 @@ class course_teacher {
   +course_id: int
   +user_id: int
   --
+  +FillGetData()
   +AssignTeacher()
   +RemoveTeacher()
+  +GetTeachersByCourse()
+  +GetCoursesByTeacher()
+  +AutoID()
 }
 
 class subject_teacher {
@@ -88,8 +129,12 @@ class subject_teacher {
   +subject_id: int
   +user_id: int
   --
+  +FillGetData()
   +AssignTeacher()
   +RemoveTeacher()
+  +GetTeachersBySubject()
+  +GetSubjectsByTeacher()
+  +AutoID()
 }
 
 ' Relationships

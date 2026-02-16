@@ -8,12 +8,31 @@ class User {
   +name: string
   +email: string
   +role: enum
+  +photo: string
+  +email_verified_at: datetime
+  --
+  +FillGetData()
+  +Login()
+  +Logout()
+  +Register()
+  +UpdateProfile()
+  +ResetPassword()
+  +VerifyEmail()
+  +GetRole()
+  +AutoID()
 }
 
 class Student {
   +id: int
   +user_id: int
   +student_no: string
+  +full_name: string
+  +programme: string
+  +status: enum
+  --
+  +FillGetData()
+  +GetAttendance()
+  +AutoID()
 }
 
 class Subject {
@@ -21,6 +40,15 @@ class Subject {
   +course_id: int
   +subject_code: string
   +title: string
+  +credits: int
+  +description: text
+  +photo: string
+  --
+  +FillGetData()
+  +SearchSubject()
+  +GetTimetables()
+  +GetAttendances()
+  +AutoID()
 }
 
 class Timetable {
@@ -36,6 +64,13 @@ class Timetable {
   +UpdateTimetable()
   +DeleteTimetable()
   +CheckConflict()
+  +SearchTimetable()
+  +GetByCourse()
+  +GetBySubject()
+  +GetByStudent()
+  +GetByTeacher()
+  +GetCreator()
+  +AutoID()
 }
 
 class Attendance {
@@ -48,6 +83,14 @@ class Attendance {
   +RecordAttendance()
   +UpdateAttendance()
   +CalculateRate()
+  +FillGetData()
+  +MarkPresent()
+  +MarkAbsent()
+  +SearchAttendance()
+  +GetByStudent()
+  +GetBySubject()
+  +GetByDate()
+  +AutoID()
 }
 
 class LowAttendanceAlertState {
@@ -59,6 +102,11 @@ class LowAttendanceAlertState {
   +UpdateState()
   +CheckThreshold()
   +SendAlert()
+  +FillGetData()
+  +GetByStudent()
+  +GetStudentsBelowThreshold()
+  +ResetAlert()
+  +AutoID()
 }
 
 class Announcement {
@@ -73,6 +121,11 @@ class Announcement {
   +UpdateAnnouncement()
   +DeleteAnnouncement()
   +Publish()
+  +FillGetData()
+  +SearchAnnouncement()
+  +GetVisibleToUser()
+  +IsExpired()
+  +AutoID()
 }
 
 class AnnouncementRead {
@@ -84,6 +137,11 @@ class AnnouncementRead {
   --
   +MarkAsRead()
   +MarkAsAcknowledged()
+  +FillGetData()
+  +GetReadStatus()
+  +GetByUser()
+  +GetByAnnouncement()
+  +AutoID()
 }
 
 class Message {
@@ -95,6 +153,13 @@ class Message {
   --
   +SendMessage()
   +MarkAsRead()
+  +FillGetData()
+  +DeleteMessage()
+  +GetInbox()
+  +GetSent()
+  +SearchMessages()
+  +GetConversation()
+  +AutoID()
 }
 
 class Notification {
@@ -106,6 +171,10 @@ class Notification {
   --
   +MarkAsRead()
   +GetUnread()
+  +FillGetData()
+  +GetByUser()
+  +Notify()
+  +AutoID()
 }
 
 class ContactMessage {
@@ -118,6 +187,11 @@ class ContactMessage {
   --
   +SubmitContact()
   +MarkAsRead()
+  +FillGetData()
+  +SearchContactMessage()
+  +GetUnread()
+  +Reply()
+  +AutoID()
 }
 
 class FeedbackMessage {
@@ -130,6 +204,11 @@ class FeedbackMessage {
   --
   +SubmitFeedback()
   +MarkAsRead()
+  +FillGetData()
+  +MarkAsReplied()
+  +SearchFeedbackMessage()
+  +GetUnread()
+  +AutoID()
 }
 
 ' Relationships

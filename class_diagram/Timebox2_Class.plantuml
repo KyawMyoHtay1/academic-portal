@@ -7,6 +7,16 @@ class Student {
   +id: int
   +user_id: int
   +student_no: string
+  +full_name: string
+  +programme: string
+  +status: enum
+  --
+  +FillGetData()
+  +GetGrades()
+  +GetFees()
+  +GetAttendance()
+  +CalculateGPA()
+  +AutoID()
 }
 
 class User {
@@ -14,12 +24,33 @@ class User {
   +name: string
   +email: string
   +role: enum
+  +photo: string
+  +email_verified_at: datetime
+  --
+  +FillGetData()
+  +Login()
+  +Logout()
+  +Register()
+  +UpdateProfile()
+  +ResetPassword()
+  +VerifyEmail()
+  +GetRole()
+  +AutoID()
 }
 
 class Course {
   +id: int
   +course_code: string
   +title: string
+  +credits: int
+  +semester: string
+  +photo: string
+  --
+  +FillGetData()
+  +SearchCourse()
+  +GetSubjects()
+  +GetEnrollments()
+  +AutoID()
 }
 
 class Subject {
@@ -27,6 +58,16 @@ class Subject {
   +course_id: int
   +subject_code: string
   +title: string
+  +credits: int
+  +description: text
+  +photo: string
+  --
+  +FillGetData()
+  +SearchSubject()
+  +GetGrades()
+  +GetTimetables()
+  +GetAttendances()
+  +AutoID()
 }
 
 class Grade {
@@ -39,10 +80,15 @@ class Grade {
   +score: decimal
   +status: enum
   --
+  +FillGetData()
   +SubmitGrade()
   +ApproveGrade()
   +RejectGrade()
   +GetLetterGrade()
+  +SearchGrade()
+  +GetByStudent()
+  +GetBySubject()
+  +AutoID()
 }
 
 class GradeReviewLog {
@@ -52,8 +98,11 @@ class GradeReviewLog {
   +action: string
   +reason: string
   --
+  +FillGetData()
   +LogAction()
   +GetByGrade()
+  +SearchLog()
+  +AutoID()
 }
 
 class Fee {
@@ -65,11 +114,15 @@ class Fee {
   +due_date: date
   +paid_date: date
   --
+  +FillGetData()
   +CreateFee()
   +UpdateFee()
   +ApprovePayment()
   +RejectPayment()
   +GenerateReceipt()
+  +SearchFee()
+  +GetLatePayments()
+  +AutoID()
 }
 
 class Assignment {
@@ -82,10 +135,14 @@ class Assignment {
   +max_score: int
   +status: enum
   --
+  +FillGetData()
   +CreateAssignment()
   +UpdateAssignment()
   +PublishAssignment()
   +GetSubmissions()
+  +IsOverdue()
+  +CanSubmit()
+  +AutoID()
 }
 
 class AssignmentSubmission {
@@ -98,9 +155,15 @@ class AssignmentSubmission {
   +graded_by: int
   +status: enum
   --
+  +FillGetData()
   +Submit()
   +GradeSubmission()
   +IsGraded()
+  +UpdateScore()
+  +GetPercentage()
+  +GetByStudent()
+  +GetByAssignment()
+  +AutoID()
 }
 
 ' Relationships
