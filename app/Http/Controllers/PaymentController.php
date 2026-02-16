@@ -8,6 +8,7 @@ use App\Notifications\FeeStatusUpdated;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +42,7 @@ class PaymentController extends Controller
                 ->with('error', 'Unauthorized access.');
         }
 
-        if ($fee->status === 'paid') {
+        if ($fee->status === Fee::STATUS_PAID) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'This fee has already been paid.');
@@ -71,10 +72,7 @@ class PaymentController extends Controller
                 'customer_email' => $student->email,
             ]);
 
-            $fee->update([
-                'payment_intent_id' => $checkoutSession->payment_intent,
-                'status' => 'payment_pending',
-            ]);
+            $fee->markAsPaymentPending($checkoutSession->payment_intent);
 
             Log::info('payment.checkout_started', [
                 'fee_id' => $fee->id,
@@ -130,16 +128,13 @@ class PaymentController extends Controller
 
                         return redirect()
                             ->route('student.fees.index')
-                            ->with('success', "Payment of £{$fee->amount} completed successfully!");
+                            ->with('success', "Payment of GBP {$fee->amount} completed successfully!");
                     }
                 }
 
                 // If user left checkout without paying, reset the fee so they can try again
-                if ($session->payment_status !== 'paid' && $fee->status === 'payment_pending') {
-                    $fee->update([
-                        'status' => 'pending',
-                        'payment_intent_id' => null,
-                    ]);
+                if ($session->payment_status !== 'paid' && $fee->status === Fee::STATUS_PAYMENT_PENDING) {
+                    $fee->markAsPending();
                 }
             } catch (ApiErrorException $e) {
                 Log::error('Stripe Session verification failed: '.$e->getMessage());
@@ -147,10 +142,10 @@ class PaymentController extends Controller
         }
 
         // If webhook already processed, just show success
-        if ($fee->status === 'paid') {
+        if ($fee->status === Fee::STATUS_PAID) {
             return redirect()
                 ->route('student.fees.index')
-                ->with('success', "Payment of £{$fee->amount} completed successfully!");
+                ->with('success', "Payment of GBP {$fee->amount} completed successfully!");
         }
 
         return redirect()
@@ -173,11 +168,8 @@ class PaymentController extends Controller
         }
 
         // Reset payment intent if payment was cancelled
-        if ($fee->status === 'payment_pending' && $fee->payment_intent_id) {
-            $fee->update([
-                'status' => 'pending',
-                'payment_intent_id' => null,
-            ]);
+        if ($fee->status === Fee::STATUS_PAYMENT_PENDING && $fee->payment_intent_id) {
+            $fee->markAsPending();
 
             Log::info('payment.checkout_cancelled', [
                 'fee_id' => $fee->id,
@@ -193,7 +185,7 @@ class PaymentController extends Controller
     /**
      * Handle Stripe webhook for payment confirmation.
      */
-    public function webhook(Request $request): \Illuminate\Http\Response
+    public function webhook(Request $request): Response
     {
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
@@ -314,20 +306,17 @@ class PaymentController extends Controller
             }
 
             // Idempotency guard: if already paid, no further changes or notifications.
-            if ($fee->status === 'paid') {
+            if ($fee->status === Fee::STATUS_PAID) {
                 return [
                     'newly_paid' => false,
                     'fee' => $fee->fresh(['student.user']),
                 ];
             }
 
-            $fee->update([
-                'status' => 'paid',
-                'paid_date' => now(),
-                'payment_method' => $paymentIntent->payment_method_types[0] ?? 'card',
-                'payment_processed_at' => now(),
-                'payment_intent_id' => $paymentIntentId,
-            ]);
+            $fee->markAsPaid(
+                $paymentIntent->payment_method_types[0] ?? 'card',
+                $paymentIntentId
+            );
 
             return [
                 'newly_paid' => true,
@@ -375,7 +364,7 @@ class PaymentController extends Controller
         $updated = DB::transaction(function () use ($feeId, $paymentIntent) {
             $fee = Fee::query()->lockForUpdate()->find($feeId);
 
-            if (! $fee || $fee->status === 'paid') {
+            if (! $fee || $fee->status === Fee::STATUS_PAID) {
                 return false;
             }
 
@@ -389,14 +378,11 @@ class PaymentController extends Controller
                 return false;
             }
 
-            if ($fee->status !== 'payment_pending') {
+            if ($fee->status !== Fee::STATUS_PAYMENT_PENDING) {
                 return false;
             }
 
-            $fee->update([
-                'status' => 'pending',
-                'payment_intent_id' => null,
-            ]);
+            $fee->markAsPending();
 
             return true;
         });
@@ -439,3 +425,4 @@ class PaymentController extends Controller
         }
     }
 }
+
