@@ -1018,10 +1018,10 @@ const userRoleMeta = computed(() => {
                                 <template #trigger>
                                     <button
                                         type="button"
-                                        class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50"
+                                        class="inline-flex items-center rounded-full bg-white p-1.5 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50"
                                     >
                                         <span
-                                            class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-portal-navy text-xs font-semibold text-white overflow-hidden"
+                                            class="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-portal-navy text-xs font-semibold text-white overflow-hidden"
                                         >
                                             <img
                                                 v-if="
@@ -1038,16 +1038,10 @@ const userRoleMeta = computed(() => {
                                                         .toUpperCase()
                                                 }}
                                             </span>
-                                        </span>
-                                        <span class="hidden sm:inline">
-                                            {{ $page.props.auth.user.name }}
-                                        </span>
-                                        <span
-                                            v-if="userRoleMeta.label"
-                                            class="hidden md:inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border"
-                                            :class="userRoleMeta.chipClasses"
-                                        >
-                                            {{ userRoleMeta.label }}
+                                            <span
+                                                class="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white"
+                                                :class="userRoleMeta.dotClass"
+                                            />
                                         </span>
                                         <svg
                                             class="h-4 w-4 text-slate-400"
@@ -1065,6 +1059,21 @@ const userRoleMeta = computed(() => {
                                 </template>
 
                                 <template #content>
+                                    <div
+                                        class="border-b border-slate-100 px-4 py-3"
+                                    >
+                                        <p
+                                            class="text-sm font-semibold text-slate-900"
+                                        >
+                                            {{ $page.props.auth.user.name }}
+                                        </p>
+                                        <p
+                                            v-if="userRoleMeta.label"
+                                            class="mt-0.5 text-xs text-slate-500"
+                                        >
+                                            {{ userRoleMeta.label }}
+                                        </p>
+                                    </div>
                                     <DropdownLink :href="route('profile.edit')">
                                         Profile
                                     </DropdownLink>
@@ -1097,13 +1106,13 @@ const userRoleMeta = computed(() => {
                         >
                             <div
                                 v-if="$slots.header"
-                                class="text-lg font-semibold leading-tight text-slate-900"
+                                class="text-xl font-semibold leading-tight text-slate-900"
                             >
                                 <slot name="header" />
                             </div>
                             <div
                                 v-if="headerStatus"
-                                class="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+                                class="flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold"
                                 :class="userRoleMeta.statusClasses"
                             >
                                 <span
