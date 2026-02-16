@@ -19,4 +19,3 @@ class UnenrollCourseRequest extends FormRequest
         return [];
     }
 }
-

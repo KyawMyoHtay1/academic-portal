@@ -21,4 +21,3 @@ class SearchResultResource extends JsonResource
         ];
     }
 }
-

@@ -22,4 +22,3 @@ class StoreMessageRequest extends FormRequest
         ];
     }
 }
-

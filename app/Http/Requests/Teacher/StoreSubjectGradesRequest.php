@@ -23,4 +23,3 @@ class StoreSubjectGradesRequest extends FormRequest
         ];
     }
 }
-

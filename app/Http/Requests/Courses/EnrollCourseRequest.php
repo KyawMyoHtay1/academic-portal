@@ -19,4 +19,3 @@ class EnrollCourseRequest extends FormRequest
         return [];
     }
 }
-
