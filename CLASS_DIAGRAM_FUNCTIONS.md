@@ -1,12 +1,13 @@
 # Class Diagram Functions for University Academic Portal
 
 Each class lists its suggested functions in the format: **+FunctionName()** — suitable for use in a class diagram (PlantUML, draw.io, StarUML, etc.).  
-**Schema note:** *Timetable* and *Attendance* have no `course_id`; course is derived via Subject → Course (normalized schema). Use this document for both class diagram and ERD/entity-attribute lists.
+**Schema note:** _Timetable_ and _Attendance_ have no `course_id`; course is derived via Subject → Course (normalized schema). Use this document for both class diagram and ERD/entity-attribute lists.
 
 ---
 
 ## **User**
-*Attributes: id, name, email, password, role, photo, email_verified_at*
+
+_Attributes: id, name, email, password, role, photo, email_verified_at_
 
 - +FillGetData()
 - +Login()
@@ -21,7 +22,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Student**
-*Attributes: id, user_id, student_no, full_name, dob, gender, email, phone, address, programme, intake_year, status, photo*
+
+_Attributes: id, user_id, student_no, full_name, dob, gender, email, phone, address, programme, intake_year, status, photo_
 
 - +FillGetData()
 - +AddStudent()
@@ -38,7 +40,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Course**
-*Attributes: id, course_code, title, credits, semester, photo*
+
+_Attributes: id, course_code, title, credits, semester, photo_
 
 - +FillGetData()
 - +AddCourse()
@@ -54,7 +57,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Subject**
-*Attributes: id, course_id, subject_code, title, credits, description, photo*
+
+_Attributes: id, course_id, subject_code, title, credits, description, photo_
 
 - +FillGetData()
 - +AddSubject()
@@ -70,7 +74,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Enrollment** (course_student)
-*Attributes: id, course_id, student_id, status, timestamps*
+
+_Attributes: id, course_id, student_id, status, timestamps_
 
 - +FillGetData()
 - +RequestEnrollment()
@@ -87,7 +92,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **course_teacher** (pivot)
-*Attributes: id, course_id, user_id*
+
+_Attributes: id, course_id, user_id_
 
 - +FillGetData()
 - +AssignTeacher()
@@ -99,7 +105,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **subject_teacher** (pivot)
-*Attributes: id, subject_id, user_id*
+
+_Attributes: id, subject_id, user_id_
 
 - +FillGetData()
 - +AssignTeacher()
@@ -111,7 +118,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Grade**
-*Attributes: id, subject_id, course_id, student_id, graded_by, reviewed_by, score, status, reviewed_at, rejection_reason*
+
+_Attributes: id, subject_id, course_id, student_id, graded_by, reviewed_by, score, status, reviewed_at, rejection_reason_
 
 - +FillGetData()
 - +SubmitGrade()
@@ -127,7 +135,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **GradeReviewLog**
-*Attributes: id, grade_id, performed_by, action, reason, meta, timestamps*
+
+_Attributes: id, grade_id, performed_by, action, reason, meta, timestamps_
 
 - +FillGetData()
 - +LogAction()
@@ -138,7 +147,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Fee**
-*Attributes: id, student_id, amount, description, status, due_date, paid_date, payment_intent_id, payment_method, payment_processed_at, processed_by*
+
+_Attributes: id, student_id, amount, description, status, due_date, paid_date, payment_intent_id, payment_method, payment_processed_at, processed_by_
 
 - +FillGetData()
 - +CreateFee()
@@ -154,8 +164,9 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Timetable**
-*Attributes: id, subject_id, created_by, day_of_week, start_time, end_time, location*  
-*(Course is derived via Subject → Course; no course_id column. User 1 – Timetable 0..* via created_by.)*
+
+_Attributes: id, subject_id, created_by, day_of_week, start_time, end_time, location_  
+_(Course is derived via Subject → Course; no course_id column. User 1 – Timetable 0.._ via created_by.)\*
 
 - +FillGetData()
 - +AddTimetable()
@@ -173,8 +184,9 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Attendance**
-*Attributes: id, subject_id, student_id, date, status*  
-*(Course is derived via Subject → Course; no course_id column.)*
+
+_Attributes: id, subject_id, student_id, date, status_  
+_(Course is derived via Subject → Course; no course_id column.)_
 
 - +FillGetData()
 - +RecordAttendance()
@@ -191,7 +203,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Announcement**
-*Attributes: id, user_id, title, body, priority, pinned, require_ack, audience, publish_at, expires_at*
+
+_Attributes: id, user_id, title, body, priority, pinned, require_ack, audience, publish_at, expires_at_
 
 - +FillGetData()
 - +CreateAnnouncement()
@@ -206,7 +219,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **AnnouncementRead**
-*Attributes: id, announcement_id, user_id, read_at, acknowledged_at*
+
+_Attributes: id, announcement_id, user_id, read_at, acknowledged_at_
 
 - +FillGetData()
 - +MarkAsRead()
@@ -219,7 +233,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Message**
-*Attributes: id, sender_id, receiver_id, body, read, timestamps*
+
+_Attributes: id, sender_id, receiver_id, body, read, timestamps_
 
 - +FillGetData()
 - +SendMessage()
@@ -234,7 +249,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Notification** (Laravel)
-*Attributes: id, notifiable_type, notifiable_id, type, data, read_at*
+
+_Attributes: id, notifiable_type, notifiable_id, type, data, read_at_
 
 - +FillGetData()
 - +MarkAsRead()
@@ -246,7 +262,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **ContactMessage**
-*Attributes: id, first_name, last_name, email, phone, subject, message, timestamps*
+
+_Attributes: id, first_name, last_name, email, phone, subject, message, timestamps_
 
 - +FillGetData()
 - +SubmitContact()
@@ -259,7 +276,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **FeedbackMessage**
-*Attributes: id, name, email, type, message, is_read, replied_at, timestamps*
+
+_Attributes: id, name, email, type, message, is_read, replied_at, timestamps_
 
 - +FillGetData()
 - +SubmitFeedback()
@@ -272,7 +290,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **LowAttendanceAlertState**
-*Attributes: id, student_id, last_rate, is_below_threshold, last_alert_sent_at*
+
+_Attributes: id, student_id, last_rate, is_below_threshold, last_alert_sent_at_
 
 - +FillGetData()
 - +UpdateState()
@@ -286,7 +305,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **Assignment**
-*Attributes: id, subject_id, course_id, created_by, title, description, due_date, due_time, max_score, status, allowed_file_types, max_file_size, timestamps*
+
+_Attributes: id, subject_id, course_id, created_by, title, description, due_date, due_time, max_score, status, allowed_file_types, max_file_size, timestamps_
 
 - +FillGetData()
 - +CreateAssignment()
@@ -305,7 +325,8 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 ---
 
 ## **AssignmentSubmission**
-*Attributes: id, assignment_id, student_id, file_path, original_filename, comments, score, feedback, graded_by, graded_at, status, timestamps*
+
+_Attributes: id, assignment_id, student_id, file_path, original_filename, comments, score, feedback, graded_by, graded_at, status, timestamps_
 
 - +FillGetData()
 - +Submit()
@@ -324,29 +345,29 @@ Each class lists its suggested functions in the format: **+FunctionName()** — 
 
 ## Summary Table
 
-| Class | Main Functions |
-|-------|----------------|
-| **User** | Login, Logout, Register, UpdateProfile, ResetPassword |
-| **Student** | Add/Update/Delete, Search, GetEnrollments, GetGrades, CalculateGPA |
-| **Course** | Add/Update/Delete, Search, GetSubjects, GetEnrollments |
-| **Subject** | Add/Update/Delete, Search, GetGrades, GetTimetables |
-| **Enrollment** | Request/Approve/Reject, RequestWithdrawal, ApproveWithdrawal |
-| **course_teacher** | AssignTeacher, RemoveTeacher |
-| **subject_teacher** | AssignTeacher, RemoveTeacher |
-| **Grade** | SubmitGrade, ApproveGrade, RejectGrade, GetLetterGrade |
-| **GradeReviewLog** | LogAction, GetByGrade |
-| **Fee** | Create/Update/Delete, ApprovePayment, RejectPayment, GenerateReceipt |
-| **Timetable** | Add/Update/Delete, CheckConflict, GetByCourse/Subject/Student, GetCreator |
-| **Attendance** | RecordAttendance, MarkPresent/MarkAbsent, CalculateRate |
-| **Announcement** | Create/Update/Delete, Publish, GetVisibleToUser |
-| **AnnouncementRead** | MarkAsRead, MarkAsAcknowledged |
-| **Message** | SendMessage, MarkAsRead, GetInbox, GetConversation |
-| **Notification** | MarkAsRead, GetUnread, Notify |
-| **ContactMessage** | SubmitContact, MarkAsRead, Reply |
-| **FeedbackMessage** | SubmitFeedback, MarkAsRead, MarkAsReplied |
-| **LowAttendanceAlertState** | UpdateState, CheckThreshold, SendAlert |
-| **Assignment** | Create/Update/Delete, Publish, GetSubmissions, IsOverdue, CanSubmit |
-| **AssignmentSubmission** | Submit, GradeSubmission, IsGraded, GetPercentage |
+| Class                       | Main Functions                                                            |
+| --------------------------- | ------------------------------------------------------------------------- |
+| **User**                    | Login, Logout, Register, UpdateProfile, ResetPassword                     |
+| **Student**                 | Add/Update/Delete, Search, GetEnrollments, GetGrades, CalculateGPA        |
+| **Course**                  | Add/Update/Delete, Search, GetSubjects, GetEnrollments                    |
+| **Subject**                 | Add/Update/Delete, Search, GetGrades, GetTimetables                       |
+| **Enrollment**              | Request/Approve/Reject, RequestWithdrawal, ApproveWithdrawal              |
+| **course_teacher**          | AssignTeacher, RemoveTeacher                                              |
+| **subject_teacher**         | AssignTeacher, RemoveTeacher                                              |
+| **Grade**                   | SubmitGrade, ApproveGrade, RejectGrade, GetLetterGrade                    |
+| **GradeReviewLog**          | LogAction, GetByGrade                                                     |
+| **Fee**                     | Create/Update/Delete, ApprovePayment, RejectPayment, GenerateReceipt      |
+| **Timetable**               | Add/Update/Delete, CheckConflict, GetByCourse/Subject/Student, GetCreator |
+| **Attendance**              | RecordAttendance, MarkPresent/MarkAbsent, CalculateRate                   |
+| **Announcement**            | Create/Update/Delete, Publish, GetVisibleToUser                           |
+| **AnnouncementRead**        | MarkAsRead, MarkAsAcknowledged                                            |
+| **Message**                 | SendMessage, MarkAsRead, GetInbox, GetConversation                        |
+| **Notification**            | MarkAsRead, GetUnread, Notify                                             |
+| **ContactMessage**          | SubmitContact, MarkAsRead, Reply                                          |
+| **FeedbackMessage**         | SubmitFeedback, MarkAsRead, MarkAsReplied                                 |
+| **LowAttendanceAlertState** | UpdateState, CheckThreshold, SendAlert                                    |
+| **Assignment**              | Create/Update/Delete, Publish, GetSubmissions, IsOverdue, CanSubmit       |
+| **AssignmentSubmission**    | Submit, GradeSubmission, IsGraded, GetPercentage                          |
 
 ---
 
@@ -616,3 +637,5 @@ User "1" --> "*" AssignmentSubmission : graded_by
 User "1" --> "*" Timetable : created_by
 @enduml
 ```
+
+/dev/verify-email-now
