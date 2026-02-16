@@ -9,20 +9,25 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 // Default application name shown in browser titles
 const appName = import.meta.env.VITE_APP_NAME || "University Academic Portal";
 
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob("./Pages/**/*.vue")
-        ),
-    setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(ZiggyVue)
-            .mount(el);
-    },
-    progress: {
-        color: "#0f172a", // dark academic navy
-    },
-});
+const inertiaRoot = document.getElementById("app");
+const hasInertiaPage = inertiaRoot?.dataset?.page;
+
+if (inertiaRoot && hasInertiaPage) {
+    createInertiaApp({
+        title: (title) => `${title} - ${appName}`,
+        resolve: (name) =>
+            resolvePageComponent(
+                `./Pages/${name}.vue`,
+                import.meta.glob("./Pages/**/*.vue")
+            ),
+        setup({ el, App, props, plugin }) {
+            return createApp({ render: () => h(App, props) })
+                .use(plugin)
+                .use(ZiggyVue)
+                .mount(el);
+        },
+        progress: {
+            color: "#0f172a", // dark academic navy
+        },
+    });
+}

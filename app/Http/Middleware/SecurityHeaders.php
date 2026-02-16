@@ -47,6 +47,7 @@ class SecurityHeaders
         if ($isLocal) {
             // Allow Vite/HMR regardless of localhost/loopback port in local development.
             $scriptSources[] = 'http:';
+            $styleSources[] = 'http:';
             $connectSources[] = 'http:';
             $connectSources[] = 'ws:';
         }
