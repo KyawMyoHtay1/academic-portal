@@ -415,8 +415,49 @@ const headerStatus = computed(() => {
     if (role === "staff" || role === "admin") {
         return "Administration term in progress";
     }
-
     return "Academic year in progress";
+});
+
+const userRoleMeta = computed(() => {
+    const role = page.props.auth?.user?.role;
+
+    if (role === "student") {
+        return {
+            label: "Student",
+            statusClasses:
+                "bg-emerald-50 text-emerald-800 border border-emerald-200",
+            dotClass: "bg-emerald-500",
+            chipClasses:
+                "bg-emerald-50 text-emerald-800 border border-emerald-200",
+        };
+    }
+
+    if (role === "teacher") {
+        return {
+            label: "Teacher",
+            statusClasses: "bg-blue-50 text-blue-800 border border-blue-200",
+            dotClass: "bg-blue-500",
+            chipClasses: "bg-blue-50 text-blue-800 border border-blue-200",
+        };
+    }
+
+    if (role === "staff" || role === "admin") {
+        return {
+            label: "Staff",
+            statusClasses: "bg-amber-50 text-amber-800 border border-amber-200",
+            dotClass: "bg-amber-500",
+            chipClasses: "bg-amber-50 text-amber-800 border border-amber-200",
+        };
+    }
+
+    return {
+        label: null,
+        statusClasses:
+            "bg-slate-100 text-slate-600 border border-slate-200",
+        dotClass: "bg-emerald-500",
+        chipClasses:
+            "bg-slate-100 text-slate-600 border border-slate-200",
+    };
 });
 </script>
 
@@ -898,7 +939,7 @@ const headerStatus = computed(() => {
             <div class="flex min-h-screen flex-1 flex-col sm:ml-64">
                 <!-- Top bar -->
                 <header
-                    class="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-3 shadow-sm backdrop-blur-sm sm:px-6 lg:px-8"
+                    class="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6 lg:px-8"
                 >
                     <div class="flex items-center gap-3">
                         <button
@@ -1001,6 +1042,13 @@ const headerStatus = computed(() => {
                                         <span class="hidden sm:inline">
                                             {{ $page.props.auth.user.name }}
                                         </span>
+                                        <span
+                                            v-if="userRoleMeta.label"
+                                            class="hidden md:inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border"
+                                            :class="userRoleMeta.chipClasses"
+                                        >
+                                            {{ userRoleMeta.label }}
+                                        </span>
                                         <svg
                                             class="h-4 w-4 text-slate-400"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -1055,10 +1103,12 @@ const headerStatus = computed(() => {
                             </div>
                             <div
                                 v-if="headerStatus"
-                                class="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                                class="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+                                :class="userRoleMeta.statusClasses"
                             >
                                 <span
-                                    class="h-2 w-2 rounded-full bg-emerald-500"
+                                    class="h-2 w-2 rounded-full"
+                                    :class="userRoleMeta.dotClass"
                                 />
                                 {{ headerStatus }}
                             </div>
