@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\Hash;
 class SampleDataSeeder extends Seeder
 {
     /**
-    * Seed a realistic demo dataset: staff, teachers, students, courses,
-    * enrollments, timetables, grades, fees, attendance, announcements, messages.
-    */
+     * Seed a realistic demo dataset: staff, teachers, students, courses,
+     * enrollments, timetables, grades, fees, attendance, announcements, messages.
+     */
     public function run(): void
     {
         // Staff users
@@ -79,6 +79,7 @@ class SampleDataSeeder extends Seeder
         $programmes = ['BSc Computing', 'BBA', 'BEng Software'];
         $students = $studentUsers->map(function (User $user, $idx) use ($programmes, $courses) {
             $course = $courses[$idx % $courses->count()] ?? $courses->first();
+
             return Student::firstOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -88,10 +89,10 @@ class SampleDataSeeder extends Seeder
                     'gender' => ['Male', 'Female', 'Other'][$idx % 3],
                     'nationality' => 'Nigerian',
                     'email' => $user->email,
-                    'phone' => '555-010' . ($idx + 1),
-                    'address' => 'Demo Address ' . ($idx + 1),
-                    'emergency_contact_name' => 'Guardian ' . ($idx + 1),
-                    'emergency_contact_phone' => '555-090' . ($idx + 1),
+                    'phone' => '555-010'.($idx + 1),
+                    'address' => 'Demo Address '.($idx + 1),
+                    'emergency_contact_name' => 'Guardian '.($idx + 1),
+                    'emergency_contact_phone' => '555-090'.($idx + 1),
                     'programme' => $course?->course_code ?? $programmes[$idx % count($programmes)],
                     'intake_year' => 2024 - ($idx % 2),
                     'previous_institution' => 'Demo Secondary School',
@@ -180,7 +181,7 @@ class SampleDataSeeder extends Seeder
                 ],
                 [
                     'subject_id' => $subject?->id,
-                    'location' => 'Room ' . chr(65 + $idx) . '10',
+                    'location' => 'Room '.chr(65 + $idx).'10',
                 ]
             );
         }
@@ -190,7 +191,7 @@ class SampleDataSeeder extends Seeder
             Fee::firstOrCreate(
                 [
                     'student_id' => $student->id,
-                    'description' => 'Tuition ' . (2024 + ($i % 2)),
+                    'description' => 'Tuition '.(2024 + ($i % 2)),
                     'due_date' => Carbon::now()->addDays(30 + $i)->format('Y-m-d'),
                     'amount' => 1500 + ($i * 100),
                 ],
@@ -265,5 +266,3 @@ class SampleDataSeeder extends Seeder
         }
     }
 }
-
-

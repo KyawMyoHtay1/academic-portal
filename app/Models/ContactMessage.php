@@ -23,4 +23,3 @@ class ContactMessage extends Model
         'replied_at' => 'datetime',
     ];
 }
-

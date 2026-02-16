@@ -17,7 +17,7 @@ class MyCoursesController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('MyCourses/Index', [
                 'courses' => [],
                 'message' => 'No student record found. Please contact administration to create your student profile.',
@@ -47,4 +47,3 @@ class MyCoursesController extends Controller
         ]);
     }
 }
-

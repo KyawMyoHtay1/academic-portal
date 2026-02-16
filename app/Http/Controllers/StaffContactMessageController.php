@@ -19,7 +19,7 @@ class StaffContactMessageController extends Controller
 
         $messages = ContactMessage::query()
             ->when($q !== '', function ($query) use ($q) {
-                $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+                $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q).'%';
 
                 $query->where(function ($sub) use ($like) {
                     $sub->where('first_name', 'like', $like)
@@ -52,7 +52,7 @@ class StaffContactMessageController extends Controller
      */
     public function markRead(ContactMessage $contactMessage): RedirectResponse
     {
-        if (!$contactMessage->is_read) {
+        if (! $contactMessage->is_read) {
             $contactMessage->forceFill(['is_read' => true])->save();
         }
 
@@ -77,4 +77,3 @@ class StaffContactMessageController extends Controller
         return back()->with('success', 'Reply saved.');
     }
 }
-

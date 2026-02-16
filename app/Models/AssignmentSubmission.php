@@ -10,7 +10,9 @@ class AssignmentSubmission extends Model
     use HasFactory;
 
     public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_GRADED = 'graded';
+
     public const STATUS_RETURNED = 'returned';
 
     protected $fillable = [
@@ -53,7 +55,7 @@ class AssignmentSubmission extends Model
 
     public function getPercentageAttribute(): ?float
     {
-        if (!$this->score || !$this->assignment) {
+        if (! $this->score || ! $this->assignment) {
             return null;
         }
 

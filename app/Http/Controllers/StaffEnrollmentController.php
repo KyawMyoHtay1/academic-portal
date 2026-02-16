@@ -81,7 +81,7 @@ class StaffEnrollmentController extends Controller
             ->where('course_student.status', 'pending')
             ->first();
 
-        if (!$enrollmentRecord) {
+        if (! $enrollmentRecord) {
             return redirect()
                 ->route('admin.enrollments.index')
                 ->with('error', 'Enrollment not found or already processed.');
@@ -109,7 +109,7 @@ class StaffEnrollmentController extends Controller
             ->where('course_student.status', 'pending')
             ->first();
 
-        if (!$enrollmentRecord) {
+        if (! $enrollmentRecord) {
             return redirect()
                 ->route('admin.enrollments.index')
                 ->with('error', 'Enrollment not found or already processed.');
@@ -137,7 +137,7 @@ class StaffEnrollmentController extends Controller
             ->where('course_student.status', 'withdrawal_pending')
             ->first();
 
-        if (!$enrollmentRecord) {
+        if (! $enrollmentRecord) {
             return redirect()
                 ->route('admin.enrollments.index')
                 ->with('error', 'Withdrawal request not found or already processed.');
@@ -166,7 +166,7 @@ class StaffEnrollmentController extends Controller
             ->where('course_student.status', 'withdrawal_pending')
             ->first();
 
-        if (!$enrollmentRecord) {
+        if (! $enrollmentRecord) {
             return redirect()
                 ->route('admin.enrollments.index')
                 ->with('error', 'Withdrawal request not found or already processed.');

@@ -6,7 +6,6 @@ use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
-use Illuminate\Http\Response;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -21,8 +20,8 @@ class StaffAttendanceReportController extends Controller
         $totalRecords = Attendance::count();
         $totalPresent = Attendance::where('status', 'present')->count();
         $totalAbsent = Attendance::where('status', 'absent')->count();
-        $attendanceRate = $totalRecords > 0 
-            ? round(($totalPresent / $totalRecords) * 100, 2) 
+        $attendanceRate = $totalRecords > 0
+            ? round(($totalPresent / $totalRecords) * 100, 2)
             : 0;
 
         // Attendance by course
@@ -32,23 +31,24 @@ class StaffAttendanceReportController extends Controller
                 $query->where('status', 'present');
             },
         ])
-        ->having('total_attendances', '>', 0)
-        ->orderBy('course_code')
-        ->get()
-        ->map(function ($course) {
-            $rate = $course->total_attendances > 0
-                ? round(($course->present_attendances / $course->total_attendances) * 100, 2)
-                : 0;
-            return [
-                'id' => $course->id,
-                'course_code' => $course->course_code,
-                'title' => $course->title,
-                'total' => $course->total_attendances,
-                'present' => $course->present_attendances,
-                'absent' => $course->total_attendances - $course->present_attendances,
-                'rate' => $rate,
-            ];
-        });
+            ->having('total_attendances', '>', 0)
+            ->orderBy('course_code')
+            ->get()
+            ->map(function ($course) {
+                $rate = $course->total_attendances > 0
+                    ? round(($course->present_attendances / $course->total_attendances) * 100, 2)
+                    : 0;
+
+                return [
+                    'id' => $course->id,
+                    'course_code' => $course->course_code,
+                    'title' => $course->title,
+                    'total' => $course->total_attendances,
+                    'present' => $course->present_attendances,
+                    'absent' => $course->total_attendances - $course->present_attendances,
+                    'rate' => $rate,
+                ];
+            });
 
         // Students with low attendance (< 75%)
         $studentsWithLowAttendance = Student::with('courses')
@@ -93,6 +93,7 @@ class StaffAttendanceReportController extends Controller
                 $rate = $subject->total_attendances > 0
                     ? round(($subject->present_attendances / $subject->total_attendances) * 100, 2)
                     : 0;
+
                 return [
                     'id' => $subject->id,
                     'subject_code' => $subject->subject_code,
@@ -112,6 +113,7 @@ class StaffAttendanceReportController extends Controller
             ->paginate(20)
             ->through(function ($attendance) {
                 $courseCode = $attendance->subject?->course?->course_code ?? 'N/A';
+
                 return [
                     'id' => $attendance->id,
                     'date' => $attendance->date->format('Y-m-d'),

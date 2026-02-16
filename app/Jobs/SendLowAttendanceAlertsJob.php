@@ -59,7 +59,7 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
                     $state = $statesByStudentId->get($studentId);
 
                     $wasBelow = (bool) ($state?->is_below_threshold ?? false);
-                    $newlyBelow = $isBelow && !$wasBelow;
+                    $newlyBelow = $isBelow && ! $wasBelow;
 
                     $cooldownOk = true;
                     if ($state?->last_alert_sent_at) {
@@ -87,4 +87,3 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
             });
     }
 }
-

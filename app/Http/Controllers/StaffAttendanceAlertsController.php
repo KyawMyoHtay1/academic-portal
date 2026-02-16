@@ -14,4 +14,3 @@ class StaffAttendanceAlertsController extends Controller
         return back()->with('success', 'Low attendance alerts have been queued.');
     }
 }
-

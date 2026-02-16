@@ -16,7 +16,7 @@ class StudentTimetableController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('Student/Timetable/Index', [
                 'courses' => [],
                 'message' => 'No student record found. Please contact administration to create your student profile.',
@@ -40,7 +40,7 @@ class StudentTimetableController extends Controller
 
         $data = $courses->map(function ($course) {
             $timetables = collect();
-            
+
             // Collect all timetables from all subjects in this course
             foreach ($course->subjects as $subject) {
                 foreach ($subject->timetables as $entry) {
@@ -56,13 +56,13 @@ class StudentTimetableController extends Controller
                     ]);
                 }
             }
-            
+
             // Sort by day and time
             $timetables = $timetables->sortBy([
                 ['day_of_week', 'asc'],
                 ['start_time', 'asc'],
             ])->values();
-            
+
             return [
                 'id' => $course->id,
                 'course_code' => $course->course_code,

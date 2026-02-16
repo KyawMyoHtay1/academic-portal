@@ -6,7 +6,6 @@ use App\Models\Course;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -79,7 +78,7 @@ class StaffCourseController extends Controller
                 'credits' => $course->credits,
                 'semester' => $course->semester,
                 'photo_url' => $course->photo
-                    ? asset('storage/' . $course->photo)
+                    ? asset('storage/'.$course->photo)
                     : null,
             ],
         ]);
@@ -91,7 +90,7 @@ class StaffCourseController extends Controller
     public function update(Request $request, Course $course): RedirectResponse
     {
         $data = $request->validate([
-            'course_code' => ['required', 'string', 'max:50', 'unique:courses,course_code,' . $course->id],
+            'course_code' => ['required', 'string', 'max:50', 'unique:courses,course_code,'.$course->id],
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['required', 'integer', 'min:1', 'max:10'],
             'semester' => ['required', 'string', 'max:50'],

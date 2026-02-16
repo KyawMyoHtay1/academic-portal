@@ -49,7 +49,7 @@ class LoginRequest extends FormRequest
             // Verify reCAPTCHA if configured
             if (config('recaptcha.site_key') && $this->filled('recaptcha_token')) {
                 $recaptchaService = app(RecaptchaService::class);
-                if (!$recaptchaService->verify($this->input('recaptcha_token'), $this->ip())) {
+                if (! $recaptchaService->verify($this->input('recaptcha_token'), $this->ip())) {
                     $validator->errors()->add('recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
                 }
             }

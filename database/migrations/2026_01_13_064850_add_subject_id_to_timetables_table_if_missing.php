@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::table('timetables', function (Blueprint $table) {
             // Ensure course_id exists (older installs might miss it)
-            if (!Schema::hasColumn('timetables', 'course_id')) {
+            if (! Schema::hasColumn('timetables', 'course_id')) {
                 $table->foreignId('course_id')->constrained()->cascadeOnDelete();
             }
 
             // Only add subject_id if it is missing
-            if (!Schema::hasColumn('timetables', 'subject_id')) {
+            if (! Schema::hasColumn('timetables', 'subject_id')) {
                 $table->foreignId('subject_id')->nullable()->after('course_id')->constrained()->cascadeOnDelete();
             }
         });

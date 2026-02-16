@@ -10,9 +10,7 @@ class FeeStatusUpdated extends Notification
 {
     use Queueable;
 
-    public function __construct(protected Fee $fee)
-    {
-    }
+    public function __construct(protected Fee $fee) {}
 
     public function via(object $notifiable): array
     {
@@ -33,6 +31,3 @@ class FeeStatusUpdated extends Notification
         ];
     }
 }
-
-
-

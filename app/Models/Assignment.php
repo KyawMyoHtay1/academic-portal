@@ -10,7 +10,9 @@ class Assignment extends Model
     use HasFactory;
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PUBLISHED = 'published';
+
     public const STATUS_CLOSED = 'closed';
 
     protected $fillable = [
@@ -55,7 +57,7 @@ class Assignment extends Model
 
     public function isOverdue(): bool
     {
-        if (!$this->due_date) {
+        if (! $this->due_date) {
             return false;
         }
 
@@ -63,7 +65,7 @@ class Assignment extends Model
         if ($this->due_time) {
             $timeParts = explode(':', $this->due_time);
             if (count($timeParts) >= 2) {
-                $dueDateTime = $this->due_date->copy()->setTime((int)$timeParts[0], (int)$timeParts[1], 0);
+                $dueDateTime = $this->due_date->copy()->setTime((int) $timeParts[0], (int) $timeParts[1], 0);
             }
         }
 
@@ -72,6 +74,6 @@ class Assignment extends Model
 
     public function canSubmit(): bool
     {
-        return $this->status === self::STATUS_PUBLISHED && !$this->isOverdue();
+        return $this->status === self::STATUS_PUBLISHED && ! $this->isOverdue();
     }
 }

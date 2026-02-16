@@ -18,7 +18,7 @@ class StaffFeedbackMessageController extends Controller
 
         $messages = FeedbackMessage::query()
             ->when($q !== '', function ($query) use ($q) {
-                $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+                $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q).'%';
 
                 $query->where(function ($sub) use ($like) {
                     $sub->where('name', 'like', $like)
@@ -71,4 +71,3 @@ class StaffFeedbackMessageController extends Controller
         return back()->with('success', 'Feedback marked as replied.');
     }
 }
-

@@ -16,12 +16,11 @@ return new class extends Migration
             $table->timestamp('visible_until')->nullable()->after('visible_from');
         });
     }
-    
+
     public function down()
     {
         Schema::table('announcements', function (Blueprint $table) {
             $table->dropColumn(['visible_from', 'visible_until']);
         });
     }
-    
 };

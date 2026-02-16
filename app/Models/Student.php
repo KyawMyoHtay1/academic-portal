@@ -80,7 +80,7 @@ class Student extends Model
     /**
      * Calculate the student's GPA (Grade Point Average).
      * GPA is calculated as the average of all grade scores.
-     * 
+     *
      * @return float|null GPA value (0.00 - 100.00) or null if no grades
      */
     public function calculateGPA(): ?float
@@ -90,7 +90,7 @@ class Student extends Model
             ->where('status', Grade::STATUS_APPROVED)
             ->whereNotNull('score')
             ->get();
-        
+
         if ($grades->isEmpty()) {
             return null;
         }
@@ -101,5 +101,3 @@ class Student extends Model
         return $count > 0 ? round($totalScore / $count, 2) : null;
     }
 }
-
-

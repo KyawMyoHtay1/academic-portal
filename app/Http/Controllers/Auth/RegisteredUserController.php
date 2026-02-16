@@ -49,7 +49,7 @@ class RegisteredUserController extends Controller
         // Verify reCAPTCHA if configured
         if (config('recaptcha.site_key') && isset($validated['recaptcha_token'])) {
             $recaptchaService = app(RecaptchaService::class);
-            if (!$recaptchaService->verify($validated['recaptcha_token'], $request->ip())) {
+            if (! $recaptchaService->verify($validated['recaptcha_token'], $request->ip())) {
                 throw ValidationException::withMessages([
                     'recaptcha_token' => 'reCAPTCHA verification failed. Please try again.',
                 ]);

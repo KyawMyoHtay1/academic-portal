@@ -7,7 +7,6 @@ use App\Models\Subject;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -113,7 +112,7 @@ class StaffSubjectController extends Controller
                 'credits' => $subject->credits,
                 'description' => $subject->description,
                 'photo_url' => $subject->photo
-                    ? asset('storage/' . $subject->photo)
+                    ? asset('storage/'.$subject->photo)
                     : null,
             ],
             'courses' => $courses,
@@ -127,7 +126,7 @@ class StaffSubjectController extends Controller
     {
         $data = $request->validate([
             'course_id' => ['required', 'exists:courses,id'],
-            'subject_code' => ['required', 'string', 'max:50', 'unique:subjects,subject_code,' . $subject->id],
+            'subject_code' => ['required', 'string', 'max:50', 'unique:subjects,subject_code,'.$subject->id],
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['nullable', 'integer', 'min:1', 'max:10'],
             'description' => ['nullable', 'string'],

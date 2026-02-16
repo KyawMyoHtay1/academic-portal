@@ -7,6 +7,7 @@ use App\Models\Timetable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class CourseRegistrationController extends Controller
@@ -22,7 +23,7 @@ class CourseRegistrationController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Redirect::route('courses.index')
                 ->with('error', 'Student record not found. Please contact administration.');
         }
@@ -35,16 +36,34 @@ class CourseRegistrationController extends Controller
                 ->where('course_id', $course->id)
                 ->lockForUpdate()
                 ->first();
-            
+
             if ($existingEnrollment) {
                 $status = $existingEnrollment->status;
                 if ($status === 'approved') {
+                    Log::info('enrollment.request_blocked', [
+                        'student_id' => $student->id,
+                        'course_id' => $course->id,
+                        'reason' => 'already_approved',
+                    ]);
+
                     return Redirect::route('courses.index')
                         ->with('error', 'You are already enrolled in this course.');
                 } elseif ($status === 'pending') {
+                    Log::info('enrollment.request_blocked', [
+                        'student_id' => $student->id,
+                        'course_id' => $course->id,
+                        'reason' => 'already_pending',
+                    ]);
+
                     return Redirect::route('courses.index')
                         ->with('error', 'You already have a pending enrollment request for this course.');
                 } elseif ($status === 'withdrawal_pending') {
+                    Log::info('enrollment.request_blocked', [
+                        'student_id' => $student->id,
+                        'course_id' => $course->id,
+                        'reason' => 'withdrawal_pending',
+                    ]);
+
                     return Redirect::route('courses.index')
                         ->with('error', "You have a pending withdrawal request for {$course->course_code} - {$course->title}. Please wait for admin approval before registering again.");
                 } elseif ($status === 'rejected') {
@@ -53,6 +72,13 @@ class CourseRegistrationController extends Controller
                         ->where('student_id', $student->id)
                         ->where('course_id', $course->id)
                         ->update(['status' => 'pending', 'updated_at' => now()]);
+
+                    Log::info('enrollment.request_submitted', [
+                        'student_id' => $student->id,
+                        'course_id' => $course->id,
+                        'mode' => 'resubmission_after_rejection',
+                    ]);
+
                     return Redirect::route('courses.index')
                         ->with('success', "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
                 }
@@ -64,7 +90,7 @@ class CourseRegistrationController extends Controller
                 ->pluck('courses.id')
                 ->toArray();
 
-            if (!empty($enrolledCourseIds)) {
+            if (! empty($enrolledCourseIds)) {
                 // Get timetables for the new course
                 $newCourseTimetables = Timetable::with('subject.course')
                     ->whereHas('subject', fn ($q) => $q->where('course_id', $course->id))
@@ -87,6 +113,14 @@ class CourseRegistrationController extends Controller
 
                             if (($newStart < $existingEnd && $newEnd > $existingStart)) {
                                 $conflictingCourse = $existingTimetable->subject->course;
+
+                                Log::info('enrollment.request_blocked', [
+                                    'student_id' => $student->id,
+                                    'course_id' => $course->id,
+                                    'reason' => 'schedule_conflict',
+                                    'conflict_course_id' => $conflictingCourse?->id,
+                                ]);
+
                                 return Redirect::route('courses.index')
                                     ->with('error', "Schedule conflict detected! This course conflicts with {$conflictingCourse->course_code} on {$newTimetable->day_of_week} ({$newTimetable->start_time} - {$newTimetable->end_time}). Please choose a different course or contact administration.");
                             }
@@ -112,7 +146,7 @@ class CourseRegistrationController extends Controller
                         ->where('student_id', $student->id)
                         ->where('course_id', $course->id)
                         ->first();
-                    
+
                     if ($existingEnrollment) {
                         $status = $existingEnrollment->status;
                         if ($status === 'approved') {
@@ -126,12 +160,18 @@ class CourseRegistrationController extends Controller
                                 ->with('error', "You have a pending withdrawal request for {$course->course_code} - {$course->title}. Please wait for admin approval before registering again.");
                         }
                     }
-                    
+
                     return Redirect::route('courses.index')
                         ->with('error', 'An error occurred while processing your enrollment request. Please try again.');
                 }
                 throw $e;
             }
+
+            Log::info('enrollment.request_submitted', [
+                'student_id' => $student->id,
+                'course_id' => $course->id,
+                'mode' => 'new_request',
+            ]);
 
             return Redirect::route('courses.index')
                 ->with('success', "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");
@@ -149,7 +189,7 @@ class CourseRegistrationController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Redirect::route('my-courses.index')
                 ->with('error', 'Student record not found.');
         }
@@ -158,25 +198,31 @@ class CourseRegistrationController extends Controller
         $enrollment = $student->courses()
             ->where('course_id', $course->id)
             ->first();
-        
-        if (!$enrollment) {
+
+        if (! $enrollment) {
             return Redirect::route('my-courses.index')
                 ->with('error', 'You are not enrolled in this course.');
         }
 
         $status = $enrollment->pivot->status;
-        
+
         if ($status !== 'approved') {
             if ($status === 'withdrawal_pending') {
                 return Redirect::route('my-courses.index')
                     ->with('error', 'You already have a pending withdrawal request for this course.');
             }
+
             return Redirect::route('my-courses.index')
                 ->with('error', 'You are not enrolled in this course.');
         }
 
         // Create withdrawal request
         $student->courses()->updateExistingPivot($course->id, ['status' => 'withdrawal_pending']);
+
+        Log::info('enrollment.withdrawal_requested', [
+            'student_id' => $student->id,
+            'course_id' => $course->id,
+        ]);
 
         return Redirect::route('my-courses.index')
             ->with('success', "Withdrawal request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval.");

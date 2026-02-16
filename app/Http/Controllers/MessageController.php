@@ -31,7 +31,7 @@ class MessageController extends Controller
             ->withQueryString()
             ->through(function ($m) use ($user) {
                 $isSent = $m->sender_id === $user->id;
-                
+
                 return [
                     'id' => $m->id,
                     'body' => $m->body,

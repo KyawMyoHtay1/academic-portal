@@ -10,7 +10,9 @@ class Grade extends Model
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [
@@ -81,7 +83,7 @@ class Grade extends Model
      * D: 50-59
      * E: 40-49
      * F: 1-39
-     * 
+     *
      * @return string|null Letter grade or null if score is null
      */
     public function getLetterGradeAttribute(): ?string
@@ -105,7 +107,7 @@ class Grade extends Model
         } elseif ($score >= 1) {
             return 'F';
         }
-        
+
         return null;
     }
 }

@@ -36,4 +36,3 @@ class GradePolicy
         return $user->isStaff();
     }
 }
-

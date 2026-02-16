@@ -16,8 +16,7 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
         protected Student $student,
         protected float $rate,
         protected float $threshold,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -31,7 +30,7 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject('Low attendance alert')
-            ->greeting('Hello ' . ($notifiable->name ?? 'Student') . ',')
+            ->greeting('Hello '.($notifiable->name ?? 'Student').',')
             ->line(sprintf(
                 'Your attendance is currently %s%%, which is below the required threshold of %s%%.',
                 $rateText,
@@ -57,4 +56,3 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
         ];
     }
 }
-

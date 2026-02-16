@@ -21,4 +21,3 @@ class StripeWebhookEvent extends Model
         'processed_at' => 'datetime',
     ];
 }
-

@@ -145,7 +145,7 @@ class PaymentWebhookTest extends TestCase
         $payload = json_encode($event, JSON_THROW_ON_ERROR);
         $timestamp = time();
         $secret = (string) config('services.stripe.webhook.secret');
-        $signature = hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
+        $signature = hash_hmac('sha256', $timestamp.'.'.$payload, $secret);
         $signatureHeader = "t={$timestamp},v1={$signature}";
 
         return $this->call(
@@ -173,7 +173,7 @@ class PaymentWebhookTest extends TestCase
 
         $student = Student::create([
             'user_id' => $user->id,
-            'student_no' => 'STU' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
+            'student_no' => 'STU'.str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
             'full_name' => $user->name,
             'email' => $user->email,
             'programme' => 'BSc Computing',
@@ -183,4 +183,3 @@ class PaymentWebhookTest extends TestCase
         return [$user, $student];
     }
 }
-

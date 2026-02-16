@@ -32,7 +32,7 @@ class TeacherCoursesController extends Controller
         $courses = $subjects->groupBy('course_id')->map(function ($courseSubjects, $courseId) {
             $firstSubject = $courseSubjects->first();
             $course = $firstSubject->course;
-            
+
             return [
                 'id' => $course->id,
                 'course_code' => $course->course_code,

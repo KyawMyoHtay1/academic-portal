@@ -21,7 +21,7 @@ class StudentAssignmentController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('Student/Assignments/Index', [
                 'assignments' => [],
                 'message' => 'No student record found. Please contact administration.',
@@ -43,6 +43,7 @@ class StudentAssignmentController extends Controller
             ->get()
             ->map(function ($assignment) {
                 $submission = $assignment->submissions->first();
+
                 return [
                     'id' => $assignment->id,
                     'title' => $assignment->title,
@@ -89,7 +90,7 @@ class StudentAssignmentController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             abort(404);
         }
 
@@ -104,7 +105,7 @@ class StudentAssignmentController extends Controller
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->exists();
 
-        if (!$isEnrolled) {
+        if (! $isEnrolled) {
             abort(403, 'You are not enrolled in this course.');
         }
 
@@ -159,7 +160,7 @@ class StudentAssignmentController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             abort(404);
         }
 
@@ -169,12 +170,12 @@ class StudentAssignmentController extends Controller
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->exists();
 
-        if (!$isEnrolled) {
+        if (! $isEnrolled) {
             abort(403, 'You are not enrolled in this course.');
         }
 
         // Check if assignment is still open for submission
-        if (!$assignment->canSubmit()) {
+        if (! $assignment->canSubmit()) {
             return back()->withErrors(['file' => 'This assignment is no longer accepting submissions.']);
         }
 
@@ -193,9 +194,9 @@ class StudentAssignmentController extends Controller
 
         // Validate file type
         $allowedTypes = $assignment->allowed_file_types ?? ['pdf', 'doc', 'docx', 'txt', 'zip', 'rar'];
-        if (!in_array($extension, $allowedTypes)) {
+        if (! in_array($extension, $allowedTypes)) {
             return back()->withErrors([
-                'file' => 'File type not allowed. Allowed types: ' . implode(', ', $allowedTypes)
+                'file' => 'File type not allowed. Allowed types: '.implode(', ', $allowedTypes),
             ]);
         }
 
@@ -204,12 +205,12 @@ class StudentAssignmentController extends Controller
         $fileSizeKB = $file->getSize() / 1024;
         if ($fileSizeKB > $maxSizeKB) {
             return back()->withErrors([
-                'file' => "File size exceeds maximum allowed size of {$maxSizeKB}KB."
+                'file' => "File size exceeds maximum allowed size of {$maxSizeKB}KB.",
             ]);
         }
 
         // Store file
-        $filename = 'assignments/' . uniqid() . '.' . $extension;
+        $filename = 'assignments/'.uniqid().'.'.$extension;
         Storage::disk('public')->put($filename, file_get_contents($file->getRealPath()));
 
         if ($existingSubmission) {
@@ -257,11 +258,11 @@ class StudentAssignmentController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student || $submission->student_id !== $student->id) {
+        if (! $student || $submission->student_id !== $student->id) {
             abort(403, 'You can only download your own submissions.');
         }
 
-        if (!Storage::disk('public')->exists($submission->file_path)) {
+        if (! Storage::disk('public')->exists($submission->file_path)) {
             abort(404, 'File not found.');
         }
 

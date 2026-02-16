@@ -10,9 +10,7 @@ class TimetableUpdated extends Notification
 {
     use Queueable;
 
-    public function __construct(protected Timetable $timetable, protected string $action = 'updated')
-    {
-    }
+    public function __construct(protected Timetable $timetable, protected string $action = 'updated') {}
 
     public function via(object $notifiable): array
     {
@@ -23,7 +21,7 @@ class TimetableUpdated extends Notification
     {
         return [
             'type' => 'timetable',
-            'title' => 'Timetable ' . $this->action,
+            'title' => 'Timetable '.$this->action,
             'message' => sprintf(
                 'Timetable for %s (%s) on %s at %s-%s has been %s.',
                 $this->timetable->course->title,
@@ -36,6 +34,3 @@ class TimetableUpdated extends Notification
         ];
     }
 }
-
-
-

@@ -10,9 +10,7 @@ class AttendanceAlert extends Notification
 {
     use Queueable;
 
-    public function __construct(protected Attendance $attendance)
-    {
-    }
+    public function __construct(protected Attendance $attendance) {}
 
     public function via(object $notifiable): array
     {
@@ -34,6 +32,3 @@ class AttendanceAlert extends Notification
         ];
     }
 }
-
-
-

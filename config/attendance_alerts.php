@@ -23,4 +23,3 @@ return [
     */
     'cooldown_days' => (int) env('ATTENDANCE_ALERT_COOLDOWN_DAYS', 7),
 ];
-

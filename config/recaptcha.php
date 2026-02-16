@@ -13,7 +13,7 @@ return [
 
     'site_key' => env('RECAPTCHA_SITE_KEY', ''),
     'secret_key' => env('RECAPTCHA_SECRET_KEY', ''),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Minimum Score Threshold
@@ -24,9 +24,9 @@ return [
     | pass validation. Recommended: 0.5
     |
     */
-    
+
     'score_threshold' => (float) env('RECAPTCHA_SCORE_THRESHOLD', 0.5),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Verify URL
@@ -35,6 +35,6 @@ return [
     | Google's reCAPTCHA verification endpoint
     |
     */
-    
+
     'verify_url' => 'https://www.google.com/recaptcha/api/siteverify',
 ];

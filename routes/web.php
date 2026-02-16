@@ -1,53 +1,52 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CourseController;
-use App\Models\Course;
-use App\Models\Announcement;
-use App\Models\Student;
-use App\Models\User;
-use App\Models\Attendance;
 use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MyCoursesController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StaffAnnouncementController;
+use App\Http\Controllers\StaffAttendanceAlertsController;
+use App\Http\Controllers\StaffAttendanceReportController;
+use App\Http\Controllers\StaffContactMessageController;
 use App\Http\Controllers\StaffCourseController;
 use App\Http\Controllers\StaffCourseTeacherController;
 use App\Http\Controllers\StaffEnrollmentController;
 use App\Http\Controllers\StaffFeeController;
+use App\Http\Controllers\StaffFeedbackMessageController;
 use App\Http\Controllers\StaffGradesController;
 use App\Http\Controllers\StaffSubjectController;
 use App\Http\Controllers\StaffSubjectTeacherController;
 use App\Http\Controllers\StaffTimetableController;
 use App\Http\Controllers\StaffUserController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\StudentTimetableController;
-use App\Http\Controllers\StudentFeeController;
-use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\StudentAssignmentController;
+use App\Http\Controllers\StudentAttendanceController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentFeeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\StudentProfileController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\StaffAnnouncementController;
-use App\Http\Controllers\StaffAttendanceAlertsController;
-use App\Http\Controllers\StaffAttendanceReportController;
-use App\Http\Controllers\TeacherAttendanceController;
+use App\Http\Controllers\StudentTimetableController;
+use App\Http\Controllers\TeacherAnnouncementController;
 use App\Http\Controllers\TeacherAssignmentController;
+use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherCoursesController;
 use App\Http\Controllers\TeacherGradesController;
 use App\Http\Controllers\TeacherTimetableController;
-use App\Http\Controllers\TeacherAnnouncementController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\StaffContactMessageController;
-use App\Http\Controllers\StaffFeedbackMessageController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
+use App\Models\Announcement;
+use App\Models\Attendance;
+use App\Models\Course;
+use App\Models\Student;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
@@ -57,20 +56,20 @@ Route::get('/', function () {
     $totalCourses = Course::count();
     $totalStudents = Student::count();
     $totalFaculty = User::where('role', 'teacher')->count();
-    
+
     // Calculate success rate based on attendance (present rate)
     $totalAttendance = Attendance::count();
     $presentAttendance = Attendance::where('status', 'present')->count();
-    $successRate = $totalAttendance > 0 
-        ? round(($presentAttendance / $totalAttendance) * 100, 0) 
+    $successRate = $totalAttendance > 0
+        ? round(($presentAttendance / $totalAttendance) * 100, 0)
         : 95; // Default to 95% if no attendance data
-    
+
     // Get total credits
     $totalCredits = Course::sum('credits');
-    
+
     // Get unique semesters count
     $uniqueSemesters = Course::distinct('semester')->count('semester');
-    
+
     return view('guest.home', [
         'publicCourses' => Course::orderBy('course_code')
             ->take(6)
@@ -103,27 +102,27 @@ Route::get('/guest/courses', function () {
         'semester',
         'photo',
     ]);
-    
+
     // Dynamic Statistics
     $totalCourses = $courses->count();
     $uniqueSemesters = $courses->unique('semester')->count();
     $totalCredits = $courses->sum('credits');
     $averageCredits = $totalCourses > 0 ? round($totalCredits / $totalCourses, 1) : 0;
-    
+
     // Get total enrollments (approved enrollments)
     $totalEnrollments = DB::table('course_student')
         ->where('status', 'approved')
         ->count();
-    
+
     // Calculate availability percentage (courses with at least one enrollment)
     $coursesWithEnrollments = DB::table('course_student')
         ->where('status', 'approved')
         ->distinct('course_id')
         ->count('course_id');
-    $availabilityRate = $totalCourses > 0 
-        ? round(($coursesWithEnrollments / $totalCourses) * 100, 0) 
+    $availabilityRate = $totalCourses > 0
+        ? round(($coursesWithEnrollments / $totalCourses) * 100, 0)
         : 100;
-    
+
     // Get most popular course (by enrollment count)
     $popularCourse = DB::table('course_student')
         ->where('status', 'approved')
@@ -131,7 +130,7 @@ Route::get('/guest/courses', function () {
         ->groupBy('course_id')
         ->orderByDesc('enrollment_count')
         ->first();
-    
+
     return view('guest.courses', [
         'courses' => $courses,
         'stats' => [
@@ -155,13 +154,13 @@ Route::get('/guest/news', function () {
             ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'important' THEN 2 WHEN 'info' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get([
-            'id',
-            'title',
-            'body',
-            'priority',
-            'pinned',
-            'created_at',
-        ]),
+                'id',
+                'title',
+                'body',
+                'priority',
+                'pinned',
+                'created_at',
+            ]),
     ]);
 })->name('guest.news');
 
@@ -170,23 +169,23 @@ Route::get('/guest/about', function () {
     $totalStudents = Student::count();
     $totalFaculty = User::where('role', 'teacher')->count();
     $totalCourses = Course::count();
-    
+
     // Calculate years of excellence (from oldest student enrollment or use a base year)
     $oldestEnrollment = Student::whereNotNull('enrollment_date')
         ->orderBy('enrollment_date', 'asc')
         ->value('enrollment_date');
-    
+
     $yearsOfExcellence = 50; // Default
     if ($oldestEnrollment) {
         $yearsOfExcellence = max(50, now()->year - $oldestEnrollment->year);
     }
-    
+
     // Get unique programs (based on unique course codes or could be based on student programmes)
     $uniqueProgrammes = Student::distinct('programme')
         ->whereNotNull('programme')
         ->count('programme');
     $totalPrograms = max($uniqueProgrammes, $totalCourses); // Use courses as fallback
-    
+
     return view('guest.about', [
         'stats' => [
             'yearsOfExcellence' => $yearsOfExcellence,
@@ -205,7 +204,7 @@ Route::get('/guest/vision', function () {
     $totalEnrollments = DB::table('course_student')
         ->where('status', 'approved')
         ->count();
-    
+
     return view('guest.vision', [
         'stats' => [
             'totalStudents' => $totalStudents,
@@ -224,18 +223,18 @@ Route::get('/guest/services', function () {
     $totalEnrollments = DB::table('course_student')
         ->where('status', 'approved')
         ->count();
-    
+
     // Assignment statistics
     $totalAssignments = DB::table('assignments')->count();
     $totalSubmissions = DB::table('assignment_submissions')->count();
-    
+
     // Grade statistics
     $totalGrades = DB::table('grades')->count();
-    
+
     // Fee statistics
     $totalFees = DB::table('fees')->count();
     $paidFees = DB::table('fees')->where('status', 'paid')->count();
-    
+
     return view('guest.services', [
         'stats' => [
             'totalStudents' => $totalStudents,
@@ -257,12 +256,12 @@ Route::get('/guest/support', function () {
     $totalUsers = User::count();
     $totalAnnouncements = DB::table('announcements')
         ->where('visible_from', '<=', now())
-        ->where(function($query) {
+        ->where(function ($query) {
             $query->whereNull('visible_until')
-                  ->orWhere('visible_until', '>=', now());
+                ->orWhere('visible_until', '>=', now());
         })
         ->count();
-    
+
     return view('guest.support', [
         'stats' => [
             'totalStudents' => $totalStudents,
@@ -278,12 +277,12 @@ Route::get('/guest/contact', function () {
     $totalStudents = Student::count();
     $totalFaculty = User::where('role', 'teacher')->count();
     $totalCourses = Course::count();
-    
+
     // Get department/role breakdown
     $adminCount = User::where('role', 'admin')->count();
     $teacherCount = User::where('role', 'teacher')->count();
     $studentCount = Student::count();
-    
+
     return view('guest.contact', [
         'stats' => [
             'totalStudents' => $totalStudents,
@@ -385,7 +384,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     // Student Fees
     Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
     Route::post('/student/fees/{fee}/submit-payment', [StudentFeeController::class, 'submitPayment'])->name('student.fees.submit-payment');
-    
+
     // Payment Gateway (Stripe)
     Route::post('/payment/{fee}/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::get('/payment/{fee}/success', [PaymentController::class, 'success'])->name('payment.success');
@@ -397,10 +396,10 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::post('/announcements/{announcement}/read', [AnnouncementController::class, 'markAsRead'])->name('announcements.read');
     Route::post('/announcements/{announcement}/ack', [AnnouncementController::class, 'acknowledge'])->name('announcements.ack');
-        // Notifications (all authenticated users)
-        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    // Notifications (all authenticated users)
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     // Messaging (all roles can send)
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
@@ -528,7 +527,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     // Timebox 3: Teacher Features (teacher only)
     Route::middleware('role:teacher')->group(function () {
         Route::get('/teacher/courses', [TeacherCoursesController::class, 'index'])->name('teacher.courses.index');
-        
+
         // Attendance Management
         Route::get('/teacher/attendance', [TeacherAttendanceController::class, 'index'])->name('teacher.attendance.index');
         Route::get('/teacher/attendance/{subject}', [TeacherAttendanceController::class, 'show'])->name('teacher.attendance.show');

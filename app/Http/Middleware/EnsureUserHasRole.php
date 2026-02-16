@@ -15,14 +15,14 @@ class EnsureUserHasRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->route('login');
         }
 
         $user = auth()->user();
 
-        if (!$user->hasRole($role)) {
-            abort(403, 'Unauthorized access. This page requires ' . $role . ' role.');
+        if (! $user->hasRole($role)) {
+            abort(403, 'Unauthorized access. This page requires '.$role.' role.');
         }
 
         return $next($request);

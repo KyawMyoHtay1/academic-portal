@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class SearchController extends Controller
 {
     private const LIMIT_PER_TYPE = 5;
+
     private const MIN_QUERY_LENGTH = 2;
 
     /**
@@ -27,7 +28,7 @@ class SearchController extends Controller
             return response()->json(['results' => []]);
         }
 
-        $term = '%' . $q . '%';
+        $term = '%'.$q.'%';
 
         if (Auth::guest()) {
             return response()->json(['results' => $this->searchGuest($term, $q)]);
@@ -64,10 +65,10 @@ class SearchController extends Controller
         foreach ($courses as $c) {
             $results[] = [
                 'type' => 'course',
-                'id' => 'course-' . $c->id,
+                'id' => 'course-'.$c->id,
                 'title' => $c->title,
                 'subtitle' => $c->course_code,
-                'url' => route('guest.courses') . '#course-' . $c->id,
+                'url' => route('guest.courses').'#course-'.$c->id,
             ];
         }
 
@@ -86,10 +87,10 @@ class SearchController extends Controller
         foreach ($announcements as $a) {
             $results[] = [
                 'type' => 'announcement',
-                'id' => 'announcement-' . $a->id,
+                'id' => 'announcement-'.$a->id,
                 'title' => $a->title,
                 'subtitle' => 'News',
-                'url' => route('guest.news') . '#announcement-' . $a->id,
+                'url' => route('guest.news').'#announcement-'.$a->id,
             ];
         }
 
@@ -114,7 +115,7 @@ class SearchController extends Controller
             if ($matchTitle || $matchKeyword) {
                 $results[] = [
                     'type' => 'page',
-                    'id' => 'page-' . $i,
+                    'id' => 'page-'.$i,
                     'title' => $page['title'],
                     'subtitle' => 'Page',
                     'url' => $page['url'],
@@ -160,7 +161,7 @@ class SearchController extends Controller
                 'type' => 'user',
                 'id' => $u->id,
                 'title' => $u->name,
-                'subtitle' => $u->email . ' (' . $u->role . ')',
+                'subtitle' => $u->email.' ('.$u->role.')',
                 'url' => route('admin.users.edit', $u),
             ];
         }
@@ -308,7 +309,7 @@ class SearchController extends Controller
     {
         $results = [];
         $student = $user->student;
-        if (!$student) {
+        if (! $student) {
             return $results;
         }
 

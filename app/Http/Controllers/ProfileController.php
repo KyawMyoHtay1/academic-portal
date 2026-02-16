@@ -20,10 +20,11 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         $user = $request->user();
+
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
-            'photo_url' => $user->photo ? asset('storage/' . $user->photo) : null,
+            'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null,
         ]);
     }
 
@@ -41,7 +42,7 @@ class ProfileController extends Controller
             if ($user->photo && Storage::disk('public')->exists($user->photo)) {
                 Storage::disk('public')->delete($user->photo);
             }
-            
+
             // Store new photo
             $path = $request->file('photo')->store('users', 'public');
             $user->photo = $path;

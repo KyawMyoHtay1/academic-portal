@@ -41,6 +41,7 @@ class CourseController extends Controller
         // Add enrollment status to each course
         $courses = $courses->map(function ($course) use ($enrollmentStatuses) {
             $status = $enrollmentStatuses[$course->id] ?? null;
+
             return [
                 'id' => $course->id,
                 'course_code' => $course->course_code,
@@ -59,4 +60,3 @@ class CourseController extends Controller
         ]);
     }
 }
-

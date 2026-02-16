@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Fee;
 use App\Models\Student;
 use App\Notifications\FeeStatusUpdated;
-use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -44,6 +44,7 @@ class StaffFeeController extends Controller
             ->paginate(15)
             ->through(function (Fee $fee) {
                 $isLate = $fee->status === 'pending' && $fee->due_date < now();
+
                 return [
                     'id' => $fee->id,
                     'student_no' => $fee->student->student_no,
@@ -282,11 +283,11 @@ class StaffFeeController extends Controller
         $pdf = Pdf::loadView('fees.receipt', [
             'fee' => $fee,
             'student' => $fee->student,
-            'receipt_number' => 'REC-' . str_pad((string) $fee->id, 6, '0', STR_PAD_LEFT),
+            'receipt_number' => 'REC-'.str_pad((string) $fee->id, 6, '0', STR_PAD_LEFT),
             'generated_at' => now()->format('F j, Y \a\t g:i A'),
         ]);
 
-        $filename = 'receipt-' . $fee->student->student_no . '-' . $fee->id . '.pdf';
+        $filename = 'receipt-'.$fee->student->student_no.'-'.$fee->id.'.pdf';
 
         return $pdf->download($filename);
     }

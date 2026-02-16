@@ -19,14 +19,14 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('subject');
             $table->text('message');
-        
+
             // Admin handling
             $table->boolean('is_read')->default(false);
             $table->timestamp('replied_at')->nullable();
-        
+
             $table->timestamps();
         });
-        
+
     }
 
     /**

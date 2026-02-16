@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Subject;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,7 +19,7 @@ class StudentAttendanceController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('Student/Attendance/Index', [
                 'overall' => [
                     'total' => 0,
@@ -40,8 +39,8 @@ class StudentAttendanceController extends Controller
         $totalRecords = $attendances->count();
         $totalPresent = $attendances->where('status', 'present')->count();
         $totalAbsent = $totalRecords - $totalPresent;
-        $attendanceRate = $totalRecords > 0 
-            ? round(($totalPresent / $totalRecords) * 100, 2) 
+        $attendanceRate = $totalRecords > 0
+            ? round(($totalPresent / $totalRecords) * 100, 2)
             : 0;
 
         // Attendance by course
@@ -62,6 +61,7 @@ class StudentAttendanceController extends Controller
                 $rate = $course->total_attendances > 0
                     ? round(($course->present_attendances / $course->total_attendances) * 100, 2)
                     : 0;
+
                 return [
                     'id' => $course->id,
                     'course_code' => $course->course_code,
@@ -75,18 +75,18 @@ class StudentAttendanceController extends Controller
 
         // Attendance by subject
         $attendanceBySubject = Subject::whereHas('attendances', function ($query) use ($student) {
-                $query->where('student_id', $student->id);
-            })
+            $query->where('student_id', $student->id);
+        })
             ->with('course')
             ->withCount([
-                'attendances as total_attendances' => function ($query) use ($student) {
-                    $query->where('student_id', $student->id);
-                },
-                'attendances as present_attendances' => function ($query) use ($student) {
-                    $query->where('student_id', $student->id)
-                        ->where('status', 'present');
-                },
-            ])
+            'attendances as total_attendances' => function ($query) use ($student) {
+                $query->where('student_id', $student->id);
+            },
+            'attendances as present_attendances' => function ($query) use ($student) {
+                $query->where('student_id', $student->id)
+                    ->where('status', 'present');
+            },
+        ])
             ->having('total_attendances', '>', 0)
             ->orderBy('subject_code')
             ->get()
@@ -94,6 +94,7 @@ class StudentAttendanceController extends Controller
                 $rate = $subject->total_attendances > 0
                     ? round(($subject->present_attendances / $subject->total_attendances) * 100, 2)
                     : 0;
+
                 return [
                     'id' => $subject->id,
                     'subject_code' => $subject->subject_code,
@@ -114,8 +115,9 @@ class StudentAttendanceController extends Controller
             ->limit(50)
             ->get()
             ->map(function ($attendance) {
-                $courseCode = $attendance->subject?->course?->course_code 
+                $courseCode = $attendance->subject?->course?->course_code
                     ?? 'N/A';
+
                 return [
                     'id' => $attendance->id,
                     'date' => $attendance->date->format('Y-m-d'),

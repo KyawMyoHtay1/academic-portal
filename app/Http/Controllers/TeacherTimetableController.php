@@ -33,7 +33,7 @@ class TeacherTimetableController extends Controller
         $courses = $subjects->groupBy('course_id')->map(function ($courseSubjects, $courseId) {
             $firstSubject = $courseSubjects->first();
             $course = $firstSubject->course;
-            
+
             $timetables = collect();
             foreach ($courseSubjects as $subject) {
                 foreach ($subject->timetables as $entry) {
@@ -49,13 +49,13 @@ class TeacherTimetableController extends Controller
                     ]);
                 }
             }
-            
+
             // Sort by day and time
             $timetables = $timetables->sortBy([
                 ['day_of_week', 'asc'],
                 ['start_time', 'asc'],
             ])->values();
-            
+
             return [
                 'id' => $course->id,
                 'course_code' => $course->course_code,

@@ -1,73 +1,159 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# University Academic Portal
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+University Academic Portal is a Laravel + Inertia (Vue) application for managing academic operations across student, teacher, and staff roles.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Role-based dashboards (student, teacher, staff)
+- Course enrollment and withdrawal request workflow
+- Fee management and Stripe payment processing
+- Grade submission and staff review/approval workflow
+- Attendance tracking and low-attendance alerts
+- Announcements, notifications, and internal messaging
+- Public guest pages (courses, news, contact, support)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Backend: Laravel 12, PHP 8.2+
+- Frontend: Vue 3, Inertia.js, Vite, Tailwind CSS
+- Database: MySQL (primary), SQLite (tests)
+- Payments: Stripe Checkout + Webhooks
 
-## Learning Laravel
+## Prerequisites
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP 8.2+
+- Composer 2+
+- Node.js 20+
+- npm 10+
+- MySQL 8+ (or compatible)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Local Setup
 
-## Laravel Sponsors
+1. Install dependencies:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+composer install
+npm ci
+```
 
-### Premium Partners
+2. Configure environment:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Contributing
+3. Update `.env` database and service keys.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Run migrations and seeders:
 
-## Code of Conduct
+```bash
+php artisan migrate
+php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Start development services:
 
-## Security Vulnerabilities
+```bash
+composer run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+This runs Laravel server, queue worker, logs, and Vite dev server concurrently.
 
-## License
+## Environment Variables
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Core:
 
-## Automated low attendance alerts
+- `APP_NAME`, `APP_ENV`, `APP_KEY`, `APP_URL`
+- `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+- `QUEUE_CONNECTION`, `SESSION_DRIVER`, `CACHE_STORE`
 
-This project includes an automated low-attendance alert that notifies students when their overall attendance rate drops below a configured threshold.
+Stripe:
 
-- **Command**: `php artisan attendance:send-low-attendance-alerts`
-- **Schedule**: configured to run daily (see `bootstrap/app.php`). In production you must run Laravel's scheduler (e.g. `php artisan schedule:run` every minute via cron / Windows Task Scheduler, or `php artisan schedule:work`).
-- **Queue worker**: required (notifications are queued). Example: `php artisan queue:work` (this repo's `composer dev` already runs a queue listener).
-- **Mail**: by default `MAIL_MAILER=log`, so emails will be written to logs until SMTP (or another mailer) is configured.
+- `STRIPE_KEY`
+- `STRIPE_SECRET`
+- `STRIPE_WEBHOOK_SECRET`
 
-Configuration:
+reCAPTCHA:
 
-- `ATTENDANCE_LOW_THRESHOLD` (default 75)
-- `ATTENDANCE_ALERT_COOLDOWN_DAYS` (default 7)
+- `RECAPTCHA_SITE_KEY`
+- `RECAPTCHA_SECRET_KEY`
+- `RECAPTCHA_SCORE_THRESHOLD`
+
+Attendance alerts:
+
+- `ATTENDANCE_LOW_THRESHOLD`
+- `ATTENDANCE_ALERT_COOLDOWN_DAYS`
+
+## Testing and Quality
+
+Run backend tests:
+
+```bash
+php artisan test
+```
+
+Run code style checks:
+
+```bash
+./vendor/bin/pint --test
+```
+
+Build frontend assets:
+
+```bash
+npm run build
+```
+
+## CI
+
+GitHub Actions workflow: `.github/workflows/ci.yml`
+
+On every push and pull request, CI runs:
+
+- `./vendor/bin/pint --test`
+- `php artisan test`
+- `npm run build`
+
+## Payment Webhooks (Stripe)
+
+Local testing example:
+
+```bash
+stripe listen --forward-to http://127.0.0.1:8000/stripe/webhook
+```
+
+Webhook handler is idempotent and ignores duplicate event deliveries.
+
+## Queue and Scheduler
+
+Low-attendance alerts are scheduled daily in `bootstrap/app.php`.
+
+Production requirements:
+
+- Queue worker: `php artisan queue:work`
+- Scheduler trigger (every minute): `php artisan schedule:run`
+
+## Demo Workflow
+
+1. Staff creates courses, subjects, and fees.
+2. Student registers, enrolls in courses, and views fees/grades.
+3. Teacher records grades for assigned subjects.
+4. Staff reviews and approves/rejects grades.
+5. Student pays fees via Stripe checkout and receives status updates.
+
+## Security and Hardening
+
+- Role middleware and resource policies for fees/grades/enrollment actions
+- Throttling on search, messaging, and public form endpoints
+- Security headers middleware (CSP, X-Frame-Options, X-Content-Type-Options, HSTS in production)
+- Structured logging for payments, enrollment actions, grade review decisions, and queue job failures
+
+## Useful Commands
+
+```bash
+php artisan migrate:fresh --seed
+php artisan queue:work
+php artisan schedule:work
+npm run dev
+```

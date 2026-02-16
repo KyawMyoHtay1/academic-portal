@@ -12,11 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Inertia\Response;
-use Stripe\Exception\ApiErrorException;
-use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use Stripe\Webhook;
 
 class PaymentController extends Controller
@@ -35,19 +34,19 @@ class PaymentController extends Controller
 
         $user = Auth::user();
         $student = $user->student;
-    
-        if (!$student || $fee->student_id !== $student->id) {
+
+        if (! $student || $fee->student_id !== $student->id) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'Unauthorized access.');
         }
-    
+
         if ($fee->status === 'paid') {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'This fee has already been paid.');
         }
-    
+
         try {
             $checkoutSession = Session::create([
                 'line_items' => [[
@@ -67,30 +66,34 @@ class PaymentController extends Controller
                         'student_id' => $student->id,
                     ],
                 ],
-                'success_url' => route('payment.success', $fee) . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => route('payment.success', $fee).'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment.cancel', $fee),
                 'customer_email' => $student->email,
             ]);
-    
+
             $fee->update([
                 'payment_intent_id' => $checkoutSession->payment_intent,
                 'status' => 'payment_pending',
             ]);
-    
+
+            Log::info('payment.checkout_started', [
+                'fee_id' => $fee->id,
+                'student_id' => $student->id,
+                'payment_intent_id' => $checkoutSession->payment_intent,
+            ]);
+
             return Inertia::location($checkoutSession->url);
-    
+
         } catch (ApiErrorException $e) {
             Log::error('Stripe Checkout Session creation failed', [
                 'error' => $e->getMessage(),
             ]);
-    
+
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'Payment initialization failed.');
         }
     }
-    
-
 
     /**
      * Handle successful payment.
@@ -102,7 +105,7 @@ class PaymentController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student || $fee->student_id !== $student->id) {
+        if (! $student || $fee->student_id !== $student->id) {
             abort(403, 'Unauthorized');
         }
 
@@ -112,12 +115,18 @@ class PaymentController extends Controller
         if ($sessionId) {
             try {
                 $session = Session::retrieve($sessionId);
-                
+
                 // If Stripe confirms payment, verify the intent one more time
                 if ($session->payment_status === 'paid' && $session->payment_intent) {
                     $paymentIntent = PaymentIntent::retrieve($session->payment_intent);
                     if ($paymentIntent->status === 'succeeded') {
                         $this->handlePaymentSuccess($paymentIntent);
+
+                        Log::info('payment.success_redirect_confirmed', [
+                            'fee_id' => $fee->id,
+                            'student_id' => $student->id,
+                            'payment_intent_id' => $paymentIntent->id ?? null,
+                        ]);
 
                         return redirect()
                             ->route('student.fees.index')
@@ -133,7 +142,7 @@ class PaymentController extends Controller
                     ]);
                 }
             } catch (ApiErrorException $e) {
-                Log::error('Stripe Session verification failed: ' . $e->getMessage());
+                Log::error('Stripe Session verification failed: '.$e->getMessage());
             }
         }
 
@@ -159,7 +168,7 @@ class PaymentController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student || $fee->student_id !== $student->id) {
+        if (! $student || $fee->student_id !== $student->id) {
             abort(403, 'Unauthorized');
         }
 
@@ -168,6 +177,11 @@ class PaymentController extends Controller
             $fee->update([
                 'status' => 'pending',
                 'payment_intent_id' => null,
+            ]);
+
+            Log::info('payment.checkout_cancelled', [
+                'fee_id' => $fee->id,
+                'student_id' => $student->id,
             ]);
         }
 
@@ -188,13 +202,15 @@ class PaymentController extends Controller
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
         } catch (\Exception $e) {
-            Log::error('Stripe webhook signature verification failed: ' . $e->getMessage());
+            Log::error('Stripe webhook signature verification failed: '.$e->getMessage());
+
             return response('Webhook signature verification failed', 400);
         }
 
         $eventId = $event->id ?? null;
-        if (!$eventId) {
+        if (! $eventId) {
             Log::warning('Stripe webhook payload missing event id');
+
             return response('Webhook event id missing', 400);
         }
 
@@ -266,8 +282,9 @@ class PaymentController extends Controller
     {
         $feeId = $paymentIntent->metadata->fee_id ?? null;
 
-        if (!$feeId) {
+        if (! $feeId) {
             Log::warning('Payment Intent missing fee_id metadata', ['payment_intent_id' => $paymentIntent->id]);
+
             return;
         }
 
@@ -276,7 +293,7 @@ class PaymentController extends Controller
         $result = DB::transaction(function () use ($feeId, $paymentIntent, $paymentIntentId) {
             $fee = Fee::query()->lockForUpdate()->find($feeId);
 
-            if (!$fee) {
+            if (! $fee) {
                 Log::warning('Fee not found for payment', [
                     'fee_id' => $feeId,
                     'payment_intent_id' => $paymentIntentId,
@@ -318,14 +335,14 @@ class PaymentController extends Controller
             ];
         });
 
-        if (!$result) {
+        if (! $result) {
             return;
         }
 
         /** @var \App\Models\Fee $fee */
         $fee = $result['fee'];
 
-        if (!$result['newly_paid']) {
+        if (! $result['newly_paid']) {
             Log::info('Payment already processed, skipping duplicate success handler', [
                 'fee_id' => $fee->id,
                 'payment_intent_id' => $paymentIntentId,
@@ -350,15 +367,15 @@ class PaymentController extends Controller
     private function handlePaymentFailure($paymentIntent): void
     {
         $feeId = $paymentIntent->metadata->fee_id ?? null;
-        
-        if (!$feeId) {
+
+        if (! $feeId) {
             return;
         }
 
         $updated = DB::transaction(function () use ($feeId, $paymentIntent) {
             $fee = Fee::query()->lockForUpdate()->find($feeId);
 
-            if (!$fee || $fee->status === 'paid') {
+            if (! $fee || $fee->status === 'paid') {
                 return false;
             }
 
@@ -400,8 +417,9 @@ class PaymentController extends Controller
         // When a checkout session completes, Stripe includes the payment_intent id
         $paymentIntentId = $session->payment_intent ?? null;
 
-        if (!$paymentIntentId) {
+        if (! $paymentIntentId) {
             Log::warning('Checkout completed without payment_intent id', ['session_id' => $session->id]);
+
             return;
         }
 

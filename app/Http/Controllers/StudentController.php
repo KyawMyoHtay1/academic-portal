@@ -120,13 +120,13 @@ class StudentController extends Controller
                 'notes' => $student->notes,
                 'enrollment_date' => $student->enrollment_date,
                 'photo_url' => $student->photo
-                    ? asset('storage/' . $student->photo)
+                    ? asset('storage/'.$student->photo)
                     : null,
                 'id_card_url' => $student->id_card
-                    ? asset('storage/' . $student->id_card)
+                    ? asset('storage/'.$student->id_card)
                     : null,
                 'transcript_url' => $student->transcript
-                    ? asset('storage/' . $student->transcript)
+                    ? asset('storage/'.$student->transcript)
                     : null,
             ],
             'programmes' => $this->getProgrammes(),
@@ -136,12 +136,12 @@ class StudentController extends Controller
     public function update(Request $request, Student $student): RedirectResponse
     {
         $data = $request->validate([
-            'student_no' => ['required', 'string', 'max:50', 'unique:students,student_no,' . $student->id],
+            'student_no' => ['required', 'string', 'max:50', 'unique:students,student_no,'.$student->id],
             'full_name' => ['required', 'string', 'max:255'],
             'dob' => ['required', 'date', 'before:today'],
             'gender' => ['nullable', 'in:Male,Female,Other'],
             'nationality' => ['nullable', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:255', 'unique:students,email,' . $student->id],
+            'email' => ['required', 'email', 'max:255', 'unique:students,email,'.$student->id],
             'phone' => ['required', 'string', 'max:50', 'regex:/^[0-9+\\-() ]+$/'],
             'address' => ['nullable', 'string', 'max:2000'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
@@ -223,7 +223,7 @@ class StudentController extends Controller
             $next = 1;
         }
 
-        return 'STU' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+        return 'STU'.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -251,7 +251,7 @@ class StudentController extends Controller
     protected function storeDocument($file, string $folder): string
     {
         $extension = strtolower($file->getClientOriginalExtension());
-        $filename = $folder . '/' . uniqid() . '.' . $extension;
+        $filename = $folder.'/'.uniqid().'.'.$extension;
 
         // For PDFs, store directly without image processing
         if ($extension === 'pdf') {
@@ -269,7 +269,7 @@ class StudentController extends Controller
      */
     protected function deleteDocument(?string $path): bool
     {
-        if (!$path) {
+        if (! $path) {
             return false;
         }
 
@@ -280,5 +280,3 @@ class StudentController extends Controller
         return false;
     }
 }
-
-

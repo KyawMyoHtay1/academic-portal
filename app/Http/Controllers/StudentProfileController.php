@@ -6,7 +6,6 @@ use App\Models\Student;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +22,7 @@ class StudentProfileController extends Controller
         $student = $user->student()->first();
 
         // If student record doesn't exist yet, show a message
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('StudentProfile/Show', [
                 'student' => null,
                 'message' => 'No student record found. Please contact administration to create your student profile.',
@@ -49,7 +48,7 @@ class StudentProfileController extends Controller
                 'intake_year' => $student->intake_year,
                 'gpa' => $gpa,
                 'photo_url' => $student->photo
-                    ? asset('storage/' . $student->photo)
+                    ? asset('storage/'.$student->photo)
                     : null,
             ],
         ]);
@@ -64,7 +63,7 @@ class StudentProfileController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return redirect()
                 ->route('student.profile.show')
                 ->with('error', 'Student record not found.');
@@ -82,7 +81,7 @@ class StudentProfileController extends Controller
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             ImageService::delete($student->photo);
-            
+
             // Store new optimized photo
             $data['photo'] = ImageService::store($request->file('photo'), 'students');
         }
@@ -102,7 +101,7 @@ class StudentProfileController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return redirect()
                 ->route('student.profile.show')
                 ->with('error', 'Student record not found.');
@@ -119,4 +118,3 @@ class StudentProfileController extends Controller
             ->with('success', 'Profile photo removed successfully.');
     }
 }
-

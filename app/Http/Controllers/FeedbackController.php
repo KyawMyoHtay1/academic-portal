@@ -47,4 +47,3 @@ class FeedbackController extends Controller
         return back()->with('success', 'Thank you for your feedback. We appreciate your input.');
     }
 }
-

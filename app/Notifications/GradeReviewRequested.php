@@ -6,7 +6,6 @@ use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class GradeReviewRequested extends Notification
@@ -17,8 +16,7 @@ class GradeReviewRequested extends Notification
         protected Grade $grade,
         protected Student $student,
         protected Subject $subject
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -46,4 +44,3 @@ class GradeReviewRequested extends Notification
         ];
     }
 }
-

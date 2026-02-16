@@ -77,7 +77,7 @@ class TeacherAssignmentController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -126,7 +126,7 @@ class TeacherAssignmentController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -148,7 +148,7 @@ class TeacherAssignmentController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -379,7 +379,7 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You can only download submissions for your own assignments.');
         }
 
-        if (!Storage::disk('public')->exists($submission->file_path)) {
+        if (! Storage::disk('public')->exists($submission->file_path)) {
             abort(404, 'File not found.');
         }
 

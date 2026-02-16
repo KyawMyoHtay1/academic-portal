@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->timestamps();
         });
-        
+
     }
 
     /**

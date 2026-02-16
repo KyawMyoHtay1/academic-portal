@@ -24,7 +24,7 @@ class StudentFeeController extends Controller
 
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('Student/Fees/Index', [
                 'fees' => [],
                 'message' => 'No student record found. Please contact administration to create your student profile.',
@@ -70,7 +70,7 @@ class StudentFeeController extends Controller
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
+        if (! $student) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'Student record not found.');

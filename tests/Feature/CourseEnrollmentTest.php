@@ -85,7 +85,7 @@ class CourseEnrollmentTest extends TestCase
 
         $student = Student::create([
             'user_id' => $user->id,
-            'student_no' => 'STU' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
+            'student_no' => 'STU'.str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
             'full_name' => $user->name,
             'email' => $user->email,
             'programme' => 'BSc Computing',
@@ -95,4 +95,3 @@ class CourseEnrollmentTest extends TestCase
         return [$user, $student];
     }
 }
-

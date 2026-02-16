@@ -20,4 +20,3 @@ class FeedbackMessage extends Model
         'replied_at' => 'datetime',
     ];
 }
-

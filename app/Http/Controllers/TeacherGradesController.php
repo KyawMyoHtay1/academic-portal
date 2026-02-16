@@ -12,6 +12,7 @@ use App\Notifications\GradeReviewRequested;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,7 +60,7 @@ class TeacherGradesController extends Controller
         $user = Auth::user();
 
         // Ensure the teacher is assigned to this subject
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -110,7 +111,7 @@ class TeacherGradesController extends Controller
         $user = Auth::user();
 
         // Ensure the teacher is assigned to this subject
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -122,12 +123,12 @@ class TeacherGradesController extends Controller
 
         // Verify all students are enrolled in the subject's course
         $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
-        
+
         // Filter and save only grades with scores (skip empty ones)
         $savedCount = 0;
         foreach ($data['grades'] as $record) {
             // Skip if student is not enrolled
-            if (!in_array($record['student_id'], $enrolledStudentIds)) {
+            if (! in_array($record['student_id'], $enrolledStudentIds)) {
                 return redirect()
                     ->back()
                     ->withErrors(['grades' => 'One or more students are not enrolled in this course.']);
@@ -167,13 +168,21 @@ class TeacherGradesController extends Controller
                 ],
             ]);
 
+            Log::info('grade.review_submitted', [
+                'grade_id' => $grade->id,
+                'subject_id' => $subject->id,
+                'course_id' => $subject->course_id,
+                'student_id' => (int) $record['student_id'],
+                'submitted_by' => $user->id,
+            ]);
+
             // Notify staff/admin users that a grade needs review.
             $student = Student::find($record['student_id']);
             $staffUsers = User::where('role', 'staff')->get(['id', 'name', 'email']);
             foreach ($staffUsers as $staff) {
                 $staff->notify(new GradeReviewRequested($grade, $student, $subject));
             }
-            
+
             $savedCount++;
         }
 

@@ -61,4 +61,3 @@ class FeePolicy
         return $user->isStaff();
     }
 }
-

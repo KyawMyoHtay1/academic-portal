@@ -22,6 +22,3 @@ class NoCache
             ->header('Expires', '0');
     }
 }
-
-
-

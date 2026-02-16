@@ -9,10 +9,6 @@ class RecaptchaService
 {
     /**
      * Verify reCAPTCHA token with Google
-     *
-     * @param string $token
-     * @param string|null $ip
-     * @return bool
      */
     public function verify(string $token, ?string $ip = null): bool
     {
@@ -22,6 +18,7 @@ class RecaptchaService
         if (empty($secretKey)) {
             // If no secret key configured, skip verification (for development)
             Log::warning('reCAPTCHA secret key not configured. Skipping verification.');
+
             return true;
         }
 
@@ -38,11 +35,12 @@ class RecaptchaService
 
             $result = $response->json();
 
-            if (!isset($result['success']) || !$result['success']) {
+            if (! isset($result['success']) || ! $result['success']) {
                 Log::warning('reCAPTCHA verification failed', [
                     'errors' => $result['error-codes'] ?? [],
                     'ip' => $ip ?? request()->ip(),
                 ]);
+
                 return false;
             }
 
@@ -54,6 +52,7 @@ class RecaptchaService
                     'threshold' => $scoreThreshold,
                     'ip' => $ip ?? request()->ip(),
                 ]);
+
                 return false;
             }
 
@@ -63,7 +62,7 @@ class RecaptchaService
                 'message' => $e->getMessage(),
                 'ip' => $ip ?? request()->ip(),
             ]);
-            
+
             // Fail open in case of network issues (optional - you may want to fail closed)
             return false;
         }

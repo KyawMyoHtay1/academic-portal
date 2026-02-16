@@ -37,7 +37,7 @@ class DashboardController extends Controller
             // Check alert system status
             $queueConnection = config('queue.default', 'sync');
             $queueConfigured = $queueConnection !== 'sync';
-            
+
             // Check for pending jobs (if using database queue)
             $pendingJobs = 0;
             if ($queueConnection === 'database') {
@@ -50,7 +50,7 @@ class DashboardController extends Controller
 
             // Check scheduler status (we can't detect if it's running, but we can show if configured)
             $schedulerConfigured = true; // We have it configured in bootstrap/app.php
-            
+
             // Determine overall status
             $alertSystemStatus = [
                 'queueConfigured' => $queueConfigured,
@@ -58,7 +58,7 @@ class DashboardController extends Controller
                 'pendingJobs' => $pendingJobs,
                 'schedulerConfigured' => $schedulerConfigured,
                 'status' => $queueConfigured && $schedulerConfigured ? 'ready' : 'warning',
-                'message' => $queueConfigured 
+                'message' => $queueConfigured
                     ? ($pendingJobs > 10 ? 'Queue worker may need attention (many pending jobs)' : 'System ready for automatic alerts')
                     : 'Queue is set to sync mode - configure QUEUE_CONNECTION for automatic alerts',
             ];
@@ -80,10 +80,12 @@ class DashboardController extends Controller
             $pendingFees = Cache::remember('dashboard:staff:pending_fees_total', $cacheTtl, fn () => Fee::where('status', 'pending')->sum('amount'));
 
             // Chart data: Fee status (doughnut)
-            $feeStatusCounts = Fee::select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+            $feeStatusCounts = Cache::remember('dashboard:staff:fee_status_counts', $cacheTtl, function () {
+                return Fee::select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->toArray();
+            });
             $chartsFeeStatus = [
                 'labels' => ['Pending', 'Payment Pending', 'Paid'],
                 'datasets' => [[
@@ -98,14 +100,16 @@ class DashboardController extends Controller
             ];
 
             // Chart data: Enrollments by course (bar) - top 8 courses
-            $enrollmentsByCourse = DB::table('course_student')
-                ->join('courses', 'courses.id', '=', 'course_student.course_id')
-                ->where('course_student.status', 'approved')
-                ->select('courses.course_code', DB::raw('count(*) as total'))
-                ->groupBy('courses.id', 'courses.course_code')
-                ->orderByDesc('total')
-                ->limit(8)
-                ->get();
+            $enrollmentsByCourse = Cache::remember('dashboard:staff:enrollments_by_course', $cacheTtl, function () {
+                return DB::table('course_student')
+                    ->join('courses', 'courses.id', '=', 'course_student.course_id')
+                    ->where('course_student.status', 'approved')
+                    ->select('courses.course_code', DB::raw('count(*) as total'))
+                    ->groupBy('courses.id', 'courses.course_code')
+                    ->orderByDesc('total')
+                    ->limit(8)
+                    ->get();
+            });
             $chartsEnrollmentsByCourse = [
                 'labels' => $enrollmentsByCourse->pluck('course_code')->toArray(),
                 'datasets' => [[
@@ -119,14 +123,16 @@ class DashboardController extends Controller
 
             // Chart data: Fees collected by month (line) - last 6 months
             $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
-            $feesByMonth = Fee::where('status', 'paid')
-                ->whereNotNull('paid_date')
-                ->where('paid_date', '>=', $sixMonthsAgo)
-                ->selectRaw('YEAR(paid_date) as y, MONTH(paid_date) as m, SUM(amount) as total')
-                ->groupBy('y', 'm')
-                ->orderBy('y')
-                ->orderBy('m')
-                ->get();
+            $feesByMonth = Cache::remember('dashboard:staff:fees_by_month', $cacheTtl, function () use ($sixMonthsAgo) {
+                return Fee::where('status', 'paid')
+                    ->whereNotNull('paid_date')
+                    ->where('paid_date', '>=', $sixMonthsAgo)
+                    ->selectRaw('YEAR(paid_date) as y, MONTH(paid_date) as m, SUM(amount) as total')
+                    ->groupBy('y', 'm')
+                    ->orderBy('y')
+                    ->orderBy('m')
+                    ->get();
+            });
             $monthLabels = [];
             $monthTotals = [];
             for ($i = 5; $i >= 0; $i--) {
@@ -148,10 +154,12 @@ class DashboardController extends Controller
             ];
 
             // Chart data: Grade status (doughnut)
-            $gradeStatusCounts = Grade::select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+            $gradeStatusCounts = Cache::remember('dashboard:staff:grade_status_counts', $cacheTtl, function () {
+                return Grade::select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->toArray();
+            });
             $chartsGradeStatus = [
                 'labels' => ['Pending', 'Approved', 'Rejected'],
                 'datasets' => [[
@@ -166,10 +174,12 @@ class DashboardController extends Controller
             ];
 
             // Extra chart data: Attendance status (doughnut)
-            $attendanceStatusCounts = Attendance::select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+            $attendanceStatusCounts = Cache::remember('dashboard:staff:attendance_status_counts', $cacheTtl, function () {
+                return Attendance::select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->toArray();
+            });
             $chartsAttendanceStatus = [
                 'labels' => ['Present', 'Absent'],
                 'datasets' => [[
@@ -183,11 +193,13 @@ class DashboardController extends Controller
             ];
 
             // Extra chart data: Enrollment status (doughnut)
-            $enrollmentStatusCounts = DB::table('course_student')
-                ->select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+            $enrollmentStatusCounts = Cache::remember('dashboard:staff:enrollment_status_counts', $cacheTtl, function () {
+                return DB::table('course_student')
+                    ->select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->toArray();
+            });
             $chartsEnrollmentStatus = [
                 'labels' => ['Pending', 'Approved', 'Rejected', 'Withdrawal Pending'],
                 'datasets' => [[
@@ -230,38 +242,56 @@ class DashboardController extends Controller
 
         // Teacher view: teaching-focused stats
         if ($user?->isTeacher()) {
-            $subjectIds = $user->teachingSubjects()->pluck('subjects.id');
+            $subjectIds = collect(Cache::remember("dashboard:teacher:{$user->id}:subject_ids", $cacheTtl, function () use ($user) {
+                return $user->teachingSubjects()->pluck('subjects.id')->toArray();
+            }));
             $teachingSubjects = $subjectIds->count();
 
             // Get unique students from courses that contain the assigned subjects
-            $studentsTaught = Student::whereHas('courses.subjects', function ($q) use ($subjectIds) {
-                $q->whereIn('subjects.id', $subjectIds);
-            })->distinct('students.id')->count();
+            $subjectIdArray = $subjectIds->toArray();
 
-            $gradesRecorded = Grade::whereIn('subject_id', $subjectIds)->count();
+            $studentsTaught = Cache::remember("dashboard:teacher:{$user->id}:students_taught", $cacheTtl, function () use ($subjectIdArray) {
+                return Student::whereHas('courses.subjects', function ($q) use ($subjectIdArray) {
+                    $q->whereIn('subjects.id', $subjectIdArray);
+                })->distinct('students.id')->count();
+            });
 
-            $attendanceTotal = Attendance::whereIn('subject_id', $subjectIds)->count();
-            $attendancePresent = Attendance::whereIn('subject_id', $subjectIds)
-                ->where('status', 'present')
-                ->count();
+            $gradesRecorded = Cache::remember("dashboard:teacher:{$user->id}:grades_recorded", $cacheTtl, function () use ($subjectIdArray) {
+                return Grade::whereIn('subject_id', $subjectIdArray)->count();
+            });
+
+            $attendanceTotal = Cache::remember("dashboard:teacher:{$user->id}:attendance_total", $cacheTtl, function () use ($subjectIdArray) {
+                return Attendance::whereIn('subject_id', $subjectIdArray)->count();
+            });
+            $attendancePresent = Cache::remember("dashboard:teacher:{$user->id}:attendance_present", $cacheTtl, function () use ($subjectIdArray) {
+                return Attendance::whereIn('subject_id', $subjectIdArray)
+                    ->where('status', 'present')
+                    ->count();
+            });
             $attendanceRate = $attendanceTotal > 0
                 ? round(($attendancePresent / $attendanceTotal) * 100, 1)
                 : 0;
 
             // Additional stats for teacher dashboard
-            $pendingGrades = Grade::whereIn('subject_id', $subjectIds)
-                ->where('status', 'pending')
-                ->count();
-            $approvedGrades = Grade::whereIn('subject_id', $subjectIds)
-                ->where('status', 'approved')
-                ->count();
+            $pendingGrades = Cache::remember("dashboard:teacher:{$user->id}:pending_grades", $cacheTtl, function () use ($subjectIdArray) {
+                return Grade::whereIn('subject_id', $subjectIdArray)
+                    ->where('status', 'pending')
+                    ->count();
+            });
+            $approvedGrades = Cache::remember("dashboard:teacher:{$user->id}:approved_grades", $cacheTtl, function () use ($subjectIdArray) {
+                return Grade::whereIn('subject_id', $subjectIdArray)
+                    ->where('status', 'approved')
+                    ->count();
+            });
 
             // Chart data: Grade status for my subjects (doughnut)
-            $myGradeStatusCounts = Grade::whereIn('subject_id', $subjectIds)
-                ->select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+            $myGradeStatusCounts = Cache::remember("dashboard:teacher:{$user->id}:grade_status_counts", $cacheTtl, function () use ($subjectIdArray) {
+                return Grade::whereIn('subject_id', $subjectIdArray)
+                    ->select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->toArray();
+            });
             $chartsGradeStatus = [
                 'labels' => ['Pending', 'Approved', 'Rejected'],
                 'datasets' => [[
@@ -276,13 +306,15 @@ class DashboardController extends Controller
             ];
 
             // Chart data: Grades count by subject (bar)
-            $gradesBySubject = Grade::whereIn('subject_id', $subjectIds)
-                ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
-                ->select('subjects.subject_code', DB::raw('count(*) as total'))
-                ->groupBy('subjects.id', 'subjects.subject_code')
-                ->orderByDesc('total')
-                ->limit(8)
-                ->get();
+            $gradesBySubject = Cache::remember("dashboard:teacher:{$user->id}:grades_by_subject", $cacheTtl, function () use ($subjectIdArray) {
+                return Grade::whereIn('subject_id', $subjectIdArray)
+                    ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
+                    ->select('subjects.subject_code', DB::raw('count(*) as total'))
+                    ->groupBy('subjects.id', 'subjects.subject_code')
+                    ->orderByDesc('total')
+                    ->limit(8)
+                    ->get();
+            });
             $chartsGradesBySubject = [
                 'labels' => $gradesBySubject->pluck('subject_code')->toArray(),
                 'datasets' => [[
@@ -295,22 +327,26 @@ class DashboardController extends Controller
             ];
 
             // Chart data: Attendance rate by month (line) - last 6 months for my subjects
-            $attendanceByMonth = [];
-            for ($i = 5; $i >= 0; $i--) {
-                $start = Carbon::now()->subMonths($i)->startOfMonth();
-                $end = Carbon::now()->subMonths($i)->endOfMonth();
-                $total = Attendance::whereIn('subject_id', $subjectIds)
-                    ->whereBetween('date', [$start, $end])
-                    ->count();
-                $present = Attendance::whereIn('subject_id', $subjectIds)
-                    ->whereBetween('date', [$start, $end])
-                    ->where('status', 'present')
-                    ->count();
-                $attendanceByMonth[] = [
-                    'label' => $start->format('M Y'),
-                    'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
-                ];
-            }
+            $attendanceByMonth = Cache::remember("dashboard:teacher:{$user->id}:attendance_by_month", $cacheTtl, function () use ($subjectIdArray) {
+                $rows = [];
+                for ($i = 5; $i >= 0; $i--) {
+                    $start = Carbon::now()->subMonths($i)->startOfMonth();
+                    $end = Carbon::now()->subMonths($i)->endOfMonth();
+                    $total = Attendance::whereIn('subject_id', $subjectIdArray)
+                        ->whereBetween('date', [$start, $end])
+                        ->count();
+                    $present = Attendance::whereIn('subject_id', $subjectIdArray)
+                        ->whereBetween('date', [$start, $end])
+                        ->where('status', 'present')
+                        ->count();
+                    $rows[] = [
+                        'label' => $start->format('M Y'),
+                        'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                    ];
+                }
+
+                return $rows;
+            });
             $chartsAttendanceLine = [
                 'labels' => array_column($attendanceByMonth, 'label'),
                 'datasets' => [[
@@ -324,13 +360,15 @@ class DashboardController extends Controller
             ];
 
             // Chart data: Assignments by subject (bar) - my subjects
-            $assignmentsBySubject = Assignment::whereIn('subject_id', $subjectIds)
-                ->join('subjects', 'subjects.id', '=', 'assignments.subject_id')
-                ->select('subjects.subject_code', DB::raw('count(*) as total'))
-                ->groupBy('subjects.id', 'subjects.subject_code')
-                ->orderByDesc('total')
-                ->limit(8)
-                ->get();
+            $assignmentsBySubject = Cache::remember("dashboard:teacher:{$user->id}:assignments_by_subject", $cacheTtl, function () use ($subjectIdArray) {
+                return Assignment::whereIn('subject_id', $subjectIdArray)
+                    ->join('subjects', 'subjects.id', '=', 'assignments.subject_id')
+                    ->select('subjects.subject_code', DB::raw('count(*) as total'))
+                    ->groupBy('subjects.id', 'subjects.subject_code')
+                    ->orderByDesc('total')
+                    ->limit(8)
+                    ->get();
+            });
             $chartsAssignmentsBySubject = [
                 'labels' => $assignmentsBySubject->pluck('subject_code')->toArray(),
                 'datasets' => [[
@@ -343,11 +381,13 @@ class DashboardController extends Controller
             ];
 
             // Extra chart data: Attendance status for my subjects (doughnut)
-            $teacherAttendanceStatusCounts = Attendance::whereIn('subject_id', $subjectIds)
-                ->select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+            $teacherAttendanceStatusCounts = Cache::remember("dashboard:teacher:{$user->id}:attendance_status_counts", $cacheTtl, function () use ($subjectIdArray) {
+                return Attendance::whereIn('subject_id', $subjectIdArray)
+                    ->select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->toArray();
+            });
             $chartsAttendanceStatus = [
                 'labels' => ['Present', 'Absent'],
                 'datasets' => [[
@@ -361,18 +401,20 @@ class DashboardController extends Controller
             ];
 
             // Extra chart data: Score distribution for approved grades (bar)
-            $scoreDistribution = Grade::whereIn('subject_id', $subjectIds)
-                ->where('status', Grade::STATUS_APPROVED)
-                ->whereNotNull('score')
-                ->selectRaw("
-                    SUM(CASE WHEN score >= 80 THEN 1 ELSE 0 END) as grade_a,
-                    SUM(CASE WHEN score >= 70 AND score < 80 THEN 1 ELSE 0 END) as grade_b,
-                    SUM(CASE WHEN score >= 60 AND score < 70 THEN 1 ELSE 0 END) as grade_c,
-                    SUM(CASE WHEN score >= 50 AND score < 60 THEN 1 ELSE 0 END) as grade_d,
-                    SUM(CASE WHEN score >= 40 AND score < 50 THEN 1 ELSE 0 END) as grade_e,
-                    SUM(CASE WHEN score < 40 THEN 1 ELSE 0 END) as grade_f
-                ")
-                ->first();
+            $scoreDistribution = Cache::remember("dashboard:teacher:{$user->id}:score_distribution", $cacheTtl, function () use ($subjectIdArray) {
+                return Grade::whereIn('subject_id', $subjectIdArray)
+                    ->where('status', Grade::STATUS_APPROVED)
+                    ->whereNotNull('score')
+                    ->selectRaw('
+                        SUM(CASE WHEN score >= 80 THEN 1 ELSE 0 END) as grade_a,
+                        SUM(CASE WHEN score >= 70 AND score < 80 THEN 1 ELSE 0 END) as grade_b,
+                        SUM(CASE WHEN score >= 60 AND score < 70 THEN 1 ELSE 0 END) as grade_c,
+                        SUM(CASE WHEN score >= 50 AND score < 60 THEN 1 ELSE 0 END) as grade_d,
+                        SUM(CASE WHEN score >= 40 AND score < 50 THEN 1 ELSE 0 END) as grade_e,
+                        SUM(CASE WHEN score < 40 THEN 1 ELSE 0 END) as grade_f
+                    ')
+                    ->first();
+            });
             $chartsScoreDistribution = [
                 'labels' => ['A (80-100)', 'B (70-79)', 'C (60-69)', 'D (50-59)', 'E (40-49)', 'F (<40)'],
                 'datasets' => [[
@@ -414,33 +456,46 @@ class DashboardController extends Controller
 
         // Student view: personal stats
         $student = $user?->student;
-        $myCourses = $student?->courses()->count() ?? 0;
-        $outstandingFees = $student?->fees()->where('status', 'pending')->sum('amount') ?? 0;
-        $myGrades = $student?->grades()->count() ?? 0;
+        $studentCacheKeyPrefix = "dashboard:student:{$user?->id}";
+        $myCourses = $student
+            ? Cache::remember("{$studentCacheKeyPrefix}:my_courses", $cacheTtl, fn () => $student->courses()->count())
+            : 0;
+        $outstandingFees = $student
+            ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_fees", $cacheTtl, fn () => $student->fees()->where('status', 'pending')->sum('amount'))
+            : 0;
+        $myGrades = $student
+            ? Cache::remember("{$studentCacheKeyPrefix}:my_grades", $cacheTtl, fn () => $student->grades()->count())
+            : 0;
 
         $attendanceTotal = $student
-            ? Attendance::where('student_id', $student->id)->count()
+            ? Cache::remember("{$studentCacheKeyPrefix}:attendance_total", $cacheTtl, fn () => Attendance::where('student_id', $student->id)->count())
             : 0;
         $attendancePresent = $student
-            ? Attendance::where('student_id', $student->id)->where('status', 'present')->count()
+            ? Cache::remember("{$studentCacheKeyPrefix}:attendance_present", $cacheTtl, fn () => Attendance::where('student_id', $student->id)->where('status', 'present')->count())
             : 0;
         $attendanceRate = $attendanceTotal > 0
             ? round(($attendancePresent / $attendanceTotal) * 100, 1)
             : 0;
 
         // Additional stats for student dashboard
-        $gpa = $student?->calculateGPA() ?? null;
+        $gpa = $student
+            ? Cache::remember("{$studentCacheKeyPrefix}:gpa", $cacheTtl, fn () => $student->calculateGPA())
+            : null;
         $pendingEnrollments = $student
-            ? DB::table('course_student')
-                ->where('student_id', $student->id)
-                ->where('status', 'pending')
-                ->count()
+            ? Cache::remember("{$studentCacheKeyPrefix}:pending_enrollments", $cacheTtl, function () use ($student) {
+                return DB::table('course_student')
+                    ->where('student_id', $student->id)
+                    ->where('status', 'pending')
+                    ->count();
+            })
             : 0;
         $approvedEnrollments = $student
-            ? DB::table('course_student')
-                ->where('student_id', $student->id)
-                ->where('status', 'approved')
-                ->count()
+            ? Cache::remember("{$studentCacheKeyPrefix}:approved_enrollments", $cacheTtl, function () use ($student) {
+                return DB::table('course_student')
+                    ->where('student_id', $student->id)
+                    ->where('status', 'approved')
+                    ->count();
+            })
             : 0;
 
         // Chart data for student dashboard
@@ -452,8 +507,8 @@ class DashboardController extends Controller
         $chartsGradeTrendLine = ['labels' => [], 'datasets' => [['label' => 'Avg score', 'data' => [], 'borderColor' => '#8b5cf6', 'backgroundColor' => 'rgba(139, 92, 246, 0.12)', 'fill' => true, 'tension' => 0.3]]];
 
         if ($student) {
-            $feePendingCount = $student->fees()->where('status', 'pending')->count();
-            $feePaidCount = $student->fees()->where('status', 'paid')->count();
+            $feePendingCount = Cache::remember("{$studentCacheKeyPrefix}:fee_pending_count", $cacheTtl, fn () => $student->fees()->where('status', 'pending')->count());
+            $feePaidCount = Cache::remember("{$studentCacheKeyPrefix}:fee_paid_count", $cacheTtl, fn () => $student->fees()->where('status', 'paid')->count());
             $chartsFeeStatus = [
                 'labels' => ['Pending', 'Paid'],
                 'datasets' => [[
@@ -463,14 +518,16 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            $gradesBySubject = $student->grades()
-                ->where('status', Grade::STATUS_APPROVED)
-                ->whereNotNull('score')
-                ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
-                ->select('subjects.subject_code', DB::raw('ROUND(AVG(grades.score), 1) as avg_score'))
-                ->groupBy('subjects.id', 'subjects.subject_code')
-                ->orderBy('subjects.subject_code')
-                ->get();
+            $gradesBySubject = Cache::remember("{$studentCacheKeyPrefix}:grades_by_subject", $cacheTtl, function () use ($student) {
+                return $student->grades()
+                    ->where('status', Grade::STATUS_APPROVED)
+                    ->whereNotNull('score')
+                    ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
+                    ->select('subjects.subject_code', DB::raw('ROUND(AVG(grades.score), 1) as avg_score'))
+                    ->groupBy('subjects.id', 'subjects.subject_code')
+                    ->orderBy('subjects.subject_code')
+                    ->get();
+            });
             $chartsGradesBySubject = [
                 'labels' => $gradesBySubject->pluck('subject_code')->toArray(),
                 'datasets' => [[
@@ -482,17 +539,21 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            $attendanceByMonth = [];
-            for ($i = 5; $i >= 0; $i--) {
-                $start = Carbon::now()->subMonths($i)->startOfMonth();
-                $end = Carbon::now()->subMonths($i)->endOfMonth();
-                $total = Attendance::where('student_id', $student->id)->whereBetween('date', [$start, $end])->count();
-                $present = Attendance::where('student_id', $student->id)->whereBetween('date', [$start, $end])->where('status', 'present')->count();
-                $attendanceByMonth[] = [
-                    'label' => $start->format('M Y'),
-                    'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
-                ];
-            }
+            $attendanceByMonth = Cache::remember("{$studentCacheKeyPrefix}:attendance_by_month", $cacheTtl, function () use ($student) {
+                $rows = [];
+                for ($i = 5; $i >= 0; $i--) {
+                    $start = Carbon::now()->subMonths($i)->startOfMonth();
+                    $end = Carbon::now()->subMonths($i)->endOfMonth();
+                    $total = Attendance::where('student_id', $student->id)->whereBetween('date', [$start, $end])->count();
+                    $present = Attendance::where('student_id', $student->id)->whereBetween('date', [$start, $end])->where('status', 'present')->count();
+                    $rows[] = [
+                        'label' => $start->format('M Y'),
+                        'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                    ];
+                }
+
+                return $rows;
+            });
             $chartsAttendanceLine = [
                 'labels' => array_column($attendanceByMonth, 'label'),
                 'datasets' => [[
@@ -523,15 +584,17 @@ class DashboardController extends Controller
                 ]],
             ];
 
-            $gradeTrendRows = Grade::where('student_id', $student->id)
-                ->where('status', Grade::STATUS_APPROVED)
-                ->whereNotNull('score')
-                ->where('created_at', '>=', Carbon::now()->subMonths(5)->startOfMonth())
-                ->selectRaw('YEAR(created_at) as y, MONTH(created_at) as m, ROUND(AVG(score), 1) as avg_score')
-                ->groupBy('y', 'm')
-                ->orderBy('y')
-                ->orderBy('m')
-                ->get();
+            $gradeTrendRows = Cache::remember("{$studentCacheKeyPrefix}:grade_trend_rows", $cacheTtl, function () use ($student) {
+                return Grade::where('student_id', $student->id)
+                    ->where('status', Grade::STATUS_APPROVED)
+                    ->whereNotNull('score')
+                    ->where('created_at', '>=', Carbon::now()->subMonths(5)->startOfMonth())
+                    ->selectRaw('YEAR(created_at) as y, MONTH(created_at) as m, ROUND(AVG(score), 1) as avg_score')
+                    ->groupBy('y', 'm')
+                    ->orderBy('y')
+                    ->orderBy('m')
+                    ->get();
+            });
             $gradeTrendLabels = [];
             $gradeTrendValues = [];
             for ($i = 5; $i >= 0; $i--) {

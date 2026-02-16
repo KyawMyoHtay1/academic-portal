@@ -17,4 +17,3 @@ class CoursePolicy
         return $user->isStudent() && $user->student !== null;
     }
 }
-

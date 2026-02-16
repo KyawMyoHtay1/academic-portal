@@ -57,7 +57,7 @@ class TeacherAttendanceController extends Controller
         $user = Auth::user();
 
         // Verify teacher is assigned to this subject
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -123,7 +123,7 @@ class TeacherAttendanceController extends Controller
         $user = Auth::user();
 
         // Verify teacher is assigned to this subject
-        if (!$user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
+        if (! $user->teachingSubjects()->where('subjects.id', $subject->id)->exists()) {
             abort(403, 'You are not assigned to this subject.');
         }
 
@@ -137,7 +137,7 @@ class TeacherAttendanceController extends Controller
         // Verify all students are enrolled in the subject's course
         $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
         foreach ($data['attendance'] as $record) {
-            if (!in_array($record['student_id'], $enrolledStudentIds)) {
+            if (! in_array($record['student_id'], $enrolledStudentIds)) {
                 return redirect()
                     ->back()
                     ->withErrors(['attendance' => 'One or more students are not enrolled in this course.']);

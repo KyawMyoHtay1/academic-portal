@@ -10,6 +10,7 @@ use App\Notifications\GradePublished;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -73,6 +74,7 @@ class StaffGradesController extends Controller
 
         $studentRows = $students->map(function ($student) use ($grades) {
             $grade = $grades->get($student->id);
+
             return [
                 'student' => [
                     'id' => $student->id,
@@ -130,6 +132,14 @@ class StaffGradesController extends Controller
             'action' => 'approved',
         ]);
 
+        Log::info('grade.review_decision', [
+            'grade_id' => $grade->id,
+            'student_id' => $grade->student_id,
+            'subject_id' => $grade->subject_id,
+            'decision' => 'approved',
+            'reviewed_by' => Auth::id(),
+        ]);
+
         // Notify student when grade is finalized (approved).
         $student = Student::find($grade->student_id);
         if ($student && $student->user) {
@@ -163,6 +173,15 @@ class StaffGradesController extends Controller
             'performed_by' => Auth::id(),
             'action' => 'rejected',
             'reason' => $data['reason'] ?? null,
+        ]);
+
+        Log::info('grade.review_decision', [
+            'grade_id' => $grade->id,
+            'student_id' => $grade->student_id,
+            'subject_id' => $grade->subject_id,
+            'decision' => 'rejected',
+            'reason' => $data['reason'] ?? null,
+            'reviewed_by' => Auth::id(),
         ]);
 
         return back()->with('success', 'Grade rejected.');

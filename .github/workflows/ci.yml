@@ -40,8 +40,7 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      - name: Run code style checks (non-blocking)
-        continue-on-error: true
+      - name: Run code style checks
         run: ./vendor/bin/pint --test
 
       - name: Run backend tests

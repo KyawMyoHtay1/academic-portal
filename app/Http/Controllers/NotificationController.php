@@ -59,6 +59,3 @@ class NotificationController extends Controller
         return back()->with('success', 'All notifications marked as read.');
     }
 }
-
-
-

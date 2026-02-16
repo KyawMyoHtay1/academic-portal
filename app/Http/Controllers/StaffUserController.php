@@ -7,7 +7,6 @@ use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +22,7 @@ class StaffUserController extends Controller
         if ($search = request('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -86,7 +85,7 @@ class StaffUserController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
                 'photo_url' => $user->photo
-                    ? asset('storage/' . $user->photo)
+                    ? asset('storage/'.$user->photo)
                     : null,
             ],
             'availableRoles' => [
@@ -137,7 +136,7 @@ class StaffUserController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'role' => ['required', 'in:student,teacher,staff'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ]);
@@ -184,4 +183,3 @@ class StaffUserController extends Controller
             ->with('success', 'User deleted successfully.');
     }
 }
-

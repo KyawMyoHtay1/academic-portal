@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -67,7 +67,7 @@ class Announcement extends Model
      */
     public function scopeVisibleToUser(Builder $query, ?User $user): Builder
     {
-        if (!$user) {
+        if (! $user) {
             // Guests: only show announcements intended for everyone
             return $query->where(function (Builder $q) {
                 $q->whereNull('audience')
