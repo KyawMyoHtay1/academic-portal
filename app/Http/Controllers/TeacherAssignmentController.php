@@ -271,8 +271,8 @@ class TeacherAssignmentController extends Controller
     {
         $user = Auth::user();
 
-        if (! $this->canAccessSubmissions($assignment, $user->id)) {
-            abort(403, 'You can only view submissions for assignments in subjects you teach.');
+        if ($assignment->created_by !== $user->id) {
+            abort(403, 'You can only view submissions for your own assignments.');
         }
 
         $submissions = AssignmentSubmission::where('assignment_id', $assignment->id)
@@ -324,8 +324,8 @@ class TeacherAssignmentController extends Controller
     {
         $user = Auth::user();
 
-        if (! $this->canAccessSubmissions($submission->assignment, $user->id)) {
-            abort(403, 'You can only grade submissions for assignments in subjects you teach.');
+        if ($submission->assignment->created_by !== $user->id) {
+            abort(403, 'You can only grade submissions for your own assignments.');
         }
 
         $data = $request->validated();
@@ -354,8 +354,8 @@ class TeacherAssignmentController extends Controller
     {
         $user = Auth::user();
 
-        if (! $this->canAccessSubmissions($submission->assignment, $user->id)) {
-            abort(403, 'You can only download submissions for assignments in subjects you teach.');
+        if ($submission->assignment->created_by !== $user->id) {
+            abort(403, 'You can only download submissions for your own assignments.');
         }
 
         if (! Storage::disk('public')->exists($submission->file_path)) {
@@ -366,18 +366,5 @@ class TeacherAssignmentController extends Controller
             $submission->file_path,
             $submission->original_filename
         );
-    }
-
-    private function canAccessSubmissions(Assignment $assignment, int $userId): bool
-    {
-        if ((int) $assignment->created_by === $userId) {
-            return true;
-        }
-
-        return $assignment->subject()
-            ->whereHas('teachers', function ($query) use ($userId) {
-                $query->where('users.id', $userId);
-            })
-            ->exists();
     }
 }

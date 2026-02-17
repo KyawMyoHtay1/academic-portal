@@ -58,6 +58,38 @@ const statusBadge = (status) => {
     if (status === "closed") return "bg-slate-100 text-slate-800";
     return "bg-amber-100 text-amber-800";
 };
+
+const formatDue = (assignment) => {
+    if (!assignment?.due_date) return "-";
+
+    const [year, month, day] = String(assignment.due_date)
+        .split("-")
+        .map((part) => parseInt(part, 10));
+
+    const dueDate = new Date(year, month - 1, day);
+
+    if (Number.isNaN(dueDate.getTime())) {
+        return assignment.due_time
+            ? `${assignment.due_date}, ${assignment.due_time}`
+            : assignment.due_date;
+    }
+
+    const dateLabel = new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(dueDate);
+
+    return assignment.due_time ? `${dateLabel}, ${assignment.due_time}` : dateLabel;
+};
+
+const submissionPercent = (assignment) => {
+    const total = Number(assignment?.submissions_count ?? 0);
+    const graded = Number(assignment?.graded_count ?? 0);
+
+    if (total <= 0) return 0;
+    return Math.min(100, Math.max(0, Math.round((graded / total) * 100)));
+};
 </script>
 
 <template>
@@ -125,7 +157,7 @@ const statusBadge = (status) => {
                                 <input
                                     v-model="query"
                                     type="search"
-                                    placeholder="Search assignments…"
+                                    placeholder="Search assignments..."
                                     class="block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                             </div>
@@ -164,11 +196,49 @@ const statusBadge = (status) => {
                                     <p v-if="assignment.description" class="mt-1 text-sm text-slate-600 line-clamp-2">
                                         {{ assignment.description }}
                                     </p>
-                                    <div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                                        <span>Due: {{ assignment.due_date }}{{ assignment.due_time ? ` at ${assignment.due_time}` : "" }}</span>
-                                        <span>Max score: {{ assignment.max_score }}</span>
-                                        <span>Submissions: {{ assignment.submissions_count }} ({{ assignment.graded_count }} graded)</span>
-                                        <span v-if="assignment.creator_name">Created by: {{ assignment.creator_name }}</span>
+
+                                    <div class="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Due
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ formatDue(assignment) }}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Max Score
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ assignment.max_score }} points
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Submissions
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ assignment.submissions_count }} total, {{ assignment.graded_count }} graded
+                                            </p>
+                                            <div class="mt-1 h-1.5 rounded-full bg-slate-200">
+                                                <div
+                                                    class="h-1.5 rounded-full bg-emerald-500"
+                                                    :style="{ width: `${submissionPercent(assignment)}%` }"
+                                                ></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Created By
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ assignment.creator_name ?? "Unknown" }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
