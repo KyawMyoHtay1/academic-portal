@@ -1,0 +1,36 @@
+@startuml Timebox3_TimetableSequence
+title Timebox 3 - Timetable Sequence
+
+actor Staff as "Staff/Admin"
+actor Teacher
+actor Student
+
+participant "Subject" as Subject
+participant "Timetable" as Timetable
+participant "Notification" as Notification
+
+== Create or Update Timetable ==
+
+Staff -> Subject: View subjects and courses
+Subject --> Staff: Show subject list
+
+Staff -> Timetable: Register or update timetable\n(subjectId, day, start, end, location)
+Timetable -> Timetable: Validate subject exists
+Timetable -> Timetable: Check schedule conflicts
+Timetable -> Timetable: Save timetable entry
+Timetable --> Staff: Confirm timetable saved
+
+Timetable -> Notification: Send TimetableUpdated\n(to assigned teachers and linked students)
+Notification -> Teacher: Notify timetable updated
+Notification -> Student: Notify timetable updated
+
+== View Timetable ==
+
+Teacher -> Timetable: View my timetable
+Timetable --> Teacher: Show week grid\nfor assigned subjects
+
+Student -> Timetable: View my timetable
+Timetable -> Timetable: Load timetables from\nstudent course links
+Timetable --> Student: Show week grid\nfor linked courses (current implementation)
+
+@enduml

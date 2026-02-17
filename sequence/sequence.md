@@ -1,33 +1,51 @@
-Yes, your @sequence/ folder now has a complete and well‑aligned set of sequence diagrams for the University Academic Portal. Here are the descriptions you can paste into Chapter 5 (one under each figure).
-Timebox 1 – Course Registration Process
-File: Timebox1_SequenceDiagram.plantuml
-Description
-This sequence diagram is for the Course Registration Process. The actors are Student and Staff/Admin, and the objects are Course and Enrolment. First, the Student browses the available courses from the Course object and views the course list. Then, the Student sends an enrolment request to the Enrolment object. The Enrolment object checks for existing enrolments, pending requests and timetable conflicts before creating a new record with status pending and returning this status to the Student. Afterwards, the Staff/Admin views all pending enrolment requests and approves a selected request. The Enrolment object updates the status from pending to approved, confirms the approval to the Staff/Admin, and notifies the Student that the enrolment has been approved.
-Timebox 1 – Student Registration Process
-File: Timebox1_StudentRegistrationProcess.plantuml
-Description
-This sequence diagram is for the Student Registration Process. The actor is Staff/Admin, and the objects are User and Student. First, the Staff/Admin creates a new user account by sending the registration details to the User object. The User object validates the fields and email uniqueness, hashes the password, assigns the default role as student and confirms that the user record has been created. Next, the Staff/Admin registers the student profile linked to this user by sending the personal details to the Student object. The Student object validates the email, phone, date of birth, gender and status, stores the uploaded photo and documents, and returns a confirmation together with the generated student number.
-Timebox 2 – Grade Submission and Approval Process
-File: Timebox2_GradeSequence.plantuml
-Description
-This sequence diagram is for the Grade Submission and Approval Process. The actors are Teacher, Staff/Admin and Student, and the objects are Subject, Grade and GradeReviewLog. First, the Teacher views the list of assigned subjects and then submits grades to the Grade object. The Grade object validates that the Teacher is assigned to the subject and that the Student is enrolled, saves the grade with status pending and records a submitted action in the GradeReviewLog before confirming submission. Later, the Staff/Admin views all pending grades and approves a selected grade. The Grade object updates the status from pending to approved, records an approved action in the GradeReviewLog and confirms the approval. Finally, the Student is notified that the grade has been published and can view all approved grades together with the calculated GPA.
-Timebox 2 – Fee Payment and Receipt Process
-File: Timebox2_FeeSequence.plantuml
-Description
-This sequence diagram is for the Fee Payment and Receipt Process. The actors are Staff/Admin and Student, and the objects are Fee, Payment and Receipt (PDF). First, the Staff/Admin registers a new fee for a student. The Fee object validates the data, creates a fee record with status pending, confirms creation to the Staff/Admin and notifies the Student of the new fee. The Student then views their fees and submits a payment confirmation to the Payment object. The Payment object sets the related fee status to payment_pending and shows this status to the Student. Afterwards, the Staff/Admin reviews the payment details and approves the payment. The Payment object updates the fee status from payment_pending to paid, sets the paid date and confirms the approval, while the Fee object notifies the Student that the fee has been paid. Finally, the Staff/Admin requests a receipt, and the Receipt component generates a PDF receipt for the paid fee.
-Timebox 2 – Assignment Management Process
-File: Timebox2_AssignmentSequence.plantuml
-Description
-This sequence diagram is for the Assignment Management Process. The actors are Teacher and Student, and the objects are Subject, Assignment and Submission. First, the Teacher views assigned subjects and creates a new assignment under a selected subject. The Assignment object validates the Teacher’s assignment and the input fields, saves the assignment with status draft and then updates it to published when the Teacher decides to publish it, notifying enrolled Students that the assignment is available. Next, the Student views the assignment details and current submission status. The Student submits their work to the Submission object, which validates enrolment, file type and file size, and then creates or updates the submission with status submitted. Later, the Teacher views all submissions for the assignment, selects a submission and records a score and feedback. The Submission object validates the score, saves the graded data with status graded and confirms to the Teacher. Finally, the Student can view their own submission file together with the score and feedback.
-Timebox 3 – Attendance Recording and Reporting Process
-File: Timebox3_AttendanceSequence.plantuml
-Description
-This sequence diagram is for the Attendance Recording and Reporting Process. The actors are Teacher, Student and Staff/Admin, and the objects are Subject, Attendance and LowAttendanceAlert. First, the Teacher views the timetable and selects a subject session. The Teacher records attendance for the students, and the Attendance object validates that the Teacher is assigned and that the Students are properly enrolled, then saves or updates the attendance records and confirms the operation. The Attendance object then checks each student’s attendance rate and calls the LowAttendanceAlert object to send alerts to Students whose attendance is below the defined threshold. Students can request their attendance information from the Attendance object and receive overall and per‑course statistics. Staff/Admin can also request attendance reports and receive summary statistics together with a list of students with low attendance.
-Timebox 3 – Timetable and Communication Process
-File: Timebox3_TimetableandCommunicationProcess.plantuml
-Description
-This sequence diagram is for the Timetable and Communication Process. The actors are Staff/Admin, Teacher and Student, and the objects are Subject, Timetable and Notification. First, the Staff/Admin views the list of subjects and creates or updates a timetable entry by sending the subject, day, time and location information to the Timetable object. The Timetable object validates that the subject exists, checks for schedule conflicts, saves the timetable entry and confirms the update to the Staff/Admin. After the timetable change is saved, the Timetable object sends a TimetableUpdated event to the Notification object, which delivers notifications to the affected Teachers and Students. Finally, Teachers and Students can each request their timetable, and the Timetable object returns a week‑grid view showing their assigned subjects or enrolled courses.
-With these diagrams and descriptions:
-Every major timebox has its main processes modelled.
-All core features promised in your proposal and functional requirements are represented.
-Your “Sequence Diagram” sections in Chapter 5 are effectively complete for the University Academic Portal.
+# Sequence Diagram Index (Current)
+
+This folder contains the implementation-aligned sequence diagrams for the University Academic Portal.
+
+## Timebox 1
+
+### 1) Course Registration Process
+- File: `Timebox1_SequenceDiagram.plantuml`
+- Scope: Student course enrolment request, staff approve/reject, student checks status.
+
+### 2) Student Registration Process
+- File: `Timebox1_StudentRegistrationProcess.plantuml`
+- Scope: Staff registers user account and linked student profile.
+
+## Timebox 2
+
+### 3) Grade Submission and Approval Process
+- File: `Timebox2_GradeSequence.plantuml`
+- Scope: Save draft grades, submit final grade for review, staff approve/reject, student views approved grade.
+
+### 4) Computed Grade and Final Submission Process
+- File: `Timebox2_ComputedGradeSequence.plantuml`
+- Scope: Assignment-based computed grade calculation and final grade submission workflow.
+
+### 5) Fee Payment and Receipt Process
+- File: `Timebox2_FeeSequence.plantuml`
+- Scope: Staff fee setup, student payment confirmation, staff approve/reject payment, receipt generation.
+
+### 6) Assignment Management Process
+- File: `Timebox2_AssignmentSequence.plantuml`
+- Scope: Teacher create/publish assignment, student submit, teacher grade, student view feedback.
+
+## Timebox 3
+
+### 7) Attendance Recording and Reporting Process
+- File: `Timebox3_AttendanceSequence.plantuml`
+- Scope: Teacher records attendance, attendance alerts, staff reports, low-attendance job flow.
+
+### 8) Timetable Sequence
+- File: `Timebox3_TimetableSequence.plantuml`
+- Scope: Staff create/update timetable, conflict checks, timetable notifications, teacher/student view timetable.
+
+### 9) Communication Sequence
+- File: `Timebox3_CommunicationSequence.plantuml`
+- Scope: Announcements, messages, contact/feedback submissions, staff handling, notification read actions.
+
+## Overview (Split Note)
+
+### 10) Timetable and Communication Overview
+- File: `Timebox3_TimetableandCommunicationProcess.plantuml`
+- Scope: Lightweight pointer diagram indicating the split into timetable and communication diagrams.

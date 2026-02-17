@@ -1,122 +1,14 @@
 @startuml
-title Timebox 3 - Timetable and Communication Process
+title Timebox 3 - Timetable and Communication Process (Overview)
+skinparam shadowing false
+skinparam dpi 300
 
-actor Guest
-actor Staff as "Staff/Admin"
-actor Teacher
-actor Student
-
-participant "Subject" as Subject
-participant "Timetable" as Timetable
-participant "Announcement" as Announcement
-participant "AnnouncementRead" as AnnouncementRead
-participant "Message" as Message
-participant "ContactMessage" as ContactMessage
-participant "FeedbackMessage" as FeedbackMessage
-participant "Notification" as Notification
-
-' --- Staff creates or updates timetable ---
-
-Staff -> Subject: View subjects and courses
-Subject --> Staff: Show subject list
-
-Staff -> Timetable: Register / update timetable\n(subjectId, day, startTime, endTime, location)
-Timetable -> Timetable: Validate subject exists
-Timetable -> Timetable: Check schedule conflicts
-Timetable -> Timetable: Save timetable entry
-Timetable --> Staff: Confirm timetable saved
-
-' --- System communicates changes ---
-
-Timetable -> Notification: Send TimetableUpdated\n(to assigned teachers and enrolled students)
-Notification -> Teacher: Notify timetable updated
-Notification -> Student: Notify timetable updated
-
-' --- Users view timetable ---
-
-Teacher -> Timetable: View my timetable
-Timetable --> Teacher: Show week grid\nfor assigned subjects
-
-Student -> Timetable: View my timetable
-Timetable -> Timetable: Load timetables from\nstudent course links
-Timetable --> Student: Show week grid\nfor linked courses (current implementation)
-
-== Announcements ==
-
-Staff -> Announcement: Create/update announcement\n(title, body, priority, audience, schedule)
-Announcement -> Announcement: Validate payload
-Announcement -> Announcement: Save with author = current user
-Announcement --> Staff: Confirm announcement saved
-
-Teacher -> Announcement: Create/update own announcement
-Announcement -> Announcement: Validate ownership\n(on edit/delete)
-Announcement -> Announcement: Save with author = current user
-Announcement --> Teacher: Confirm announcement saved
-
-Student -> Announcement: View announcements
-Announcement -> Announcement: Filter currentlyVisible + visibleToUser
-Announcement -> AnnouncementRead: Load read/ack status\nfor current user
-Announcement --> Student: Return ordered list\n(pinned, priority, created_at)
-
-Student -> AnnouncementRead: Mark announcement as read
-AnnouncementRead -> AnnouncementRead: updateOrCreate(read_at)
-AnnouncementRead --> Student: Confirm read status
-
-Student -> AnnouncementRead: Acknowledge announcement\n(if require_ack=true)
-AnnouncementRead -> AnnouncementRead: updateOrCreate(read_at, acknowledged_at)
-AnnouncementRead --> Student: Confirm acknowledgment
-
-== Messages ==
-
-Teacher -> Message: Send message(receiver_id, body)
-Message -> Message: Validate receiver exists
-Message -> Message: Prevent sending to self
-Message -> Message: Save sender_role, receiver_role,\nread=false
-Message --> Teacher: Confirm sent
-
-Student -> Message: View inbox/sent messages
-Message --> Student: Return paginated list\n(sorted by created_at desc)
-
-Student -> Message: Mark message as read(messageId)
-Message -> Message: Validate receiver is current user
-Message -> Message: Update read=true
-Message --> Student: Confirm read
-
-== Contact and Feedback ==
-
-Guest -> ContactMessage: Submit contact form
-ContactMessage -> ContactMessage: Validate fields\n(+ optional reCAPTCHA)
-ContactMessage -> ContactMessage: Save record
-ContactMessage --> Guest: Show success
-
-Guest -> FeedbackMessage: Submit feedback form
-FeedbackMessage -> FeedbackMessage: Validate fields\n(+ optional reCAPTCHA)
-FeedbackMessage -> FeedbackMessage: Save record
-FeedbackMessage --> Guest: Show success
-
-Staff -> ContactMessage: View contact inbox\n(search + paginate)
-ContactMessage --> Staff: Return messages + unread count
-Staff -> ContactMessage: Mark as read / reply
-ContactMessage -> ContactMessage: Update is_read=true\n(+ reply, replied_at when replying)
-ContactMessage --> Staff: Confirm updated
-
-Staff -> FeedbackMessage: View feedback inbox\n(search + paginate)
-FeedbackMessage --> Staff: Return messages + unread count
-Staff -> FeedbackMessage: Mark as read / mark replied
-FeedbackMessage -> FeedbackMessage: Update is_read/replied_at
-FeedbackMessage --> Staff: Confirm updated
-
-== Notifications ==
-
-Teacher -> Notification: View notifications
-Notification --> Teacher: Return latest 50\n(sorted by created_at desc)
-
-Teacher -> Notification: Mark one as read
-Notification -> Notification: Set read_at
-Notification --> Teacher: Confirm updated
-
-Teacher -> Notification: Mark all as read
-Notification -> Notification: Batch set read_at\nfor unread notifications
-Notification --> Teacher: Confirm all updated
+rectangle "Split for readability" #FFFFFF {
+  note as N1
+    This combined diagram is separated into:
+    1) Timebox3_TimetableSequence.plantuml
+    2) Timebox3_CommunicationSequence.plantuml
+  end note
+}
 
 @enduml
