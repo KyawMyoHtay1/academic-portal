@@ -131,7 +131,7 @@ class Grade extends Model
      * C: 60-69
      * D: 50-59
      * E: 40-49
-     * F: 1-39
+     * F: 0-39
      *
      * @return string|null Letter grade or null if score is null
      */
@@ -153,7 +153,7 @@ class Grade extends Model
             return 'D';
         } elseif ($score >= 40) {
             return 'E';
-        } elseif ($score >= 1) {
+        } elseif ($score >= 0) {
             return 'F';
         }
 
