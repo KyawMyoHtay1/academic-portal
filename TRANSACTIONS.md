@@ -39,9 +39,9 @@ Timetable is a management transaction, not a core academic transaction.
 
 Your strongest core set remains:
 
-Enrollment
+Course Enrollment
 
-Withdrawal
+Course Withdrawal
 
 Fee Payment
 
