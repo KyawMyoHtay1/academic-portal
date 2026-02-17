@@ -166,6 +166,12 @@ class AssignmentSubmission {
   +AutoID()
 }
 
+class SubjectGradeCalculator {
+  --
+  +CalculateSuggestedGrade(subjectId: int, studentId: int): array
+  +GetAssignmentBreakdown(subjectId: int, studentId: int): array
+}
+
 ' Relationships
 Course  "1" -- "0..*" Subject
 Subject "1" -- "0..*" Grade
@@ -181,5 +187,10 @@ User    "1" -- "0..*" Assignment : created_by
 Assignment "1" -- "0..*" AssignmentSubmission
 Student    "1" -- "0..*" AssignmentSubmission
 User       "1" -- "0..*" AssignmentSubmission : graded_by
+
+SubjectGradeCalculator ..> Assignment : uses
+SubjectGradeCalculator ..> AssignmentSubmission : uses
+SubjectGradeCalculator ..> Subject : uses
+SubjectGradeCalculator ..> Student : uses
 
 @enduml

@@ -1,0 +1,107 @@
+@startuml
+title Timebox 2 - Computed Grade and Final Grade Submission Process
+
+actor Teacher
+actor Student
+actor Staff as "Staff/Admin"
+
+participant "Subject" as Subject
+participant "Assignment" as Assignment
+participant "AssignmentSubmission" as Submission
+participant "SubjectGradeCalculator" as Calculator
+participant "Grade" as Grade
+participant "GradeReviewLog" as GradeLog
+
+' --- Teacher grades assignments ---
+
+Teacher -> Assignment: View assignments for subject
+Assignment --> Teacher: Show assignment list
+
+Teacher -> Submission: View submissions\n(assignmentId)
+Submission --> Teacher: List submissions
+
+Teacher -> Submission: Grade submission\n(submissionId, score, feedback)
+Submission -> Submission: Validate score\n(0..maxScore)
+Submission -> Submission: Save grade\nstatus = graded, set graded_at
+Submission --> Teacher: Confirm graded
+
+note right of Submission
+  Assignment grades are stored
+  in assignment_submissions table
+end note
+
+' --- Student views computed grade ---
+
+Student -> Subject: View grades page
+Subject -> Calculator: CalculateSuggestedGrade\n(subjectId, studentId)
+Calculator -> Assignment: Get published assignments\nfor subject
+Assignment --> Calculator: Return assignments list
+
+Calculator -> Submission: Get graded submissions\nfor student
+Submission --> Calculator: Return submissions with scores
+
+Calculator -> Calculator: Calculate percentage\nfor each graded assignment\n(score / max_score * 100)
+Calculator -> Calculator: Calculate average\nof all percentages
+Calculator --> Subject: Return computed grade\nand breakdown
+
+Subject --> Student: Show computed grade\nand assignment breakdown
+
+' --- Teacher views computed grades ---
+
+Teacher -> Subject: View grade management page\n(subjectId)
+Subject -> Calculator: CalculateSuggestedGrade\nfor each student
+
+loop For each student
+  Calculator -> Assignment: Get published assignments
+  Assignment --> Calculator: Return assignments
+  
+  Calculator -> Submission: Get graded submissions\nfor student
+  Submission --> Calculator: Return submissions
+  
+  Calculator -> Calculator: Calculate computed grade
+  Calculator --> Subject: Return computed grade\nand breakdown
+end
+
+Subject --> Teacher: Show students with\ncomputed grades and breakdowns
+
+' --- Teacher submits final grade ---
+
+Teacher -> Grade: Submit Final Grade\n(subjectId, studentId, use_computed, score)
+Grade -> Grade: Validate teacher assignment
+Grade -> Grade: Validate student enrolment
+
+alt Use computed grade
+  Grade -> Calculator: CalculateSuggestedGrade\n(subjectId, studentId)
+  Calculator -> Assignment: Get assignments
+  Calculator -> Submission: Get graded submissions
+  Calculator -> Calculator: Calculate average percentage
+  Calculator --> Grade: Return computed grade
+  Grade -> Grade: Set score = computed grade
+else Manual input
+  Grade -> Grade: Validate manual score\n(0-100)
+  Grade -> Grade: Set score = manual input
+end
+
+Grade -> Grade: Create/update grade record\nstatus = pending
+Grade -> GradeLog: Record action 'submitted'\nwith meta: use_computed flag
+Grade --> Teacher: Confirm final grade submitted
+
+Grade --> Staff: Notify GradeReviewRequested
+
+' --- Staff approves final grade ---
+
+Staff -> Grade: View pending grades
+Grade --> Staff: Show pending grade list
+
+Staff -> Grade: Approve grade\n(gradeId)
+Grade -> Grade: Update status\npending -> approved
+Grade -> Grade: Set reviewed_by, reviewed_at
+Grade -> GradeLog: Record action 'approved'
+Grade --> Staff: Confirm approval
+
+Grade --> Student: Notify grade published
+
+Student -> Grade: View approved grades
+Grade --> Student: Show final approved grade\nand computed grade (if available)
+
+@enduml
