@@ -1,4 +1,4 @@
-@startuml
+@startuml Timebox2_Class
 hide circle
 skinparam classAttributeIconSize 0
 title Timebox 2 - Class Diagram (Grades, Fees, Assignments)

@@ -1,4 +1,4 @@
-@startuml
+@startuml Timebox2_ComputedGradeSequence
 title Timebox 2 - Computed Grade and Final Grade Submission Process
 
 actor Teacher
