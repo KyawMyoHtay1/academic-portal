@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     assignment: {
@@ -23,6 +23,59 @@ const form = useForm({
 const fileInput = ref(null);
 const isResubmitting = ref(false);
 
+const hasScore = computed(
+    () => props.submission?.score !== null && props.submission?.score !== undefined
+);
+
+const submissionStatusLabel = computed(() => {
+    if (hasScore.value) return "Graded";
+    if (props.submission) return "Submitted";
+    if (props.assignment?.can_submit) return "Pending";
+    return "Closed";
+});
+
+const submissionStatusClass = computed(() => {
+    if (hasScore.value) return "bg-emerald-100 text-emerald-800";
+    if (props.submission) return "bg-blue-100 text-blue-800";
+    if (props.assignment?.can_submit) return "bg-amber-100 text-amber-800";
+    return "bg-slate-100 text-slate-800";
+});
+
+const allowedTypesLabel = computed(() => {
+    const types = props.assignment?.allowed_file_types;
+    return Array.isArray(types) && types.length > 0
+        ? types.join(", ").toUpperCase()
+        : "PDF, DOC, DOCX";
+});
+
+const maxFileSizeMB = computed(() =>
+    Math.round(Number(props.assignment?.max_file_size ?? 5120) / 1024)
+);
+
+const formatDue = (assignment) => {
+    if (!assignment?.due_date) return "-";
+
+    const [year, month, day] = String(assignment.due_date)
+        .split("-")
+        .map((part) => parseInt(part, 10));
+
+    const dueDate = new Date(year, month - 1, day);
+
+    if (Number.isNaN(dueDate.getTime())) {
+        return assignment.due_time
+            ? `${assignment.due_date}, ${assignment.due_time}`
+            : assignment.due_date;
+    }
+
+    const dateLabel = new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(dueDate);
+
+    return assignment.due_time ? `${dateLabel}, ${assignment.due_time}` : dateLabel;
+};
+
 const selectFile = () => {
     fileInput.value?.click();
 };
@@ -38,6 +91,7 @@ const submit = () => {
     if (!form.file) {
         return;
     }
+
     form.post(route("student.assignments.submit", props.assignment.id), {
         forceFormData: true,
         onSuccess: () => {
@@ -45,12 +99,6 @@ const submit = () => {
             form.reset();
         },
     });
-};
-
-const downloadFile = () => {
-    if (props.submission?.file_path) {
-        window.open(`/storage/${props.submission.file_path}`, "_blank");
-    }
 };
 
 const downloadSubmission = () => {
@@ -94,7 +142,7 @@ const downloadSubmission = () => {
                 <div class="mb-6 portal-card p-6">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <h3 class="text-xl font-bold text-slate-900">
                                     {{ props.assignment.title }}
                                 </h3>
@@ -104,33 +152,65 @@ const downloadSubmission = () => {
                                 >
                                     Overdue
                                 </span>
+                                <span
+                                    class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                                    :class="submissionStatusClass"
+                                >
+                                    {{ submissionStatusLabel }}
+                                </span>
                             </div>
+
                             <p class="mt-1 text-sm text-slate-600">
                                 {{ props.assignment.subject.subject_code }} - {{ props.assignment.subject.title }}
                             </p>
                             <p class="mt-1 text-xs text-slate-500">
                                 {{ props.assignment.course.course_code }} - {{ props.assignment.course.title }}
                             </p>
-                            <div class="mt-3 flex flex-wrap gap-4 text-sm text-slate-600">
-                                <span>
-                                    <strong>Due Date:</strong> {{ props.assignment.due_date }}{{ props.assignment.due_time ? ` at ${props.assignment.due_time}` : "" }}
-                                </span>
-                                <span>
-                                    <strong>Max Score:</strong> {{ props.assignment.max_score }}
-                                </span>
-                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Due</p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ formatDue(props.assignment) }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Max Score</p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ props.assignment.max_score }} points
+                            </p>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Submission</p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ props.submission ? `Submitted: ${props.submission.submitted_at}` : "Not submitted yet" }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Result</p>
+                            <p v-if="hasScore" class="mt-1 text-xs font-semibold text-emerald-700">
+                                {{ props.submission.score }}/{{ props.assignment.max_score }}
+                                ({{ props.submission.percentage }}%)
+                            </p>
+                            <p v-else class="mt-1 text-xs font-medium text-slate-800">
+                                {{ props.submission ? "Waiting for grading" : "-" }}
+                            </p>
                         </div>
                     </div>
 
                     <div v-if="props.assignment.description" class="mt-4 rounded-md bg-slate-50 p-4">
                         <p class="text-sm font-medium text-slate-700">Description</p>
-                        <p class="mt-2 text-sm text-slate-600 whitespace-pre-line">
+                        <p class="mt-2 whitespace-pre-line text-sm text-slate-600">
                             {{ props.assignment.description }}
                         </p>
                     </div>
                 </div>
 
-                <!-- Submission Status -->
                 <div v-if="props.submission" class="mb-6 portal-card p-6">
                     <div class="mb-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -148,7 +228,7 @@ const downloadSubmission = () => {
                                 @click="downloadSubmission"
                                 class="mt-1 inline-flex items-center rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
                             >
-                                📎 {{ props.submission.original_filename }}
+                                Download file: {{ props.submission.original_filename }}
                             </button>
                         </div>
 
@@ -157,7 +237,7 @@ const downloadSubmission = () => {
                             <p class="mt-1 text-sm text-slate-600">{{ props.submission.comments }}</p>
                         </div>
 
-                        <div v-if="props.submission.score !== null && props.submission.score !== undefined" class="rounded-md bg-emerald-50 p-4">
+                        <div v-if="hasScore" class="rounded-md bg-emerald-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                                 Graded
                             </p>
@@ -171,7 +251,7 @@ const downloadSubmission = () => {
                             </div>
                             <div v-if="props.submission.feedback" class="mt-3">
                                 <p class="text-xs font-medium text-emerald-800">Feedback</p>
-                                <p class="mt-1 text-sm text-emerald-700 whitespace-pre-line">
+                                <p class="mt-1 whitespace-pre-line text-sm text-emerald-700">
                                     {{ props.submission.feedback }}
                                 </p>
                             </div>
@@ -181,7 +261,6 @@ const downloadSubmission = () => {
                         </div>
                     </div>
 
-                    <!-- Resubmission -->
                     <div v-if="props.assignment.can_submit" class="mt-6 rounded-md border border-slate-200 bg-slate-50 p-4">
                         <div class="flex items-start justify-between gap-4">
                             <div>
@@ -209,7 +288,7 @@ const downloadSubmission = () => {
                                         ref="fileInput"
                                         type="file"
                                         @change="handleFileChange"
-                                        :accept="props.assignment.allowed_file_types?.map(t => `.${t}`).join(',')"
+                                        :accept="props.assignment.allowed_file_types?.map((type) => `.${type}`).join(',')"
                                         class="hidden"
                                     />
                                     <button
@@ -224,9 +303,9 @@ const downloadSubmission = () => {
                                     </span>
                                 </div>
                                 <p class="mt-1 text-xs text-slate-500">
-                                    Allowed types: {{ props.assignment.allowed_file_types?.join(", ").toUpperCase() || "PDF, DOC, DOCX" }}
+                                    Allowed types: {{ allowedTypesLabel }}
                                     <br />
-                                    Max size: {{ Math.round(props.assignment.max_file_size / 1024) }} MB
+                                    Max size: {{ maxFileSizeMB }} MB
                                 </p>
                                 <p v-if="form.errors.file" class="mt-1 text-sm text-red-600">
                                     {{ form.errors.file }}
@@ -261,7 +340,6 @@ const downloadSubmission = () => {
                     </div>
                 </div>
 
-                <!-- Submission Form -->
                 <div v-if="!props.submission && props.assignment.can_submit" class="portal-card p-6">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Submit Assignment
@@ -280,7 +358,7 @@ const downloadSubmission = () => {
                                     ref="fileInput"
                                     type="file"
                                     @change="handleFileChange"
-                                    :accept="props.assignment.allowed_file_types?.map(t => `.${t}`).join(',')"
+                                    :accept="props.assignment.allowed_file_types?.map((type) => `.${type}`).join(',')"
                                     class="hidden"
                                 />
                                 <button
@@ -295,9 +373,9 @@ const downloadSubmission = () => {
                                 </span>
                             </div>
                             <p class="mt-1 text-xs text-slate-500">
-                                Allowed types: {{ props.assignment.allowed_file_types?.join(", ").toUpperCase() || "PDF, DOC, DOCX" }}
+                                Allowed types: {{ allowedTypesLabel }}
                                 <br />
-                                Max size: {{ Math.round(props.assignment.max_file_size / 1024) }} MB
+                                Max size: {{ maxFileSizeMB }} MB
                             </p>
                             <p v-if="form.errors.file" class="mt-1 text-sm text-red-600">
                                 {{ form.errors.file }}
