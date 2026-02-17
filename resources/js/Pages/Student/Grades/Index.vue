@@ -128,8 +128,13 @@ const gradeSummary = computed(() => {
     };
 });
 
+const hasFinalScore = (subject) =>
+    subject?.score !== null &&
+    subject?.score !== undefined &&
+    subject?.score !== "";
+
 // Convert numeric score to letter grade
-// Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 1-39
+// Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 0-39
 const getLetterGrade = (score) => {
     if (score === null || score === undefined) return null;
     const s = parseFloat(score);
@@ -139,7 +144,7 @@ const getLetterGrade = (score) => {
     if (s >= 60) return { letter: "C", class: "bg-amber-100 text-amber-800" };
     if (s >= 50) return { letter: "D", class: "bg-yellow-100 text-yellow-800" };
     if (s >= 40) return { letter: "E", class: "bg-orange-100 text-orange-800" };
-    if (s >= 1) return { letter: "F", class: "bg-red-100 text-red-800" };
+    if (s >= 0) return { letter: "F", class: "bg-red-100 text-red-800" };
     return null;
 };
 </script>
@@ -597,7 +602,7 @@ const getLetterGrade = (score) => {
                                                                     </span>
                                                                 </span>
                                                                 <span
-                                                                    v-if="subject.score"
+                                                                    v-if="hasFinalScore(subject)"
                                                                     class="text-slate-600"
                                                                 >
                                                                     Final Grade:
@@ -605,7 +610,7 @@ const getLetterGrade = (score) => {
                                                                         class="ml-1 font-semibold"
                                                                         :class="getLetterGrade(subject.score)?.class || 'text-slate-700'"
                                                                     >
-                                                                        {{ subject.score.toFixed(2) }}%
+                                                                        {{ Number(subject.score).toFixed(2) }}%
                                                                     </span>
                                                                     <span
                                                                         v-if="subject.grade_status === 'approved'"

@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, useForm, Link, router } from "@inertiajs/vue3";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
 const props = defineProps({
@@ -54,17 +54,31 @@ const closeSubmitModal = () => {
 
 const submitFinalGrade = () => {
     if (!selectedStudent.value) return;
-    
-    // Build route URL manually since route helper may not support multiple params
-    const url = `/teacher/grades/${props.subject.id}/students/${selectedStudent.value.id}/submit-final`;
-    
-    submitFinalForm.post(url, {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeSubmitModal();
-        },
-    });
+
+    submitFinalForm.post(
+        route("teacher.grades.submit-final", {
+            subject: props.subject.id,
+            student: selectedStudent.value.id,
+        }),
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                closeSubmitModal();
+            },
+        }
+    );
 };
+
+const hasNumericScore = (value) =>
+    value !== null &&
+    value !== undefined &&
+    value !== "" &&
+    !Number.isNaN(parseFloat(value));
+
+const hasFinalScore = (student) =>
+    student?.score !== null &&
+    student?.score !== undefined &&
+    student?.score !== "";
 
 const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -112,12 +126,13 @@ const getGradeClass = (score) => {
     if (score == null || score === "") return "text-slate-400";
     const s = parseFloat(score);
     if (isNaN(s)) return "text-slate-400";
-    // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 1-39
+    // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 0-39
     if (s >= 80) return "text-emerald-700 font-semibold";
     if (s >= 70) return "text-blue-700 font-semibold";
     if (s >= 60) return "text-amber-700 font-semibold";
     if (s >= 50) return "text-yellow-700 font-semibold";
     if (s >= 40) return "text-orange-700 font-semibold";
+    if (s >= 0) return "text-red-700 font-semibold";
     return "text-red-700 font-semibold";
 };
 
@@ -125,13 +140,13 @@ const getGradeBadge = (score) => {
     if (score == null || score === "") return null;
     const s = parseFloat(score);
     if (isNaN(s)) return null;
-    // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 1-39
+    // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 0-39
     if (s >= 80) return { label: "A", class: "bg-emerald-100 text-emerald-800" };
     if (s >= 70) return { label: "B", class: "bg-blue-100 text-blue-800" };
     if (s >= 60) return { label: "C", class: "bg-amber-100 text-amber-800" };
     if (s >= 50) return { label: "D", class: "bg-yellow-100 text-yellow-800" };
     if (s >= 40) return { label: "E", class: "bg-orange-100 text-orange-800" };
-    if (s >= 1) return { label: "F", class: "bg-red-100 text-red-800" };
+    if (s >= 0) return { label: "F", class: "bg-red-100 text-red-800" };
     return null;
 };
 
@@ -368,16 +383,16 @@ const submit = () => {
                                                             step="0.01"
                                                             class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                                             :class="{
-                                                                'border-emerald-300 bg-emerald-50': entry.record.score && parseFloat(entry.record.score) >= 80,
-                                                                'border-blue-300 bg-blue-50': entry.record.score && parseFloat(entry.record.score) >= 70 && parseFloat(entry.record.score) < 80,
-                                                                'border-amber-300 bg-amber-50': entry.record.score && parseFloat(entry.record.score) >= 60 && parseFloat(entry.record.score) < 70,
-                                                                'border-yellow-300 bg-yellow-50': entry.record.score && parseFloat(entry.record.score) >= 50 && parseFloat(entry.record.score) < 60,
-                                                                'border-orange-300 bg-orange-50': entry.record.score && parseFloat(entry.record.score) >= 40 && parseFloat(entry.record.score) < 50,
-                                                                'border-red-300 bg-red-50': entry.record.score && parseFloat(entry.record.score) >= 1 && parseFloat(entry.record.score) < 40,
+                                                                'border-emerald-300 bg-emerald-50': hasNumericScore(entry.record.score) && parseFloat(entry.record.score) >= 80,
+                                                                'border-blue-300 bg-blue-50': hasNumericScore(entry.record.score) && parseFloat(entry.record.score) >= 70 && parseFloat(entry.record.score) < 80,
+                                                                'border-amber-300 bg-amber-50': hasNumericScore(entry.record.score) && parseFloat(entry.record.score) >= 60 && parseFloat(entry.record.score) < 70,
+                                                                'border-yellow-300 bg-yellow-50': hasNumericScore(entry.record.score) && parseFloat(entry.record.score) >= 50 && parseFloat(entry.record.score) < 60,
+                                                                'border-orange-300 bg-orange-50': hasNumericScore(entry.record.score) && parseFloat(entry.record.score) >= 40 && parseFloat(entry.record.score) < 50,
+                                                                'border-red-300 bg-red-50': hasNumericScore(entry.record.score) && parseFloat(entry.record.score) >= 0 && parseFloat(entry.record.score) < 40,
                                                             }"
                                                         />
                                                         <span
-                                                            v-if="entry.record.score && !isNaN(parseFloat(entry.record.score))"
+                                                            v-if="hasNumericScore(entry.record.score)"
                                                             class="text-xs font-medium"
                                                             :class="getGradeClass(entry.record.score)"
                                                         >
@@ -431,7 +446,7 @@ const submit = () => {
                                                             </span>
                                                         </button>
                                                         <button
-                                                            v-if="entry.student?.computed_grade !== null || entry.student?.score"
+                                                            v-if="entry.student?.computed_grade !== null || hasFinalScore(entry.student)"
                                                             type="button"
                                                             @click="openSubmitModal(entry.student)"
                                                             class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-700"
@@ -663,7 +678,7 @@ const submit = () => {
                                     </div>
 
                                     <div
-                                        v-if="selectedStudent.score"
+                                        v-if="hasFinalScore(selectedStudent)"
                                         class="rounded-lg bg-emerald-50 p-3"
                                     >
                                         <div class="flex items-center justify-between">
@@ -674,7 +689,7 @@ const submit = () => {
                                                 class="text-lg font-bold"
                                                 :class="getGradeClass(selectedStudent.score)"
                                             >
-                                                {{ selectedStudent.score }}%
+                                                {{ Number(selectedStudent.score).toFixed(2) }}%
                                             </span>
                                         </div>
                                         <div class="mt-1">
@@ -742,7 +757,7 @@ const submit = () => {
                         <button
                             type="button"
                             @click="submitFinalGrade"
-                            :disabled="submitFinalForm.processing || (!submitFinalForm.use_computed && !submitFinalForm.score)"
+                            :disabled="submitFinalForm.processing || (!submitFinalForm.use_computed && !hasNumericScore(submitFinalForm.score))"
                             class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
                         >
                             <span v-if="submitFinalForm.processing">Submitting...</span>

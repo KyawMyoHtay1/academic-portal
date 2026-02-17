@@ -41,41 +41,56 @@ class StudentGradesController extends Controller
                 'courses.credits',
                 'courses.semester',
                 'courses.photo',
-            ])
-            ->map(function ($course) use ($student) {
-                $calculator = new SubjectGradeCalculator();
-                
-                $subjectsWithGrades = $course->subjects->map(function ($subject) use ($student, $calculator) {
-                    $grade = $subject->grades->first();
-                    $assignmentData = $calculator->calculateSuggestedGrade($subject->id, $student->id);
+            ]);
 
-                    return [
-                        'id' => $subject->id,
-                        'subject_code' => $subject->subject_code,
-                        'title' => $subject->title,
-                        'photo' => $subject->photo,
-                        'score' => $grade?->score,
-                        'grade_status' => $grade?->status,
-                        // Assignment-based computed grade
-                        'computed_grade' => $assignmentData['computed_grade'],
-                        'assignment_breakdown' => $assignmentData['breakdown'],
-                        'total_assignments' => $assignmentData['total_assignments'],
-                        'graded_assignments' => $assignmentData['graded_assignments'],
-                        'ungraded_assignments' => $assignmentData['ungraded_assignments'],
-                        'has_assignments' => $assignmentData['has_assignments'],
-                    ];
-                });
+        $subjectIds = $courses
+            ->pluck('subjects')
+            ->flatten()
+            ->pluck('id')
+            ->all();
+
+        $calculator = new SubjectGradeCalculator();
+        $assignmentDataBySubject = $calculator->calculateForStudentSubjects($subjectIds, $student->id);
+
+        $courses = $courses->map(function ($course) use ($assignmentDataBySubject) {
+            $subjectsWithGrades = $course->subjects->map(function ($subject) use ($assignmentDataBySubject) {
+                $grade = $subject->grades->first();
+                $assignmentData = $assignmentDataBySubject[$subject->id] ?? [
+                    'computed_grade' => null,
+                    'breakdown' => [],
+                    'total_assignments' => 0,
+                    'graded_assignments' => 0,
+                    'ungraded_assignments' => 0,
+                    'has_assignments' => false,
+                ];
 
                 return [
-                    'id' => $course->id,
-                    'course_code' => $course->course_code,
-                    'title' => $course->title,
-                    'credits' => $course->credits,
-                    'semester' => $course->semester,
-                    'photo' => $course->photo,
-                    'subjects' => $subjectsWithGrades,
+                    'id' => $subject->id,
+                    'subject_code' => $subject->subject_code,
+                    'title' => $subject->title,
+                    'photo' => $subject->photo,
+                    'score' => $grade?->score,
+                    'grade_status' => $grade?->status,
+                    // Assignment-based computed grade
+                    'computed_grade' => $assignmentData['computed_grade'],
+                    'assignment_breakdown' => $assignmentData['breakdown'],
+                    'total_assignments' => $assignmentData['total_assignments'],
+                    'graded_assignments' => $assignmentData['graded_assignments'],
+                    'ungraded_assignments' => $assignmentData['ungraded_assignments'],
+                    'has_assignments' => $assignmentData['has_assignments'],
                 ];
             });
+
+            return [
+                'id' => $course->id,
+                'course_code' => $course->course_code,
+                'title' => $course->title,
+                'credits' => $course->credits,
+                'semester' => $course->semester,
+                'photo' => $course->photo,
+                'subjects' => $subjectsWithGrades,
+            ];
+        });
 
         // Calculate overall GPA
         $gpa = $student->calculateGPA();

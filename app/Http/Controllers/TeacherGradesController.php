@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Teacher\StoreSubjectGradesRequest;
-use App\Models\Course;
 use App\Models\Grade;
 use App\Models\GradeReviewLog;
 use App\Models\Student;
@@ -74,19 +73,28 @@ class TeacherGradesController extends Controller
                 'students.full_name',
                 'students.photo',
             ]);
+        $studentIds = $students->pluck('id')->all();
 
         // Fetch existing grades keyed by student_id
         $grades = Grade::where('subject_id', $subject->id)
-            ->whereIn('student_id', $students->pluck('id'))
+            ->whereIn('student_id', $studentIds)
             ->get()
             ->keyBy('student_id');
 
-        // Calculate suggested grades from assignments
+        // Batch-calculate suggested grades from assignments to avoid N+1 queries.
         $calculator = new SubjectGradeCalculator();
-        
-        $studentData = $students->map(function ($student) use ($grades, $subject, $calculator) {
-            $assignmentData = $calculator->calculateSuggestedGrade($subject->id, $student->id);
-            
+        $assignmentDataByStudent = $calculator->calculateForSubjectStudents($subject->id, $studentIds);
+
+        $studentData = $students->map(function ($student) use ($grades, $assignmentDataByStudent) {
+            $assignmentData = $assignmentDataByStudent[$student->id] ?? [
+                'computed_grade' => null,
+                'breakdown' => [],
+                'total_assignments' => 0,
+                'graded_assignments' => 0,
+                'ungraded_assignments' => 0,
+                'has_assignments' => false,
+            ];
+
             return [
                 'id' => $student->id,
                 'student_no' => $student->student_no,
@@ -225,24 +233,33 @@ class TeacherGradesController extends Controller
         }
 
         $request->validate([
-            'score' => 'required|numeric|min:0|max:100',
             'use_computed' => 'sometimes|boolean',
+            'score' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        $score = (float) $request->input('score');
+        $useComputed = $request->boolean('use_computed');
+        $score = null;
+
+        if (! $useComputed && ($request->input('score') === null || $request->input('score') === '')) {
+            return redirect()
+                ->back()
+                ->withErrors(['score' => 'The score field is required when not using computed grade.']);
+        }
 
         // If use_computed is true, calculate from assignments
-        if ($request->boolean('use_computed')) {
+        if ($useComputed) {
             $calculator = new SubjectGradeCalculator();
             $assignmentData = $calculator->calculateSuggestedGrade($subject->id, $student->id);
-            
+
             if ($assignmentData['computed_grade'] === null) {
                 return redirect()
                     ->back()
                     ->withErrors(['score' => 'Cannot use computed grade: no assignments have been graded yet.']);
             }
-            
+
             $score = $assignmentData['computed_grade'];
+        } else {
+            $score = (float) $request->input('score');
         }
 
         // Create or update grade as pending
@@ -270,8 +287,8 @@ class TeacherGradesController extends Controller
             'meta' => [
                 'subject_id' => $subject->id,
                 'course_id' => $subject->course_id,
-                'use_computed' => $request->boolean('use_computed'),
-                'computed_score' => $request->boolean('use_computed') ? $score : null,
+                'use_computed' => $useComputed,
+                'computed_score' => $useComputed ? $score : null,
             ],
         ]);
 
@@ -281,7 +298,7 @@ class TeacherGradesController extends Controller
             'course_id' => $subject->course_id,
             'student_id' => $student->id,
             'score' => $score,
-            'use_computed' => $request->boolean('use_computed'),
+            'use_computed' => $useComputed,
             'submitted_by' => $user->id,
         ]);
 
