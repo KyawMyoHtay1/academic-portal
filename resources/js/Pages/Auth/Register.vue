@@ -26,9 +26,14 @@ const submit = async () => {
         form.recaptcha_token = token || '';
     }
 
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
+    form
+        .transform((data) => ({
+            ...data,
+            terms: data.terms ? 'on' : '',
+        }))
+        .post(route('register'), {
+            onFinish: () => form.reset('password', 'password_confirmation'),
+        });
 };
 </script>
 
@@ -106,7 +111,7 @@ const submit = async () => {
 
             <div class="mt-4 block">
                 <label class="flex items-center">
-                    <Checkbox name="terms" v-model:checked="form.terms" required />
+                    <Checkbox id="terms" name="terms" v-model:checked="form.terms" required />
                     <span class="ms-2 text-sm text-gray-600">
                         I agree to the
                         <a

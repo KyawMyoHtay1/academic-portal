@@ -33,9 +33,14 @@ const submit = async () => {
         form.recaptcha_token = token || '';
     }
 
-    form.post(route("login"), {
-        onFinish: () => form.reset("password"),
-    });
+    form
+        .transform((data) => ({
+            ...data,
+            remember: data.remember ? 'on' : '',
+        }))
+        .post(route("login"), {
+            onFinish: () => form.reset("password"),
+        });
 };
 </script>
 
@@ -81,7 +86,7 @@ const submit = async () => {
 
             <div class="block">
                 <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
+                    <Checkbox id="remember" name="remember" v-model:checked="form.remember" />
                     <span class="ms-2 text-sm text-gray-600">Remember me</span>
                 </label>
             </div>
