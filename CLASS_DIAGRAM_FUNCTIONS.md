@@ -343,6 +343,15 @@ _Attributes: id, assignment_id, student_id, file_path, original_filename, commen
 
 ---
 
+## **SubjectGradeCalculator**
+
+_Attributes: None (service class)_
+
+- +CalculateSuggestedGrade(subjectId: int, studentId: int): array
+- +GetAssignmentBreakdown(subjectId: int, studentId: int): array
+
+---
+
 ## Summary Table
 
 | Class                       | Main Functions                                                            |
@@ -368,6 +377,7 @@ _Attributes: id, assignment_id, student_id, file_path, original_filename, commen
 | **LowAttendanceAlertState** | UpdateState, CheckThreshold, SendAlert                                    |
 | **Assignment**              | Create/Update/Delete, Publish, GetSubmissions, IsOverdue, CanSubmit       |
 | **AssignmentSubmission**    | Submit, GradeSubmission, IsGraded, GetPercentage                          |
+| **SubjectGradeCalculator**  | CalculateSuggestedGrade, GetAssignmentBreakdown                            |
 
 ---
 
@@ -628,12 +638,20 @@ class AssignmentSubmission {
   +GetPercentage()
 }
 
+class SubjectGradeCalculator {
+  --
+  +CalculateSuggestedGrade(subjectId: int, studentId: int): array
+  +GetAssignmentBreakdown(subjectId: int, studentId: int): array
+}
+
 Subject "1" --> "*" Assignment : has many
 Course "1" --> "*" Assignment : has many
 User "1" --> "*" Assignment : created_by
 Assignment "1" --> "*" AssignmentSubmission : has many
 Student "1" --> "*" AssignmentSubmission : has many
 User "1" --> "*" AssignmentSubmission : graded_by
+SubjectGradeCalculator ..> Assignment : uses
+SubjectGradeCalculator ..> AssignmentSubmission : uses
 User "1" --> "*" Timetable : created_by
 @enduml
 ```

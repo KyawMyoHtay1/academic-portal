@@ -21,6 +21,8 @@ rectangle "University Academic Portal\n(Timebox 2)" {
     usecase "Reject Grade" as UC_RejectGrade
     usecase "View Grade" as UC_ViewGrade
     usecase "Search Grade" as UC_SearchGrade
+    usecase "Calculate Computed Grade" as UC_CalculateComputedGrade
+    usecase "Submit Final Grade" as UC_SubmitFinalGrade
   }
 
   rectangle "Manage Fee" {
@@ -57,6 +59,7 @@ rectangle "University Academic Portal\n(Timebox 2)" {
 
 Student --> UC_ViewGrade
 Student --> UC_SearchGrade
+Student --> UC_CalculateComputedGrade
 Student --> UC_ViewFee
 Student --> UC_SubmitPayment
 Student --> UC_StripePayment
@@ -68,6 +71,8 @@ Student --> UC_DownloadOwnSubmission
 Teacher --> UC_RecordGrade
 Teacher --> UC_ViewGrade
 Teacher --> UC_SearchGrade
+Teacher --> UC_CalculateComputedGrade
+Teacher --> UC_SubmitFinalGrade
 Teacher --> UC_CreateAssignment
 Teacher --> UC_UpdateAssignment
 Teacher --> UC_DeleteAssignment
@@ -102,6 +107,8 @@ Staff --> UC_GenerateReceipt
 |---------------|-------|----------------|
 | Record Grade | Teacher | Enter the grades for each enrolled student in the grade entry form. Then, click the "Submit Grades" button to store the grade records. |
 | Approve Grade | Staff | Select a pending grade in the grades review list. Then, click the "Approve" button to approve the grade. |
+| Calculate Computed Grade | Teacher, Student | System automatically calculates a suggested subject grade by retrieving all graded assignment submissions for the subject, converting each assignment score to a percentage (score/max_score * 100), and calculating the average of all percentages. The computed grade is displayed alongside the final approved grade in the grade view. |
+| Submit Final Grade | Teacher | Teacher views the grade management page showing computed grades from assignments. Teacher can either use the computed grade or enter a manual score. Teacher clicks "Submit Final Grade" button, which creates or updates a Grade record with status 'pending' and triggers the approval workflow. |
 | Register Fee | Staff | Enter the fee details (amount, description, due date) in the fee form. Then, click the "Add Fee" button to store the fee records. |
 | Submit Payment Confirmation | Student | Select an unpaid fee in My Fees. Then, click the "Submit Payment Confirmation" button to submit the payment for staff approval. |
 | Process Stripe Payment | Student | Select an unpaid fee in My Fees. Then, click the "Pay with Stripe" button to complete the payment online. |
