@@ -1,196 +1,192 @@
 @startuml Timebox2_Class
 hide circle
 skinparam classAttributeIconSize 0
-title Timebox 2 - Class Diagram (Grades, Fees, Assignments)
-
-class Student {
-  +id: int
-  +user_id: int
-  +student_no: string
-  +full_name: string
-  +programme: string
-  +status: enum
-  --
-  +FillGetData()
-  +GetGrades()
-  +GetFees()
-  +GetAttendance()
-  +CalculateGPA()
-  +AutoID()
-}
+title Timebox 2 - Grades, Fee Payment, and Assignment
 
 class User {
-  +id: int
-  +name: string
-  +email: string
-  +role: enum
-  +photo: string
-  +email_verified_at: datetime
+  +id: bigint
+  +name: varchar
+  +email: varchar
+  +role: varchar
   --
-  +FillGetData()
-  +Login()
-  +Logout()
-  +Register()
-  +UpdateProfile()
-  +ResetPassword()
-  +VerifyEmail()
-  +GetRole()
-  +AutoID()
+  +student()
+  +teachingSubjects()
+}
+
+class Student {
+  +id: bigint
+  +user_id: bigint
+  +student_no: varchar
+  +full_name: varchar
+  --
+  +grades()
+  +fees()
+  +calculateGPA()
 }
 
 class Course {
-  +id: int
-  +course_code: string
-  +title: string
-  +credits: int
-  +semester: string
-  +photo: string
+  +id: bigint
+  +course_code: varchar
+  +title: varchar
   --
-  +FillGetData()
-  +SearchCourse()
-  +GetSubjects()
-  +GetEnrollments()
-  +AutoID()
+  +subjects()
+  +grades()
+  +assignments()
 }
 
 class Subject {
-  +id: int
-  +course_id: int
-  +subject_code: string
-  +title: string
-  +credits: int
-  +description: text
-  +photo: string
+  +id: bigint
+  +course_id: bigint
+  +subject_code: varchar
+  +title: varchar
   --
-  +FillGetData()
-  +SearchSubject()
-  +GetGrades()
-  +GetTimetables()
-  +GetAttendances()
-  +AutoID()
+  +course()
+  +grades()
+  +assignments()
 }
 
 class Grade {
-  +id: int
-  +subject_id: int
-  +course_id: int
-  +student_id: int
-  +graded_by: int
-  +reviewed_by: int
-  +score: decimal
-  +status: enum
+  +id: bigint
+  +subject_id: bigint
+  +course_id: bigint
+  +student_id: bigint
+  +graded_by: bigint
+  +reviewed_by: bigint
+  +score: decimal(5,2)
+  +status: enum(draft,pending,approved,rejected)
+  +reviewed_at: timestamp
+  +rejection_reason: varchar
   --
-  +FillGetData()
-  +SubmitGrade()
-  +ApproveGrade()
-  +RejectGrade()
-  +GetLetterGrade()
-  +SearchGrade()
-  +GetByStudent()
-  +GetBySubject()
-  +AutoID()
+  +course()
+  +student()
+  +grader()
+  +reviewer()
+  +reviewLogs()
+  +scopeDraft()
+  +scopePending()
+  +scopeApproved()
+  +scopeRejected()
+  +submitForReview(score, gradedBy, courseId)
+  +approve(reviewedBy)
+  +reject(reviewedBy, reason)
+  +getLetterGradeAttribute()
 }
 
 class GradeReviewLog {
-  +id: int
-  +grade_id: int
-  +performed_by: int
-  +action: string
-  +reason: string
+  +id: bigint
+  +grade_id: bigint
+  +performed_by: bigint
+  +action: enum(submitted,approved,rejected)
+  +reason: varchar
+  +meta: json
   --
-  +FillGetData()
-  +LogAction()
-  +GetByGrade()
-  +SearchLog()
-  +AutoID()
+  +grade()
+  +performer()
 }
 
 class Fee {
-  +id: int
-  +student_id: int
-  +amount: decimal
-  +description: string
-  +status: enum
+  +id: bigint
+  +student_id: bigint
+  +amount: decimal(10,2)
+  +description: varchar
+  +status: enum(pending,payment_pending,paid)
   +due_date: date
   +paid_date: date
+  +payment_intent_id: varchar
+  +payment_method: varchar
+  +payment_processed_at: timestamp
+  +processed_by: bigint
   --
-  +FillGetData()
-  +CreateFee()
-  +UpdateFee()
-  +ApprovePayment()
-  +RejectPayment()
-  +GenerateReceipt()
-  +SearchFee()
-  +GetLatePayments()
-  +AutoID()
+  +student()
+  +processor()
+  +scopePending()
+  +scopePaymentPending()
+  +scopePaid()
+  +scopeOverdue()
+  +markAsPaymentPending(intentId)
+  +markAsPending()
+  +markAsPaid(method, intentId, processedBy)
 }
 
 class Assignment {
-  +id: int
-  +subject_id: int
-  +course_id: int
-  +created_by: int
-  +title: string
+  +id: bigint
+  +subject_id: bigint
+  +course_id: bigint
+  +created_by: bigint
+  +title: varchar
+  +description: text
   +due_date: date
+  +due_time: time
   +max_score: int
-  +status: enum
+  +status: enum(draft,published,closed)
+  +allowed_file_types: json
+  +max_file_size: int
   --
-  +FillGetData()
-  +CreateAssignment()
-  +UpdateAssignment()
-  +PublishAssignment()
-  +GetSubmissions()
-  +IsOverdue()
-  +CanSubmit()
-  +AutoID()
+  +subject()
+  +course()
+  +creator()
+  +submissions()
+  +isOverdue()
+  +canSubmit()
 }
 
 class AssignmentSubmission {
-  +id: int
-  +assignment_id: int
-  +student_id: int
-  +file_path: string
-  +score: decimal
-  +feedback: string
-  +graded_by: int
-  +status: enum
+  +id: bigint
+  +assignment_id: bigint
+  +student_id: bigint
+  +file_path: varchar
+  +original_filename: varchar
+  +comments: text
+  +score: decimal(5,2)
+  +feedback: text
+  +graded_by: bigint
+  +graded_at: timestamp
+  +status: enum(submitted,graded,returned)
   --
-  +FillGetData()
-  +Submit()
-  +GradeSubmission()
-  +IsGraded()
-  +UpdateScore()
-  +GetPercentage()
-  +GetByStudent()
-  +GetByAssignment()
-  +AutoID()
+  +assignment()
+  +student()
+  +grader()
+  +isGraded()
+  +getPercentageAttribute()
 }
 
 class SubjectGradeCalculator {
-  --
-  +CalculateSuggestedGrade(subjectId: int, studentId: int): array
-  +GetAssignmentBreakdown(subjectId: int, studentId: int): array
+  +calculateSuggestedGrade(subjectId, studentId)
+  +calculateForSubjectStudents(subjectId, studentIds)
+  +calculateForStudentSubjects(subjectIds, studentId)
+  +getAssignmentBreakdown(subjectId, studentId)
 }
 
-' Relationships
+class StripeWebhookEvent {
+  +id: bigint
+  +event_id: varchar
+  +event_type: varchar
+  +payload: json
+  +processed_at: timestamp
+}
+
 Course  "1" -- "0..*" Subject
 Subject "1" -- "0..*" Grade
+Course  "0..1" -- "0..*" Grade
 Student "1" -- "0..*" Grade
-User    "1" -- "0..*" Grade : graded_by / reviewed_by
+User    "1" -- "0..*" Grade : graded_by
+User    "1" -- "0..*" Grade : reviewed_by
 Grade   "1" -- "0..*" GradeReviewLog
+User    "1" -- "0..*" GradeReviewLog : performed_by
 
 Student "1" -- "0..*" Fee
+User    "0..1" -- "0..*" Fee : processed_by
 
 Subject "1" -- "0..*" Assignment
 Course  "1" -- "0..*" Assignment
 User    "1" -- "0..*" Assignment : created_by
 Assignment "1" -- "0..*" AssignmentSubmission
 Student    "1" -- "0..*" AssignmentSubmission
-User       "1" -- "0..*" AssignmentSubmission : graded_by
+User       "0..1" -- "0..*" AssignmentSubmission : graded_by
 
-SubjectGradeCalculator ..> Assignment : uses
-SubjectGradeCalculator ..> AssignmentSubmission : uses
-SubjectGradeCalculator ..> Subject : uses
-SubjectGradeCalculator ..> Student : uses
+SubjectGradeCalculator ..> Assignment
+SubjectGradeCalculator ..> AssignmentSubmission
+SubjectGradeCalculator ..> Subject
+SubjectGradeCalculator ..> Student
 
 @enduml

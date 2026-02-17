@@ -1,163 +1,130 @@
-@startuml
+@startuml Timebox1_Class
 hide circle
 skinparam classAttributeIconSize 0
-title Timebox 1 - Class Diagram (User, Student, Course, Subject, Enrollment)
+title Timebox 1 - Student Registration and Course Registration
 
 class User {
-  +id: int
-  +name: string
-  +email: string
-  +password: string
-  +role: enum
-  +photo: string
-  +email_verified_at: datetime
+  +id: bigint
+  +name: varchar
+  +email: varchar
+  +role: varchar
+  +photo: varchar
+  +preferences: json
+  +email_verified_at: timestamp
   --
-  +FillGetData()
-  +Login()
-  +Logout()
-  +Register()
-  +UpdateProfile()
-  +ResetPassword()
-  +VerifyEmail()
-  +GetRole()
-  +AutoID()
+  +student()
+  +teachingCourses()
+  +teachingSubjects()
+  +hasRole(role)
+  +isStudent()
+  +isTeacher()
+  +isStaff()
 }
 
 class Student {
-  +id: int
-  +user_id: int
-  +student_no: string
-  +full_name: string
+  +id: bigint
+  +user_id: bigint
+  +student_no: varchar
+  +full_name: varchar
   +dob: date
-  +gender: enum
-  +email: string
-  +phone: string
-  +address: string
-  +programme: string
-  +intake_year: int
-  +status: enum
-  +photo: string
+  +gender: varchar
+  +email: varchar
+  +phone: varchar
+  +programme: varchar
+  +intake_year: varchar
+  +status: varchar
+  +photo: varchar
+  +id_card: varchar
+  +transcript: varchar
+  +enrollment_date: date
   --
-  +FillGetData()
-  +AddStudent()
-  +UpdateStudent()
-  +DeleteStudent()
-  +SearchStudent()
-  +GetEnrollments()
-  +GetGrades()
-  +GetFees()
-  +GetAttendance()
-  +CalculateGPA()
-  +AutoID()
+  +user()
+  +courses()
+  +attendances()
+  +grades()
+  +fees()
+  +calculateGPA()
+  +requestEnrollment(course)
+  +requestWithdrawal(course)
 }
 
 class Course {
-  +id: int
-  +course_code: string
-  +title: string
+  +id: bigint
+  +course_code: varchar
+  +title: varchar
   +credits: int
-  +semester: string
-  +photo: string
+  +semester: varchar
+  +photo: varchar
   --
-  +FillGetData()
-  +AddCourse()
-  +UpdateCourse()
-  +DeleteCourse()
-  +SearchCourse()
-  +GetSubjects()
-  +GetEnrollments()
-  +GetTimetables()
-  +ValidateCourseCode()
-  +AutoID()
+  +students()
+  +teachers()
+  +subjects()
+  +attendances()
+  +grades()
+  +timetables()
 }
 
 class Subject {
-  +id: int
-  +course_id: int
-  +subject_code: string
-  +title: string
+  +id: bigint
+  +course_id: bigint
+  +subject_code: varchar
+  +title: varchar
   +credits: int
   +description: text
-  +photo: string
+  +photo: varchar
   --
-  +FillGetData()
-  +AddSubject()
-  +UpdateSubject()
-  +DeleteSubject()
-  +SearchSubject()
-  +GetGrades()
-  +GetTimetables()
-  +GetAttendances()
-  +ValidateSubjectCode()
-  +AutoID()
+  +course()
+  +teachers()
+  +grades()
+  +timetables()
+  +attendances()
 }
 
-class Enrollment {
-  +id: int
-  +course_id: int
-  +student_id: int
+class CourseStudent <<pivot: course_student>> {
+  +id: bigint
+  +course_id: bigint
+  +student_id: bigint
   +status: enum
-  --
-  +FillGetData()
-  +RequestEnrollment()
-  +ApproveEnrollment()
-  +RejectEnrollment()
-  +RequestWithdrawal()
-  +ApproveWithdrawal()
-  +RejectWithdrawal()
-  +SearchEnrollment()
-  +GetByStudent()
-  +GetByCourse()
-  +AutoID()
+  +created_at: timestamp
+  +updated_at: timestamp
 }
 
-class course_teacher {
-  +id: int
-  +course_id: int
-  +user_id: int
-  --
-  +FillGetData()
-  +AssignTeacher()
-  +RemoveTeacher()
-  +GetTeachersByCourse()
-  +GetCoursesByTeacher()
-  +AutoID()
+class CourseTeacher <<pivot: course_teacher>> {
+  +id: bigint
+  +course_id: bigint
+  +user_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
 }
 
-class subject_teacher {
-  +id: int
-  +subject_id: int
-  +user_id: int
-  --
-  +FillGetData()
-  +AssignTeacher()
-  +RemoveTeacher()
-  +GetTeachersBySubject()
-  +GetSubjectsByTeacher()
-  +AutoID()
+class SubjectTeacher <<pivot: subject_teacher>> {
+  +id: bigint
+  +subject_id: bigint
+  +user_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
 }
 
-' Relationships
+class EnrollmentService {
+  +requestEnrollment(student, course)
+  +requestWithdrawal(student, course)
+  +approveEnrollment(enrollmentId)
+  +rejectEnrollment(enrollmentId)
+  +approveWithdrawal(enrollmentId)
+  +rejectWithdrawal(enrollmentId)
+}
 
-' One User may or may not be a Student (0 or 1),
-' but each Student must have exactly one User.
-User "0..1" -- "1" Student : has profile >
+User "1" -- "0..1" Student : has profile
+Course "1" -- "0..*" Subject : has
+Course "1" -- "0..*" CourseStudent
+Student "1" -- "0..*" CourseStudent
+Course "1" -- "0..*" CourseTeacher
+User "1" -- "0..*" CourseTeacher : teaches
+Subject "1" -- "0..*" SubjectTeacher
+User "1" -- "0..*" SubjectTeacher : teaches
 
-' One Course has many Subjects, each Subject belongs to one Course.
-Course "1" -- "0..*" Subject : has >
-
-' One Course has many Enrollments, each Enrollment belongs to one Course.
-Course "1" -- "0..*" Enrollment
-
-' One Student has many Enrollments, each Enrollment belongs to one Student.
-Student "1" -- "0..*" Enrollment
-
-' Many-to-many Course–Teacher via course_teacher pivot.
-Course "1" -- "0..*" course_teacher
-User  "1"  -- "0..*" course_teacher : teaches
-
-' Many-to-many Subject–Teacher via subject_teacher pivot.
-Subject "1" -- "0..*" subject_teacher
-User    "1" -- "0..*" subject_teacher : teaches
+EnrollmentService ..> CourseStudent : manages status
+EnrollmentService ..> Course : checks conflicts
+EnrollmentService ..> Student : validates ownership
 
 @enduml

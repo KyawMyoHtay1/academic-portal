@@ -35,6 +35,7 @@ rectangle "Use Case Diagram for University Academic Portal (Whole System)" #FFFF
   usecase "Manage Grades" as UC_ManageGrades
   usecase "Manage Fees" as UC_ManageFees
   usecase "Manage Payment" as UC_ManagePayment
+  usecase "Manage Assignments" as UC_ManageAssignments
   usecase "Manage Timetable" as UC_ManageTimetable
   usecase "Manage Attendance" as UC_ManageAttendance
   usecase "Manage Announcements" as UC_ManageAnnouncements
@@ -66,6 +67,7 @@ Guest -[#6B7280]-> UC_ManageContactFeedback
 Teacher -[#CA8A04]-> UC_LoginLogout
 Teacher -[#CA8A04]-> UC_ManageProfile
 Teacher -[#CA8A04]-> UC_ManageGrades
+Teacher -[#CA8A04]-> UC_ManageAssignments
 Teacher -[#CA8A04]-> UC_ManageTimetable
 Teacher -[#CA8A04]-> UC_ManageAttendance
 Teacher -[#CA8A04]-> UC_ManageAnnouncements
@@ -79,6 +81,7 @@ Student -[#2563EB]-> UC_ManageCourseRegistration
 Student -[#2563EB]-> UC_ManageGrades
 Student -[#2563EB]-> UC_ManageFees
 Student -[#2563EB]-> UC_ManagePayment
+Student -[#2563EB]-> UC_ManageAssignments
 Student -[#2563EB]-> UC_ManageTimetable
 Student -[#2563EB]-> UC_ManageAttendance
 Student -[#2563EB]-> UC_ManageAnnouncements

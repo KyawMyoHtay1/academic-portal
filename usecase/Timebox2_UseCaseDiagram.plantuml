@@ -13,6 +13,7 @@ skinparam RectanglePadding 5
 actor Student #LightBlue
 actor Teacher #LightYellow
 actor Staff   #LightGreen
+actor Stripe  #LightGray
 
 rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignment (Detailed)" #White {
 
@@ -40,6 +41,7 @@ rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignme
     usecase "Process Stripe Payment" as UC6b
     usecase "Approve Payment" as UC6c
     usecase "Reject Payment" as UC6d
+    usecase "Handle Stripe Webhook" as UC6f
     usecase "Generate Receipt" as UC6e
   }
 
@@ -52,6 +54,7 @@ rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignme
     usecase "View Submissions" as UC10e
     usecase "Grade Submission" as UC12
     usecase "Download Submission" as UC10f
+    usecase "View Assignment Detail" as UC11c
     usecase "Submit Assignment" as UC11
     usecase "Download Own Submission" as UC11b
   }
@@ -67,6 +70,7 @@ Student --> UC7
 Student --> UC5
 Student --> UC6a
 Student --> UC6b
+Student --> UC11c
 Student --> UC11
 Student --> UC11b
 Student --> UC13
@@ -98,5 +102,8 @@ Staff --> UC5e
 Staff --> UC6c
 Staff --> UC6d
 Staff --> UC6e
+
+' Stripe webhook callback
+Stripe --> UC6f
 
 @enduml

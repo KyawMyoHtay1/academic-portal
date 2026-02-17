@@ -1,233 +1,186 @@
-@startuml
+@startuml Timebox3_Class
 hide circle
 skinparam classAttributeIconSize 0
-title Timebox 3 - Class Diagram (Timetable, Attendance, Communication)
+title Timebox 3 - Timetable, Attendance, and Communication
 
 class User {
-  +id: int
-  +name: string
-  +email: string
-  +role: enum
-  +photo: string
-  +email_verified_at: datetime
+  +id: bigint
+  +name: varchar
+  +email: varchar
+  +role: varchar
+  +photo: varchar
   --
-  +FillGetData()
-  +Login()
-  +Logout()
-  +Register()
-  +UpdateProfile()
-  +ResetPassword()
-  +VerifyEmail()
-  +GetRole()
-  +AutoID()
+  +student()
+  +sentMessages()
+  +receivedMessages()
+  +teachingCourses()
+  +teachingSubjects()
+  +hasRole(role)
+  +isStudent()
+  +isTeacher()
+  +isStaff()
 }
 
 class Student {
-  +id: int
-  +user_id: int
-  +student_no: string
-  +full_name: string
-  +programme: string
-  +status: enum
+  +id: bigint
+  +user_id: bigint
+  +student_no: varchar
+  +full_name: varchar
   --
-  +FillGetData()
-  +GetAttendance()
-  +AutoID()
+  +user()
+  +courses()
+  +attendances()
+}
+
+class Course {
+  +id: bigint
+  +course_code: varchar
+  +title: varchar
+  --
+  +subjects()
+  +students()
+  +teachers()
+  +attendances()
+  +timetables()
 }
 
 class Subject {
-  +id: int
-  +course_id: int
-  +subject_code: string
-  +title: string
-  +credits: int
-  +description: text
-  +photo: string
+  +id: bigint
+  +course_id: bigint
+  +subject_code: varchar
+  +title: varchar
   --
-  +FillGetData()
-  +SearchSubject()
-  +GetTimetables()
-  +GetAttendances()
-  +AutoID()
+  +course()
+  +teachers()
+  +timetables()
+  +attendances()
 }
 
 class Timetable {
-  +id: int
-  +subject_id: int
-  +created_by: int
-  +day_of_week: string
+  +id: bigint
+  +subject_id: bigint
+  +day_of_week: varchar
   +start_time: time
   +end_time: time
-  +location: string
+  +location: varchar
+  +created_by: bigint
   --
-  +AddTimetable()
-  +UpdateTimetable()
-  +DeleteTimetable()
-  +CheckConflict()
-  +SearchTimetable()
-  +GetByCourse()
-  +GetBySubject()
-  +GetByStudent()
-  +GetByTeacher()
-  +GetCreator()
-  +AutoID()
+  +subject()
+  +creator()
+  +getCourseAttribute()
 }
 
 class Attendance {
-  +id: int
-  +subject_id: int
-  +student_id: int
+  +id: bigint
+  +subject_id: bigint
+  +student_id: bigint
   +date: date
-  +status: enum
+  +status: enum(present,absent)
   --
-  +RecordAttendance()
-  +UpdateAttendance()
-  +CalculateRate()
-  +FillGetData()
-  +MarkPresent()
-  +MarkAbsent()
-  +SearchAttendance()
-  +GetByStudent()
-  +GetBySubject()
-  +GetByDate()
-  +AutoID()
+  +subject()
+  +student()
+  +getCourseAttribute()
 }
 
 class LowAttendanceAlertState {
-  +id: int
-  +student_id: int
-  +last_rate: float
-  +is_below_threshold: bool
+  +id: bigint
+  +student_id: bigint
+  +last_rate: decimal
+  +is_below_threshold: boolean
+  +last_alert_sent_at: timestamp
   --
-  +UpdateState()
-  +CheckThreshold()
-  +SendAlert()
-  +FillGetData()
-  +GetByStudent()
-  +GetStudentsBelowThreshold()
-  +ResetAlert()
-  +AutoID()
+  +student()
 }
 
 class Announcement {
-  +id: int
-  +user_id: int
-  +title: string
+  +id: bigint
+  +user_id: bigint
+  +title: varchar
   +body: text
-  +priority: enum
-  +require_ack: bool
+  +priority: varchar
+  +pinned: boolean
+  +require_ack: boolean
+  +audience: json
+  +publish_at: timestamp
+  +expires_at: timestamp
   --
-  +CreateAnnouncement()
-  +UpdateAnnouncement()
-  +DeleteAnnouncement()
-  +Publish()
-  +FillGetData()
-  +SearchAnnouncement()
-  +GetVisibleToUser()
-  +IsExpired()
-  +AutoID()
+  +author()
+  +reads()
+  +scopeCurrentlyVisible(now)
+  +scopeVisibleToUser(user)
 }
 
 class AnnouncementRead {
-  +id: int
-  +announcement_id: int
-  +user_id: int
-  +read_at: datetime
-  +acknowledged_at: datetime
+  +id: bigint
+  +announcement_id: bigint
+  +user_id: bigint
+  +read_at: timestamp
+  +acknowledged_at: timestamp
   --
-  +MarkAsRead()
-  +MarkAsAcknowledged()
-  +FillGetData()
-  +GetReadStatus()
-  +GetByUser()
-  +GetByAnnouncement()
-  +AutoID()
+  +announcement()
+  +user()
 }
 
 class Message {
-  +id: int
-  +sender_id: int
-  +receiver_id: int
+  +id: bigint
+  +sender_id: bigint
+  +sender_role: varchar
+  +receiver_id: bigint
+  +receiver_role: varchar
   +body: text
-  +read: bool
+  +read: boolean
   --
-  +SendMessage()
-  +MarkAsRead()
-  +FillGetData()
-  +DeleteMessage()
-  +GetInbox()
-  +GetSent()
-  +SearchMessages()
-  +GetConversation()
-  +AutoID()
+  +sender()
+  +receiver()
 }
 
-class Notification {
-  +id: int
-  +notifiable_id: int
-  +type: string
-  +data: json
-  +read_at: datetime
-  --
-  +MarkAsRead()
-  +GetUnread()
-  +FillGetData()
-  +GetByUser()
-  +Notify()
-  +AutoID()
+class Notification <<laravel-notification>> {
+  +id: uuid
+  +notifiable_type: varchar
+  +notifiable_id: bigint
+  +type: varchar
+  +data: text
+  +read_at: timestamp
 }
 
 class ContactMessage {
-  +id: int
-  +first_name: string
-  +last_name: string
-  +email: string
-  +subject: string
+  +id: bigint
+  +first_name: varchar
+  +last_name: varchar
+  +email: varchar
+  +phone: varchar
+  +subject: varchar
   +message: text
-  --
-  +SubmitContact()
-  +MarkAsRead()
-  +FillGetData()
-  +SearchContactMessage()
-  +GetUnread()
-  +Reply()
-  +AutoID()
+  +reply: text
+  +is_read: boolean
+  +replied_at: timestamp
 }
 
 class FeedbackMessage {
-  +id: int
-  +name: string
-  +email: string
-  +type: string
+  +id: bigint
+  +name: varchar
+  +email: varchar
+  +type: varchar
   +message: text
-  +is_read: bool
-  --
-  +SubmitFeedback()
-  +MarkAsRead()
-  +FillGetData()
-  +MarkAsReplied()
-  +SearchFeedbackMessage()
-  +GetUnread()
-  +AutoID()
+  +is_read: boolean
+  +replied_at: timestamp
 }
 
-' Relationships
+Course  "1" -- "0..*" Subject
 Subject "1" -- "0..*" Timetable
-User    "1" -- "0..*" Timetable : created_by
+User    "0..1" -- "0..*" Timetable : created_by
 
 Subject "1" -- "0..*" Attendance
 Student "1" -- "0..*" Attendance
-
-' Each Student can have 0 or 1 alert state; each state belongs to 1 Student.
 Student "1" -- "0..1" LowAttendanceAlertState
 
-User "1" -- "0..*" Announcement
+User "1" -- "0..*" Announcement : author
 Announcement "1" -- "0..*" AnnouncementRead
 User "1" -- "0..*" AnnouncementRead
 
 User "1" -- "0..*" Message : sender
 User "1" -- "0..*" Message : receiver
 
-User "1" -- "0..*" Notification
+User "1" -- "0..*" Notification : notifiable
 
 @enduml

@@ -14,6 +14,7 @@ skinparam RectanglePadding 5
 actor "Student" as Student #BFDBFE
 actor "Teacher" as Teacher #FEF9C3
 actor "Staff" as Staff #BBF7D0
+actor "Guest" as Guest #E5E7EB
 
 rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Communication (Detailed)" #FFFFFF {
 
@@ -49,8 +50,10 @@ rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Commun
   }
 
   rectangle "Manage Contact & Feedback" #FEF9C3 {
+    usecase "Submit Contact Message" as UC_C0
     usecase "View Contact Messages" as UC_C1
     usecase "Mark Contact as Read" as UC_C2
+    usecase "Submit Feedback Message" as UC_F0
     usecase "View Feedback Messages" as UC_F1
     usecase "Mark Feedback as Read" as UC_F2
   }
@@ -61,6 +64,10 @@ rectangle "University Academic Portal\nTimebox 3: Timetable, Attendance & Commun
     usecase "Mark All Notifications as Read" as UC_O3
   }
 }
+
+' Guest
+Guest -[#6B7280]-> UC_C0
+Guest -[#6B7280]-> UC_F0
 
 ' Student
 Student -[#2563EB]-> UC_T4
