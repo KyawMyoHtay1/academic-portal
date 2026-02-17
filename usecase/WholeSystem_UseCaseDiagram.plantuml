@@ -1,0 +1,86 @@
+@startuml WholeSystem_UseCaseDiagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam dpi 300
+
+scale 0.9
+skinparam defaultFontSize 10
+skinparam ranksep 14
+skinparam nodesep 10
+skinparam RectanglePadding 6
+
+actor Guest #D1D5DB
+actor Student #BFDBFE
+actor Teacher #FEF9C3
+actor "Administrator/Staff" as Staff #FECACA
+
+rectangle "Use Case Diagram for University Academic Portal (Whole System)" #FFFFFF {
+  usecase "Create Account" as UC_CreateAccount
+  usecase "Login / Logout" as UC_LoginLogout
+  usecase "Manage Profile" as UC_ManageProfile
+  usecase "Manage Users" as UC_ManageUsers
+  usecase "Manage Students" as UC_ManageStudents
+  usecase "Manage Courses" as UC_ManageCourses
+  usecase "Manage Subjects" as UC_ManageSubjects
+  usecase "Manage Course Registration" as UC_ManageCourseRegistration
+  usecase "Manage Grades" as UC_ManageGrades
+  usecase "Manage Fees" as UC_ManageFees
+  usecase "Manage Payment" as UC_ManagePayment
+  usecase "Manage Timetable" as UC_ManageTimetable
+  usecase "Manage Attendance" as UC_ManageAttendance
+  usecase "Manage Announcements" as UC_ManageAnnouncements
+  usecase "Manage Messages" as UC_ManageMessages
+  usecase "Manage Contact & Feedback" as UC_ManageContactFeedback
+  usecase "Manage Notifications" as UC_ManageNotifications
+  usecase "View Reports" as UC_ViewReports
+}
+
+' Guest
+Guest -[#6B7280]-> UC_CreateAccount
+Guest -[#6B7280]-> UC_LoginLogout
+Guest -[#6B7280]-> UC_ManageContactFeedback
+
+' Student
+Student -[#2563EB]-> UC_LoginLogout
+Student -[#2563EB]-> UC_ManageProfile
+Student -[#2563EB]-> UC_ManageCourseRegistration
+Student -[#2563EB]-> UC_ManageGrades
+Student -[#2563EB]-> UC_ManageFees
+Student -[#2563EB]-> UC_ManagePayment
+Student -[#2563EB]-> UC_ManageTimetable
+Student -[#2563EB]-> UC_ManageAttendance
+Student -[#2563EB]-> UC_ManageAnnouncements
+Student -[#2563EB]-> UC_ManageMessages
+Student -[#2563EB]-> UC_ManageNotifications
+
+' Teacher
+Teacher -[#CA8A04]-> UC_LoginLogout
+Teacher -[#CA8A04]-> UC_ManageProfile
+Teacher -[#CA8A04]-> UC_ManageGrades
+Teacher -[#CA8A04]-> UC_ManageTimetable
+Teacher -[#CA8A04]-> UC_ManageAttendance
+Teacher -[#CA8A04]-> UC_ManageAnnouncements
+Teacher -[#CA8A04]-> UC_ManageMessages
+Teacher -[#CA8A04]-> UC_ManageNotifications
+
+' Administrator / Staff
+Staff -[#DC2626]-> UC_LoginLogout
+Staff -[#DC2626]-> UC_ManageProfile
+Staff -[#DC2626]-> UC_ManageUsers
+Staff -[#DC2626]-> UC_ManageStudents
+Staff -[#DC2626]-> UC_ManageCourses
+Staff -[#DC2626]-> UC_ManageSubjects
+Staff -[#DC2626]-> UC_ManageCourseRegistration
+Staff -[#DC2626]-> UC_ManageGrades
+Staff -[#DC2626]-> UC_ManageFees
+Staff -[#DC2626]-> UC_ManagePayment
+Staff -[#DC2626]-> UC_ManageTimetable
+Staff -[#DC2626]-> UC_ManageAttendance
+Staff -[#DC2626]-> UC_ManageAnnouncements
+Staff -[#DC2626]-> UC_ManageMessages
+Staff -[#DC2626]-> UC_ManageContactFeedback
+Staff -[#DC2626]-> UC_ManageNotifications
+Staff -[#DC2626]-> UC_ViewReports
+
+@enduml
