@@ -545,6 +545,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/teacher/grades', [TeacherGradesController::class, 'index'])->name('teacher.grades.index');
         Route::get('/teacher/grades/{subject}', [TeacherGradesController::class, 'show'])->name('teacher.grades.show');
         Route::post('/teacher/grades/{subject}', [TeacherGradesController::class, 'store'])->name('teacher.grades.store');
+        Route::post('/teacher/grades/{subject}/students/{student}/submit-final', [TeacherGradesController::class, 'submitFinalGrade'])->name('teacher.grades.submit-final');
 
         // Assignment Management
         Route::get('/teacher/assignments', [TeacherAssignmentController::class, 'index'])->name('teacher.assignments.index');
