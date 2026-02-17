@@ -26,6 +26,15 @@ const props = defineProps({
 const searchTerm = ref("");
 const semesterFilter = ref("all");
 const showOnlyGraded = ref(false);
+const expandedSubjects = ref(new Set());
+
+const toggleSubjectExpansion = (subjectId) => {
+    if (expandedSubjects.value.has(subjectId)) {
+        expandedSubjects.value.delete(subjectId);
+    } else {
+        expandedSubjects.value.add(subjectId);
+    }
+};
 
 const semesters = computed(() => {
     const set = new Set();
@@ -443,6 +452,11 @@ const getLetterGrade = (score) => {
                                                 >
                                                     Score & Grade
                                                 </th>
+                                                <th
+                                                    class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                                >
+                                                    Actions
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody
@@ -539,6 +553,162 @@ const getLetterGrade = (score) => {
                                                     >
                                                         Not graded yet
                                                     </span>
+                                                </td>
+                                                <td class="px-4 py-3 text-center">
+                                                    <button
+                                                        v-if="subject.has_assignments"
+                                                        type="button"
+                                                        @click="toggleSubjectExpansion(subject.id)"
+                                                        class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                                                    >
+                                                        <span v-if="expandedSubjects.has(subject.id)">
+                                                            Hide Assignments
+                                                        </span>
+                                                        <span v-else>
+                                                            View Assignments
+                                                        </span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <!-- Assignment Breakdown Row -->
+                                            <tr
+                                                v-if="expandedSubjects.has(subject.id) && subject.has_assignments"
+                                                class="bg-slate-50"
+                                            >
+                                                <td colspan="3" class="px-4 py-4">
+                                                    <div class="space-y-3">
+                                                        <div class="flex items-center justify-between">
+                                                            <h4 class="text-sm font-semibold text-slate-900">
+                                                                Assignment Breakdown
+                                                            </h4>
+                                                            <div class="flex items-center gap-4 text-xs">
+                                                                <span
+                                                                    v-if="subject.computed_grade !== null"
+                                                                    class="text-slate-600"
+                                                                >
+                                                                    Computed Grade:
+                                                                    <span
+                                                                        class="ml-1 font-semibold"
+                                                                        :class="getLetterGrade(subject.computed_grade)?.class || 'text-slate-700'"
+                                                                    >
+                                                                        {{ subject.computed_grade.toFixed(2) }}%
+                                                                    </span>
+                                                                </span>
+                                                                <span
+                                                                    v-if="subject.score"
+                                                                    class="text-slate-600"
+                                                                >
+                                                                    Final Grade:
+                                                                    <span
+                                                                        class="ml-1 font-semibold"
+                                                                        :class="getLetterGrade(subject.score)?.class || 'text-slate-700'"
+                                                                    >
+                                                                        {{ subject.score.toFixed(2) }}%
+                                                                    </span>
+                                                                    <span
+                                                                        v-if="subject.grade_status === 'approved'"
+                                                                        class="ml-2 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800"
+                                                                    >
+                                                                        Approved
+                                                                    </span>
+                                                                    <span
+                                                                        v-else-if="subject.grade_status === 'pending'"
+                                                                        class="ml-2 inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800"
+                                                                    >
+                                                                        Pending
+                                                                    </span>
+                                                                </span>
+                                                                <span class="text-slate-600">
+                                                                    Graded: {{ subject.graded_assignments }}/{{ subject.total_assignments }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            v-if="subject.assignment_breakdown?.length > 0"
+                                                            class="overflow-x-auto"
+                                                        >
+                                                            <table class="min-w-full divide-y divide-slate-200">
+                                                                <thead class="bg-white">
+                                                                    <tr>
+                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-slate-600">
+                                                                            Assignment
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Due Date
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Status
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Score
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Percentage
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="divide-y divide-slate-200 bg-white">
+                                                                    <tr
+                                                                        v-for="assignment in subject.assignment_breakdown"
+                                                                        :key="assignment.assignment_id"
+                                                                    >
+                                                                        <td class="px-3 py-2 text-sm text-slate-900">
+                                                                            {{ assignment.title }}
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center text-xs text-slate-600">
+                                                                            {{ assignment.due_date }}
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center">
+                                                                            <span
+                                                                                v-if="assignment.graded"
+                                                                                class="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800"
+                                                                            >
+                                                                                Graded
+                                                                            </span>
+                                                                            <span
+                                                                                v-else-if="assignment.submitted"
+                                                                                class="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"
+                                                                            >
+                                                                                Submitted
+                                                                            </span>
+                                                                            <span
+                                                                                v-else
+                                                                                class="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+                                                                            >
+                                                                                Not submitted
+                                                                            </span>
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center text-sm">
+                                                                            <span
+                                                                                v-if="assignment.score !== null"
+                                                                                class="font-medium"
+                                                                                :class="getLetterGrade(assignment.percentage)?.class || 'text-slate-700'"
+                                                                            >
+                                                                                {{ assignment.score }}/{{ assignment.max_score }}
+                                                                            </span>
+                                                                            <span v-else class="text-slate-400">—</span>
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center text-sm">
+                                                                            <span
+                                                                                v-if="assignment.percentage !== null"
+                                                                                class="font-medium"
+                                                                                :class="getLetterGrade(assignment.percentage)?.class || 'text-slate-700'"
+                                                                            >
+                                                                                {{ assignment.percentage.toFixed(1) }}%
+                                                                            </span>
+                                                                            <span v-else class="text-slate-400">—</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div
+                                                            v-else
+                                                            class="rounded-md bg-slate-50 p-3 text-center text-xs text-slate-500"
+                                                        >
+                                                            No assignments found for this subject.
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>

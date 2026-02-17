@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
-import { computed, ref, watch } from "vue";
+import { Head, useForm, Link, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     subject: {
@@ -23,6 +23,48 @@ const form = useForm({
 });
 
 const query = ref("");
+const expandedStudents = ref(new Set());
+const showSubmitModal = ref(false);
+const selectedStudent = ref(null);
+const submitFinalForm = useForm({
+    score: "",
+    use_computed: false,
+});
+
+const toggleStudentExpansion = (studentId) => {
+    if (expandedStudents.value.has(studentId)) {
+        expandedStudents.value.delete(studentId);
+    } else {
+        expandedStudents.value.add(studentId);
+    }
+};
+
+const openSubmitModal = (student) => {
+    selectedStudent.value = student;
+    submitFinalForm.score = student.computed_grade?.toFixed(2) || "";
+    submitFinalForm.use_computed = student.computed_grade !== null;
+    showSubmitModal.value = true;
+};
+
+const closeSubmitModal = () => {
+    showSubmitModal.value = false;
+    selectedStudent.value = null;
+    submitFinalForm.reset();
+};
+
+const submitFinalGrade = () => {
+    if (!selectedStudent.value) return;
+    
+    // Build route URL manually since route helper may not support multiple params
+    const url = `/teacher/grades/${props.subject.id}/students/${selectedStudent.value.id}/submit-final`;
+    
+    submitFinalForm.post(url, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeSubmitModal();
+        },
+    });
+};
 
 const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -256,6 +298,12 @@ const submit = () => {
                                                 >
                                                     Review status
                                                 </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                                >
+                                                    Actions
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody
@@ -365,9 +413,152 @@ const submit = () => {
                                                     </div>
                                                     <span v-else class="text-xs text-slate-400">—</span>
                                                 </td>
+                                                <td class="whitespace-nowrap px-4 py-4 text-center">
+                                                    <div class="flex items-center justify-center gap-2">
+                                                        <button
+                                                            v-if="entry.student?.has_assignments"
+                                                            type="button"
+                                                            @click="toggleStudentExpansion(entry.student.id)"
+                                                            class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                                                        >
+                                                            <span v-if="expandedStudents.has(entry.student.id)">
+                                                                Hide Assignments
+                                                            </span>
+                                                            <span v-else>
+                                                                View Assignments
+                                                            </span>
+                                                        </button>
+                                                        <button
+                                                            v-if="entry.student?.computed_grade !== null || entry.student?.score"
+                                                            type="button"
+                                                            @click="openSubmitModal(entry.student)"
+                                                            class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-700"
+                                                        >
+                                                            Submit Final Grade
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <!-- Assignment Breakdown Row -->
+                                            <tr
+                                                v-if="expandedStudents.has(entry.student?.id) && entry.student?.has_assignments"
+                                                class="bg-slate-50"
+                                            >
+                                                <td colspan="5" class="px-4 py-4">
+                                                    <div class="space-y-3">
+                                                        <div class="flex items-center justify-between">
+                                                            <h4 class="text-sm font-semibold text-slate-900">
+                                                                Assignment Breakdown
+                                                            </h4>
+                                                            <div class="flex items-center gap-4 text-xs">
+                                                                <span class="text-slate-600">
+                                                                    Computed Grade:
+                                                                    <span
+                                                                        v-if="entry.student?.computed_grade !== null"
+                                                                        class="ml-1 font-semibold"
+                                                                        :class="getGradeClass(entry.student.computed_grade)"
+                                                                    >
+                                                                        {{ entry.student.computed_grade.toFixed(2) }}%
+                                                                    </span>
+                                                                    <span v-else class="ml-1 text-slate-400">
+                                                                        Not available
+                                                                    </span>
+                                                                </span>
+                                                                <span class="text-slate-600">
+                                                                    Graded: {{ entry.student?.graded_assignments }}/{{ entry.student?.total_assignments }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            v-if="entry.student?.assignment_breakdown?.length > 0"
+                                                            class="overflow-x-auto"
+                                                        >
+                                                            <table class="min-w-full divide-y divide-slate-200">
+                                                                <thead class="bg-white">
+                                                                    <tr>
+                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-slate-600">
+                                                                            Assignment
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Due Date
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Status
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Score
+                                                                        </th>
+                                                                        <th class="px-3 py-2 text-center text-xs font-medium text-slate-600">
+                                                                            Percentage
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="divide-y divide-slate-200 bg-white">
+                                                                    <tr
+                                                                        v-for="assignment in entry.student.assignment_breakdown"
+                                                                        :key="assignment.assignment_id"
+                                                                    >
+                                                                        <td class="px-3 py-2 text-sm text-slate-900">
+                                                                            {{ assignment.title }}
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center text-xs text-slate-600">
+                                                                            {{ assignment.due_date }}
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center">
+                                                                            <span
+                                                                                v-if="assignment.graded"
+                                                                                class="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800"
+                                                                            >
+                                                                                Graded
+                                                                            </span>
+                                                                            <span
+                                                                                v-else-if="assignment.submitted"
+                                                                                class="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"
+                                                                            >
+                                                                                Submitted
+                                                                            </span>
+                                                                            <span
+                                                                                v-else
+                                                                                class="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+                                                                            >
+                                                                                Not submitted
+                                                                            </span>
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center text-sm">
+                                                                            <span
+                                                                                v-if="assignment.score !== null"
+                                                                                class="font-medium"
+                                                                                :class="getGradeClass(assignment.percentage)"
+                                                                            >
+                                                                                {{ assignment.score }}/{{ assignment.max_score }}
+                                                                            </span>
+                                                                            <span v-else class="text-slate-400">—</span>
+                                                                        </td>
+                                                                        <td class="px-3 py-2 text-center text-sm">
+                                                                            <span
+                                                                                v-if="assignment.percentage !== null"
+                                                                                class="font-medium"
+                                                                                :class="getGradeClass(assignment.percentage)"
+                                                                            >
+                                                                                {{ assignment.percentage.toFixed(1) }}%
+                                                                            </span>
+                                                                            <span v-else class="text-slate-400">—</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div
+                                                            v-else
+                                                            class="rounded-md bg-slate-50 p-3 text-center text-xs text-slate-500"
+                                                        >
+                                                            No assignments found for this subject.
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             <tr v-if="gradeEntries.length === 0">
-                                                <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
                                                     {{ query.trim() ? "No students match your search." : "No students found." }}
                                                 </td>
                                             </tr>
@@ -406,6 +597,162 @@ const submit = () => {
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Final Grade Modal -->
+        <div
+            v-if="showSubmitModal && selectedStudent"
+            class="fixed inset-0 z-50 overflow-y-auto"
+            aria-labelledby="modal-title"
+            role="dialog"
+            aria-modal="true"
+        >
+            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div
+                    class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity"
+                    @click="closeSubmitModal"
+                ></div>
+
+                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+
+                <div
+                    class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle"
+                >
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3
+                                    class="text-lg font-medium leading-6 text-slate-900"
+                                    id="modal-title"
+                                >
+                                    Submit Final Grade
+                                </h3>
+                                <div class="mt-4 space-y-4">
+                                    <div>
+                                        <p class="text-sm text-slate-600">
+                                            Student: <span class="font-semibold">{{ selectedStudent.full_name }}</span>
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ selectedStudent.student_no }}
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-if="selectedStudent.computed_grade !== null"
+                                        class="rounded-lg bg-indigo-50 p-3"
+                                    >
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-medium text-indigo-900">
+                                                Computed Grade from Assignments:
+                                            </span>
+                                            <span
+                                                class="text-lg font-bold"
+                                                :class="getGradeClass(selectedStudent.computed_grade)"
+                                            >
+                                                {{ selectedStudent.computed_grade.toFixed(2) }}%
+                                            </span>
+                                        </div>
+                                        <p class="mt-1 text-xs text-indigo-700">
+                                            Based on {{ selectedStudent.graded_assignments }} graded assignment(s)
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-if="selectedStudent.score"
+                                        class="rounded-lg bg-emerald-50 p-3"
+                                    >
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-medium text-emerald-900">
+                                                Current Final Grade:
+                                            </span>
+                                            <span
+                                                class="text-lg font-bold"
+                                                :class="getGradeClass(selectedStudent.score)"
+                                            >
+                                                {{ selectedStudent.score }}%
+                                            </span>
+                                        </div>
+                                        <div class="mt-1">
+                                            <span
+                                                v-if="reviewBadge(selectedStudent.status)"
+                                                class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                                                :class="reviewBadge(selectedStudent.status).class"
+                                            >
+                                                {{ reviewBadge(selectedStudent.status).label }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="flex items-center gap-2">
+                                            <input
+                                                v-model="submitFinalForm.use_computed"
+                                                type="checkbox"
+                                                class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                :disabled="selectedStudent.computed_grade === null"
+                                            />
+                                            <span class="text-sm text-slate-700">
+                                                Use computed grade from assignments
+                                                <span
+                                                    v-if="selectedStudent.computed_grade === null"
+                                                    class="text-xs text-slate-400"
+                                                >
+                                                    (No graded assignments available)
+                                                </span>
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div v-if="!submitFinalForm.use_computed">
+                                        <label
+                                            for="final-score"
+                                            class="block text-sm font-medium text-slate-700"
+                                        >
+                                            Enter Final Grade (0-100)
+                                        </label>
+                                        <input
+                                            id="final-score"
+                                            v-model="submitFinalForm.score"
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            :class="{
+                                                'border-red-300': submitFinalForm.errors.score,
+                                            }"
+                                        />
+                                        <p
+                                            v-if="submitFinalForm.errors.score"
+                                            class="mt-1 text-sm text-red-600"
+                                        >
+                                            {{ submitFinalForm.errors.score }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button
+                            type="button"
+                            @click="submitFinalGrade"
+                            :disabled="submitFinalForm.processing || (!submitFinalForm.use_computed && !submitFinalForm.score)"
+                            class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
+                        >
+                            <span v-if="submitFinalForm.processing">Submitting...</span>
+                            <span v-else>Submit for Approval</span>
+                        </button>
+                        <button
+                            type="button"
+                            @click="closeSubmitModal"
+                            class="mt-3 inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-base font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
