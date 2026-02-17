@@ -4,11 +4,14 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam dpi 300
 
-scale 0.9
+' Balanced size
+scale 1.0
 skinparam defaultFontSize 10
-skinparam ranksep 14
-skinparam nodesep 10
-skinparam RectanglePadding 6
+
+' Moderate spacing (not too tight, not too wide)
+skinparam ranksep 35
+skinparam nodesep 30
+skinparam RectanglePadding 12
 
 actor Guest #D1D5DB
 actor Student #BFDBFE
