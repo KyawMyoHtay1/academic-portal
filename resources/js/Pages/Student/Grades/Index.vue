@@ -462,9 +462,11 @@ const getLetterGrade = (score) => {
                                         <tbody
                                             class="divide-y divide-slate-200 bg-white"
                                         >
-                                            <tr
+                                            <template
                                                 v-for="subject in course.subjects"
                                                 :key="subject.id"
+                                            >
+                                            <tr
                                                 class="bg-white hover:bg-slate-50 transition-colors"
                                             >
                                                 <td
@@ -711,6 +713,7 @@ const getLetterGrade = (score) => {
                                                     </div>
                                                 </td>
                                             </tr>
+                                            </template>
                                         </tbody>
                                     </table>
                                 </div>
