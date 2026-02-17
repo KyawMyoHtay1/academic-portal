@@ -32,6 +32,7 @@ Teacher -> Timetable: View my timetable
 Timetable --> Teacher: Show week grid\nfor assigned subjects
 
 Student -> Timetable: View my timetable
-Timetable --> Student: Show week grid\nfor enrolled courses
+Timetable -> Timetable: Load timetables from\nstudent course links
+Timetable --> Student: Show week grid\nfor linked courses (current implementation)
 
 @enduml

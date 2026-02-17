@@ -12,6 +12,14 @@ participant "SubjectGradeCalculator" as Calculator
 participant "Grade" as Grade
 participant "GradeReviewLog" as GradeLog
 
+' --- Optional draft save before final submission ---
+
+Teacher -> Grade: Save draft grade (optional)\n(subjectId, studentId, score)
+Grade -> Grade: Validate teacher assignment
+Grade -> Grade: Validate student enrolment
+Grade -> Grade: Save/update draft\nstatus = draft, set graded_by
+Grade --> Teacher: Confirm draft saved\n(no review log, no staff notification)
+
 ' --- Teacher grades assignments ---
 
 Teacher -> Assignment: View assignments for subject
@@ -69,24 +77,29 @@ Subject --> Teacher: Show students with\ncomputed grades and breakdowns
 Teacher -> Grade: Submit Final Grade\n(subjectId, studentId, use_computed, score)
 Grade -> Grade: Validate teacher assignment
 Grade -> Grade: Validate student enrolment
+Grade -> Grade: Check current status
 
-alt Use computed grade
-  Grade -> Calculator: CalculateSuggestedGrade\n(subjectId, studentId)
-  Calculator -> Assignment: Get assignments
-  Calculator -> Submission: Get graded submissions
-  Calculator -> Calculator: Calculate average percentage
-  Calculator --> Grade: Return computed grade
-  Grade -> Grade: Set score = computed grade
-else Manual input
-  Grade -> Grade: Validate manual score\n(0-100)
-  Grade -> Grade: Set score = manual input
+alt Status is pending or approved
+  Grade --> Teacher: Reject submission\n(final grade is locked)
+else Status is draft, rejected, or empty
+  alt Use computed grade
+    Grade -> Calculator: CalculateSuggestedGrade\n(subjectId, studentId)
+    Calculator -> Assignment: Get assignments
+    Calculator -> Submission: Get graded submissions
+    Calculator -> Calculator: Calculate average percentage
+    Calculator --> Grade: Return computed grade
+    Grade -> Grade: Set score = computed grade
+  else Manual input
+    Grade -> Grade: Validate manual score\n(0-100)
+    Grade -> Grade: Set score = manual input
+  end
+
+  Grade -> Grade: Create/update grade record\nstatus = pending
+  Grade -> GradeLog: Record action 'submitted'\nwith meta: use_computed flag
+  Grade --> Teacher: Confirm final grade submitted
+
+  Grade --> Staff: Notify GradeReviewRequested
 end
-
-Grade -> Grade: Create/update grade record\nstatus = pending
-Grade -> GradeLog: Record action 'submitted'\nwith meta: use_computed flag
-Grade --> Teacher: Confirm final grade submitted
-
-Grade --> Staff: Notify GradeReviewRequested
 
 ' --- Staff approves final grade ---
 

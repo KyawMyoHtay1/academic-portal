@@ -5,7 +5,6 @@ actor Staff as "Staff/Admin"
 actor Student
 
 participant "Fee" as Fee
-participant "Payment" as Payment
 participant "Receipt (PDF)" as Receipt
 
 Staff -> Fee: Register fee\n(studentId, amount, dueDate)
@@ -16,18 +15,27 @@ Fee --> Student: Notify new fee
 Student -> Fee: View my fees
 Fee --> Student: Show pending fees
 
-Student -> Payment: Submit payment confirmation\n(feeId, evidence)
-Payment -> Fee: Set status = payment_pending
-Payment --> Student: Show status = payment_pending
+Student -> Fee: Submit payment confirmation\n(feeId)
+Fee -> Fee: Validate ownership and status
+Fee -> Fee: Set status = payment_pending
+Fee --> Student: Show status = payment_pending
 
-Staff -> Payment: Review payment confirmation
-Payment --> Staff: Show details
+Staff -> Fee: Review payment confirmation
+Fee --> Staff: Show details
 
-Staff -> Payment: Approve payment
-Payment -> Fee: Update status\npayment_pending -> paid
-Payment -> Fee: Set paid_date = today
-Payment --> Staff: Confirm approval
-Fee --> Student: Notify fee paid
+alt Staff approves payment
+  Staff -> Fee: Approve payment
+  Fee -> Fee: Update status\npayment_pending -> paid
+  Fee -> Fee: Set paid_date and processed_by
+  Fee --> Staff: Confirm approval
+  Fee --> Student: Notify fee paid
+else Staff rejects payment
+  Staff -> Fee: Reject payment
+  Fee -> Fee: Update status\npayment_pending -> pending
+  Fee -> Fee: Clear paid_date
+  Fee --> Staff: Confirm rejection
+  Fee --> Student: Notify payment rejected
+end
 
 Staff -> Receipt: Generate receipt\n(feeId)
 Receipt --> Staff: PDF file generated

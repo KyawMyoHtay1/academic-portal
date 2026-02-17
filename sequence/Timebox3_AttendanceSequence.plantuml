@@ -7,7 +7,9 @@ actor Staff as "Staff/Admin"
 
 participant "Subject" as Subject
 participant "Attendance" as Attendance
-participant "LowAttendanceAlert" as Alert
+participant "Notification" as Notification
+participant "LowAttendanceAlertJob" as AlertJob
+participant "LowAttendanceAlertState" as AlertState
 
 Teacher -> Subject: View timetable and sessions
 Subject --> Teacher: Show session list
@@ -18,13 +20,19 @@ Attendance -> Attendance: Validate enrolled students
 Attendance -> Attendance: Save / update records
 Attendance --> Teacher: Confirm attendance saved
 
-Attendance -> Alert: Check low attendance\nper student
-Alert -> Student: Send alert\n(if below threshold)
+Attendance -> Notification: Send AttendanceAlert\n(per recorded student)
+Notification -> Student: Notify attendance recorded
 
 Student -> Attendance: View my attendance
 Attendance --> Student: Show overall and per-course stats
 
 Staff -> Attendance: View attendance report
 Attendance --> Staff: Show statistics and\nlow attendance list
+
+Staff -> AlertJob: Dispatch low attendance alert job
+AlertJob -> Attendance: Aggregate attendance rates
+AlertJob -> AlertState: Evaluate threshold + cooldown
+AlertJob -> Notification: Send LowAttendanceAlert\n(only eligible students)
+Notification -> Student: Notify low attendance
 
 @enduml

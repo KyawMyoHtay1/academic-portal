@@ -18,10 +18,17 @@ Enrolment --> Student: Show status = pending
 Staff -> Enrolment: View pending enrolment requests
 Enrolment --> Staff: Display pending list
 
-Staff -> Enrolment: Approve enrolment\n(enrolmentId)
-Enrolment -> Enrolment: Update status\npending -> approved
-Enrolment --> Staff: Confirm approval
+alt Staff approves request
+  Staff -> Enrolment: Approve enrolment\n(enrolmentId)
+  Enrolment -> Enrolment: Update status\npending -> approved
+  Enrolment --> Staff: Confirm approval
+else Staff rejects request
+  Staff -> Enrolment: Reject enrolment\n(enrolmentId)
+  Enrolment -> Enrolment: Update status\npending -> rejected
+  Enrolment --> Staff: Confirm rejection
+end
 
-Enrolment --> Student: Notify enrolment approved
+Student -> Enrolment: View my registration status
+Enrolment --> Student: Show updated status\n(approved/rejected)
 
 @enduml
