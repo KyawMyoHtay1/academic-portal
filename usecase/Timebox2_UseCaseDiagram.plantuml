@@ -4,7 +4,6 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam dpi 300
 
-' Detailed diagram - covers full FR list 5.2.1 (ML level)
 scale 0.85
 skinparam defaultFontSize 9
 skinparam ranksep 8
@@ -18,11 +17,12 @@ actor Staff   #LightGreen
 rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignment (Detailed)" #White {
 
   rectangle "Manage Grade" #AliceBlue {
-    usecase "Record Grade" as UC1
+    usecase "Submit Final Grade" as UC1
     usecase "Approve Grade" as UC2a
     usecase "Reject Grade" as UC2b
-    usecase "View Grades" as UC3
-    usecase "Search Grades" as UC4
+    usecase "View Grade" as UC3
+    usecase "Search Grade" as UC4
+    usecase "Calculate Computed Grade" as UC7
   }
 
   rectangle "Manage Fee" #MintCream {
@@ -30,7 +30,7 @@ rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignme
     usecase "Update Fee" as UC5b
     usecase "Delete Fee" as UC5c
     usecase "Search Fee" as UC5d
-    usecase "View Fees" as UC5
+    usecase "View Fee" as UC5
     usecase "Track Late Payment" as UC5e
   }
 
@@ -56,40 +56,45 @@ rectangle "University Academic Portal\nTimebox 2: Grades, Fee Payment & Assignme
   }
 }
 
+' Optional UML relationship: Viewing grade includes computing grade
+UC3 ..> UC7 : <<include>>
+
 ' Student
-Student -[#2563EB]-> UC3
-Student -[#2563EB]-> UC4
-Student -[#2563EB]-> UC5
-Student -[#2563EB]-> UC6a
-Student -[#2563EB]-> UC6b
-Student -[#2563EB]-> UC11
-Student -[#2563EB]-> UC11b
-Student -[#2563EB]-> UC13
+Student --> UC3
+Student --> UC4
+Student --> UC7
+Student --> UC5
+Student --> UC6a
+Student --> UC6b
+Student --> UC11
+Student --> UC11b
+Student --> UC13
 
 ' Teacher
-Teacher -[#CA8A04]-> UC1
-Teacher -[#CA8A04]-> UC3
-Teacher -[#CA8A04]-> UC4
-Teacher -[#CA8A04]-> UC10a
-Teacher -[#CA8A04]-> UC10b
-Teacher -[#CA8A04]-> UC10c
-Teacher -[#CA8A04]-> UC10d
-Teacher -[#CA8A04]-> UC10e
-Teacher -[#CA8A04]-> UC10f
-Teacher -[#CA8A04]-> UC12
-Teacher -[#CA8A04]-> UC13
+Teacher --> UC1
+Teacher --> UC3
+Teacher --> UC4
+Teacher --> UC7
+Teacher --> UC10a
+Teacher --> UC10b
+Teacher --> UC10c
+Teacher --> UC10d
+Teacher --> UC10e
+Teacher --> UC10f
+Teacher --> UC12
+Teacher --> UC13
 
 ' Staff
-Staff -[#16A34A]-> UC2a
-Staff -[#16A34A]-> UC2b
-Staff -[#16A34A]-> UC4
-Staff -[#16A34A]-> UC5a
-Staff -[#16A34A]-> UC5b
-Staff -[#16A34A]-> UC5c
-Staff -[#16A34A]-> UC5d
-Staff -[#16A34A]-> UC5e
-Staff -[#16A34A]-> UC6c
-Staff -[#16A34A]-> UC6d
-Staff -[#16A34A]-> UC6e
+Staff --> UC2a
+Staff --> UC2b
+Staff --> UC4
+Staff --> UC5a
+Staff --> UC5b
+Staff --> UC5c
+Staff --> UC5d
+Staff --> UC5e
+Staff --> UC6c
+Staff --> UC6d
+Staff --> UC6e
 
 @enduml
