@@ -306,6 +306,8 @@ class TeacherAssignmentController extends Controller
             'assignment' => [
                 'id' => $assignment->id,
                 'title' => $assignment->title,
+                'due_date' => $assignment->due_date?->format('Y-m-d'),
+                'due_time' => $assignment->due_time ? (is_string($assignment->due_time) ? substr($assignment->due_time, 0, 5) : $assignment->due_time->format('H:i')) : null,
                 'max_score' => $assignment->max_score,
                 'subject' => [
                     'id' => $assignment->subject->id,

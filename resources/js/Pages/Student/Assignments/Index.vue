@@ -23,24 +23,58 @@ const filtered = computed(() => {
     let list = props.assignments ?? [];
 
     if (statusFilter.value === "pending") {
-        list = list.filter((a) => !a.submission && a.can_submit);
+        list = list.filter((assignment) => !assignment.submission && assignment.can_submit);
     } else if (statusFilter.value === "submitted") {
-        list = list.filter((a) => a.submission && !a.submission.score);
+        list = list.filter(
+            (assignment) =>
+                assignment.submission &&
+                (assignment.submission.score === null || assignment.submission.score === undefined)
+        );
     } else if (statusFilter.value === "graded") {
-        list = list.filter((a) => a.submission?.score !== null && a.submission?.score !== undefined);
+        list = list.filter(
+            (assignment) =>
+                assignment.submission?.score !== null && assignment.submission?.score !== undefined
+        );
     }
 
     if (q) {
-        list = list.filter((a) => {
-            const title = (a.title ?? "").toLowerCase();
-            const subject = `${a.subject?.subject_code ?? ""} ${a.subject?.title ?? ""}`.toLowerCase();
-            const course = `${a.course?.course_code ?? ""} ${a.course?.title ?? ""}`.toLowerCase();
+        list = list.filter((assignment) => {
+            const title = (assignment.title ?? "").toLowerCase();
+            const subject = `${assignment.subject?.subject_code ?? ""} ${assignment.subject?.title ?? ""}`.toLowerCase();
+            const course = `${assignment.course?.course_code ?? ""} ${assignment.course?.title ?? ""}`.toLowerCase();
             return title.includes(q) || subject.includes(q) || course.includes(q);
         });
     }
 
     return list;
 });
+
+const formatDue = (assignment) => {
+    if (!assignment?.due_date) return "-";
+
+    const [year, month, day] = String(assignment.due_date)
+        .split("-")
+        .map((part) => parseInt(part, 10));
+
+    const dueDate = new Date(year, month - 1, day);
+
+    if (Number.isNaN(dueDate.getTime())) {
+        return assignment.due_time
+            ? `${assignment.due_date}, ${assignment.due_time}`
+            : assignment.due_date;
+    }
+
+    const dateLabel = new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(dueDate);
+
+    return assignment.due_time ? `${dateLabel}, ${assignment.due_time}` : dateLabel;
+};
+
+const hasScore = (assignment) =>
+    assignment?.submission?.score !== null && assignment?.submission?.score !== undefined;
 </script>
 
 <template>
@@ -91,15 +125,22 @@ const filtered = computed(() => {
                                 <input
                                     v-model="query"
                                     type="search"
-                                    placeholder="Search assignments…"
+                                    placeholder="Search assignments..."
                                     class="block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div v-if="filtered.length === 0" class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500">
-                        {{ query.trim() || statusFilter !== 'all' ? "No assignments match your filters." : "No assignments available." }}
+                    <div
+                        v-if="filtered.length === 0"
+                        class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500"
+                    >
+                        {{
+                            query.trim() || statusFilter !== "all"
+                                ? "No assignments match your filters."
+                                : "No assignments available."
+                        }}
                     </div>
 
                     <div v-else class="space-y-4">
@@ -133,23 +174,71 @@ const filtered = computed(() => {
                                             Submitted
                                         </span>
                                     </div>
+
                                     <p class="mt-1 text-xs text-slate-500">
                                         {{ assignment.subject.subject_code }} - {{ assignment.subject.title }}
                                     </p>
                                     <p class="mt-1 text-xs text-slate-500">
                                         {{ assignment.course.course_code }} - {{ assignment.course.title }}
                                     </p>
-                                    <p v-if="assignment.description" class="mt-2 text-sm text-slate-700 line-clamp-2">
+
+                                    <p
+                                        v-if="assignment.description"
+                                        class="mt-2 line-clamp-2 text-sm text-slate-700"
+                                    >
                                         {{ assignment.description }}
                                     </p>
-                                    <div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                                        <span>Due: {{ assignment.due_date }}{{ assignment.due_time ? ` at ${assignment.due_time}` : "" }}</span>
-                                        <span>Max score: {{ assignment.max_score }}</span>
-                                        <span v-if="assignment.submission?.score !== null && assignment.submission?.score !== undefined" class="font-semibold text-emerald-700">
-                                            Score: {{ assignment.submission.score }}/{{ assignment.max_score }} ({{ assignment.submission.percentage }}%)
-                                        </span>
+
+                                    <div class="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Due
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ formatDue(assignment) }}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Max Score
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ assignment.max_score }} points
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Submission
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{
+                                                    assignment.submission
+                                                        ? `Submitted: ${assignment.submission.submitted_at}`
+                                                        : "Not submitted yet"
+                                                }}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Result
+                                            </p>
+                                            <p
+                                                v-if="hasScore(assignment)"
+                                                class="mt-1 text-xs font-semibold text-emerald-700"
+                                            >
+                                                {{ assignment.submission.score }}/{{ assignment.max_score }}
+                                                ({{ assignment.submission.percentage }}%)
+                                            </p>
+                                            <p v-else class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ assignment.submission ? "Waiting for grading" : "-" }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="flex flex-col items-end gap-2">
                                     <Link
                                         :href="route('student.assignments.show', assignment.id)"

@@ -22,12 +22,58 @@ const activeGrading = ref(null);
 const filtered = computed(() => {
     const q = searchQuery.value.trim().toLowerCase();
     if (!q) return props.submissions;
-    return props.submissions.filter((s) => {
-        const name = (s.student?.full_name ?? "").toLowerCase();
-        const no = (s.student?.student_no ?? "").toLowerCase();
-        return name.includes(q) || no.includes(q);
+
+    return props.submissions.filter((submission) => {
+        const name = (submission.student?.full_name ?? "").toLowerCase();
+        const studentNo = (submission.student?.student_no ?? "").toLowerCase();
+        return name.includes(q) || studentNo.includes(q);
     });
 });
+
+const totalSubmissions = computed(() => Number(props.submissions?.length ?? 0));
+
+const gradedSubmissions = computed(() =>
+    Number(
+        (props.submissions ?? []).filter(
+            (submission) =>
+                submission.status === "graded" ||
+                (submission.score !== null && submission.score !== undefined)
+        ).length
+    )
+);
+
+const submissionPercent = computed(() => {
+    if (totalSubmissions.value <= 0) return 0;
+
+    return Math.min(
+        100,
+        Math.max(0, Math.round((gradedSubmissions.value / totalSubmissions.value) * 100))
+    );
+});
+
+const formatDue = (assignment) => {
+    if (!assignment?.due_date) return "-";
+
+    const [year, month, day] = String(assignment.due_date)
+        .split("-")
+        .map((part) => parseInt(part, 10));
+
+    const dueDate = new Date(year, month - 1, day);
+
+    if (Number.isNaN(dueDate.getTime())) {
+        return assignment.due_time
+            ? `${assignment.due_date}, ${assignment.due_time}`
+            : assignment.due_date;
+    }
+
+    const dateLabel = new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(dueDate);
+
+    return assignment.due_time ? `${dateLabel}, ${assignment.due_time}` : dateLabel;
+};
 
 const startGrading = (submission) => {
     activeGrading.value = submission.id;
@@ -93,9 +139,51 @@ const downloadFile = (submissionId) => {
                 <div class="mb-6 portal-card p-6">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Assignment</p>
                     <p class="mt-2 text-lg font-bold text-slate-900">{{ props.assignment.title }}</p>
-                    <p class="mt-1 text-xs text-slate-500">
-                        {{ props.assignment.subject.subject_code }} - Max score: {{ props.assignment.max_score }}
-                    </p>
+                    <p class="mt-1 text-xs text-slate-500">{{ props.assignment.subject.subject_code }}</p>
+
+                    <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Due
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ formatDue(props.assignment) }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Max Score
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ props.assignment.max_score }} points
+                            </p>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Submissions
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ totalSubmissions }} total, {{ gradedSubmissions }} graded
+                            </p>
+                            <div class="mt-1 h-1.5 rounded-full bg-slate-200">
+                                <div
+                                    class="h-1.5 rounded-full bg-emerald-500"
+                                    :style="{ width: `${submissionPercent}%` }"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Subject
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ props.assignment.subject.subject_code }} - {{ props.assignment.subject.title }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="portal-card p-6">
@@ -113,13 +201,16 @@ const downloadFile = (submissionId) => {
                             <input
                                 v-model="searchQuery"
                                 type="search"
-                                placeholder="Search by name or student number…"
+                                placeholder="Search by name or student number..."
                                 class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             />
                         </div>
                     </div>
 
-                    <div v-if="filtered.length === 0" class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500">
+                    <div
+                        v-if="filtered.length === 0"
+                        class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500"
+                    >
                         {{ searchQuery.trim() ? "No submissions match your search." : "No submissions yet." }}
                     </div>
 
@@ -130,8 +221,10 @@ const downloadFile = (submissionId) => {
                             class="rounded-lg border border-slate-200 bg-white p-4"
                         >
                             <div class="flex items-start justify-between gap-4">
-                                <div class="flex items-start gap-3 flex-1">
-                                    <div class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                                <div class="flex flex-1 items-start gap-3">
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100"
+                                    >
                                         <img
                                             v-if="submission.student?.photo"
                                             :src="`/storage/${submission.student.photo}`"
@@ -142,6 +235,7 @@ const downloadFile = (submissionId) => {
                                             {{ submission.student?.full_name?.charAt(0) ?? "?" }}
                                         </span>
                                     </div>
+
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <h3 class="text-sm font-semibold text-slate-900">
@@ -154,20 +248,24 @@ const downloadFile = (submissionId) => {
                                                 Graded
                                             </span>
                                         </div>
+
                                         <p class="text-xs text-slate-500">
-                                            {{ submission.student?.student_no }} • Submitted: {{ submission.submitted_at }}
+                                            {{ submission.student?.student_no }} - Submitted: {{ submission.submitted_at }}
                                         </p>
+
                                         <p v-if="submission.comments" class="mt-2 text-sm text-slate-700">
                                             {{ submission.comments }}
                                         </p>
+
                                         <button
                                             @click="downloadFile(submission.id)"
                                             class="mt-2 inline-flex items-center rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
                                         >
-                                            📎 {{ submission.original_filename }}
+                                            Download file: {{ submission.original_filename }}
                                         </button>
                                     </div>
                                 </div>
+
                                 <div v-if="submission.status === 'graded'" class="text-right">
                                     <div class="text-sm font-semibold text-slate-900">
                                         Score: {{ submission.score }}/{{ props.assignment.max_score }}
@@ -175,7 +273,10 @@ const downloadFile = (submissionId) => {
                                     <div class="text-xs text-slate-500">
                                         {{ submission.percentage }}%
                                     </div>
-                                    <div v-if="submission.feedback" class="mt-2 max-w-xs rounded-md bg-slate-50 p-2 text-xs text-slate-700">
+                                    <div
+                                        v-if="submission.feedback"
+                                        class="mt-2 max-w-xs rounded-md bg-slate-50 p-2 text-xs text-slate-700"
+                                    >
                                         {{ submission.feedback }}
                                     </div>
                                     <div class="mt-1 text-xs text-slate-500">
@@ -184,8 +285,10 @@ const downloadFile = (submissionId) => {
                                 </div>
                             </div>
 
-                            <!-- Grading Form -->
-                            <div v-if="activeGrading === submission.id" class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-4">
+                            <div
+                                v-if="activeGrading === submission.id"
+                                class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-4"
+                            >
                                 <form @submit.prevent="submitGrade(submission.id)">
                                     <div class="space-y-3">
                                         <div>
@@ -205,6 +308,7 @@ const downloadFile = (submissionId) => {
                                                 {{ gradingForm.errors.score }}
                                             </p>
                                         </div>
+
                                         <div>
                                             <label class="block text-xs font-medium text-slate-700">
                                                 Feedback (optional)
@@ -215,6 +319,7 @@ const downloadFile = (submissionId) => {
                                                 class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                             ></textarea>
                                         </div>
+
                                         <div class="flex items-center justify-end gap-2">
                                             <button
                                                 type="button"
@@ -235,7 +340,6 @@ const downloadFile = (submissionId) => {
                                 </form>
                             </div>
 
-                            <!-- Grade Button -->
                             <div v-else-if="submission.status !== 'graded'" class="mt-4 flex justify-end">
                                 <button
                                     @click="startGrading(submission)"
