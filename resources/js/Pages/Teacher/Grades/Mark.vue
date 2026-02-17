@@ -309,9 +309,11 @@ const submit = () => {
                                         <tbody
                                             class="divide-y divide-slate-200 bg-white"
                                         >
-                                            <tr
+                                            <template
                                                 v-for="entry in gradeEntries"
                                                 :key="entry.record.student_id"
+                                            >
+                                            <tr
                                                 class="bg-white hover:bg-slate-50 transition-colors"
                                             >
                                                 <td
@@ -557,6 +559,7 @@ const submit = () => {
                                                     </div>
                                                 </td>
                                             </tr>
+                                            </template>
                                             <tr v-if="gradeEntries.length === 0">
                                                 <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
                                                     {{ query.trim() ? "No students match your search." : "No students found." }}
