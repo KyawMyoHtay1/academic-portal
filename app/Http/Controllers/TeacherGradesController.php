@@ -158,8 +158,9 @@ class TeacherGradesController extends Controller
                 continue;
             }
 
-            // Save grade (idempotent via updateOrCreate) and notify student
-            $grade = Grade::updateOrCreate(
+            // Save as draft (idempotent via updateOrCreate). Drafts do NOT notify staff
+            // and do NOT create review logs until the teacher submits final grade.
+            Grade::updateOrCreate(
                 [
                     'subject_id' => $subject->id,
                     'student_id' => $record['student_id'],
@@ -168,38 +169,12 @@ class TeacherGradesController extends Controller
                     'course_id' => $subject->course_id,
                     'graded_by' => $user->id,
                     'score' => $score,
-                    // Submit for review; staff/admin will approve to publish.
-                    'status' => Grade::STATUS_PENDING,
+                    'status' => Grade::STATUS_DRAFT,
                     'reviewed_by' => null,
                     'reviewed_at' => null,
                     'rejection_reason' => null,
                 ]
             );
-
-            GradeReviewLog::create([
-                'grade_id' => $grade->id,
-                'performed_by' => $user->id,
-                'action' => 'submitted',
-                'meta' => [
-                    'subject_id' => $subject->id,
-                    'course_id' => $subject->course_id,
-                ],
-            ]);
-
-            Log::info('grade.review_submitted', [
-                'grade_id' => $grade->id,
-                'subject_id' => $subject->id,
-                'course_id' => $subject->course_id,
-                'student_id' => (int) $record['student_id'],
-                'submitted_by' => $user->id,
-            ]);
-
-            // Notify staff/admin users that a grade needs review.
-            $student = Student::find($record['student_id']);
-            $staffUsers = User::where('role', 'staff')->get(['id', 'name', 'email']);
-            foreach ($staffUsers as $staff) {
-                $staff->notify(new GradeReviewRequested($grade, $student, $subject));
-            }
 
             $savedCount++;
         }
@@ -207,7 +182,7 @@ class TeacherGradesController extends Controller
         if ($savedCount > 0) {
             return redirect()
                 ->route('teacher.grades.show', $subject->id)
-                ->with('success', "Successfully submitted {$savedCount} grade(s) for review.");
+                ->with('success', "Saved {$savedCount} draft grade(s). Use \"Submit Final Grade\" to send for review.");
         }
 
         return redirect()
@@ -262,7 +237,7 @@ class TeacherGradesController extends Controller
             $score = (float) $request->input('score');
         }
 
-        // Create or update grade as pending
+        // Create or update grade as pending (submission for staff review)
         $grade = Grade::updateOrCreate(
             [
                 'subject_id' => $subject->id,

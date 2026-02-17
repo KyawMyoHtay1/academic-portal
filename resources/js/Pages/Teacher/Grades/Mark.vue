@@ -116,6 +116,7 @@ const stats = computed(() => {
 });
 
 const reviewBadge = (status) => {
+    if (status === "draft") return { label: "Draft", class: "bg-slate-100 text-slate-700" };
     if (status === "approved") return { label: "Approved", class: "bg-emerald-100 text-emerald-800" };
     if (status === "rejected") return { label: "Rejected", class: "bg-red-100 text-red-800" };
     if (status === "pending") return { label: "Pending review", class: "bg-amber-100 text-amber-800" };
@@ -610,7 +611,7 @@ const submit = () => {
                                     <span v-if="form.processing">
                                         Saving...
                                     </span>
-                                    <span v-else>Save Grades</span>
+                                    <span v-else>Save Draft Grades</span>
                                 </button>
                             </div>
                         </div>

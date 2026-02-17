@@ -10,6 +10,8 @@ class Grade extends Model
 {
     use HasFactory;
 
+    public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PENDING = 'pending';
 
     public const STATUS_APPROVED = 'approved';
@@ -73,6 +75,11 @@ class Grade extends Model
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_PENDING);
+    }
+
+    public function scopeDraft(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_DRAFT);
     }
 
     public function scopeApproved(Builder $query): Builder
