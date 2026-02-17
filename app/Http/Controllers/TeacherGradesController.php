@@ -140,10 +140,19 @@ class TeacherGradesController extends Controller
         $data = $request->validated();
 
         // Verify all students are enrolled in the subject's course
-        $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
+        $enrolledStudents = $subject->course->students()->get([
+            'students.id',
+            'students.full_name',
+        ]);
+        $enrolledStudentIds = $enrolledStudents->pluck('id')->toArray();
+        $existingGrades = Grade::where('subject_id', $subject->id)
+            ->whereIn('student_id', $enrolledStudentIds)
+            ->get(['id', 'student_id', 'status'])
+            ->keyBy('student_id');
 
         // Filter and save only grades with scores (skip empty ones)
         $savedCount = 0;
+        $lockedCount = 0;
         foreach ($data['grades'] as $record) {
             // Skip if student is not enrolled
             if (! in_array($record['student_id'], $enrolledStudentIds)) {
@@ -155,6 +164,16 @@ class TeacherGradesController extends Controller
             // Skip if score is empty or null (but allow 0.0 as a valid grade)
             $score = $record['score'] ?? null;
             if ($score === null || $score === '') {
+                continue;
+            }
+
+            $existingGrade = $existingGrades->get($record['student_id']);
+            if (
+                $existingGrade &&
+                in_array($existingGrade->status, [Grade::STATUS_PENDING, Grade::STATUS_APPROVED], true)
+            ) {
+                $lockedCount++;
+
                 continue;
             }
 
@@ -180,9 +199,24 @@ class TeacherGradesController extends Controller
         }
 
         if ($savedCount > 0) {
-            return redirect()
+            $response = redirect()
                 ->route('teacher.grades.show', $subject->id)
                 ->with('success', "Saved {$savedCount} draft grade(s). Use \"Submit Final Grade\" to send for review.");
+
+            if ($lockedCount > 0) {
+                $response = $response->with(
+                    'info',
+                    "Skipped {$lockedCount} grade(s) because pending/approved grades are locked."
+                );
+            }
+
+            return $response;
+        }
+
+        if ($lockedCount > 0) {
+            return redirect()
+                ->route('teacher.grades.show', $subject->id)
+                ->with('info', "No grades were saved. {$lockedCount} grade(s) are locked because they are pending/approved.");
         }
 
         return redirect()
@@ -205,6 +239,22 @@ class TeacherGradesController extends Controller
         // Verify student is enrolled in the subject's course
         if (! $subject->course->students()->where('students.id', $student->id)->exists()) {
             abort(403, 'Student is not enrolled in this course.');
+        }
+
+        $existingGrade = Grade::where('subject_id', $subject->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if ($existingGrade && $existingGrade->status === Grade::STATUS_PENDING) {
+            return redirect()
+                ->back()
+                ->with('info', 'Final grade is already pending review and cannot be resubmitted.');
+        }
+
+        if ($existingGrade && $existingGrade->status === Grade::STATUS_APPROVED) {
+            return redirect()
+                ->back()
+                ->with('info', 'Final grade is already approved and locked.');
         }
 
         $request->validate([

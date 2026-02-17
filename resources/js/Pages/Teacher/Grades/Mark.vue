@@ -80,6 +80,13 @@ const hasFinalScore = (student) =>
     student?.score !== undefined &&
     student?.score !== "";
 
+const isGradeLocked = (status) =>
+    status === "pending" || status === "approved";
+
+const canSubmitFinal = (student) =>
+    !isGradeLocked(student?.status) &&
+    (student?.computed_grade !== null || hasFinalScore(student));
+
 const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
     return form.grades
@@ -270,6 +277,9 @@ const submit = () => {
                                 <p class="mt-1 text-xs text-slate-500">
                                     Enter scores (0-100) for each student
                                 </p>
+                                <p class="mt-1 text-xs text-amber-700">
+                                    Pending and approved grades are locked.
+                                </p>
                             </div>
                             <div class="relative w-full sm:w-64">
                                 <input
@@ -437,7 +447,14 @@ const submit = () => {
                                                                 min="0"
                                                                 max="100"
                                                                 step="0.01"
-                                                                class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                                :disabled="
+                                                                    isGradeLocked(
+                                                                        entry
+                                                                            .student
+                                                                            ?.status,
+                                                                    )
+                                                                "
+                                                                class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy disabled:cursor-not-allowed disabled:opacity-60"
                                                                 :class="{
                                                                     'border-emerald-300 bg-emerald-50':
                                                                         hasNumericScore(
@@ -699,15 +716,7 @@ const submit = () => {
                                                                 </span>
                                                             </button>
                                                             <button
-                                                                v-if="
-                                                                    entry
-                                                                        .student
-                                                                        ?.computed_grade !==
-                                                                        null ||
-                                                                    hasFinalScore(
-                                                                        entry.student,
-                                                                    )
-                                                                "
+                                                                v-if="canSubmitFinal(entry.student)"
                                                                 type="button"
                                                                 @click="
                                                                     openSubmitModal(
@@ -719,6 +728,18 @@ const submit = () => {
                                                                 Submit Final
                                                                 Grade
                                                             </button>
+                                                            <span
+                                                                v-else-if="
+                                                                    isGradeLocked(
+                                                                        entry
+                                                                            .student
+                                                                            ?.status,
+                                                                    )
+                                                                "
+                                                                class="text-[11px] font-medium text-slate-500"
+                                                            >
+                                                                Locked
+                                                            </span>
                                                         </div>
                                                     </td>
                                                 </tr>

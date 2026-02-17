@@ -21,6 +21,12 @@ o	Exclude ungraded assignments from calculation (do not count as 0) (LL)
 o	Return computed grade (0-100), assignment breakdown, and statistics (LL)
 o	Return null if no assignments have been graded (LL)
 o	Round computed grade to 2 decimal places (LL)
+#### Record Grade - Teacher (ML) - **UPDATED**
+o	Validate current User has Teacher role and is assigned to Subject (LL)
+o	Save entered scores as draft status (LL)
+o	Draft save does not create review log and does not notify Staff (LL)
+o	Pending and approved grades are locked from teacher editing (LL)
+o	Store graded_by as current Teacher who last edited the grade (LL)
 
 #### • Submit Final Grade - Teacher (ML) - **NEW**
 o	Validate Teacher is assigned to Subject (LL)
@@ -30,6 +36,8 @@ o	If using computed grade: validate computed grade exists (LL)
 o	If using manual input: validate Score - numeric, min: 0, max: 100 (LL)
 o	Create or update Grade record with status: pending (LL)
 o	Set graded_by to current Teacher (LL)
+o	Allow submission only when grade status is draft or rejected (LL)
+o	Prevent re-submission when grade status is pending or approved (locked) (LL)
 o	Create Review Log entry with action 'submitted' (LL)
 o	Include meta data: use_computed flag and computed_score if applicable (LL)
 o	Notify all Staff users via GradeReviewRequested notification (LL)
@@ -155,3 +163,4 @@ Add to Section A: Use Case Descriptions:
 
 **Last Updated:** Based on implementation completed on [Current Date]
 **Status:** ✅ Implemented and tested
+
