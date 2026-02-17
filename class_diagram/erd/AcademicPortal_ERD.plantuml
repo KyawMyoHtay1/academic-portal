@@ -4,262 +4,310 @@ skinparam classAttributeIconSize 0
 title University Academic Portal - Overall ERD
 
 entity "users" as User {
-  *id : int <<PK>>
+  *id : bigint <<PK>>
   --
-  name : string
-  email : string <<UK>>
-  password : string
-  role : enum
-  photo : string
-  email_verified_at : datetime
-  created_at : datetime
-  updated_at : datetime
+  name : varchar
+  email : varchar <<UK>>
+  password : varchar
+  remember_token : varchar
+  role : varchar
+  photo : varchar
+  preferences : json
+  email_verified_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 entity "students" as Student {
-  *id : int <<PK>>
-  user_id : int <<FK>>
-  student_no : string <<UK>>
-  full_name : string
+  *id : bigint <<PK>>
+  user_id : bigint <<FK>>
+  student_no : varchar <<UK>>
+  full_name : varchar
   dob : date
-  gender : enum
-  email : string
-  phone : string
-  address : string
-  programme : string
-  intake_year : int
-  status : enum
-  photo : string
-  created_at : datetime
-  updated_at : datetime
+  gender : varchar
+  nationality : varchar
+  email : varchar <<UK>>
+  phone : varchar
+  address : text
+  emergency_contact_name : varchar
+  emergency_contact_phone : varchar
+  programme : varchar
+  intake_year : varchar
+  previous_institution : varchar
+  previous_qualification : varchar
+  status : varchar
+  notes : text
+  enrollment_date : date
+  photo : varchar
+  id_card : varchar
+  transcript : varchar
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 entity "courses" as Course {
-  *id : int <<PK>>
-  course_code : string <<UK>>
-  title : string
+  *id : bigint <<PK>>
+  course_code : varchar <<UK>>
+  title : varchar
   credits : int
-  semester : string
-  photo : string
-  created_at : datetime
-  updated_at : datetime
+  semester : varchar
+  photo : varchar
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 entity "subjects" as Subject {
-  *id : int <<PK>>
-  course_id : int <<FK>>
-  subject_code : string <<UK>>
-  title : string
+  *id : bigint <<PK>>
+  course_id : bigint <<FK>>
+  subject_code : varchar <<UK>>
+  title : varchar
   credits : int
   description : text
-  photo : string
-  created_at : datetime
-  updated_at : datetime
+  photo : varchar
+  created_at : timestamp
+  updated_at : timestamp
 }
 
-entity "enrollments" as Enrollment {
-  *id : int <<PK>>
-  course_id : int <<FK>>
-  student_id : int <<FK>>
+entity "course_student" as Enrollment {
+  *id : bigint <<PK>>
+  course_id : bigint <<FK>>
+  student_id : bigint <<FK>>
   status : enum        ' pending, approved, rejected, withdrawal_pending
-  created_at : datetime
-  updated_at : datetime
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(course_id,student_id)>>
 }
 
 entity "course_teacher" as CourseTeacher {
-  *id : int <<PK>>
-  course_id : int <<FK>>
-  user_id : int <<FK>>  ' teacher
+  *id : bigint <<PK>>
+  course_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(course_id,user_id)>>
 }
 
 entity "subject_teacher" as SubjectTeacher {
-  *id : int <<PK>>
-  subject_id : int <<FK>>
-  user_id : int <<FK>>  ' teacher
+  *id : bigint <<PK>>
+  subject_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(subject_id,user_id)>>
 }
 
 entity "grades" as Grade {
-  *id : int <<PK>>
-  subject_id : int <<FK>>
-  course_id : int <<FK>>
-  student_id : int <<FK>>
-  graded_by : int <<FK>>   ' user
-  reviewed_by : int <<FK>> ' staff
-  score : decimal
-  status : enum        ' pending, approved, rejected
-  reviewed_at : datetime
-  rejection_reason : string
-  created_at : datetime
-  updated_at : datetime
+  *id : bigint <<PK>>
+  course_id : bigint <<FK,nullable>>
+  subject_id : bigint <<FK,nullable>>
+  student_id : bigint <<FK>>
+  graded_by : bigint <<FK,nullable>>
+  reviewed_by : bigint <<FK,nullable>>
+  score : decimal(5,2)
+  status : enum        ' draft, pending, approved, rejected
+  reviewed_at : timestamp
+  rejection_reason : varchar
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(subject_id,student_id)>>
 }
 
 entity "grade_review_logs" as GradeLog {
-  *id : int <<PK>>
-  grade_id : int <<FK>>
-  performed_by : int <<FK>>  ' user
-  action : string             ' submitted, approved, rejected
-  reason : string
+  *id : bigint <<PK>>
+  grade_id : bigint <<FK>>
+  performed_by : bigint <<FK,nullable>>
+  action : enum       ' submitted, approved, rejected
+  reason : varchar
   meta : json
-  created_at : datetime
-  updated_at : datetime
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 entity "fees" as Fee {
-  *id : int <<PK>>
-  student_id : int <<FK>>
-  amount : decimal
-  description : string
-  status : enum         ' pending, payment_pending, paid
+  *id : bigint <<PK>>
+  student_id : bigint <<FK>>
+  amount : decimal(10,2)
+  description : varchar
+  status : enum       ' pending, payment_pending, paid
   due_date : date
   paid_date : date
-  payment_intent_id : string
-  payment_method : string
-  payment_processed_at : datetime
-  processed_by : int <<FK>>   ' staff user
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "timetables" as Timetable {
-  *id : int <<PK>>
-  subject_id : int <<FK>>
-  created_by : int <<FK>>   ' staff
-  day_of_week : string
-  start_time : time
-  end_time : time
-  location : string
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "attendances" as Attendance {
-  *id : int <<PK>>
-  subject_id : int <<FK>>
-  student_id : int <<FK>>
-  date : date
-  status : enum      ' present, absent
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "low_attendance_alert_states" as LowAlert {
-  *id : int <<PK>>
-  student_id : int <<FK>>
-  last_rate : float
-  is_below_threshold : bool
-  last_alert_sent_at : datetime
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "announcements" as Announcement {
-  *id : int <<PK>>
-  user_id : int <<FK>>   ' author
-  title : string
-  body : text
-  priority : enum        ' info, important, urgent
-  pinned : bool
-  require_ack : bool
-  audience : json        ' roles
-  publish_at : datetime
-  expires_at : datetime
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "announcement_reads" as AnnouncementRead {
-  *id : int <<PK>>
-  announcement_id : int <<FK>>
-  user_id : int <<FK>>
-  read_at : datetime
-  acknowledged_at : datetime
-}
-
-entity "messages" as Message {
-  *id : int <<PK>>
-  sender_id : int <<FK>>    ' user
-  receiver_id : int <<FK>>  ' user
-  body : text
-  read : bool
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "notifications" as Notification {
-  *id : int <<PK>>
-  notifiable_type : string   ' User model
-  notifiable_id : int <<FK>>
-  type : string
-  data : json
-  read_at : datetime
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "contact_messages" as ContactMessage {
-  *id : int <<PK>>
-  first_name : string
-  last_name : string
-  email : string
-  phone : string
-  subject : string
-  message : text
-  is_read : bool
-  created_at : datetime
-  updated_at : datetime
-}
-
-entity "feedback_messages" as FeedbackMessage {
-  *id : int <<PK>>
-  name : string
-  email : string
-  type : string
-  message : text
-  is_read : bool
-  replied_at : datetime
-  created_at : datetime
-  updated_at : datetime
+  payment_intent_id : varchar
+  payment_method : varchar
+  payment_processed_at : timestamp
+  processed_by : bigint <<FK,nullable>>
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 entity "assignments" as Assignment {
-  *id : int <<PK>>
-  subject_id : int <<FK>>
-  course_id : int <<FK>>
-  created_by : int <<FK>>   ' teacher
-  title : string
+  *id : bigint <<PK>>
+  subject_id : bigint <<FK>>
+  course_id : bigint <<FK>>
+  created_by : bigint <<FK>>
+  title : varchar
   description : text
   due_date : date
   due_time : time
   max_score : int
-  status : enum             ' draft, published, closed
+  status : enum       ' draft, published, closed
   allowed_file_types : json
   max_file_size : int
-  created_at : datetime
-  updated_at : datetime
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 entity "assignment_submissions" as Submission {
-  *id : int <<PK>>
-  assignment_id : int <<FK>>
-  student_id : int <<FK>>
-  file_path : string
-  original_filename : string
+  *id : bigint <<PK>>
+  assignment_id : bigint <<FK>>
+  student_id : bigint <<FK>>
+  file_path : varchar
+  original_filename : varchar
   comments : text
-  score : decimal
+  score : decimal(5,2)
   feedback : text
-  graded_by : int <<FK>>
-  graded_at : datetime
-  status : enum            ' submitted, graded
-  created_at : datetime
-  updated_at : datetime
+  graded_by : bigint <<FK,nullable>>
+  graded_at : timestamp
+  status : enum       ' submitted, graded, returned
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(assignment_id,student_id)>>
+}
+
+entity "timetables" as Timetable {
+  *id : bigint <<PK>>
+  subject_id : bigint <<FK>>
+  day_of_week : varchar
+  start_time : time
+  end_time : time
+  location : varchar
+  created_by : bigint <<FK,nullable>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "attendances" as Attendance {
+  *id : bigint <<PK>>
+  subject_id : bigint <<FK>>
+  student_id : bigint <<FK>>
+  date : date
+  status : enum       ' present, absent
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(subject_id,student_id,date)>>
+}
+
+entity "low_attendance_alert_states" as LowAlert {
+  *id : bigint <<PK>>
+  student_id : bigint <<FK,UK>>
+  last_rate : decimal(5,2)
+  is_below_threshold : bool
+  last_alert_sent_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "announcements" as Announcement {
+  *id : bigint <<PK>>
+  user_id : bigint <<FK>>
+  title : varchar
+  body : text
+  priority : varchar
+  pinned : bool
+  require_ack : bool
+  audience : json
+  publish_at : timestamp
+  expires_at : timestamp
+  visible_from : timestamp
+  visible_until : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "announcement_reads" as AnnouncementRead {
+  *id : bigint <<PK>>
+  announcement_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+  read_at : timestamp
+  acknowledged_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+  --
+  <<UK(announcement_id,user_id)>>
+}
+
+entity "messages" as Message {
+  *id : bigint <<PK>>
+  sender_id : bigint <<FK>>
+  sender_role : varchar
+  receiver_id : bigint <<FK>>
+  receiver_role : varchar
+  body : text
+  read : bool
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "notifications" as Notification {
+  *id : uuid <<PK>>
+  type : varchar
+  notifiable_type : varchar
+  notifiable_id : bigint
+  data : text
+  read_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "contact_messages" as ContactMessage {
+  *id : bigint <<PK>>
+  first_name : varchar
+  last_name : varchar
+  email : varchar
+  phone : varchar
+  subject : varchar
+  message : text
+  reply : text
+  is_read : bool
+  replied_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "feedback_messages" as FeedbackMessage {
+  *id : bigint <<PK>>
+  name : varchar
+  email : varchar
+  type : varchar
+  message : text
+  is_read : bool
+  replied_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "stripe_webhook_events" as StripeWebhookEvent {
+  *id : bigint <<PK>>
+  event_id : varchar <<UK>>
+  event_type : varchar
+  payload : json
+  processed_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
 }
 
 '----------------------------------------------------
 ' Relationships
 '----------------------------------------------------
 
-User ||--o{ Student        : has 0..1 profile
-Course ||--o{ Subject       : has >
+User ||--o{ Student : has 0..1 profile
+
+Course ||--o{ Subject
 Course ||--o{ Enrollment
 Student ||--o{ Enrollment
 
@@ -272,11 +320,20 @@ User    ||--o{ SubjectTeacher : teaches
 Subject ||--o{ Grade
 Course  ||--o{ Grade
 Student ||--o{ Grade
-User    ||--o{ Grade : graded_by / reviewed_by
+User    ||--o{ Grade : graded_by
+User    ||--o{ Grade : reviewed_by
 Grade   ||--o{ GradeLog
+User    ||--o{ GradeLog : performed_by
 
 Student ||--o{ Fee
-User    ||--o{ Fee  : processed_by
+User    ||--o{ Fee : processed_by
+
+Subject ||--o{ Assignment
+Course  ||--o{ Assignment
+User    ||--o{ Assignment : created_by
+Assignment ||--o{ Submission
+Student    ||--o{ Submission
+User       ||--o{ Submission : graded_by
 
 Subject ||--o{ Timetable
 User    ||--o{ Timetable : created_by
@@ -285,20 +342,13 @@ Subject ||--o{ Attendance
 Student ||--o{ Attendance
 Student ||--o| LowAlert
 
-Student ||--o{ AssignmentSubmission
-Assignment ||--o{ Submission
-Subject ||--o{ Assignment
-Course  ||--o{ Assignment
-User    ||--o{ Assignment : created_by
-User    ||--o{ Submission : graded_by
-
-User ||--o{ Announcement
+User ||--o{ Announcement : author
 Announcement ||--o{ AnnouncementRead
 User ||--o{ AnnouncementRead
 
 User ||--o{ Message : sender
 User ||--o{ Message : receiver
 
-User ||--o{ Notification
+User ||--o{ Notification : notifiable
 
 @enduml
