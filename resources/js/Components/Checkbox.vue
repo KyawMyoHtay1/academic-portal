@@ -28,6 +28,6 @@ const onChange = (event) => {
         :value="value"
         :checked="checked"
         @change="onChange"
-        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+        class="h-4 w-4 cursor-pointer appearance-auto rounded border-gray-300 accent-indigo-600 shadow-sm focus:ring-indigo-500"
     />
 </template>

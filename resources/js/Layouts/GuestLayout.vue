@@ -308,7 +308,7 @@ const quickStats = [
     font-weight: 600;
 }
 
-.guest-form-shell :deep(input),
+.guest-form-shell :deep(input:not([type="checkbox"]):not([type="radio"])),
 .guest-form-shell :deep(select),
 .guest-form-shell :deep(textarea) {
     border-radius: 0.8rem;
@@ -318,12 +318,16 @@ const quickStats = [
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.guest-form-shell :deep(input:focus),
+.guest-form-shell :deep(input:not([type="checkbox"]):not([type="radio"]):focus),
 .guest-form-shell :deep(select:focus),
 .guest-form-shell :deep(textarea:focus) {
     border-color: rgba(11, 31, 58, 0.65);
     box-shadow: 0 0 0 3px rgba(11, 31, 58, 0.16);
     background-color: #ffffff;
+}
+
+.guest-form-shell :deep(input[type="checkbox"]) {
+    accent-color: #4f46e5;
 }
 
 .guest-form-shell :deep(button[type="submit"]),
