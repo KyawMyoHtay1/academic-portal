@@ -4,21 +4,26 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam dpi 300
 
-' Balanced size
 scale 1.0
 skinparam defaultFontSize 10
-
-' Moderate spacing (not too tight, not too wide)
 skinparam ranksep 35
 skinparam nodesep 30
 skinparam RectanglePadding 12
 
+' Actors
 actor Guest #D1D5DB
-actor Student #BFDBFE
 actor Teacher #FEF9C3
+actor Student #BFDBFE
 actor "Administrator/Staff" as Staff #FECACA
 
 rectangle "Use Case Diagram for University Academic Portal (Whole System)" #FFFFFF {
+
+  ' --- Invisible anchors (force left/right placement) ---
+  usecase " " as UC_LeftAnchor  #transparent
+  usecase " " as UC_RightAnchor #transparent
+  UC_LeftAnchor -[hidden]-> UC_RightAnchor
+
+  ' --- Real use cases ---
   usecase "Create Account" as UC_CreateAccount
   usecase "Login / Logout" as UC_LoginLogout
   usecase "Manage Profile" as UC_ManageProfile
@@ -39,10 +44,33 @@ rectangle "Use Case Diagram for University Academic Portal (Whole System)" #FFFF
   usecase "View Reports" as UC_ViewReports
 }
 
+' ---- FORCE SIDES (hidden links to anchors) ----
+Guest  -[hidden]-> UC_LeftAnchor
+Teacher-[hidden]-> UC_LeftAnchor
+
+Student-[hidden]-> UC_RightAnchor
+Staff  -[hidden]-> UC_RightAnchor
+
+' Optional: keep each side stacked nicely
+Guest -[hidden]-> Teacher
+Student -[hidden]-> Staff
+
+' ---------------- CONNECTIONS ----------------
+
 ' Guest
 Guest -[#6B7280]-> UC_CreateAccount
 Guest -[#6B7280]-> UC_LoginLogout
 Guest -[#6B7280]-> UC_ManageContactFeedback
+
+' Teacher
+Teacher -[#CA8A04]-> UC_LoginLogout
+Teacher -[#CA8A04]-> UC_ManageProfile
+Teacher -[#CA8A04]-> UC_ManageGrades
+Teacher -[#CA8A04]-> UC_ManageTimetable
+Teacher -[#CA8A04]-> UC_ManageAttendance
+Teacher -[#CA8A04]-> UC_ManageAnnouncements
+Teacher -[#CA8A04]-> UC_ManageMessages
+Teacher -[#CA8A04]-> UC_ManageNotifications
 
 ' Student
 Student -[#2563EB]-> UC_LoginLogout
@@ -56,16 +84,6 @@ Student -[#2563EB]-> UC_ManageAttendance
 Student -[#2563EB]-> UC_ManageAnnouncements
 Student -[#2563EB]-> UC_ManageMessages
 Student -[#2563EB]-> UC_ManageNotifications
-
-' Teacher
-Teacher -[#CA8A04]-> UC_LoginLogout
-Teacher -[#CA8A04]-> UC_ManageProfile
-Teacher -[#CA8A04]-> UC_ManageGrades
-Teacher -[#CA8A04]-> UC_ManageTimetable
-Teacher -[#CA8A04]-> UC_ManageAttendance
-Teacher -[#CA8A04]-> UC_ManageAnnouncements
-Teacher -[#CA8A04]-> UC_ManageMessages
-Teacher -[#CA8A04]-> UC_ManageNotifications
 
 ' Administrator / Staff
 Staff -[#DC2626]-> UC_LoginLogout
