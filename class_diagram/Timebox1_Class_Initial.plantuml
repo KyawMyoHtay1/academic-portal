@@ -1,0 +1,37 @@
+@startuml Timebox1_Class_Initial
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 1 - Initial Class Diagram (Student Registration and Course Registration)
+
+class User {
+}
+
+class Student {
+}
+
+class Course {
+}
+
+class Subject {
+}
+
+class Course_Teacher {
+}
+
+class Subject_Teacher {
+}
+
+class Course_Student {
+}
+
+' Relationships
+User "1" -- "0..1" Student : has profile
+Course "1" -- "1..*" Subject : has
+Course "1" -- "0..*" Course_Teacher
+User "1" -- "0..*" Course_Teacher : teaches
+Subject "1" -- "0..*" Subject_Teacher
+User "1" -- "0..*" Subject_Teacher : teaches
+Course "1" -- "0..*" Course_Student
+Student "1" -- "0..*" Course_Student
+
+@enduml
