@@ -129,6 +129,42 @@
             background: linear-gradient(90deg, rgba(11, 31, 58, 0.92), rgba(31, 73, 118, 0.88));
             transition: width 120ms linear;
         }
+        .guest-page-loading {
+            position: fixed;
+            top: 10px;
+            right: 12px;
+            z-index: 70;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(255, 255, 255, 0.95);
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+            transition: opacity 140ms ease, transform 140ms ease;
+        }
+        .guest-page-loading.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .guest-page-loading-spinner {
+            width: 14px;
+            height: 14px;
+            border-radius: 999px;
+            border: 2px solid rgba(11, 31, 58, 0.18);
+            border-top-color: rgba(11, 31, 58, 0.78);
+            animation: guestPageSpin 0.8s linear infinite;
+        }
+        @keyframes guestPageSpin {
+            to { transform: rotate(360deg); }
+        }
         @keyframes guestFloat {
             0%, 100% {
                 transform: translateY(0) scale(1);
@@ -249,6 +285,10 @@
     </div>
     <div class="guest-progress-track" aria-hidden="true">
         <span id="guest-scroll-progress" class="guest-progress-bar"></span>
+    </div>
+    <div id="guest-page-loading" class="guest-page-loading" aria-live="polite" role="status">
+        <span class="guest-page-loading-spinner" aria-hidden="true"></span>
+        <span>Loading...</span>
     </div>
     @php
         $guestRouteName = Route::currentRouteName();
@@ -625,6 +665,87 @@
             updateProgress();
             window.addEventListener('scroll', updateProgress, { passive: true });
             window.addEventListener('resize', updateProgress);
+        });
+
+        // Top-right loading status for guest Blade pages.
+        document.addEventListener('DOMContentLoaded', function () {
+            var pageLoading = document.getElementById('guest-page-loading');
+            if (!pageLoading) return;
+
+            var showTimer = null;
+            var isVisible = false;
+            var SHOW_DELAY_MS = 120;
+
+            function showLoading() {
+                if (isVisible) return;
+                if (showTimer) clearTimeout(showTimer);
+                showTimer = setTimeout(function () {
+                    pageLoading.classList.add('is-visible');
+                    isVisible = true;
+                }, SHOW_DELAY_MS);
+            }
+
+            function hideLoading() {
+                if (showTimer) {
+                    clearTimeout(showTimer);
+                    showTimer = null;
+                }
+                isVisible = false;
+                pageLoading.classList.remove('is-visible');
+            }
+
+            function isInternalNavigationLink(link) {
+                if (!link) return false;
+                if (link.hasAttribute('download')) return false;
+
+                var target = (link.getAttribute('target') || '').toLowerCase();
+                if (target === '_blank') return false;
+
+                var href = link.getAttribute('href') || '';
+                if (!href || href.charAt(0) === '#') return false;
+                if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0 || href.indexOf('javascript:') === 0) {
+                    return false;
+                }
+
+                var url;
+                try {
+                    url = new URL(href, window.location.href);
+                } catch (e) {
+                    return false;
+                }
+
+                if (url.origin !== window.location.origin) return false;
+                if (url.href === window.location.href) return false;
+
+                return true;
+            }
+
+            document.addEventListener('click', function (event) {
+                if (event.defaultPrevented) return;
+                if (event.button !== 0) return;
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+                var link = event.target.closest('a[href]');
+                if (!isInternalNavigationLink(link)) return;
+
+                showLoading();
+            }, true);
+
+            document.addEventListener('submit', function (event) {
+                if (event.defaultPrevented) return;
+                var form = event.target;
+                if (!(form instanceof HTMLFormElement)) return;
+
+                var method = (form.getAttribute('method') || 'get').toLowerCase();
+                var target = (form.getAttribute('target') || '').toLowerCase();
+                if (target === '_blank') return;
+                if (method !== 'get' && method !== 'post') return;
+
+                showLoading();
+            }, true);
+
+            window.addEventListener('beforeunload', showLoading);
+            window.addEventListener('pageshow', hideLoading);
         });
 
         // Guest search: search everything (courses, news, pages)
