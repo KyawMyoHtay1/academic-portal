@@ -1,46 +1,17 @@
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import PortalLogo from "@/Components/PortalLogo.vue";
 import GlobalSearch from "@/Components/GlobalSearch.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import GoogleTranslate from "@/Components/GoogleTranslate.vue";
 import PageLoadingIndicator from "@/Components/PageLoadingIndicator.vue";
+import GlobalToastStack from "@/Components/GlobalToastStack.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 
 const showingMobileSidebar = ref(false);
 const page = usePage();
 const openNavGroups = ref({});
-
-// Local flash visibility so success/error messages can auto-dismiss
-const showSuccessFlash = ref(!!page.props.flash?.success);
-const showErrorFlash = ref(!!page.props.flash?.error);
-
-watch(
-    () => page.props.flash?.success,
-    (value) => {
-        showSuccessFlash.value = !!value;
-        if (value) {
-            setTimeout(() => {
-                showSuccessFlash.value = false;
-            }, 5000);
-        }
-    },
-    { immediate: true }
-);
-
-watch(
-    () => page.props.flash?.error,
-    (value) => {
-        showErrorFlash.value = !!value;
-        if (value) {
-            setTimeout(() => {
-                showErrorFlash.value = false;
-            }, 7000);
-        }
-    },
-    { immediate: true }
-);
 
 // Icon mapping for menu items
 const getMenuIcon = (name) => {
@@ -473,65 +444,7 @@ const userRoleMeta = computed(() => {
 <template>
     <div class="min-h-screen bg-portal-background">
         <PageLoadingIndicator />
-
-        <!-- Flash messages -->
-        <div
-            class="fixed top-4 right-4 z-50 max-w-md space-y-2"
-            v-if="showSuccessFlash || showErrorFlash"
-        >
-            <div
-                v-if="showSuccessFlash && $page.props.flash?.success"
-                class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200 shadow-lg flex items-start justify-between gap-3"
-            >
-                <div class="flex items-center gap-2">
-                    <svg
-                        class="h-5 w-5 text-emerald-600"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                    <span>{{ $page.props.flash.success }}</span>
-                </div>
-                <button
-                    type="button"
-                    class="ml-2 text-emerald-700/70 hover:text-emerald-900"
-                    @click="showSuccessFlash = false"
-                >
-                    ✕
-                </button>
-            </div>
-            <div
-                v-if="showErrorFlash && $page.props.flash?.error"
-                class="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-800 ring-1 ring-red-200 shadow-lg flex items-start justify-between gap-3"
-            >
-                <div class="flex items-center gap-2">
-                    <svg
-                        class="h-5 w-5 text-red-600"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                    <span>{{ $page.props.flash.error }}</span>
-                </div>
-                <button
-                    type="button"
-                    class="ml-2 text-red-700/70 hover:text-red-900"
-                    @click="showErrorFlash = false"
-                >
-                    ✕
-                </button>
-            </div>
-        </div>
+        <GlobalToastStack />
 
         <div class="flex min-h-screen">
             <!-- Desktop sidebar -->
@@ -1164,3 +1077,4 @@ const userRoleMeta = computed(() => {
         </div>
     </div>
 </template>
+

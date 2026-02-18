@@ -97,13 +97,6 @@
                 <p class="mt-2 text-sm text-slate-600">Use the form below to share suggestions, report issues, or leave compliments. Clear, specific feedback helps us investigate quickly and apply improvements where they matter most.</p>
             </div>
 
-            @if (session('success'))
-                <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
-                    <p class="text-sm font-semibold">Feedback submitted</p>
-                    <p class="mt-1 text-sm">{{ session('success') }}</p>
-                </div>
-            @endif
-
             @if ($errors->any())
                 <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
                     <p class="text-sm font-semibold">Please fix the errors below</p>
@@ -259,7 +252,6 @@
     </section>
 </div>
 @endsection
-
 
 
 

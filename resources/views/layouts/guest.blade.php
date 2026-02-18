@@ -170,6 +170,61 @@
             border-top-color: rgba(11, 31, 58, 0.78);
             animation: guestPageSpin 0.8s linear infinite;
         }
+        .guest-toast-stack {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 85;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: min(92vw, 28rem);
+            pointer-events: none;
+        }
+        .guest-toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            border-radius: 12px;
+            border: 1px solid;
+            padding: 10px 12px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+        }
+        .guest-toast--success {
+            border-color: #a7f3d0;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+        .guest-toast--error {
+            border-color: #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .guest-toast--warning {
+            border-color: #fde68a;
+            background: #fffbeb;
+            color: #92400e;
+        }
+        .guest-toast--info {
+            border-color: #bae6fd;
+            background: #f0f9ff;
+            color: #0c4a6e;
+        }
+        .guest-toast-close {
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.75;
+            cursor: pointer;
+            padding: 0;
+        }
+        .guest-toast-close:hover {
+            opacity: 1;
+        }
         @keyframes guestPageSpin {
             to { transform: rotate(360deg); }
         }
@@ -300,6 +355,34 @@
             <span>Loading...</span>
         </span>
     </div>
+    @if (session('success') || session('error') || session('warning') || session('info'))
+        <div class="guest-toast-stack" aria-live="polite" aria-atomic="true">
+            @if (session('success'))
+                <div class="guest-toast guest-toast--success" data-guest-toast data-timeout="5000" role="status">
+                    <span>{{ session('success') }}</span>
+                    <button type="button" class="guest-toast-close" data-guest-toast-close aria-label="Dismiss notification">&times;</button>
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="guest-toast guest-toast--error" data-guest-toast data-timeout="7000" role="status">
+                    <span>{{ session('error') }}</span>
+                    <button type="button" class="guest-toast-close" data-guest-toast-close aria-label="Dismiss notification">&times;</button>
+                </div>
+            @endif
+            @if (session('warning'))
+                <div class="guest-toast guest-toast--warning" data-guest-toast data-timeout="6500" role="status">
+                    <span>{{ session('warning') }}</span>
+                    <button type="button" class="guest-toast-close" data-guest-toast-close aria-label="Dismiss notification">&times;</button>
+                </div>
+            @endif
+            @if (session('info'))
+                <div class="guest-toast guest-toast--info" data-guest-toast data-timeout="5500" role="status">
+                    <span>{{ session('info') }}</span>
+                    <button type="button" class="guest-toast-close" data-guest-toast-close aria-label="Dismiss notification">&times;</button>
+                </div>
+            @endif
+        </div>
+    @endif
     @php
         $guestRouteName = Route::currentRouteName();
 
@@ -756,6 +839,28 @@
 
             window.addEventListener('beforeunload', showLoading);
             window.addEventListener('pageshow', hideLoading);
+        });
+
+        // Auto-dismiss and close handlers for guest flash toasts.
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastNodes = document.querySelectorAll('[data-guest-toast]');
+            if (!toastNodes.length) return;
+
+            toastNodes.forEach(function (toastNode) {
+                var timeoutMs = parseInt(toastNode.getAttribute('data-timeout') || '5000', 10);
+                var closeButton = toastNode.querySelector('[data-guest-toast-close]');
+
+                function dismissToast() {
+                    if (!toastNode || !toastNode.parentNode) return;
+                    toastNode.parentNode.removeChild(toastNode);
+                }
+
+                if (closeButton) {
+                    closeButton.addEventListener('click', dismissToast);
+                }
+
+                window.setTimeout(dismissToast, timeoutMs);
+            });
         });
 
         // Guest search: search everything (courses, news, pages)

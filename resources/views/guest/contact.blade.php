@@ -99,13 +99,6 @@
                 <p class="mt-2 text-sm leading-relaxed text-slate-600">Complete the form and include enough detail—such as your role, the topic (admissions, grades, support, etc.), and what you need—so we can respond effectively. Specific requests help us reduce delays and provide more accurate guidance on the first response.</p>
             </div>
 
-            @if (session('success'))
-                <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
-                    <p class="text-sm font-semibold">Message sent</p>
-                    <p class="mt-1 text-sm">{{ session('success') }}</p>
-                </div>
-            @endif
-
             @if ($errors->any())
                 <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
                     <p class="text-sm font-semibold">Please fix the errors below</p>
@@ -289,7 +282,6 @@
     </section>
 </div>
 @endsection
-
 
 
 
