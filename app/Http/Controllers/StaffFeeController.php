@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,15 +47,19 @@ class StaffFeeController extends Controller
                 ];
             });
 
-        $query = Fee::with([
+        $with = [
             'student',
             'processor:id,name',
-            'statusLogs' => function ($q) {
+        ];
+        if ($this->hasFeeStatusLogTable()) {
+            $with['statusLogs'] = function ($q) {
                 $q->with('performer:id,name')
                     ->latest('created_at')
                     ->limit(10);
-            },
-        ]);
+            };
+        }
+
+        $query = Fee::with($with);
 
         $this->applyIndexFilters($query, $filters, $todayDate);
 
@@ -476,6 +481,10 @@ class StaffFeeController extends Controller
      */
     private function mapFeeTimeline(Fee $fee): array
     {
+        if (! $this->hasFeeStatusLogTable() || ! $fee->relationLoaded('statusLogs')) {
+            return $this->snapshotTimeline($fee);
+        }
+
         $timeline = $fee->statusLogs
             ->sortBy('created_at')
             ->values()
@@ -493,10 +502,14 @@ class StaffFeeController extends Controller
             })
             ->all();
 
-        if ($timeline !== []) {
-            return $timeline;
-        }
+        return $timeline !== [] ? $timeline : $this->snapshotTimeline($fee);
+    }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function snapshotTimeline(Fee $fee): array
+    {
         return [[
             'id' => null,
             'action' => 'snapshot',
@@ -507,6 +520,17 @@ class StaffFeeController extends Controller
             'note' => null,
             'created_at' => $fee->updated_at?->format('Y-m-d H:i'),
         ]];
+    }
+
+    private function hasFeeStatusLogTable(): bool
+    {
+        static $exists = null;
+
+        if ($exists === null) {
+            $exists = Schema::hasTable('fee_status_logs');
+        }
+
+        return (bool) $exists;
     }
 
     private function statusActionLabel(string $action, ?string $fromStatus, ?string $toStatus): string

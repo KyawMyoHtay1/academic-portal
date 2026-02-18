@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Fee extends Model
 {
@@ -173,6 +174,14 @@ class Fee extends Model
         array $meta = []
     ): void
     {
+        static $hasTable = null;
+        if ($hasTable === null) {
+            $hasTable = Schema::hasTable('fee_status_logs');
+        }
+        if (! $hasTable) {
+            return;
+        }
+
         FeeStatusLog::create([
             'fee_id' => $this->id,
             'from_status' => $fromStatus,
