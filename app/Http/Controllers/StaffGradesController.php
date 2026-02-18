@@ -190,40 +190,12 @@ class StaffGradesController extends Controller
         $this->authorize('review', $grade);
 
         $request->validated();
-        $grade->loadMissing([
-            'student.user:id,name,email',
-            'grader:id,name,email',
-            'subject:id,subject_code,title',
-        ]);
 
         if ($grade->status !== Grade::STATUS_PENDING) {
             return back()->with('info', 'Grade is not pending review.');
         }
 
-        $grade->approve(Auth::id());
-
-        GradeReviewLog::create([
-            'grade_id' => $grade->id,
-            'performed_by' => Auth::id(),
-            'action' => 'approved',
-        ]);
-
-        Log::info('grade.review_decision', [
-            'grade_id' => $grade->id,
-            'student_id' => $grade->student_id,
-            'subject_id' => $grade->subject_id,
-            'decision' => 'approved',
-            'reviewed_by' => Auth::id(),
-        ]);
-
-        // Notify student when grade is finalized (approved).
-        $student = Student::find($grade->student_id);
-        if ($student && $student->user) {
-            $student->user->notify(new GradePublished($grade));
-        }
-        if ($grade->grader && $grade->grader->id !== Auth::id()) {
-            $grade->grader->notify(new GradeReviewOutcome($grade, 'approved'));
-        }
+        $this->approvePendingGrade($grade);
 
         return back()->with('success', 'Grade approved and published.');
     }
@@ -233,38 +205,72 @@ class StaffGradesController extends Controller
         $this->authorize('review', $grade);
 
         $data = $request->validated();
-        $grade->loadMissing([
-            'student.user:id,name,email',
-            'grader:id,name,email',
-            'subject:id,subject_code,title',
-        ]);
 
         if ($grade->status !== Grade::STATUS_PENDING) {
             return back()->with('info', 'Grade is not pending review.');
         }
 
-        $grade->reject(Auth::id(), $data['reason'] ?? null);
-
-        GradeReviewLog::create([
-            'grade_id' => $grade->id,
-            'performed_by' => Auth::id(),
-            'action' => 'rejected',
-            'reason' => $data['reason'] ?? null,
-        ]);
-
-        Log::info('grade.review_decision', [
-            'grade_id' => $grade->id,
-            'student_id' => $grade->student_id,
-            'subject_id' => $grade->subject_id,
-            'decision' => 'rejected',
-            'reason' => $data['reason'] ?? null,
-            'reviewed_by' => Auth::id(),
-        ]);
-        if ($grade->grader && $grade->grader->id !== Auth::id()) {
-            $grade->grader->notify(new GradeReviewOutcome($grade, 'rejected', $data['reason'] ?? null));
-        }
+        $this->rejectPendingGrade($grade, $data['reason'] ?? null);
 
         return back()->with('success', 'Grade rejected.');
+    }
+
+    public function bulkReview(Request $request): RedirectResponse
+    {
+        $this->authorize('viewAny', Grade::class);
+
+        $data = $request->validate([
+            'grade_ids' => ['required', 'array', 'min:1'],
+            'grade_ids.*' => ['integer', 'distinct', 'exists:grades,id'],
+            'action' => ['required', 'in:approve,reject'],
+            'reason' => ['nullable', 'string', 'max:255', 'required_if:action,reject'],
+        ]);
+
+        $reason = trim((string) ($data['reason'] ?? ''));
+        if ($data['action'] === 'reject' && $reason === '') {
+            return back()->withErrors(['reason' => 'A rejection reason is required for bulk reject.']);
+        }
+
+        $grades = Grade::query()
+            ->whereIn('id', $data['grade_ids'])
+            ->with([
+                'student.user:id,name,email',
+                'grader:id,name,email',
+                'subject:id,subject_code,title',
+            ])
+            ->get();
+
+        $processed = 0;
+        $skipped = 0;
+
+        foreach ($grades as $grade) {
+            $this->authorize('review', $grade);
+
+            if ($grade->status !== Grade::STATUS_PENDING) {
+                $skipped++;
+                continue;
+            }
+
+            if ($data['action'] === 'approve') {
+                $this->approvePendingGrade($grade);
+            } else {
+                $this->rejectPendingGrade($grade, $reason);
+            }
+
+            $processed++;
+        }
+
+        if ($processed === 0) {
+            return back()->with('info', 'No pending grades were processed.');
+        }
+
+        $actionLabel = $data['action'] === 'approve' ? 'approved' : 'rejected';
+        $message = ucfirst($actionLabel)." {$processed} grade(s).";
+        if ($skipped > 0) {
+            $message .= " Skipped {$skipped} non-pending grade(s).";
+        }
+
+        return back()->with('success', $message);
     }
 
     /**
@@ -318,5 +324,68 @@ class StaffGradesController extends Controller
                 ] : null,
             ];
         });
+    }
+
+    private function approvePendingGrade(Grade $grade): void
+    {
+        $grade->loadMissing([
+            'student.user:id,name,email',
+            'grader:id,name,email',
+            'subject:id,subject_code,title',
+        ]);
+
+        $grade->approve(Auth::id());
+
+        GradeReviewLog::create([
+            'grade_id' => $grade->id,
+            'performed_by' => Auth::id(),
+            'action' => 'approved',
+        ]);
+
+        Log::info('grade.review_decision', [
+            'grade_id' => $grade->id,
+            'student_id' => $grade->student_id,
+            'subject_id' => $grade->subject_id,
+            'decision' => 'approved',
+            'reviewed_by' => Auth::id(),
+        ]);
+
+        $student = Student::find($grade->student_id);
+        if ($student && $student->user) {
+            $student->user->notify(new GradePublished($grade));
+        }
+        if ($grade->grader && $grade->grader->id !== Auth::id()) {
+            $grade->grader->notify(new GradeReviewOutcome($grade, 'approved'));
+        }
+    }
+
+    private function rejectPendingGrade(Grade $grade, ?string $reason = null): void
+    {
+        $grade->loadMissing([
+            'student.user:id,name,email',
+            'grader:id,name,email',
+            'subject:id,subject_code,title',
+        ]);
+
+        $grade->reject(Auth::id(), $reason);
+
+        GradeReviewLog::create([
+            'grade_id' => $grade->id,
+            'performed_by' => Auth::id(),
+            'action' => 'rejected',
+            'reason' => $reason,
+        ]);
+
+        Log::info('grade.review_decision', [
+            'grade_id' => $grade->id,
+            'student_id' => $grade->student_id,
+            'subject_id' => $grade->subject_id,
+            'decision' => 'rejected',
+            'reason' => $reason,
+            'reviewed_by' => Auth::id(),
+        ]);
+        if ($grade->grader && $grade->grader->id !== Auth::id()) {
+            $grade->grader->notify(new GradeReviewOutcome($grade, 'rejected', $reason));
+        }
     }
 }

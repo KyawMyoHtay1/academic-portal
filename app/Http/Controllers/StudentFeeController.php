@@ -68,31 +68,33 @@ class StudentFeeController extends Controller
                 ->with('error', 'Student record not found.');
         }
 
-        // Verify the fee belongs to the student
         if ($fee->student_id !== $student->id) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'You are not authorized to access this fee.');
         }
 
-        // Check if fee is already paid or has pending payment confirmation
-        if ($fee->status === 'paid') {
+        if ($fee->status === Fee::STATUS_PAID) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'This fee has already been marked as paid.');
         }
 
-        if ($fee->status === 'payment_pending') {
+        if ($fee->status === Fee::STATUS_PAYMENT_PENDING) {
             return redirect()
                 ->route('student.fees.index')
                 ->with('error', 'You already have a pending payment confirmation for this fee.');
         }
 
-        // Update fee status to payment_pending
-        $fee->markAsPaymentPending($fee->payment_intent_id);
+        $fee->markAsPaymentPending(
+            $fee->payment_intent_id,
+            Auth::id(),
+            'student_submitted_payment',
+            'Student submitted payment confirmation.'
+        );
 
         return redirect()
             ->route('student.fees.index')
-            ->with('success', "Payment confirmation submitted for fee of £{$fee->amount}. Waiting for admin approval.");
+            ->with('success', "Payment confirmation submitted for fee of GBP {$fee->amount}. Waiting for admin approval.");
     }
 }

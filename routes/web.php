@@ -497,10 +497,12 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         ]);
         Route::post('/admin/fees/{fee}/approve-payment', [StaffFeeController::class, 'approvePayment'])->name('admin.fees.approve-payment');
         Route::post('/admin/fees/{fee}/reject-payment', [StaffFeeController::class, 'rejectPayment'])->name('admin.fees.reject-payment');
+        Route::post('/admin/fees/{fee}/send-reminder', [StaffFeeController::class, 'sendReminder'])->name('admin.fees.send-reminder');
         Route::get('/admin/fees/{fee}/receipt', [StaffFeeController::class, 'receipt'])->name('admin.fees.receipt');
 
         // Grades Review & Approval (staff only)
         Route::get('/admin/grades', [StaffGradesController::class, 'index'])->name('admin.grades.index');
+        Route::post('/admin/grades/bulk-review', [StaffGradesController::class, 'bulkReview'])->name('admin.grades.bulk-review');
         Route::get('/admin/grades/{subject}/export/{format}', [StaffGradesController::class, 'export'])->name('admin.grades.export');
         Route::get('/admin/grades/{subject}', [StaffGradesController::class, 'show'])->name('admin.grades.show');
         Route::post('/admin/grades/{grade}/approve', [StaffGradesController::class, 'approve'])->name('admin.grades.approve');

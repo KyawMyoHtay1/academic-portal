@@ -48,13 +48,19 @@ class PaymentService
         ]);
     }
 
-    public function markCheckoutStarted(Fee $fee, string $paymentIntentId, int $studentId): void
+    public function markCheckoutStarted(Fee $fee, string $paymentIntentId, int $performedByUserId): void
     {
-        $fee->markAsPaymentPending($paymentIntentId);
+        $fee->markAsPaymentPending(
+            $paymentIntentId,
+            $performedByUserId,
+            'checkout_started',
+            'Stripe checkout started by student.'
+        );
 
         Log::info('payment.checkout_started', [
             'fee_id' => $fee->id,
-            'student_id' => $studentId,
+            'student_id' => $fee->student_id,
+            'performed_by' => $performedByUserId,
             'payment_intent_id' => $paymentIntentId,
         ]);
     }
@@ -76,7 +82,11 @@ class PaymentService
         }
 
         if ($session->payment_status !== 'paid' && $fee->status === Fee::STATUS_PAYMENT_PENDING) {
-            $fee->markAsPending();
+            $fee->markAsPending(
+                null,
+                'checkout_session_unpaid',
+                'Checkout session completed without successful payment.'
+            );
         }
 
         return false;
@@ -88,7 +98,11 @@ class PaymentService
             return false;
         }
 
-        $fee->markAsPending();
+        $fee->markAsPending(
+            null,
+            'checkout_cancelled',
+            'Student cancelled Stripe checkout before payment.'
+        );
 
         return true;
     }
@@ -195,7 +209,10 @@ class PaymentService
 
             $fee->markAsPaid(
                 $paymentIntent->payment_method_types[0] ?? 'card',
-                $paymentIntentId
+                $paymentIntentId,
+                null,
+                'payment_confirmed',
+                'Payment confirmed via Stripe webhook/session.'
             );
 
             return [
@@ -262,7 +279,11 @@ class PaymentService
                 return false;
             }
 
-            $fee->markAsPending();
+            $fee->markAsPending(
+                null,
+                'payment_failed',
+                'Payment failed in Stripe webhook event.'
+            );
 
             return true;
         });

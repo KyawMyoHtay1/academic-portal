@@ -23,6 +23,7 @@ const form = useForm({
 });
 
 const query = ref("");
+const quickFilter = ref("all");
 const expandedStudents = ref(new Set());
 const showSubmitModal = ref(false);
 const selectedStudent = ref(null);
@@ -114,10 +115,26 @@ const studentsById = computed(
 
 const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
+
     return form.grades
         .map((record) => {
             const student = studentsById.value.get(record.student_id);
             return { record, student };
+        })
+        .filter((entry) => {
+            const status = entry.student?.status ?? null;
+
+            if (quickFilter.value === "needs_action") {
+                return status === null || status === "draft" || status === "rejected";
+            }
+            if (quickFilter.value === "rejected") {
+                return status === "rejected";
+            }
+            if (quickFilter.value === "missing_computed") {
+                return entry.student?.computed_grade === null;
+            }
+
+            return true;
         })
         .filter((entry) => {
             if (!q) return true;
@@ -478,22 +495,36 @@ const submit = () => {
                                     Pending and approved grades are locked.
                                 </p>
                             </div>
-                            <div class="relative w-full sm:w-64">
-                                <input
-                                    v-model="query"
-                                    type="text"
-                                    placeholder="Search students..."
-                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                                />
-                                <button
-                                    v-if="query"
-                                    type="button"
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                    @click="query = ''"
+                            <div
+                                class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
+                            >
+                                <select
+                                    v-model="quickFilter"
+                                    class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-56"
                                 >
-                                    <span class="sr-only">Clear</span>
-                                    x
-                                </button>
+                                    <option value="all">All students</option>
+                                    <option value="needs_action">Needs action</option>
+                                    <option value="rejected">Rejected only</option>
+                                    <option value="missing_computed">Missing computed grade</option>
+                                </select>
+
+                                <div class="relative w-full sm:w-64">
+                                    <input
+                                        v-model="query"
+                                        type="text"
+                                        placeholder="Search students..."
+                                        class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                    />
+                                    <button
+                                        v-if="query"
+                                        type="button"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                        @click="query = ''"
+                                    >
+                                        <span class="sr-only">Clear</span>
+                                        x
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
