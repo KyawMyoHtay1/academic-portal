@@ -72,39 +72,45 @@ onBeforeUnmount(() => {
     >
         <div
             v-if="isLoading"
-            class="pointer-events-none fixed inset-x-0 top-0 z-[120]"
+            class="pointer-events-none fixed inset-0 z-[120]"
             role="status"
             aria-live="polite"
             aria-label="Loading"
         >
-            <div class="h-0.5 w-full overflow-hidden bg-slate-200/80">
+            <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-[1px]"></div>
+
+            <div class="absolute inset-x-0 top-0 h-1 w-full overflow-hidden bg-slate-200/90">
                 <div class="h-full w-1/3 bg-portal-navy loading-bar"></div>
             </div>
 
             <div
-                class="absolute right-4 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-1 text-xs font-semibold text-slate-700 shadow-md"
+                class="absolute inset-0 flex items-center justify-center px-4"
             >
-                <svg
-                    class="h-3.5 w-3.5 animate-spin text-portal-navy"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
+                <div
+                    class="inline-flex items-center gap-3 rounded-2xl border border-slate-300 bg-white/98 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-slate-800 shadow-2xl"
                 >
-                    <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                    />
-                    <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                    />
-                </svg>
-                Loading...
+                    <svg
+                        class="h-6 w-6 animate-spin text-portal-navy"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        />
+                        <path
+                            class="opacity-90"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                    </svg>
+                    <span>Loading...</span>
+                </div>
             </div>
         </div>
     </transition>

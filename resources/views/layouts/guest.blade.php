@@ -131,34 +131,42 @@
         }
         .guest-page-loading {
             position: fixed;
-            top: 10px;
-            right: 12px;
+            inset: 0;
             z-index: 70;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.45);
-            background: rgba(255, 255, 255, 0.95);
-            color: #334155;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 12px;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.26);
+            backdrop-filter: blur(1px);
             opacity: 0;
-            transform: translateY(-8px);
+            transform: scale(1.01);
             pointer-events: none;
             transition: opacity 140ms ease, transform 140ms ease;
         }
         .guest-page-loading.is-visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1);
+        }
+        .guest-page-loading-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(255, 255, 255, 0.98);
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            padding: 12px 18px;
+            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.28);
         }
         .guest-page-loading-spinner {
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
             border-radius: 999px;
-            border: 2px solid rgba(11, 31, 58, 0.18);
+            border: 3px solid rgba(11, 31, 58, 0.2);
             border-top-color: rgba(11, 31, 58, 0.78);
             animation: guestPageSpin 0.8s linear infinite;
         }
@@ -287,8 +295,10 @@
         <span id="guest-scroll-progress" class="guest-progress-bar"></span>
     </div>
     <div id="guest-page-loading" class="guest-page-loading" aria-live="polite" role="status">
-        <span class="guest-page-loading-spinner" aria-hidden="true"></span>
-        <span>Loading...</span>
+        <span class="guest-page-loading-card">
+            <span class="guest-page-loading-spinner" aria-hidden="true"></span>
+            <span>Loading...</span>
+        </span>
     </div>
     @php
         $guestRouteName = Route::currentRouteName();
