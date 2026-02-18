@@ -257,6 +257,13 @@ class StudentController extends Controller
 
     public function destroy(Student $student): RedirectResponse
     {
+        // Clean up stored files before deleting the student record
+        $this->cleanupUploadedStudentFiles([
+            'photo' => $student->photo,
+            'id_card' => $student->id_card,
+            'transcript' => $student->transcript,
+        ]);
+
         $student->delete();
 
         return redirect()

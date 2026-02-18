@@ -192,6 +192,16 @@ class StaffUserController extends Controller
      */
     public function destroy(User $user): RedirectResponse
     {
+        // Prevent staff from deleting their own account
+        if (auth()->id() === $user->id) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'You cannot delete your own account while logged in as this user.');
+        }
+
+        // Delete stored profile photo, if any
+        ImageService::delete($user->photo);
+
         $user->delete();
 
         return redirect()
