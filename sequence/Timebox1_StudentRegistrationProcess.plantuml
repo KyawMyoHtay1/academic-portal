@@ -14,6 +14,7 @@ User --> Staff: Confirm user created\n(userId)
 
 Staff -> Student: Register student profile\n(userId, personal details)
 Student -> Student: Validate email/phone\nDOB, gender, status
+Student -> Student: Generate student_no\n(if not provided)
 Student -> Student: Store photo & documents
 Student --> Staff: Confirm student registered\n(student_no)
 

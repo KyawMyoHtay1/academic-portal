@@ -13,7 +13,12 @@ Course --> Student: Show course list
 Student -> Enrolment: Request enrolment\n(studentId, courseId)
 Enrolment -> Enrolment: Check existing enrolment\nand pending requests
 Enrolment -> Enrolment: Check schedule conflicts
-Enrolment --> Student: Show status = pending
+alt request valid
+  Enrolment -> Enrolment: Create/update record\nstatus = pending
+  Enrolment --> Student: Success, status = pending
+else already enrolled / pending / conflict
+  Enrolment --> Student: Error message
+end
 
 Staff -> Enrolment: View pending enrolment requests
 Enrolment --> Staff: Display pending list
