@@ -19,6 +19,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    insights: {
+        type: Object,
+        default: () => ({}),
+    },
     alertSystemStatus: {
         type: Object,
         default: null,
@@ -27,6 +31,7 @@ const props = defineProps({
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user ?? null);
+const insights = computed(() => props.insights ?? {});
 const unread = computed(
     () =>
         page.props.unread ?? {
@@ -60,6 +65,34 @@ const hasChartData = (chart) => {
 };
 
 const feeStatusByChartIndex = ["pending", "payment_pending", "paid"];
+const enrollmentStatusByChartIndex = [
+    "pending",
+    "approved",
+    "rejected",
+    "withdrawal_pending",
+];
+const formatTrendPercent = (value) => {
+    const numeric = Number(value ?? 0);
+    if (!Number.isFinite(numeric)) {
+        return "0%";
+    }
+    return `${numeric > 0 ? "+" : ""}${numeric.toFixed(1)}%`;
+};
+const trendBadgeClass = (direction, variant = "staff") => {
+    if (direction === "up") {
+        if (variant === "staff") {
+            return "bg-emerald-100 text-emerald-700";
+        }
+        if (variant === "student") {
+            return "bg-blue-100 text-blue-700";
+        }
+        return "bg-indigo-100 text-indigo-700";
+    }
+    if (direction === "down") {
+        return "bg-red-100 text-red-700";
+    }
+    return "bg-slate-100 text-slate-700";
+};
 const onStaffFeeStatusClick = (payload) => {
     if (props.role !== "staff") {
         return;
@@ -71,6 +104,39 @@ const onStaffFeeStatusClick = (payload) => {
     }
 
     router.get(route("admin.fees.index"), { status });
+};
+const onStaffEnrollmentStatusClick = (payload) => {
+    if (props.role !== "staff") {
+        return;
+    }
+
+    const status = enrollmentStatusByChartIndex[payload?.dataIndex ?? -1];
+    if (!status) {
+        return;
+    }
+
+    router.get(route("admin.enrollments.index"), { status });
+};
+const onTeacherGradeStatusClick = () => {
+    if (props.role !== "teacher") {
+        return;
+    }
+
+    router.get(route("teacher.grades.index"));
+};
+const onTeacherAssignmentsChartClick = () => {
+    if (props.role !== "teacher") {
+        return;
+    }
+
+    router.get(route("teacher.assignments.index"));
+};
+const onStudentFeeStatusClick = () => {
+    if (props.role !== "student") {
+        return;
+    }
+
+    router.get(route("student.fees.index"));
 };
 
 const cards = computed(() => {
@@ -508,6 +574,119 @@ const quickActions = computed(() => {
 
             <!-- Student dashboard: more visual overview for key areas -->
             <div v-if="role === 'student'" class="space-y-6">
+                <div class="grid gap-4 lg:grid-cols-3">
+                    <div
+                        class="rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4"
+                    >
+                        <div
+                            class="flex items-start justify-between gap-3"
+                        >
+                            <div>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                                >
+                                    Fee progress
+                                </p>
+                                <p class="mt-2 text-sm text-emerald-900">
+                                    Paid {{ formatCurrency(insights.feeProgress?.paidAmount) }}
+                                    of
+                                    {{ formatCurrency(insights.feeProgress?.totalAmount) }}
+                                </p>
+                            </div>
+                            <span
+                                class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                            >
+                                {{ insights.feeProgress?.paidPercent ?? 0 }}%
+                            </span>
+                        </div>
+                        <div class="mt-3 h-2 overflow-hidden rounded-full bg-emerald-100">
+                            <div
+                                class="h-full rounded-full bg-emerald-500"
+                                :style="{
+                                    width: `${insights.feeProgress?.paidPercent ?? 0}%`,
+                                }"
+                            ></div>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between text-xs text-emerald-800">
+                            <span>Outstanding {{ formatCurrency(insights.feeProgress?.outstandingAmount) }}</span>
+                            <Link :href="route('student.fees.index')" class="font-semibold hover:underline">
+                                Open fees
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4"
+                    >
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-blue-700"
+                        >
+                            Attendance trend
+                        </p>
+                        <div class="mt-2 flex items-center justify-between">
+                            <p class="text-sm font-medium text-blue-900">
+                                {{ insights.attendanceTrend?.currentLabel ?? 'This month' }}
+                            </p>
+                            <span
+                                class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                                :class="trendBadgeClass(insights.attendanceTrend?.direction, 'student')"
+                            >
+                                {{ formatTrendPercent(insights.attendanceTrend?.percent) }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-blue-700">
+                            {{ insights.attendanceTrend?.current ?? 0 }}% vs
+                            {{ insights.attendanceTrend?.previous ?? 0 }}%
+                            {{
+                                insights.attendanceTrend?.previousLabel ??
+                                "last month"
+                            }}
+                        </p>
+                        <Link
+                            :href="route('student.attendance.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-blue-700 hover:underline"
+                        >
+                            View attendance details
+                        </Link>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4"
+                    >
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-amber-700"
+                        >
+                            Grade risk hints
+                        </p>
+                        <p
+                            v-if="!(insights.riskSubjects?.length > 0)"
+                            class="mt-2 text-sm text-amber-900"
+                        >
+                            No subject risk flag right now.
+                        </p>
+                        <div v-else class="mt-2 space-y-2">
+                            <div
+                                v-for="subject in insights.riskSubjects"
+                                :key="subject.subjectCode"
+                                class="rounded-lg border border-amber-200 bg-white px-2.5 py-2"
+                            >
+                                <p class="text-xs font-semibold text-amber-900">
+                                    {{ subject.subjectCode }} - {{ subject.avgScore }}%
+                                </p>
+                                <p class="mt-0.5 text-[11px] text-amber-700">
+                                    {{ subject.gapFromAverage }} pts below your average
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            :href="route('student.grades.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-amber-700 hover:underline"
+                        >
+                            Review grades
+                        </Link>
+                    </div>
+                </div>
+
                 <!-- GPA & Key Metrics Banner -->
                 <div class="grid gap-4 md:grid-cols-3">
                     <!-- GPA Card -->
@@ -919,6 +1098,8 @@ const quickActions = computed(() => {
                         :chart-data="charts.feeStatus"
                         title="Fee status"
                         :variant="role"
+                        :interactive="true"
+                        @chart-click="onStudentFeeStatusClick"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.courseEnrollment)"
@@ -1291,6 +1472,104 @@ const quickActions = computed(() => {
 
             <!-- Staff view: admin-focused overview -->
             <div v-else-if="role === 'staff'" class="space-y-6">
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div
+                        class="rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4"
+                    >
+                        <div class="flex items-center justify-between gap-2">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            >
+                                Fees collected
+                            </p>
+                            <span
+                                class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                                :class="trendBadgeClass(insights.feesCollectedTrend?.direction, 'staff')"
+                            >
+                                {{ formatTrendPercent(insights.feesCollectedTrend?.percent) }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-sm font-medium text-emerald-900">
+                            {{ formatCurrency(insights.feesCollectedTrend?.current) }}
+                            {{ insights.feesCollectedTrend?.currentLabel ?? "this month" }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            vs {{ formatCurrency(insights.feesCollectedTrend?.previous) }}
+                            {{ insights.feesCollectedTrend?.previousLabel ?? "last month" }}
+                        </p>
+                        <Link
+                            :href="route('admin.fees.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-emerald-700 hover:underline"
+                        >
+                            Open fee management
+                        </Link>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4"
+                    >
+                        <div class="flex items-center justify-between gap-2">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                            >
+                                Pending grades trend
+                            </p>
+                            <span
+                                class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                                :class="trendBadgeClass(insights.pendingGradesTrend?.direction, 'teacher')"
+                            >
+                                {{ formatTrendPercent(insights.pendingGradesTrend?.percent) }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-sm font-medium text-indigo-900">
+                            {{ insights.pendingGradesTrend?.current ?? 0 }}
+                            {{ insights.pendingGradesTrend?.currentLabel ?? "this week" }}
+                        </p>
+                        <p class="mt-1 text-xs text-indigo-700">
+                            vs {{ insights.pendingGradesTrend?.previous ?? 0 }}
+                            {{ insights.pendingGradesTrend?.previousLabel ?? "last week" }}
+                        </p>
+                        <Link
+                            :href="route('admin.grades.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-indigo-700 hover:underline"
+                        >
+                            Open grade review
+                        </Link>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4"
+                    >
+                        <div class="flex items-center justify-between gap-2">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-blue-700"
+                            >
+                                Enrollment approvals
+                            </p>
+                            <span
+                                class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                                :class="trendBadgeClass(insights.approvalsTrend?.direction, 'student')"
+                            >
+                                {{ formatTrendPercent(insights.approvalsTrend?.percent) }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-sm font-medium text-blue-900">
+                            {{ insights.approvalsTrend?.current ?? 0 }}
+                            {{ insights.approvalsTrend?.currentLabel ?? "this week" }}
+                        </p>
+                        <p class="mt-1 text-xs text-blue-700">
+                            vs {{ insights.approvalsTrend?.previous ?? 0 }}
+                            {{ insights.approvalsTrend?.previousLabel ?? "last week" }}
+                        </p>
+                        <Link
+                            :href="route('admin.enrollments.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-blue-700 hover:underline"
+                        >
+                            Open enrollments
+                        </Link>
+                    </div>
+                </div>
+
                 <!-- Pending Actions Alert Cards -->
                 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Link
@@ -1622,6 +1901,8 @@ const quickActions = computed(() => {
                                 :chart-data="charts.enrollmentStatus"
                                 title="Enrollment request status"
                                 :variant="role"
+                                :interactive="true"
+                                @chart-click="onStaffEnrollmentStatusClick"
                             />
                         </div>
                     </details>
@@ -2253,6 +2534,103 @@ const quickActions = computed(() => {
 
             <!-- Teacher view: teaching-focused overview -->
             <div v-else class="space-y-6">
+                <div class="grid gap-4 lg:grid-cols-3">
+                    <div
+                        class="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4"
+                    >
+                        <div class="flex items-center justify-between gap-2">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                            >
+                                Needs grading
+                            </p>
+                            <span
+                                class="rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-700"
+                            >
+                                {{ insights.needsGradingSubmissions ?? 0 }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-sm font-medium text-indigo-900">
+                            {{ insights.gradedSubmissions ?? 0 }} submissions graded
+                        </p>
+                        <Link
+                            :href="route('teacher.assignments.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-indigo-700 hover:underline"
+                        >
+                            Open assignments
+                        </Link>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4"
+                    >
+                        <div class="flex items-center justify-between gap-2">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            >
+                                Pending grades trend
+                            </p>
+                            <span
+                                class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                                :class="trendBadgeClass(insights.pendingGradesTrend?.direction, 'staff')"
+                            >
+                                {{ formatTrendPercent(insights.pendingGradesTrend?.percent) }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-sm font-medium text-emerald-900">
+                            {{ insights.pendingGradesTrend?.current ?? 0 }}
+                            {{ insights.pendingGradesTrend?.currentLabel ?? "this week" }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Attendance trend
+                            {{ formatTrendPercent(insights.attendanceTrend?.percent) }}
+                            ({{ insights.attendanceTrend?.current ?? 0 }}%)
+                        </p>
+                        <Link
+                            :href="route('teacher.grades.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-emerald-700 hover:underline"
+                        >
+                            Open grading
+                        </Link>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4"
+                    >
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-amber-700"
+                        >
+                            At-risk students
+                        </p>
+                        <p
+                            v-if="!(insights.atRiskStudents?.length > 0)"
+                            class="mt-2 text-sm text-amber-900"
+                        >
+                            No students below threshold in current sample.
+                        </p>
+                        <div v-else class="mt-2 space-y-2">
+                            <div
+                                v-for="student in insights.atRiskStudents"
+                                :key="student.student_id"
+                                class="rounded-lg border border-amber-200 bg-white px-2.5 py-2"
+                            >
+                                <p class="text-xs font-semibold text-amber-900">
+                                    {{ student.student_no }} - {{ student.name }}
+                                </p>
+                                <p class="mt-0.5 text-[11px] text-amber-700">
+                                    {{ student.attendanceRate }}% ({{ student.reason }})
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            :href="route('teacher.attendance.index')"
+                            class="mt-3 inline-flex text-xs font-semibold text-amber-700 hover:underline"
+                        >
+                            Open attendance
+                        </Link>
+                    </div>
+                </div>
+
                 <!-- Pending Grades Alert for Teachers -->
                 <div
                     v-if="stats.pendingGrades > 0"
@@ -2362,6 +2740,8 @@ const quickActions = computed(() => {
                         :chart-data="charts.gradeStatus"
                         title="Grade status (my subjects)"
                         :variant="role"
+                        :interactive="true"
+                        @chart-click="onTeacherGradeStatusClick"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.gradesBySubject)"
@@ -2386,6 +2766,8 @@ const quickActions = computed(() => {
                         :chart-data="charts.assignmentsBySubject"
                         title="Assignments by subject"
                         :variant="role"
+                        :interactive="true"
+                        @chart-click="onTeacherAssignmentsChartClick"
                     />
                     </div>
 

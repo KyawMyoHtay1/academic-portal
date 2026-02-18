@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Fee;
@@ -101,6 +102,68 @@ class DashboardStatsService
         $pendingPayments = Cache::remember('dashboard:staff:pending_payments', $cacheTtl, fn () => Fee::where('status', 'payment_pending')->count());
         $paidFees = Cache::remember('dashboard:staff:paid_fees_total', $cacheTtl, fn () => Fee::where('status', 'paid')->sum('amount'));
         $pendingFees = Cache::remember('dashboard:staff:pending_fees_total', $cacheTtl, fn () => Fee::where('status', 'pending')->sum('amount'));
+
+        $now = Carbon::now();
+        $currentMonthStart = $now->copy()->startOfMonth()->toDateString();
+        $currentMonthEnd = $now->copy()->endOfMonth()->toDateString();
+        $previousMonthStart = $now->copy()->subMonthNoOverflow()->startOfMonth()->toDateString();
+        $previousMonthEnd = $now->copy()->subMonthNoOverflow()->endOfMonth()->toDateString();
+        $currentWeekStart = $now->copy()->startOfWeek();
+        $previousWeekStart = $currentWeekStart->copy()->subWeek();
+        $previousWeekEnd = $currentWeekStart->copy()->subSecond();
+
+        $feesCollectedThisMonth = Cache::remember('dashboard:staff:fees_collected_this_month', $cacheTtl, function () use ($currentMonthStart, $currentMonthEnd) {
+            return Fee::where('status', Fee::STATUS_PAID)
+                ->whereBetween('paid_date', [$currentMonthStart, $currentMonthEnd])
+                ->sum('amount');
+        });
+        $feesCollectedLastMonth = Cache::remember('dashboard:staff:fees_collected_last_month', $cacheTtl, function () use ($previousMonthStart, $previousMonthEnd) {
+            return Fee::where('status', Fee::STATUS_PAID)
+                ->whereBetween('paid_date', [$previousMonthStart, $previousMonthEnd])
+                ->sum('amount');
+        });
+
+        $pendingGradesThisWeek = Cache::remember('dashboard:staff:pending_grades_this_week', $cacheTtl, function () use ($currentWeekStart, $now) {
+            return Grade::where('status', Grade::STATUS_PENDING)
+                ->whereBetween('updated_at', [$currentWeekStart, $now])
+                ->count();
+        });
+        $pendingGradesLastWeek = Cache::remember('dashboard:staff:pending_grades_last_week', $cacheTtl, function () use ($previousWeekStart, $previousWeekEnd) {
+            return Grade::where('status', Grade::STATUS_PENDING)
+                ->whereBetween('updated_at', [$previousWeekStart, $previousWeekEnd])
+                ->count();
+        });
+
+        $approvalsThisWeek = Cache::remember('dashboard:staff:approvals_this_week', $cacheTtl, function () use ($currentWeekStart, $now) {
+            return DB::table('course_student')
+                ->where('status', 'approved')
+                ->whereBetween('updated_at', [$currentWeekStart, $now])
+                ->count();
+        });
+        $approvalsLastWeek = Cache::remember('dashboard:staff:approvals_last_week', $cacheTtl, function () use ($previousWeekStart, $previousWeekEnd) {
+            return DB::table('course_student')
+                ->where('status', 'approved')
+                ->whereBetween('updated_at', [$previousWeekStart, $previousWeekEnd])
+                ->count();
+        });
+
+        $staffInsights = [
+            'feesCollectedTrend' => [
+                ...$this->buildTrendInsight((float) $feesCollectedThisMonth, (float) $feesCollectedLastMonth),
+                'currentLabel' => 'This month',
+                'previousLabel' => 'Last month',
+            ],
+            'pendingGradesTrend' => [
+                ...$this->buildTrendInsight((float) $pendingGradesThisWeek, (float) $pendingGradesLastWeek),
+                'currentLabel' => 'This week',
+                'previousLabel' => 'Last week',
+            ],
+            'approvalsTrend' => [
+                ...$this->buildTrendInsight((float) $approvalsThisWeek, (float) $approvalsLastWeek),
+                'currentLabel' => 'This week',
+                'previousLabel' => 'Last week',
+            ],
+        ];
 
         $feeStatusCounts = Cache::remember('dashboard:staff:fee_status_counts', $cacheTtl, function () {
             return Fee::select('status', DB::raw('count(*) as count'))
@@ -253,6 +316,7 @@ class DashboardStatsService
                 'attendanceStatus' => $chartsAttendanceStatus,
                 'enrollmentStatus' => $chartsEnrollmentStatus,
             ],
+            'insights' => $staffInsights,
             'alertSystemStatus' => $alertSystemStatus,
         ];
     }
@@ -297,6 +361,78 @@ class DashboardStatsService
             return Grade::whereIn('subject_id', $subjectIdArray)
                 ->where('status', 'approved')
                 ->count();
+        });
+
+        $now = Carbon::now();
+        $currentWeekStart = $now->copy()->startOfWeek();
+        $previousWeekStart = $currentWeekStart->copy()->subWeek();
+        $previousWeekEnd = $currentWeekStart->copy()->subSecond();
+
+        $pendingGradesThisWeek = Cache::remember("dashboard:teacher:{$user->id}:pending_grades_this_week", $cacheTtl, function () use ($subjectIdArray, $currentWeekStart, $now) {
+            return Grade::whereIn('subject_id', $subjectIdArray)
+                ->where('status', Grade::STATUS_PENDING)
+                ->whereBetween('updated_at', [$currentWeekStart, $now])
+                ->count();
+        });
+        $pendingGradesLastWeek = Cache::remember("dashboard:teacher:{$user->id}:pending_grades_last_week", $cacheTtl, function () use ($subjectIdArray, $previousWeekStart, $previousWeekEnd) {
+            return Grade::whereIn('subject_id', $subjectIdArray)
+                ->where('status', Grade::STATUS_PENDING)
+                ->whereBetween('updated_at', [$previousWeekStart, $previousWeekEnd])
+                ->count();
+        });
+
+        $needsGradingSubmissions = Cache::remember("dashboard:teacher:{$user->id}:needs_grading_submissions", $cacheTtl, function () use ($user) {
+            return AssignmentSubmission::whereHas('assignment', function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })
+                ->whereNull('score')
+                ->count();
+        });
+        $gradedSubmissions = Cache::remember("dashboard:teacher:{$user->id}:graded_submissions", $cacheTtl, function () use ($user) {
+            return AssignmentSubmission::whereHas('assignment', function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })
+                ->whereNotNull('score')
+                ->count();
+        });
+
+        $atRiskStudents = Cache::remember("dashboard:teacher:{$user->id}:at_risk_students", $cacheTtl, function () use ($subjectIdArray) {
+            if (count($subjectIdArray) === 0) {
+                return [];
+            }
+
+            return Attendance::query()
+                ->join('students', 'students.id', '=', 'attendances.student_id')
+                ->whereIn('attendances.subject_id', $subjectIdArray)
+                ->selectRaw('
+                    students.id as student_id,
+                    students.student_no,
+                    students.full_name,
+                    COUNT(*) as total_sessions,
+                    SUM(CASE WHEN attendances.status = "present" THEN 1 ELSE 0 END) as present_sessions
+                ')
+                ->groupBy('students.id', 'students.student_no', 'students.full_name')
+                ->havingRaw('COUNT(*) >= 3')
+                ->get()
+                ->map(function ($row) {
+                    $total = (int) ($row->total_sessions ?? 0);
+                    $present = (int) ($row->present_sessions ?? 0);
+                    $rate = $total > 0 ? round(($present / $total) * 100, 1) : 0;
+
+                    return [
+                        'student_id' => (int) $row->student_id,
+                        'student_no' => (string) $row->student_no,
+                        'name' => (string) $row->full_name,
+                        'attendanceRate' => $rate,
+                        'totalSessions' => $total,
+                        'reason' => $rate < 60 ? 'Critical attendance risk' : 'Below attendance threshold',
+                    ];
+                })
+                ->filter(fn ($row) => $row['attendanceRate'] < 75)
+                ->sortBy('attendanceRate')
+                ->take(5)
+                ->values()
+                ->all();
         });
 
         $myGradeStatusCounts = Cache::remember("dashboard:teacher:{$user->id}:grade_status_counts", $cacheTtl, function () use ($subjectIdArray) {
@@ -442,6 +578,26 @@ class DashboardStatsService
             ]],
         ];
 
+        $attendanceRates = array_column($attendanceByMonth, 'rate');
+        $teacherInsights = [
+            'pendingGradesTrend' => [
+                ...$this->buildTrendInsight((float) $pendingGradesThisWeek, (float) $pendingGradesLastWeek),
+                'currentLabel' => 'This week',
+                'previousLabel' => 'Last week',
+            ],
+            'attendanceTrend' => [
+                ...$this->buildTrendInsight(
+                    (float) ($attendanceRates[count($attendanceRates) - 1] ?? 0),
+                    (float) ($attendanceRates[count($attendanceRates) - 2] ?? 0)
+                ),
+                'currentLabel' => 'This month',
+                'previousLabel' => 'Last month',
+            ],
+            'needsGradingSubmissions' => (int) $needsGradingSubmissions,
+            'gradedSubmissions' => (int) $gradedSubmissions,
+            'atRiskStudents' => $atRiskStudents,
+        ];
+
         return [
             'role' => 'teacher',
             'stats' => [
@@ -460,6 +616,7 @@ class DashboardStatsService
                 'attendanceStatus' => $chartsAttendanceStatus,
                 'scoreDistribution' => $chartsScoreDistribution,
             ],
+            'insights' => $teacherInsights,
         ];
     }
 
@@ -476,6 +633,12 @@ class DashboardStatsService
             : 0;
         $outstandingFees = $student
             ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_fees", $cacheTtl, fn () => $student->fees()->where('status', 'pending')->sum('amount'))
+            : 0;
+        $outstandingBalance = $student
+            ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_balance", $cacheTtl, fn () => $student->fees()->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])->sum('amount'))
+            : 0;
+        $paidFees = $student
+            ? Cache::remember("{$studentCacheKeyPrefix}:paid_fees", $cacheTtl, fn () => $student->fees()->where('status', Fee::STATUS_PAID)->sum('amount'))
             : 0;
         $myGrades = $student
             ? Cache::remember("{$studentCacheKeyPrefix}:my_grades", $cacheTtl, fn () => $student->grades()->count())
@@ -517,6 +680,22 @@ class DashboardStatsService
         $chartsCourseEnrollment = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#3b82f6', '#f59e0b'], 'borderWidth' => 0]]];
         $chartsAttendanceStatus = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#10b981', '#ef4444'], 'borderWidth' => 0]]];
         $chartsGradeTrendLine = ['labels' => [], 'datasets' => [['label' => 'Avg score', 'data' => [], 'borderColor' => '#8b5cf6', 'backgroundColor' => 'rgba(139, 92, 246, 0.12)', 'fill' => true, 'tension' => 0.3]]];
+        $studentInsights = [
+            'feeProgress' => [
+                'paidAmount' => (float) $paidFees,
+                'outstandingAmount' => (float) $outstandingBalance,
+                'totalAmount' => (float) ($paidFees + $outstandingBalance),
+                'paidPercent' => ($paidFees + $outstandingBalance) > 0
+                    ? round(((float) $paidFees / (float) ($paidFees + $outstandingBalance)) * 100, 1)
+                    : 0,
+            ],
+            'attendanceTrend' => [
+                ...$this->buildTrendInsight(0, 0),
+                'currentLabel' => 'This month',
+                'previousLabel' => 'Last month',
+            ],
+            'riskSubjects' => [],
+        ];
 
         if ($student) {
             $feePendingCount = Cache::remember("{$studentCacheKeyPrefix}:fee_pending_count", $cacheTtl, fn () => $student->fees()->where('status', 'pending')->count());
@@ -535,8 +714,8 @@ class DashboardStatsService
                     ->where('status', Grade::STATUS_APPROVED)
                     ->whereNotNull('score')
                     ->join('subjects', 'subjects.id', '=', 'grades.subject_id')
-                    ->select('subjects.subject_code', DB::raw('ROUND(AVG(grades.score), 1) as avg_score'))
-                    ->groupBy('subjects.id', 'subjects.subject_code')
+                    ->select('subjects.subject_code', 'subjects.title', DB::raw('ROUND(AVG(grades.score), 1) as avg_score'))
+                    ->groupBy('subjects.id', 'subjects.subject_code', 'subjects.title')
                     ->orderBy('subjects.subject_code')
                     ->get();
             });
@@ -576,6 +755,15 @@ class DashboardStatsService
                     'fill' => true,
                     'tension' => 0.3,
                 ]],
+            ];
+            $attendanceRates = array_column($attendanceByMonth, 'rate');
+            $studentInsights['attendanceTrend'] = [
+                ...$this->buildTrendInsight(
+                    (float) ($attendanceRates[count($attendanceRates) - 1] ?? 0),
+                    (float) ($attendanceRates[count($attendanceRates) - 2] ?? 0)
+                ),
+                'currentLabel' => 'This month',
+                'previousLabel' => 'Last month',
             ];
 
             $chartsCourseEnrollment = [
@@ -626,6 +814,47 @@ class DashboardStatsService
                     'tension' => 0.3,
                 ]],
             ];
+
+            $subjectScoreRows = $gradesBySubject
+                ->map(function ($row) {
+                    return [
+                        'subjectCode' => (string) $row->subject_code,
+                        'title' => (string) ($row->title ?? ''),
+                        'avgScore' => (float) ($row->avg_score ?? 0),
+                    ];
+                })
+                ->values();
+            $overallAverage = $subjectScoreRows->avg('avgScore');
+            $riskSubjects = collect();
+
+            if ($overallAverage !== null) {
+                $riskSubjects = $subjectScoreRows
+                    ->filter(fn ($row) => $row['avgScore'] <= ($overallAverage - 10) && $row['avgScore'] < 60)
+                    ->sortBy('avgScore')
+                    ->take(3)
+                    ->values();
+            }
+
+            if ($riskSubjects->isEmpty()) {
+                $riskSubjects = $subjectScoreRows
+                    ->filter(fn ($row) => $row['avgScore'] < 50)
+                    ->sortBy('avgScore')
+                    ->take(3)
+                    ->values();
+            }
+
+            $studentInsights['riskSubjects'] = $riskSubjects
+                ->map(function ($row) use ($overallAverage) {
+                    return [
+                        'subjectCode' => $row['subjectCode'],
+                        'title' => $row['title'],
+                        'avgScore' => $row['avgScore'],
+                        'gapFromAverage' => $overallAverage !== null
+                            ? round(max((float) $overallAverage - $row['avgScore'], 0), 1)
+                            : 0,
+                    ];
+                })
+                ->all();
         }
 
         return [
@@ -647,6 +876,37 @@ class DashboardStatsService
                 'attendanceStatus' => $chartsAttendanceStatus,
                 'gradeTrendLine' => $chartsGradeTrendLine,
             ],
+            'insights' => $studentInsights,
+        ];
+    }
+
+    /**
+     * @return array<string, float|string>
+     */
+    private function buildTrendInsight(float $current, float $previous): array
+    {
+        $delta = round($current - $previous, 1);
+        $direction = 'flat';
+        if ($delta > 0) {
+            $direction = 'up';
+        } elseif ($delta < 0) {
+            $direction = 'down';
+        }
+
+        if ($previous > 0) {
+            $percent = round(($delta / $previous) * 100, 1);
+        } elseif ($current > 0) {
+            $percent = 100.0;
+        } else {
+            $percent = 0.0;
+        }
+
+        return [
+            'current' => round($current, 1),
+            'previous' => round($previous, 1),
+            'delta' => $delta,
+            'percent' => $percent,
+            'direction' => $direction,
         ];
     }
 }
