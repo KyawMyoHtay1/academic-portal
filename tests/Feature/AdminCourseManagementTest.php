@@ -40,13 +40,15 @@ class AdminCourseManagementTest extends TestCase
 
         $response = $this
             ->actingAs($staff)
-            ->withHeader('X-Inertia', 'true')
             ->get(route('admin.courses.index'));
 
         $response->assertOk();
-        $response->assertJsonPath('component', 'Admin/Courses/Index');
+        $response->assertViewHas('page');
 
-        $courses = collect($response->json('props.courses'));
+        $page = $response->viewData('page');
+        $this->assertSame('Admin/Courses/Index', $page['component']);
+
+        $courses = collect($page['props']['courses'] ?? []);
 
         $withEnrollment = $courses->firstWhere('id', $courseWithEnrollment->id);
         $withoutEnrollment = $courses->firstWhere('id', $courseWithoutEnrollment->id);
