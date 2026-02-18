@@ -20,7 +20,7 @@ class StoreSubjectRequest extends FormRequest
             'course_id' => ['required', 'exists:courses,id'],
             'subject_code' => ['required', 'string', 'max:50', 'unique:subjects,subject_code'],
             'title' => ['required', 'string', 'max:255'],
-            'credits' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'credits' => ['required', 'integer', 'min:1', 'max:10'],
             'description' => ['nullable', 'string'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ];

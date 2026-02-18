@@ -18,9 +18,35 @@ class StudentController extends Controller
 {
     public function index(): Response
     {
-        $students = Student::with('user')
+        $filters = request()->only(['search', 'programme', 'intake_year', 'status']);
+
+        $studentsQuery = Student::query()->with('user');
+
+        if ($search = trim((string) ($filters['search'] ?? ''))) {
+            $studentsQuery->where(function ($query) use ($search): void {
+                $query->where('student_no', 'like', "%{$search}%")
+                    ->orWhere('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('programme', 'like', "%{$search}%");
+            });
+        }
+
+        if (($filters['programme'] ?? 'all') !== 'all') {
+            $studentsQuery->where('programme', $filters['programme']);
+        }
+
+        if (($filters['intake_year'] ?? 'all') !== 'all') {
+            $studentsQuery->where('intake_year', $filters['intake_year']);
+        }
+
+        if (($filters['status'] ?? 'all') !== 'all') {
+            $studentsQuery->where('status', $filters['status']);
+        }
+
+        $students = $studentsQuery
             ->orderBy('student_no')
             ->paginate(10)
+            ->withQueryString()
             ->through(function (Student $student) {
                 return [
                     'id' => $student->id,
@@ -34,8 +60,30 @@ class StudentController extends Controller
                 ];
             });
 
+        $programmes = Student::query()
+            ->whereNotNull('programme')
+            ->select('programme')
+            ->distinct()
+            ->orderBy('programme')
+            ->pluck('programme')
+            ->values();
+
+        $intakeYears = Student::query()
+            ->whereNotNull('intake_year')
+            ->select('intake_year')
+            ->distinct()
+            ->orderByDesc('intake_year')
+            ->pluck('intake_year')
+            ->values();
+
         return Inertia::render('Students/Index', [
             'students' => $students,
+            'filters' => $filters,
+            'filterOptions' => [
+                'programmes' => $programmes,
+                'intakeYears' => $intakeYears,
+                'statuses' => ['active', 'suspended', 'graduated'],
+            ],
         ]);
     }
 

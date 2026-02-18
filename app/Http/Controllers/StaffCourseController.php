@@ -128,8 +128,10 @@ class StaffCourseController extends Controller
      */
     public function destroy(Course $course): RedirectResponse
     {
-        // Check if course has enrolled students
-        $enrolledCount = $course->students()->count();
+        // Check if course has active enrollments only.
+        $enrolledCount = $course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->count();
 
         if ($enrolledCount > 0) {
             return redirect()
@@ -137,6 +139,7 @@ class StaffCourseController extends Controller
                 ->with('error', "Cannot delete course. {$enrolledCount} student(s) are currently enrolled.");
         }
 
+        ImageService::delete($course->photo);
         $course->delete();
 
         return redirect()

@@ -6,8 +6,12 @@ use App\Http\Requests\Staff\Users\StoreUserRequest;
 use App\Http\Requests\Staff\Users\UpdateUserRequest;
 use App\Models\User;
 use App\Services\ImageService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +27,8 @@ class StaffUserController extends Controller
         if ($search = request('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
             });
         }
 
@@ -104,8 +109,8 @@ class StaffUserController extends Controller
     {
         $data = $request->validated();
 
-        // Simple initial password for demonstration; in a real system you would trigger a reset.
-        $password = 'Password123!';
+        // Generate a random temporary password; user sets a real one via reset link.
+        $password = Str::password(32);
 
         $userData = [
             'name' => $data['name'],
@@ -118,11 +123,31 @@ class StaffUserController extends Controller
             $userData['photo'] = ImageService::store($request->file('photo'), 'users');
         }
 
-        User::create($userData);
+        $user = User::create($userData);
+
+        // Trigger email verification flow for newly created user.
+        event(new Registered($user));
+
+        $message = 'User created successfully. Verification and password setup links have been sent.';
+
+        try {
+            $status = Password::broker()->sendResetLink(['email' => $user->email]);
+            if ($status !== Password::RESET_LINK_SENT) {
+                $message = 'User created successfully. Could not send password setup link automatically.';
+            }
+        } catch (\Throwable $e) {
+            Log::warning('staff_user_reset_link_failed', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            $message = 'User created successfully. Could not send password setup link automatically.';
+        }
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'User created successfully. An initial password has been set.');
+            ->with('success', $message);
     }
 
     /**

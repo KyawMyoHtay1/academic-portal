@@ -2,80 +2,76 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
-    students: Object,
+    students: {
+        type: Object,
+        required: true,
+    },
+    filters: {
+        type: Object,
+        default: () => ({}),
+    },
+    filterOptions: {
+        type: Object,
+        default: () => ({
+            programmes: [],
+            intakeYears: [],
+            statuses: [],
+        }),
+    },
 });
 
-const query = ref("");
-const programmeFilter = ref("all");
-const intakeYearFilter = ref("all");
-const statusFilter = ref("all");
+const query = ref(props.filters.search || "");
+const programmeFilter = ref(props.filters.programme || "all");
+const intakeYearFilter = ref(props.filters.intake_year || "all");
+const statusFilter = ref(props.filters.status || "all");
 
 const rows = computed(() => props.students?.data ?? []);
 
-const programmes = computed(() => {
-    const set = new Set(rows.value.map((s) => s.programme).filter(Boolean));
-    return Array.from(set).sort();
-});
-
-const intakeYears = computed(() => {
-    const set = new Set(rows.value.map((s) => s.intake_year).filter(Boolean));
-    return Array.from(set).sort();
-});
-
-const statuses = ["active", "suspended", "graduated"];
+const programmes = computed(() => props.filterOptions?.programmes ?? []);
+const intakeYears = computed(() => props.filterOptions?.intakeYears ?? []);
+const statuses = computed(() => props.filterOptions?.statuses ?? []);
 
 const stats = computed(() => {
     const list = rows.value;
-    const programmeCount = new Set(list.map((s) => s.programme).filter(Boolean))
-        .size;
-    const intakeCount = new Set(list.map((s) => s.intake_year).filter(Boolean))
-        .size;
+    const totalFromQuery = Number(props.students?.total ?? list.length);
+    const programmeCount = programmes.value.length;
+    const intakeCount = intakeYears.value.length;
 
     return {
-        total: list.length,
+        total: totalFromQuery,
+        onPage: list.length,
         programmeCount,
         intakeCount,
     };
 });
 
-const filtered = computed(() => {
-    const q = query.value.trim().toLowerCase();
-    let list = rows.value;
+const applyFilters = debounce(() => {
+    router.get(
+        route("students.index"),
+        {
+            search: query.value || null,
+            programme: programmeFilter.value === "all" ? null : programmeFilter.value,
+            intake_year: intakeYearFilter.value === "all" ? null : intakeYearFilter.value,
+            status: statusFilter.value === "all" ? null : statusFilter.value,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        }
+    );
+}, 300);
 
-    if (programmeFilter.value !== "all") {
-        list = list.filter((s) => s.programme === programmeFilter.value);
+watch(
+    () => [query.value, programmeFilter.value, intakeYearFilter.value, statusFilter.value],
+    () => {
+        applyFilters();
     }
-    if (intakeYearFilter.value !== "all") {
-        list = list.filter((s) => s.intake_year === intakeYearFilter.value);
-    }
-    if (statusFilter.value !== "all") {
-        list = list.filter((s) => (s.status || "").toLowerCase() === statusFilter.value);
-    }
-
-    if (q) {
-        list = list.filter((s) => {
-            const no = (s.student_no ?? "").toLowerCase();
-            const name = (s.full_name ?? "").toLowerCase();
-            const email = (s.email ?? "").toLowerCase();
-            const programme = (s.programme ?? "").toLowerCase();
-            const intake = String(s.intake_year ?? "").toLowerCase();
-            const status = (s.status ?? "").toLowerCase();
-            return (
-                no.includes(q) ||
-                name.includes(q) ||
-                email.includes(q) ||
-                programme.includes(q) ||
-                intake.includes(q) ||
-                status.includes(q)
-            );
-        });
-    }
-
-    return list;
-});
+);
 
 const deleteStudent = (id) => {
     if (
@@ -147,7 +143,7 @@ export default {
                             {{ stats.total }}
                         </p>
                         <p class="mt-1 text-xs text-slate-600">
-                            Paginated list
+                            {{ stats.onPage }} shown on this page
                         </p>
                     </div>
                     <div class="portal-card p-5 bg-indigo-50">
@@ -294,7 +290,7 @@ export default {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
-                        <tr v-for="student in filtered" :key="student.id">
+                        <tr v-for="student in rows" :key="student.id">
                             <td class="px-3 py-2">
                                 <div class="flex items-center">
                                     <div
@@ -367,15 +363,13 @@ export default {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="filtered.length === 0">
+                        <tr v-if="rows.length === 0">
                             <td
                                 colspan="7"
                                 class="px-3 py-6 text-center text-sm text-slate-500"
                             >
                                 {{
-                                    rows.length === 0
-                                        ? 'No students found yet. Use "Add student" to create your first record.'
-                                        : "No students match your filters."
+                                    "No students found. Try adjusting your search or filters."
                                 }}
                             </td>
                         </tr>

@@ -69,6 +69,8 @@ const filtered = computed(() => {
     const cmp = (a, b) => String(a ?? "").localeCompare(String(b ?? ""));
     if (sortBy.value === "title") {
         list.sort((a, b) => cmp(a.title, b.title));
+    } else if (sortBy.value === "semester") {
+        list.sort((a, b) => cmp(a.semester, b.semester));
     } else if (sortBy.value === "credits-desc") {
         list.sort((a, b) => Number(b.credits ?? 0) - Number(a.credits ?? 0));
     } else if (sortBy.value === "credits-asc") {
@@ -198,6 +200,7 @@ const deleteCourse = (courseId) => {
                             >
                                 <option value="code">Course code</option>
                                 <option value="title">Title</option>
+                                <option value="semester">Semester</option>
                                 <option value="credits-desc">Credits (high to low)</option>
                                 <option value="credits-asc">Credits (low to high)</option>
                             </select>

@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AdminCourseManagementTest extends TestCase
@@ -57,6 +58,82 @@ class AdminCourseManagementTest extends TestCase
         $this->assertNotNull($withoutEnrollment);
         $this->assertSame(1, (int) $withEnrollment['enrolled_students_count']);
         $this->assertSame(0, (int) $withoutEnrollment['enrolled_students_count']);
+    }
+
+    public function test_staff_can_delete_course_when_only_pending_or_rejected_requests_exist(): void
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+        ]);
+
+        [, $studentA] = $this->createStudentUser();
+        [, $studentB] = $this->createStudentUser();
+
+        $course = Course::create([
+            'course_code' => 'CSE403',
+            'title' => 'Digital Platforms',
+            'credits' => 20,
+            'semester' => 'Semester 1',
+        ]);
+
+        DB::table('course_student')->insert([
+            [
+                'course_id' => $course->id,
+                'student_id' => $studentA->id,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'course_id' => $course->id,
+                'student_id' => $studentB->id,
+                'status' => 'rejected',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->actingAs($staff)
+            ->delete(route('admin.courses.destroy', $course))
+            ->assertRedirect(route('admin.courses.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('courses', [
+            'id' => $course->id,
+        ]);
+    }
+
+    public function test_staff_cannot_delete_course_when_withdrawal_pending_exists(): void
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+        ]);
+
+        [, $student] = $this->createStudentUser();
+
+        $course = Course::create([
+            'course_code' => 'CSE404',
+            'title' => 'Enterprise Systems',
+            'credits' => 20,
+            'semester' => 'Semester 2',
+        ]);
+
+        DB::table('course_student')->insert([
+            'course_id' => $course->id,
+            'student_id' => $student->id,
+            'status' => 'withdrawal_pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($staff)
+            ->delete(route('admin.courses.destroy', $course))
+            ->assertRedirect(route('admin.courses.index'))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('courses', [
+            'id' => $course->id,
+        ]);
     }
 
     /**

@@ -170,9 +170,9 @@ const submit = () => {
                             </div>
 
                             <p class="text-xs text-slate-500">
-                                An initial password will be generated for this
-                                user. In a real deployment, you would send a
-                                password reset link or onboarding email.
+                                A secure temporary password will be generated.
+                                The user will receive verification and password
+                                setup links by email.
                             </p>
 
                             <!-- Form Actions -->
