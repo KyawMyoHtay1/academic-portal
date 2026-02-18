@@ -87,16 +87,16 @@ onBeforeUnmount(() => {
                 class="absolute inset-0 flex items-center justify-center px-4"
             >
                 <div
-                    class="inline-flex items-center gap-3 rounded-2xl border border-slate-300 bg-white/98 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-slate-800 shadow-2xl"
+                    class="inline-flex items-center gap-3 rounded-2xl border border-white/20 bg-slate-900/92 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-2xl"
                 >
                     <svg
-                        class="h-6 w-6 animate-spin text-portal-navy"
+                        class="h-6 w-6 animate-spin text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                     >
                         <circle
-                            class="opacity-25"
+                            class="opacity-30"
                             cx="12"
                             cy="12"
                             r="10"
@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
                             stroke-width="4"
                         />
                         <path
-                            class="opacity-90"
+                            class="opacity-100"
                             fill="currentColor"
                             d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                         />
