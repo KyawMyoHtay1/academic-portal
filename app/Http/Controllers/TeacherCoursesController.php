@@ -15,7 +15,27 @@ class TeacherCoursesController extends Controller
     {
         $user = Auth::user();
 
-        // Get subjects assigned to this teacher
+        // Courses directly assigned to this teacher (course_teacher pivot).
+        $coursesById = $user->teachingCourses()
+            ->orderBy('course_code')
+            ->get([
+                'courses.id',
+                'courses.course_code',
+                'courses.title',
+                'courses.photo',
+            ])
+            ->keyBy('id')
+            ->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'course_code' => $course->course_code,
+                    'course_title' => $course->title,
+                    'course_photo' => $course->photo,
+                    'subjects' => [],
+                ];
+            });
+
+        // Subjects assigned to this teacher (subject_teacher pivot).
         $subjects = $user->teachingSubjects()
             ->with('course')
             ->orderBy('subject_code')
@@ -28,27 +48,36 @@ class TeacherCoursesController extends Controller
                 'subjects.photo',
             ]);
 
-        // Group subjects by course
-        $courses = $subjects->groupBy('course_id')->map(function ($courseSubjects, $courseId) {
-            $firstSubject = $courseSubjects->first();
-            $course = $firstSubject->course;
+        foreach ($subjects as $subject) {
+            $course = $subject->course;
+            if (! $course) {
+                continue;
+            }
 
-            return [
-                'id' => $course->id,
-                'course_code' => $course->course_code,
-                'course_title' => $course->title,
-                'course_photo' => $course->photo,
-                'subjects' => $courseSubjects->map(function ($subject) {
-                    return [
-                        'id' => $subject->id,
-                        'subject_code' => $subject->subject_code,
-                        'title' => $subject->title,
-                        'credits' => $subject->credits,
-                        'photo' => $subject->photo,
-                    ];
-                })->values(),
+            if (! $coursesById->has($course->id)) {
+                $coursesById->put($course->id, [
+                    'id' => $course->id,
+                    'course_code' => $course->course_code,
+                    'course_title' => $course->title,
+                    'course_photo' => $course->photo,
+                    'subjects' => [],
+                ]);
+            }
+
+            $courseEntry = $coursesById->get($course->id);
+            $courseEntry['subjects'][] = [
+                'id' => $subject->id,
+                'subject_code' => $subject->subject_code,
+                'title' => $subject->title,
+                'credits' => $subject->credits,
+                'photo' => $subject->photo,
             ];
-        })->values();
+            $coursesById->put($course->id, $courseEntry);
+        }
+
+        $courses = $coursesById
+            ->sortBy('course_code')
+            ->values();
 
         return Inertia::render('Teacher/MyCourses', [
             'courses' => $courses,

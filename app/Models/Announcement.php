@@ -68,11 +68,12 @@ class Announcement extends Model
     public function scopeVisibleToUser(Builder $query, ?User $user): Builder
     {
         if (! $user) {
-            // Guests: only show announcements intended for everyone
+            // Guests: only show announcements intended for everyone.
+            // Support both {"roles":[...]} and legacy/simple JSON arrays.
             return $query->where(function (Builder $q) {
                 $q->whereNull('audience')
-                    ->orWhereJsonLength('audience', 0)
-                    ->orWhereJsonContains('audience->roles', 'all');
+                    ->orWhereJsonContains('audience->roles', 'all')
+                    ->orWhereJsonContains('audience', 'all');
             });
         }
 
@@ -80,9 +81,10 @@ class Announcement extends Model
 
         return $query->where(function (Builder $q) use ($role) {
             $q->whereNull('audience')
-                ->orWhereJsonLength('audience', 0)
                 ->orWhereJsonContains('audience->roles', 'all')
-                ->orWhereJsonContains('audience->roles', $role);
+                ->orWhereJsonContains('audience->roles', $role)
+                ->orWhereJsonContains('audience', 'all')
+                ->orWhereJsonContains('audience', $role);
         });
     }
 }

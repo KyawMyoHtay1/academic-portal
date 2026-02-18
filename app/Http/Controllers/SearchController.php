@@ -228,64 +228,69 @@ class SearchController extends Controller
     {
         $results = [];
 
-        // Courses and subjects the teacher teaches
+        // Courses and subjects the teacher teaches.
+        // Include courses implied by assigned subjects.
         $courseIds = $user->teachingCourses()->pluck('courses.id');
         $subjectIds = $user->teachingSubjects()->pluck('subjects.id')->filter()->values();
+        $subjectCourseIds = $user->teachingSubjects()->pluck('subjects.course_id')->filter()->values();
+        $courseIds = $courseIds->merge($subjectCourseIds)->unique()->values();
 
-        if ($courseIds->isEmpty() && $subjectIds->isEmpty()) {
-            return $results;
-        }
+        if ($courseIds->isNotEmpty()) {
+            $courses = Course::whereIn('id', $courseIds)
+                ->where(function ($query) use ($term) {
+                    $query->where('course_code', 'like', $term)->orWhere('title', 'like', $term);
+                })
+                ->limit(self::LIMIT_PER_TYPE)
+                ->get(['id', 'course_code', 'title']);
 
-        $courses = Course::whereIn('id', $courseIds)
-            ->where(function ($query) use ($term) {
-                $query->where('course_code', 'like', $term)->orWhere('title', 'like', $term);
-            })
-            ->limit(self::LIMIT_PER_TYPE)
-            ->get(['id', 'course_code', 'title']);
-
-        foreach ($courses as $c) {
-            $results[] = [
-                'type' => 'course',
-                'id' => $c->id,
-                'title' => $c->title,
-                'subtitle' => $c->course_code,
-                'url' => route('teacher.courses.index'),
-            ];
+            foreach ($courses as $c) {
+                $results[] = [
+                    'type' => 'course',
+                    'id' => $c->id,
+                    'title' => $c->title,
+                    'subtitle' => $c->course_code,
+                    'url' => route('teacher.courses.index'),
+                ];
+            }
         }
 
         // Subjects the teacher teaches
-        $subjects = Subject::whereIn('id', $subjectIds)
-            ->where(function ($query) use ($term) {
-                $query->where('subject_code', 'like', $term)->orWhere('title', 'like', $term);
-            })
-            ->limit(self::LIMIT_PER_TYPE)
-            ->get(['id', 'subject_code', 'title', 'course_id']);
+        if ($subjectIds->isNotEmpty()) {
+            $subjects = Subject::whereIn('id', $subjectIds)
+                ->where(function ($query) use ($term) {
+                    $query->where('subject_code', 'like', $term)->orWhere('title', 'like', $term);
+                })
+                ->limit(self::LIMIT_PER_TYPE)
+                ->get(['id', 'subject_code', 'title', 'course_id']);
 
-        foreach ($subjects as $s) {
-            $results[] = [
-                'type' => 'subject',
-                'id' => $s->id,
-                'title' => $s->title,
-                'subtitle' => $s->subject_code,
-                'url' => route('teacher.grades.show', $s),
-            ];
+            foreach ($subjects as $s) {
+                $results[] = [
+                    'type' => 'subject',
+                    'id' => $s->id,
+                    'title' => $s->title,
+                    'subtitle' => $s->subject_code,
+                    'url' => route('teacher.grades.show', $s),
+                ];
+            }
         }
 
         // Assignments (in teacher's subjects)
-        $assignments = Assignment::whereIn('subject_id', $subjectIds)
-            ->where('title', 'like', $term)
-            ->orderByDesc('created_at')
-            ->limit(self::LIMIT_PER_TYPE)
-            ->get(['id', 'title', 'subject_id']);
+        if ($subjectIds->isNotEmpty()) {
+            $assignments = Assignment::whereIn('subject_id', $subjectIds)
+                ->where('title', 'like', $term)
+                ->orderByDesc('created_at')
+                ->limit(self::LIMIT_PER_TYPE)
+                ->get(['id', 'title', 'subject_id']);
 
-        foreach ($assignments as $a) {
-            $results[] = [
-                'type' => 'assignment',
-                'id' => $a->id,
-                'title' => $a->title,
-                'subtitle' => 'Assignment',
-                'url' => route('teacher.assignments.submissions', $a),
-            ];
+            foreach ($assignments as $a) {
+                $results[] = [
+                    'type' => 'assignment',
+                    'id' => $a->id,
+                    'title' => $a->title,
+                    'subtitle' => 'Assignment',
+                    'url' => route('teacher.assignments.submissions', $a),
+                ];
+            }
         }
 
         // Announcements (visible to teacher)
