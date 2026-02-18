@@ -57,6 +57,65 @@ const filteredEntries = computed(() => {
     return list;
 });
 
+const dayOrder = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+];
+
+const timeToMinutes = (timeValue) => {
+    if (!timeValue) return 0;
+    const [hh = "0", mm = "0"] = String(timeValue).split(":");
+    return Number(hh) * 60 + Number(mm);
+};
+
+const sessionDurationMinutes = (entry) =>
+    Math.max(timeToMinutes(entry?.end_time) - timeToMinutes(entry?.start_time), 0);
+
+const timetableStats = computed(() => {
+    const rows = filteredEntries.value;
+    const totalSessions = rows.length;
+    const totalMinutes = rows.reduce(
+        (sum, entry) => sum + sessionDurationMinutes(entry),
+        0
+    );
+    const totalHours = (totalMinutes / 60).toFixed(1);
+    const courseCount = new Set(rows.map((entry) => entry.course_id)).size;
+
+    const dayLoad = dayOrder.map((day) => {
+        const sessions = rows.filter((entry) => entry.day_of_week === day);
+        const minutes = sessions.reduce(
+            (sum, entry) => sum + sessionDurationMinutes(entry),
+            0
+        );
+        return {
+            day,
+            sessions: sessions.length,
+            hours: minutes / 60,
+        };
+    });
+
+    const busiestDay = [...dayLoad].sort((a, b) => {
+        if (b.sessions !== a.sessions) return b.sessions - a.sessions;
+        return b.hours - a.hours;
+    })[0];
+
+    return {
+        totalSessions,
+        totalHours,
+        courseCount,
+        busiestDay:
+            busiestDay && busiestDay.sessions > 0
+                ? `${busiestDay.day} (${busiestDay.sessions})`
+                : "N/A",
+        dayLoad,
+    };
+});
+
 const printTimetable = () => window.print();
 </script>
 
@@ -90,6 +149,41 @@ const printTimetable = () => window.print();
                         </p>
                     </div>
 
+                    <div class="mb-5 grid gap-4 md:grid-cols-4">
+                        <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+                                Sessions
+                            </p>
+                            <p class="mt-2 text-2xl font-bold text-blue-900">
+                                {{ timetableStats.totalSessions }}
+                            </p>
+                        </div>
+                        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                                Teaching Hours
+                            </p>
+                            <p class="mt-2 text-2xl font-bold text-emerald-900">
+                                {{ timetableStats.totalHours }}h
+                            </p>
+                        </div>
+                        <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+                                Courses
+                            </p>
+                            <p class="mt-2 text-2xl font-bold text-indigo-900">
+                                {{ timetableStats.courseCount }}
+                            </p>
+                        </div>
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                                Busiest Day
+                            </p>
+                            <p class="mt-2 text-lg font-bold text-amber-900">
+                                {{ timetableStats.busiestDay }}
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- Controls -->
                     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -111,7 +205,7 @@ const printTimetable = () => window.print();
                                 <input
                                     v-model="query"
                                     type="text"
-                                    placeholder="Search subject, course, location…"
+                                    placeholder="Search subject, course, location..."
                                     class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                                 <button
@@ -121,7 +215,7 @@ const printTimetable = () => window.print();
                                     @click="query = ''"
                                 >
                                     <span class="sr-only">Clear</span>
-                                    ✕
+                                    x
                                 </button>
                             </div>
                         </div>
@@ -152,6 +246,49 @@ const printTimetable = () => window.print();
                             >
                                 Print
                             </button>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="filteredEntries.length > 0"
+                        class="mb-5 rounded-xl border border-slate-200 bg-white p-4"
+                    >
+                        <div class="mb-3 flex items-center justify-between gap-2">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Weekly Load
+                            </p>
+                            <p class="text-xs text-slate-500">
+                                Sessions and hours by day
+                            </p>
+                        </div>
+
+                        <div class="grid gap-2 md:grid-cols-2">
+                            <div
+                                v-for="load in timetableStats.dayLoad"
+                                :key="load.day"
+                                class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+                            >
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-medium text-slate-700">
+                                        {{ load.day }}
+                                    </span>
+                                    <span class="text-slate-500">
+                                        {{ load.sessions }} sessions | {{ load.hours.toFixed(1) }}h
+                                    </span>
+                                </div>
+                                <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                                    <div
+                                        class="h-full rounded-full bg-portal-navy"
+                                        :style="{
+                                            width: `${
+                                                timetableStats.totalSessions > 0
+                                                    ? (load.sessions / timetableStats.totalSessions) * 100
+                                                    : 0
+                                            }%`,
+                                        }"
+                                    ></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -230,3 +367,4 @@ const printTimetable = () => window.print();
         </div>
     </AuthenticatedLayout>
 </template>
+

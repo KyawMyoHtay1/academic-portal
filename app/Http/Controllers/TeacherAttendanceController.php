@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\AttendanceAlert;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -52,7 +53,7 @@ class TeacherAttendanceController extends Controller
     /**
      * Show the form for marking attendance for a specific subject.
      */
-    public function show(Subject $subject): Response
+    public function show(Request $request, Subject $subject): Response
     {
         $user = Auth::user();
 
@@ -102,6 +103,91 @@ class TeacherAttendanceController extends Controller
             ->distinct('date')
             ->count('date');
 
+        $historyFilters = [
+            'date_from' => trim((string) $request->input('date_from', '')),
+            'date_to' => trim((string) $request->input('date_to', '')),
+        ];
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $historyFilters['date_from'])) {
+            $historyFilters['date_from'] = '';
+        }
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $historyFilters['date_to'])) {
+            $historyFilters['date_to'] = '';
+        }
+        if (
+            $historyFilters['date_from'] !== '' &&
+            $historyFilters['date_to'] !== '' &&
+            $historyFilters['date_from'] > $historyFilters['date_to']
+        ) {
+            [$historyFilters['date_from'], $historyFilters['date_to']] = [
+                $historyFilters['date_to'],
+                $historyFilters['date_from'],
+            ];
+        }
+
+        $historyBaseQuery = Attendance::query()
+            ->where('subject_id', $subject->id)
+            ->when($historyFilters['date_from'] !== '', function ($query) use ($historyFilters) {
+                $query->whereDate('date', '>=', $historyFilters['date_from']);
+            })
+            ->when($historyFilters['date_to'] !== '', function ($query) use ($historyFilters) {
+                $query->whereDate('date', '<=', $historyFilters['date_to']);
+            });
+
+        $sessionHistory = (clone $historyBaseQuery)
+            ->selectRaw('date, COUNT(*) as total, SUM(CASE WHEN status = "present" THEN 1 ELSE 0 END) as present')
+            ->groupBy('date')
+            ->orderByDesc('date')
+            ->limit(40)
+            ->get()
+            ->map(function ($row) {
+                $total = (int) ($row->total ?? 0);
+                $present = (int) ($row->present ?? 0);
+                $absent = max($total - $present, 0);
+                return [
+                    'date' => $row->date?->format('Y-m-d') ?? (string) $row->date,
+                    'total' => $total,
+                    'present' => $present,
+                    'absent' => $absent,
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                ];
+            })
+            ->values();
+
+        $detailDates = $sessionHistory
+            ->take(12)
+            ->pluck('date')
+            ->filter()
+            ->values()
+            ->all();
+
+        $sessionDetails = [];
+        if (count($detailDates) > 0) {
+            $detailRows = Attendance::query()
+                ->with('student:id,student_no,full_name')
+                ->where('subject_id', $subject->id)
+                ->whereIn('date', $detailDates)
+                ->orderByDesc('date')
+                ->orderBy('student_id')
+                ->get(['id', 'student_id', 'date', 'status']);
+
+            $sessionDetails = $detailRows
+                ->groupBy(function ($attendance) {
+                    return $attendance->date?->format('Y-m-d') ?? (string) $attendance->date;
+                })
+                ->map(function ($rows) {
+                    return $rows->map(function ($attendance) {
+                        return [
+                            'id' => $attendance->id,
+                            'student_id' => $attendance->student_id,
+                            'student_no' => $attendance->student?->student_no,
+                            'student_name' => $attendance->student?->full_name,
+                            'status' => $attendance->status,
+                        ];
+                    })->values()->all();
+                })
+                ->toArray();
+        }
+
         return Inertia::render('Teacher/Attendance/Mark', [
             'subject' => [
                 'id' => $subject->id,
@@ -113,6 +199,9 @@ class TeacherAttendanceController extends Controller
             'students' => $students,
             'summary' => $summary,
             'totalSessions' => $totalSessions,
+            'sessionHistory' => $sessionHistory,
+            'sessionDetails' => $sessionDetails,
+            'historyFilters' => $historyFilters,
         ]);
     }
 

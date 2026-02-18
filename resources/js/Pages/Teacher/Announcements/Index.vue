@@ -20,14 +20,39 @@ const tabs = [
 const activeTab = ref("all");
 const query = ref("");
 const sortBy = ref("newest");
+const priorityFilter = ref("all");
+const audienceFilter = ref("all");
+const dateRangeFilter = ref("all");
 
 const stats = computed(() => {
     const list = props.announcements ?? [];
+    const recipientTotal = list.reduce(
+        (sum, announcement) =>
+            sum + (announcement.analytics?.recipient_count ?? 0),
+        0
+    );
+    const readTotal = list.reduce(
+        (sum, announcement) => sum + (announcement.analytics?.read_count ?? 0),
+        0
+    );
+    const ackTotal = list.reduce(
+        (sum, announcement) => sum + (announcement.analytics?.ack_count ?? 0),
+        0
+    );
+
     return {
         total: list.length,
         pinned: list.filter((a) => !!a.pinned).length,
         urgent: list.filter((a) => a.priority === "urgent").length,
         ackRequired: list.filter((a) => !!a.require_ack).length,
+        averageReadRate:
+            recipientTotal > 0
+                ? Math.round((readTotal / recipientTotal) * 100)
+                : 0,
+        averageAckRate:
+            recipientTotal > 0
+                ? Math.round((ackTotal / recipientTotal) * 100)
+                : 0,
     };
 });
 
@@ -37,6 +62,27 @@ const filtered = computed(() => {
 
     if (activeTab.value === "pinned") list = list.filter((a) => !!a.pinned);
     if (activeTab.value === "urgent") list = list.filter((a) => a.priority === "urgent");
+
+    if (priorityFilter.value !== "all") {
+        list = list.filter((a) => a.priority === priorityFilter.value);
+    }
+
+    if (audienceFilter.value !== "all") {
+        list = list.filter((a) =>
+            (a.audience?.roles ?? []).includes(audienceFilter.value) ||
+            (a.audience?.roles ?? []).includes("all")
+        );
+    }
+
+    if (dateRangeFilter.value !== "all") {
+        const days = Number(dateRangeFilter.value);
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - days);
+        list = list.filter((a) => {
+            const createdAt = new Date(a.created_at_iso || a.created_at);
+            return !Number.isNaN(createdAt.getTime()) && createdAt >= cutoff;
+        });
+    }
 
     if (q) {
         list = list.filter((a) => {
@@ -49,19 +95,33 @@ const filtered = computed(() => {
 
     if (sortBy.value === "title") {
         list.sort((a, b) => String(a.title ?? "").localeCompare(String(b.title ?? "")));
+    } else if (sortBy.value === "engagement") {
+        list.sort(
+            (a, b) =>
+                (b.analytics?.read_rate ?? 0) - (a.analytics?.read_rate ?? 0)
+        );
     }
 
     return list;
 });
 
 const hasActiveFilters = computed(
-    () => activeTab.value !== "all" || query.value.trim() !== "" || sortBy.value !== "newest"
+    () =>
+        activeTab.value !== "all" ||
+        query.value.trim() !== "" ||
+        sortBy.value !== "newest" ||
+        priorityFilter.value !== "all" ||
+        audienceFilter.value !== "all" ||
+        dateRangeFilter.value !== "all"
 );
 
 const clearFilters = () => {
     activeTab.value = "all";
     query.value = "";
     sortBy.value = "newest";
+    priorityFilter.value = "all";
+    audienceFilter.value = "all";
+    dateRangeFilter.value = "all";
 };
 
 const deleteAnnouncement = (id) => {
@@ -113,7 +173,7 @@ const priorityLabel = (p) => {
                     </p>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
                     <div class="rounded-xl border border-blue-200 bg-blue-50 p-5">
                         <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Total</p>
                         <p class="mt-2 text-3xl font-bold text-blue-900">{{ stats.total }}</p>
@@ -129,6 +189,14 @@ const priorityLabel = (p) => {
                     <div class="rounded-xl border border-purple-200 bg-purple-50 p-5">
                         <p class="text-xs font-semibold uppercase tracking-wide text-purple-700">Ack required</p>
                         <p class="mt-2 text-3xl font-bold text-purple-900">{{ stats.ackRequired }}</p>
+                    </div>
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Avg read rate</p>
+                        <p class="mt-2 text-3xl font-bold text-emerald-900">{{ stats.averageReadRate }}%</p>
+                    </div>
+                    <div class="rounded-xl border border-fuchsia-200 bg-fuchsia-50 p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Avg ack rate</p>
+                        <p class="mt-2 text-3xl font-bold text-fuchsia-900">{{ stats.averageAckRate }}%</p>
                     </div>
                 </div>
 
@@ -148,7 +216,7 @@ const priorityLabel = (p) => {
                         </button>
                     </div>
 
-                    <div class="mt-4 grid gap-3 lg:grid-cols-3">
+                    <div class="mt-4 grid gap-3 lg:grid-cols-6">
                         <div class="flex flex-wrap gap-2">
                             <button
                                 v-for="t in tabs"
@@ -177,11 +245,48 @@ const priorityLabel = (p) => {
 
                         <div>
                             <select
+                                v-model="priorityFilter"
+                                class="block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All priorities</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="important">Important</option>
+                                <option value="info">Info</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <select
+                                v-model="audienceFilter"
+                                class="block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All audiences</option>
+                                <option value="student">Students</option>
+                                <option value="teacher">Teachers</option>
+                                <option value="staff">Staff</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <select
+                                v-model="dateRangeFilter"
+                                class="block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All dates</option>
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <select
                                 v-model="sortBy"
                                 class="block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
                             >
                                 <option value="newest">Newest first</option>
                                 <option value="title">Title (A-Z)</option>
+                                <option value="engagement">Highest read rate</option>
                             </select>
                         </div>
                     </div>
@@ -247,6 +352,39 @@ const priorityLabel = (p) => {
                                     >
                                         {{ r === "all" ? "All roles" : r }}
                                     </span>
+                                </div>
+
+                                <div class="mt-3 grid gap-2 text-xs text-slate-600 sm:grid-cols-4">
+                                    <div class="rounded-md bg-slate-50 px-2 py-1">
+                                        Audience:
+                                        <span class="font-semibold text-slate-800">{{
+                                            announcement.analytics?.recipient_count ?? 0
+                                        }}</span>
+                                    </div>
+                                    <div class="rounded-md bg-emerald-50 px-2 py-1">
+                                        Read:
+                                        <span class="font-semibold text-emerald-800">{{
+                                            announcement.analytics?.read_count ?? 0
+                                        }}</span>
+                                        ({{ announcement.analytics?.read_rate ?? 0 }}%)
+                                    </div>
+                                    <div class="rounded-md bg-fuchsia-50 px-2 py-1">
+                                        Ack:
+                                        <span class="font-semibold text-fuchsia-800">{{
+                                            announcement.analytics?.ack_count ?? 0
+                                        }}</span>
+                                        ({{ announcement.analytics?.ack_rate ?? 0 }}%)
+                                    </div>
+                                    <div class="rounded-md bg-slate-50 px-2 py-1">
+                                        Pending:
+                                        <span class="font-semibold text-slate-800">{{
+                                            Math.max(
+                                                (announcement.analytics?.recipient_count ?? 0) -
+                                                    (announcement.analytics?.read_count ?? 0),
+                                                0
+                                            )
+                                        }}</span>
+                                    </div>
                                 </div>
 
                                 <p class="mt-3 whitespace-pre-line text-sm text-slate-700">

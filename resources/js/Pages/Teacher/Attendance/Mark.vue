@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { Head, useForm, Link, router } from "@inertiajs/vue3";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     subject: {
@@ -21,6 +21,18 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    sessionHistory: {
+        type: Array,
+        default: () => [],
+    },
+    sessionDetails: {
+        type: Object,
+        default: () => ({}),
+    },
+    historyFilters: {
+        type: Object,
+        default: () => ({}),
+    },
 });
 
 const form = useForm({
@@ -32,6 +44,9 @@ const form = useForm({
 });
 
 const query = ref("");
+const historyDateFrom = ref(props.historyFilters?.date_from || "");
+const historyDateTo = ref(props.historyFilters?.date_to || "");
+const selectedHistoryDate = ref(props.sessionHistory?.[0]?.date ?? null);
 
 const attendanceEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -70,6 +85,49 @@ const markAll = (status) => {
 const submit = () => {
     form.post(route("teacher.attendance.store", props.subject.id));
 };
+
+const applyHistoryFilters = () => {
+    router.get(
+        route("teacher.attendance.show", props.subject.id),
+        {
+            date_from: historyDateFrom.value || undefined,
+            date_to: historyDateTo.value || undefined,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        }
+    );
+};
+
+const clearHistoryFilters = () => {
+    historyDateFrom.value = "";
+    historyDateTo.value = "";
+    applyHistoryFilters();
+};
+
+const selectedSessionRows = computed(() => {
+    if (!selectedHistoryDate.value) return [];
+    return props.sessionDetails?.[selectedHistoryDate.value] ?? [];
+});
+
+watch(
+    () => props.sessionHistory,
+    (history) => {
+        if (!Array.isArray(history) || history.length === 0) {
+            selectedHistoryDate.value = null;
+            return;
+        }
+
+        const selectedExists = history.some(
+            (session) => session.date === selectedHistoryDate.value
+        );
+        if (!selectedExists) {
+            selectedHistoryDate.value = history[0].date;
+        }
+    }
+);
 </script>
 
 <template>
@@ -158,6 +216,135 @@ const submit = () => {
                     </div>
                 </div>
 
+                <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Session History
+                            </p>
+                            <p class="mt-1 text-sm text-slate-600">
+                                Review past attendance sessions with optional date-range filtering.
+                            </p>
+                        </div>
+                        <div class="grid w-full gap-2 sm:grid-cols-4 lg:w-auto">
+                            <input
+                                v-model="historyDateFrom"
+                                type="date"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <input
+                                v-model="historyDateTo"
+                                type="date"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                            <button
+                                type="button"
+                                class="rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+                                @click="applyHistoryFilters"
+                            >
+                                Apply
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="clearHistoryFilters"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="sessionHistory.length === 0" class="mt-4 rounded-lg bg-slate-50 p-4 text-sm text-slate-500">
+                        No attendance sessions found for the selected range.
+                    </div>
+
+                    <div v-else class="mt-4 grid gap-4 lg:grid-cols-2">
+                        <div class="overflow-hidden rounded-lg border border-slate-200">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Date</th>
+                                        <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">Present</th>
+                                        <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">Absent</th>
+                                        <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 bg-white">
+                                    <tr
+                                        v-for="session in sessionHistory"
+                                        :key="session.date"
+                                        class="cursor-pointer hover:bg-slate-50"
+                                        :class="{
+                                            'bg-indigo-50/60': selectedHistoryDate === session.date,
+                                        }"
+                                        @click="selectedHistoryDate = session.date"
+                                    >
+                                        <td class="px-3 py-2 text-xs font-medium text-slate-800">
+                                            {{ session.date }}
+                                        </td>
+                                        <td class="px-3 py-2 text-center text-xs text-emerald-700">
+                                            {{ session.present }}
+                                        </td>
+                                        <td class="px-3 py-2 text-center text-xs text-rose-700">
+                                            {{ session.absent }}
+                                        </td>
+                                        <td class="px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                                            {{ session.rate }}%
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="rounded-lg border border-slate-200 bg-slate-50/50 p-3">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Session Detail
+                            </p>
+                            <p class="mt-1 text-sm text-slate-700">
+                                <span v-if="selectedHistoryDate">
+                                    {{ selectedHistoryDate }}
+                                </span>
+                                <span v-else>Select a session date</span>
+                            </p>
+
+                            <div
+                                v-if="selectedSessionRows.length === 0"
+                                class="mt-3 rounded-md bg-white p-3 text-xs text-slate-500"
+                            >
+                                No detailed entries available for this session.
+                            </div>
+                            <div v-else class="mt-3 max-h-56 overflow-auto rounded-md border border-slate-200 bg-white">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Student</th>
+                                            <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200">
+                                        <tr v-for="record in selectedSessionRows" :key="record.id">
+                                            <td class="px-3 py-2 text-xs text-slate-700">
+                                                {{ record.student_name }} ({{ record.student_no }})
+                                            </td>
+                                            <td class="px-3 py-2 text-center text-xs">
+                                                <span
+                                                    class="inline-flex rounded-full px-2 py-1 font-semibold capitalize"
+                                                    :class="{
+                                                        'bg-emerald-100 text-emerald-800': record.status === 'present',
+                                                        'bg-rose-100 text-rose-800': record.status === 'absent',
+                                                    }"
+                                                >
+                                                    {{ record.status }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="portal-card p-6">
                     <div class="mb-6">
                         <div
@@ -220,7 +407,7 @@ const submit = () => {
                                 <input
                                     v-model="query"
                                     type="text"
-                                    placeholder="Search students…"
+                                    placeholder="Search students..."
                                     class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                                 <button
@@ -230,7 +417,7 @@ const submit = () => {
                                     @click="query = ''"
                                 >
                                     <span class="sr-only">Clear</span>
-                                    ✕
+                                    x
                                 </button>
                             </div>
                         </div>
