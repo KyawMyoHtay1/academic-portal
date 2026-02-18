@@ -355,6 +355,12 @@ const submit = () => {
                                                     scope="col"
                                                     class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
                                                 >
+                                                    Graded By
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                                >
                                                     Actions
                                                 </th>
                                             </tr>
@@ -677,6 +683,26 @@ const submit = () => {
                                                         >
                                                     </td>
                                                     <td
+                                                        class="whitespace-nowrap px-4 py-4 text-center text-sm text-slate-700"
+                                                    >
+                                                        <span
+                                                            v-if="
+                                                                entry.student
+                                                                    ?.graded_by
+                                                            "
+                                                        >
+                                                            {{
+                                                                entry.student
+                                                                    .graded_by
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            v-else
+                                                            class="text-slate-400"
+                                                            >-</span
+                                                        >
+                                                    </td>
+                                                    <td
                                                         class="px-4 py-4 text-center"
                                                     >
                                                         <div
@@ -755,7 +781,7 @@ const submit = () => {
                                                     class="bg-slate-50"
                                                 >
                                                     <td
-                                                        colspan="5"
+                                                        colspan="6"
                                                         class="px-4 py-4"
                                                     >
                                                         <div class="space-y-3">
@@ -1017,7 +1043,7 @@ const submit = () => {
                                                 v-if="gradeEntries.length === 0"
                                             >
                                                 <td
-                                                    colspan="5"
+                                                    colspan="6"
                                                     class="px-4 py-8 text-center text-sm text-slate-500"
                                                 >
                                                     {{

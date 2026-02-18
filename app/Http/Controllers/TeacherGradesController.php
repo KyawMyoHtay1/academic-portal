@@ -78,8 +78,17 @@ class TeacherGradesController extends Controller
 
         // Fetch existing grades keyed by student_id
         $grades = Grade::where('subject_id', $subject->id)
+            ->with('grader:id,name')
             ->whereIn('student_id', $studentIds)
-            ->get()
+            ->get([
+                'id',
+                'subject_id',
+                'student_id',
+                'score',
+                'status',
+                'rejection_reason',
+                'graded_by',
+            ])
             ->keyBy('student_id');
 
         // Batch-calculate suggested grades from assignments to avoid N+1 queries.
@@ -104,6 +113,7 @@ class TeacherGradesController extends Controller
                 'score' => $grades[$student->id]->score ?? null,
                 'status' => $grades[$student->id]->status ?? null,
                 'rejection_reason' => $grades[$student->id]->rejection_reason ?? null,
+                'graded_by' => $grades[$student->id]?->grader?->name,
                 // Assignment-based computed grade
                 'computed_grade' => $assignmentData['computed_grade'],
                 'assignment_breakdown' => $assignmentData['breakdown'],
