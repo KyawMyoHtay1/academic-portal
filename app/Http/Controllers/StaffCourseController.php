@@ -17,8 +17,8 @@ class StaffCourseController extends Controller
      */
     public function index(): Response
     {
-        $courses = Course::orderBy('course_code')
-            ->get([
+        $courses = Course::query()
+            ->select([
                 'id',
                 'course_code',
                 'title',
@@ -27,7 +27,14 @@ class StaffCourseController extends Controller
                 'photo',
                 'created_at',
                 'updated_at',
-            ]);
+            ])
+            ->withCount([
+                'students as enrolled_students_count' => function ($query): void {
+                    $query->whereIn('course_student.status', ['approved', 'withdrawal_pending']);
+                },
+            ])
+            ->orderBy('course_code')
+            ->get();
 
         return Inertia::render('Admin/Courses/Index', [
             'courses' => $courses,

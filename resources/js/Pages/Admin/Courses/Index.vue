@@ -13,6 +13,7 @@ const props = defineProps({
 
 const query = ref("");
 const semesterFilter = ref("all");
+const enrollmentFilter = ref("all");
 const sortBy = ref("code");
 
 const semesters = computed(() => {
@@ -35,7 +36,11 @@ const stats = computed(() => {
 });
 
 const hasActiveFilters = computed(
-    () => query.value.trim() !== "" || semesterFilter.value !== "all" || sortBy.value !== "code"
+    () =>
+        query.value.trim() !== "" ||
+        semesterFilter.value !== "all" ||
+        enrollmentFilter.value !== "all" ||
+        sortBy.value !== "code"
 );
 
 const filtered = computed(() => {
@@ -44,6 +49,12 @@ const filtered = computed(() => {
 
     if (semesterFilter.value !== "all") {
         list = list.filter((c) => c.semester === semesterFilter.value);
+    }
+
+    if (enrollmentFilter.value === "enrolled") {
+        list = list.filter((c) => Number(c.enrolled_students_count ?? 0) > 0);
+    } else if (enrollmentFilter.value === "not-enrolled") {
+        list = list.filter((c) => Number(c.enrolled_students_count ?? 0) === 0);
     }
 
     if (q) {
@@ -72,6 +83,7 @@ const filtered = computed(() => {
 const clearFilters = () => {
     query.value = "";
     semesterFilter.value = "all";
+    enrollmentFilter.value = "all";
     sortBy.value = "code";
 };
 
@@ -143,7 +155,7 @@ const deleteCourse = (courseId) => {
                         </button>
                     </div>
 
-                    <div class="mt-4 grid gap-3 lg:grid-cols-3">
+                    <div class="mt-4 grid gap-3 lg:grid-cols-4">
                         <div>
                             <label for="admin-courses-search" class="block text-xs font-medium text-slate-600">Search</label>
                             <input
@@ -163,6 +175,18 @@ const deleteCourse = (courseId) => {
                             >
                                 <option value="all">All semesters</option>
                                 <option v-for="s in semesters" :key="s" :value="s">{{ s }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="admin-courses-enrollment" class="block text-xs font-medium text-slate-600">Enrollment status</label>
+                            <select
+                                id="admin-courses-enrollment"
+                                v-model="enrollmentFilter"
+                                class="mt-1 block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All courses</option>
+                                <option value="enrolled">Enrolled</option>
+                                <option value="not-enrolled">Not enrolled</option>
                             </select>
                         </div>
                         <div>
@@ -194,12 +218,13 @@ const deleteCourse = (courseId) => {
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Course</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Credits</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Semester</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Enrollment</th>
                                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="filtered.length === 0">
-                                    <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">
+                                    <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
                                         {{
                                             courses.length === 0
                                                 ? "No courses found. Create your first course to get started."
@@ -230,6 +255,20 @@ const deleteCourse = (courseId) => {
                                     </td>
                                     <td class="px-4 py-4 text-sm text-slate-700">{{ course.credits }}</td>
                                     <td class="px-4 py-4 text-sm text-slate-700">{{ course.semester }}</td>
+                                    <td class="px-4 py-4 text-sm">
+                                        <span
+                                            v-if="Number(course.enrolled_students_count ?? 0) > 0"
+                                            class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+                                        >
+                                            Enrolled ({{ course.enrolled_students_count }})
+                                        </span>
+                                        <span
+                                            v-else
+                                            class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
+                                        >
+                                            Not enrolled
+                                        </span>
+                                    </td>
                                     <td class="px-4 py-4 text-right text-sm">
                                         <div class="flex items-center justify-end gap-2">
                                             <Link
@@ -280,6 +319,16 @@ const deleteCourse = (courseId) => {
 
                             <p class="mt-3 text-xs text-slate-600">
                                 Credits: <span class="font-semibold text-slate-700">{{ course.credits }}</span>
+                            </p>
+                            <p class="mt-1 text-xs text-slate-600">
+                                Enrollment:
+                                <span
+                                    v-if="Number(course.enrolled_students_count ?? 0) > 0"
+                                    class="font-semibold text-emerald-700"
+                                >
+                                    Enrolled ({{ course.enrolled_students_count }})
+                                </span>
+                                <span v-else class="font-semibold text-slate-700">Not enrolled</span>
                             </p>
 
                             <div class="mt-3 grid grid-cols-2 gap-2">
