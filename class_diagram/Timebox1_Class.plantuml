@@ -9,16 +9,22 @@ class User {
   +email: varchar
   +role: varchar
   +photo: varchar
-  +preferences: json
+  +preferences: longtext
   +email_verified_at: timestamp
+  +password: varchar
+  +remember_token: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
-  +student()
-  +teachingCourses()
-  +teachingSubjects()
-  +hasRole(role)
-  +isStudent()
-  +isTeacher()
-  +isStaff()
+  +FillGetData()
+  +Login()
+  +Logout()
+  +Register()
+  +UpdateProfile()
+  +ResetPassword()
+  +VerifyEmail()
+  +GetRole()
+  +AutoID()
 }
 
 class Student {
@@ -28,24 +34,36 @@ class Student {
   +full_name: varchar
   +dob: date
   +gender: varchar
+  +nationality: varchar
   +email: varchar
   +phone: varchar
+  +address: text
+  +emergency_contact_name: varchar
+  +emergency_contact_phone: varchar
   +programme: varchar
   +intake_year: varchar
+  +previous_institution: varchar
+  +previous_qualification: varchar
   +status: varchar
+  +notes: text
+  +enrollment_date: date
   +photo: varchar
   +id_card: varchar
   +transcript: varchar
-  +enrollment_date: date
+  +created_at: timestamp
+  +updated_at: timestamp
   --
-  +user()
-  +courses()
-  +attendances()
-  +grades()
-  +fees()
-  +calculateGPA()
-  +requestEnrollment(course)
-  +requestWithdrawal(course)
+  +FillGetData()
+  +AddStudent()
+  +UpdateStudent()
+  +DeleteStudent()
+  +SearchStudent()
+  +GetGrades()
+  +GetEnrollments()
+  +GetFees()
+  +GetAttendance()
+  +CalculateGPA()
+  +AutoID()
 }
 
 class Course {
@@ -55,13 +73,19 @@ class Course {
   +credits: int
   +semester: varchar
   +photo: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
-  +students()
-  +teachers()
-  +subjects()
-  +attendances()
-  +grades()
-  +timetables()
+  +FillGetData()
+  +AddCourse()
+  +UpdateCourse()
+  +DeleteCourse()
+  +SearchCourse()
+  +GetSubjects()
+  +GetEnrollments()
+  +GetTimetables()
+  +ValidateCourseCode()
+  +AutoID()
 }
 
 class Subject {
@@ -72,59 +96,79 @@ class Subject {
   +credits: int
   +description: text
   +photo: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
-  +course()
-  +teachers()
-  +grades()
-  +timetables()
-  +attendances()
+  +FillGetData()
+  +AddSubject()
+  +UpdateSubject()
+  +DeleteSubject()
+  +SearchSubject()
+  +GetGrades()
+  +GetTimetables()
+  +GetAttendances()
+  +ValidateSubjectCode()
+  +AutoID()
 }
 
-class CourseStudent <<pivot: course_student>> {
+class Course_Teacher {
+  +id: bigint
+  +course_id: bigint
+  +user_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+  --
+  +FillGetData()
+  +AssignTeacher()
+  +RemoveTeacher()
+  +GetTeacherByCourse()
+  +GetCoursesByTeacher()
+  +AutoID()
+}
+
+class Subject_Teacher {
+  +id: bigint
+  +subject_id: bigint
+  +user_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+  --
+  +FillGetData()
+  +AssignTeacher()
+  +RemoveTeacher()
+  +GetTeacherBySubject()
+  +GetSubjectByTeacher()
+  +AutoID()
+}
+
+class Course_Student {
   +id: bigint
   +course_id: bigint
   +student_id: bigint
   +status: enum
   +created_at: timestamp
   +updated_at: timestamp
-}
-
-class CourseTeacher <<pivot: course_teacher>> {
-  +id: bigint
-  +course_id: bigint
-  +user_id: bigint
-  +created_at: timestamp
-  +updated_at: timestamp
-}
-
-class SubjectTeacher <<pivot: subject_teacher>> {
-  +id: bigint
-  +subject_id: bigint
-  +user_id: bigint
-  +created_at: timestamp
-  +updated_at: timestamp
-}
-
-class EnrollmentService {
-  +requestEnrollment(student, course)
-  +requestWithdrawal(student, course)
-  +approveEnrollment(enrollmentId)
-  +rejectEnrollment(enrollmentId)
-  +approveWithdrawal(enrollmentId)
-  +rejectWithdrawal(enrollmentId)
+  --
+  +FillGetData()
+  +RequestEnrollment()
+  +ApproveEnrollment()
+  +RejectEnrollment()
+  +RequestWithdrawal()
+  +ApproveWithdrawal()
+  +RejectWithdrawal()
+  +SearchEnrollment()
+  +GetByStudent()
+  +GetByCourse()
+  +AutoID()
 }
 
 User "1" -- "0..1" Student : has profile
-Course "1" -- "0..*" Subject : has
-Course "1" -- "0..*" CourseStudent
-Student "1" -- "0..*" CourseStudent
-Course "1" -- "0..*" CourseTeacher
-User "1" -- "0..*" CourseTeacher : teaches
-Subject "1" -- "0..*" SubjectTeacher
-User "1" -- "0..*" SubjectTeacher : teaches
-
-EnrollmentService ..> CourseStudent : manages status
-EnrollmentService ..> Course : checks conflicts
-EnrollmentService ..> Student : validates ownership
+Course "1" -- "1..*" Subject : has
+Course "1" -- "0..*" Course_Teacher
+User "1" -- "0..*" Course_Teacher : teaches
+Subject "1" -- "0..*" Subject_Teacher
+User "1" -- "0..*" Subject_Teacher : teaches
+Course "1" -- "0..*" Course_Student
+Student "1" -- "0..*" Course_Student
 
 @enduml
