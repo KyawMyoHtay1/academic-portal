@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\EnrollmentService;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StaffEnrollmentController extends Controller
 {
@@ -15,69 +18,15 @@ class StaffEnrollmentController extends Controller
     /**
      * Display and filter course enrollments for staff.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $filters = request()->only(['status', 'search', 'sort_by', 'sort_dir']);
-        $status = $filters['status'] ?? 'pending';
-        $search = trim((string) ($filters['search'] ?? ''));
-        $allowedSorts = [
-            'requested_at' => 'course_student.updated_at',
-            'student_no' => 'students.student_no',
-            'student_name' => 'students.full_name',
-            'programme' => 'students.programme',
-            'status' => 'course_student.status',
-            'course_code' => 'courses.course_code',
-            'semester' => 'courses.semester',
-        ];
-        $requestedSortBy = (string) ($filters['sort_by'] ?? 'requested_at');
-        $sortBy = array_key_exists($requestedSortBy, $allowedSorts)
-            ? $requestedSortBy
-            : 'requested_at';
-        $sortDir = ($filters['sort_dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+        $filters = $this->resolveFilters($request);
+        $allowedSorts = $this->allowedSorts();
 
-        // Base query for enrollments with student and course details
-        $query = DB::table('course_student')
-            ->join('courses', 'course_student.course_id', '=', 'courses.id')
-            ->join('students', 'course_student.student_id', '=', 'students.id')
-            ->select(
-                'course_student.id as enrollment_id',
-                'course_student.created_at',
-                'course_student.updated_at',
-                'course_student.status',
-                'courses.id as course_id',
-                'courses.course_code',
-                'courses.title as course_title',
-                'courses.credits',
-                'courses.semester',
-                'courses.photo as course_photo',
-                'students.id as student_id',
-                'students.student_no',
-                'students.full_name as student_name',
-                'students.email as student_email',
-                'students.programme',
-                'students.photo as student_photo'
-            );
-
-        // Apply search (student name/number/email, course code/title, programme)
-        if ($search !== '') {
-            $query->where(function ($q) use ($search): void {
-                $like = '%'.$search.'%';
-                $q->where('students.full_name', 'like', $like)
-                    ->orWhere('students.student_no', 'like', $like)
-                    ->orWhere('students.email', 'like', $like)
-                    ->orWhere('students.programme', 'like', $like)
-                    ->orWhere('courses.course_code', 'like', $like)
-                    ->orWhere('courses.title', 'like', $like);
-            });
-        }
-
-        // Status filter: all | pending | approved | rejected | withdrawal_pending
-        if ($status !== 'all') {
-            $query->where('course_student.status', $status);
-        }
+        $query = $this->baseEnrollmentQuery($filters);
 
         // Order by requested sort + stable fallback.
-        $query->orderBy($allowedSorts[$sortBy], $sortDir)
+        $query->orderBy($allowedSorts[$filters['sort_by']], $filters['sort_dir'])
             ->orderByDesc('course_student.updated_at')
             ->orderByDesc('course_student.created_at');
 
@@ -85,25 +34,7 @@ class StaffEnrollmentController extends Controller
         $enrollments = $query
             ->paginate($perPage)
             ->withQueryString()
-            ->through(function ($row) {
-                return [
-                    'enrollment_id' => $row->enrollment_id,
-                    'status' => $row->status,
-                    'requested_at' => $row->updated_at ?? $row->created_at,
-                    'course_id' => $row->course_id,
-                    'course_code' => $row->course_code,
-                    'course_title' => $row->course_title,
-                    'credits' => $row->credits,
-                    'semester' => $row->semester,
-                    'course_photo' => $row->course_photo,
-                    'student_id' => $row->student_id,
-                    'student_no' => $row->student_no,
-                    'student_name' => $row->student_name,
-                    'student_email' => $row->student_email,
-                    'programme' => $row->programme,
-                    'student_photo' => $row->student_photo,
-                ];
-            });
+            ->through(fn ($row) => $this->mapEnrollmentRow($row));
 
         // Status counts for tabs
         $statusCountsRaw = DB::table('course_student')
@@ -143,10 +74,12 @@ class StaffEnrollmentController extends Controller
         return Inertia::render('Admin/Enrollments/Index', [
             'enrollments' => $enrollments,
             'filters' => [
-                'status' => $status,
-                'search' => $search,
-                'sort_by' => $sortBy,
-                'sort_dir' => $sortDir,
+                'status' => $filters['status'],
+                'search' => $filters['search'],
+                'sort_by' => $filters['sort_by'],
+                'sort_dir' => $filters['sort_dir'],
+                'date_from' => $filters['date_from'],
+                'date_to' => $filters['date_to'],
             ],
             'counts' => $statusCounts,
             'overview' => [
@@ -156,6 +89,83 @@ class StaffEnrollmentController extends Controller
                 'rejection_rate' => $rejectionRate,
             ],
         ]);
+    }
+
+    /**
+     * Export enrollments using the current filters.
+     */
+    public function export(Request $request, string $format)
+    {
+        $format = strtolower($format);
+        if (! in_array($format, ['csv', 'pdf'], true)) {
+            abort(404);
+        }
+
+        $filters = $this->resolveFilters($request);
+        $allowedSorts = $this->allowedSorts();
+
+        $rows = $this->baseEnrollmentQuery($filters)
+            ->orderBy($allowedSorts[$filters['sort_by']], $filters['sort_dir'])
+            ->orderByDesc('course_student.updated_at')
+            ->orderByDesc('course_student.created_at')
+            ->get()
+            ->map(fn ($row) => $this->mapEnrollmentRow($row));
+
+        $timestamp = now()->format('Ymd_His');
+
+        if ($format === 'csv') {
+            $filename = "enrollments_{$timestamp}.csv";
+
+            return response()->streamDownload(function () use ($rows): void {
+                $handle = fopen('php://output', 'w');
+                if ($handle === false) {
+                    return;
+                }
+
+                fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($handle, [
+                    'Enrollment ID',
+                    'Student No',
+                    'Student Name',
+                    'Student Email',
+                    'Programme',
+                    'Course Code',
+                    'Course Title',
+                    'Credits',
+                    'Semester',
+                    'Status',
+                    'Requested At',
+                ]);
+
+                foreach ($rows as $row) {
+                    fputcsv($handle, [
+                        $row['enrollment_id'],
+                        $row['student_no'],
+                        $row['student_name'],
+                        $row['student_email'],
+                        $row['programme'],
+                        $row['course_code'],
+                        $row['course_title'],
+                        $row['credits'],
+                        $row['semester'],
+                        $row['status'],
+                        $row['requested_at'],
+                    ]);
+                }
+
+                fclose($handle);
+            }, $filename, [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        $pdf = Pdf::loadView('enrollments.report', [
+            'rows' => $rows,
+            'filters' => $filters,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download("enrollments_{$timestamp}.pdf");
     }
 
     /**
@@ -204,5 +214,145 @@ class StaffEnrollmentController extends Controller
         return redirect()
             ->route('admin.enrollments.index')
             ->with($result['level'], $result['message']);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function resolveFilters(Request $request): array
+    {
+        $filters = $request->only([
+            'status',
+            'search',
+            'sort_by',
+            'sort_dir',
+            'date_from',
+            'date_to',
+        ]);
+
+        $allowedSorts = $this->allowedSorts();
+        $status = (string) ($filters['status'] ?? 'pending');
+        $search = trim((string) ($filters['search'] ?? ''));
+        $requestedSortBy = (string) ($filters['sort_by'] ?? 'requested_at');
+        $sortBy = array_key_exists($requestedSortBy, $allowedSorts)
+            ? $requestedSortBy
+            : 'requested_at';
+        $sortDir = ($filters['sort_dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        $dateFrom = trim((string) ($filters['date_from'] ?? ''));
+        $dateTo = trim((string) ($filters['date_to'] ?? ''));
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+            $dateFrom = '';
+        }
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+            $dateTo = '';
+        }
+        if ($dateFrom !== '' && $dateTo !== '' && $dateFrom > $dateTo) {
+            [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        }
+
+        return [
+            'status' => $status,
+            'search' => $search,
+            'sort_by' => $sortBy,
+            'sort_dir' => $sortDir,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function allowedSorts(): array
+    {
+        return [
+            'requested_at' => 'course_student.updated_at',
+            'student_no' => 'students.student_no',
+            'student_name' => 'students.full_name',
+            'programme' => 'students.programme',
+            'status' => 'course_student.status',
+            'course_code' => 'courses.course_code',
+            'semester' => 'courses.semester',
+        ];
+    }
+
+    /**
+     * @param  array<string, string>  $filters
+     */
+    private function baseEnrollmentQuery(array $filters)
+    {
+        $query = DB::table('course_student')
+            ->join('courses', 'course_student.course_id', '=', 'courses.id')
+            ->join('students', 'course_student.student_id', '=', 'students.id')
+            ->select(
+                'course_student.id as enrollment_id',
+                'course_student.created_at',
+                'course_student.updated_at',
+                'course_student.status',
+                'courses.id as course_id',
+                'courses.course_code',
+                'courses.title as course_title',
+                'courses.credits',
+                'courses.semester',
+                'courses.photo as course_photo',
+                'students.id as student_id',
+                'students.student_no',
+                'students.full_name as student_name',
+                'students.email as student_email',
+                'students.programme',
+                'students.photo as student_photo'
+            );
+
+        if ($filters['search'] !== '') {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search): void {
+                $like = '%'.$search.'%';
+                $q->where('students.full_name', 'like', $like)
+                    ->orWhere('students.student_no', 'like', $like)
+                    ->orWhere('students.email', 'like', $like)
+                    ->orWhere('students.programme', 'like', $like)
+                    ->orWhere('courses.course_code', 'like', $like)
+                    ->orWhere('courses.title', 'like', $like);
+            });
+        }
+
+        if ($filters['status'] !== 'all') {
+            $query->where('course_student.status', $filters['status']);
+        }
+
+        if ($filters['date_from'] !== '') {
+            $query->whereDate('course_student.updated_at', '>=', $filters['date_from']);
+        }
+        if ($filters['date_to'] !== '') {
+            $query->whereDate('course_student.updated_at', '<=', $filters['date_to']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  object  $row
+     * @return array<string, mixed>
+     */
+    private function mapEnrollmentRow(object $row): array
+    {
+        return [
+            'enrollment_id' => $row->enrollment_id,
+            'status' => $row->status,
+            'requested_at' => $row->updated_at ?? $row->created_at,
+            'course_id' => $row->course_id,
+            'course_code' => $row->course_code,
+            'course_title' => $row->course_title,
+            'credits' => $row->credits,
+            'semester' => $row->semester,
+            'course_photo' => $row->course_photo,
+            'student_id' => $row->student_id,
+            'student_no' => $row->student_no,
+            'student_name' => $row->student_name,
+            'student_email' => $row->student_email,
+            'programme' => $row->programme,
+            'student_photo' => $row->student_photo,
+        ];
     }
 }

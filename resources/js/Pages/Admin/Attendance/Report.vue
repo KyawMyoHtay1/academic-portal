@@ -73,6 +73,19 @@ const applyFilters = () => {
     );
 };
 
+const exportUrl = (format) =>
+    route("admin.attendance.report.export", {
+        format,
+        programme:
+            programmeFilter.value !== "all" ? programmeFilter.value : undefined,
+        intake_year:
+            intakeYearFilter.value !== "all"
+                ? intakeYearFilter.value
+                : undefined,
+        semester:
+            semesterFilter.value !== "all" ? semesterFilter.value : undefined,
+    });
+
 watch([programmeFilter, intakeYearFilter, semesterFilter], () => {
     applyFilters();
 });
@@ -124,27 +137,41 @@ const filteredRecent = computed(() => {
                 <h2 class="text-xl font-semibold leading-tight text-slate-900">
                     Attendance Report
                 </h2>
-                <Link
-                    :href="route('admin.attendance.alerts.run')"
-                    method="post"
-                    as="button"
-                    class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-                >
-                    <svg
-                        class="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
+                <div class="flex flex-wrap items-center gap-2">
+                    <a
+                        :href="exportUrl('csv')"
+                        class="inline-flex items-center rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-100"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                        />
-                    </svg>
-                    <span>Send Low Attendance Alerts</span>
-                </Link>
+                        Export CSV
+                    </a>
+                    <a
+                        :href="exportUrl('pdf')"
+                        class="inline-flex items-center rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-100"
+                    >
+                        Export PDF
+                    </a>
+                    <Link
+                        :href="route('admin.attendance.alerts.run')"
+                        method="post"
+                        as="button"
+                        class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                            />
+                        </svg>
+                        <span>Send Low Attendance Alerts</span>
+                    </Link>
+                </div>
             </div>
         </template>
 

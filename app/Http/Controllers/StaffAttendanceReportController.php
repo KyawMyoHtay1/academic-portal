@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,44 +19,7 @@ class StaffAttendanceReportController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
-        $filters = [
-            'programme' => trim((string) $request->input('programme', 'all')),
-            'intake_year' => trim((string) $request->input('intake_year', 'all')),
-            'semester' => trim((string) $request->input('semester', 'all')),
-        ];
-
-        $programmes = Student::query()
-            ->whereNotNull('programme')
-            ->where('programme', '!=', '')
-            ->distinct()
-            ->orderBy('programme')
-            ->pluck('programme')
-            ->values();
-
-        $intakeYears = Student::query()
-            ->whereNotNull('intake_year')
-            ->distinct()
-            ->orderByDesc('intake_year')
-            ->pluck('intake_year')
-            ->values();
-
-        $semesters = Course::query()
-            ->whereNotNull('semester')
-            ->where('semester', '!=', '')
-            ->distinct()
-            ->orderBy('semester')
-            ->pluck('semester')
-            ->values();
-
-        if ($filters['programme'] !== 'all' && ! $programmes->contains($filters['programme'])) {
-            $filters['programme'] = 'all';
-        }
-        if ($filters['intake_year'] !== 'all' && ! $intakeYears->map(fn ($year) => (string) $year)->contains($filters['intake_year'])) {
-            $filters['intake_year'] = 'all';
-        }
-        if ($filters['semester'] !== 'all' && ! $semesters->contains($filters['semester'])) {
-            $filters['semester'] = 'all';
-        }
+        [$filters, $programmes, $intakeYears, $semesters] = $this->resolveReportFilters($request);
 
         $attendanceScope = Attendance::query();
         $this->applyAttendanceFilters($attendanceScope, $filters);
@@ -247,6 +211,109 @@ class StaffAttendanceReportController extends Controller
     }
 
     /**
+     * Export filtered attendance report.
+     */
+    public function export(Request $request, string $format)
+    {
+        $format = strtolower($format);
+        if (! in_array($format, ['csv', 'pdf'], true)) {
+            abort(404);
+        }
+
+        [$filters] = $this->resolveReportFilters($request);
+
+        $records = Attendance::query()
+            ->with(['student:id,student_no,full_name,programme,intake_year', 'subject.course:id,course_code,semester'])
+            ->tap(function ($query) use ($filters) {
+                $this->applyAttendanceFilters($query, $filters);
+            })
+            ->orderByDesc('date')
+            ->get()
+            ->map(function ($attendance) {
+                $student = $attendance->student;
+                $subject = $attendance->subject;
+                $course = $subject?->course;
+
+                return [
+                    'date' => $attendance->date?->format('Y-m-d'),
+                    'student_no' => $student?->student_no ?? 'N/A',
+                    'student_name' => $student?->full_name ?? 'N/A',
+                    'programme' => $student?->programme ?? 'N/A',
+                    'intake_year' => $student?->intake_year ?? 'N/A',
+                    'subject_code' => $subject?->subject_code ?? 'N/A',
+                    'subject_title' => $subject?->title ?? 'N/A',
+                    'course_code' => $course?->course_code ?? 'N/A',
+                    'semester' => $course?->semester ?? 'N/A',
+                    'status' => $attendance->status,
+                ];
+            });
+
+        $total = $records->count();
+        $present = $records->where('status', 'present')->count();
+        $absent = $records->where('status', 'absent')->count();
+        $rate = $total > 0 ? round(($present / $total) * 100, 2) : 0;
+
+        $timestamp = now()->format('Ymd_His');
+        if ($format === 'csv') {
+            $filename = "attendance_report_{$timestamp}.csv";
+
+            return response()->streamDownload(function () use ($records): void {
+                $handle = fopen('php://output', 'w');
+                if ($handle === false) {
+                    return;
+                }
+
+                fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($handle, [
+                    'Date',
+                    'Student No',
+                    'Student Name',
+                    'Programme',
+                    'Intake Year',
+                    'Subject Code',
+                    'Subject Title',
+                    'Course Code',
+                    'Semester',
+                    'Status',
+                ]);
+
+                foreach ($records as $row) {
+                    fputcsv($handle, [
+                        $row['date'],
+                        $row['student_no'],
+                        $row['student_name'],
+                        $row['programme'],
+                        $row['intake_year'],
+                        $row['subject_code'],
+                        $row['subject_title'],
+                        $row['course_code'],
+                        $row['semester'],
+                        $row['status'],
+                    ]);
+                }
+
+                fclose($handle);
+            }, $filename, [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        $pdf = Pdf::loadView('attendance.staff_report', [
+            'filters' => $filters,
+            'overall' => [
+                'total' => $total,
+                'present' => $present,
+                'absent' => $absent,
+                'rate' => $rate,
+            ],
+            'rows' => $records,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download("attendance_report_{$timestamp}.pdf");
+    }
+
+    /**
      * Apply shared attendance filters to a query.
      *
      * @param  array<string, string>  $filters
@@ -275,5 +342,54 @@ class StaffAttendanceReportController extends Controller
                 $courseQuery->where('semester', $filters['semester']);
             });
         }
+    }
+
+    /**
+     * Resolve and normalize report filters and options.
+     *
+     * @return array{0: array<string, string>, 1: \Illuminate\Support\Collection<int, string>, 2: \Illuminate\Support\Collection<int, int>, 3: \Illuminate\Support\Collection<int, string>}
+     */
+    private function resolveReportFilters(Request $request): array
+    {
+        $filters = [
+            'programme' => trim((string) $request->input('programme', 'all')),
+            'intake_year' => trim((string) $request->input('intake_year', 'all')),
+            'semester' => trim((string) $request->input('semester', 'all')),
+        ];
+
+        $programmes = Student::query()
+            ->whereNotNull('programme')
+            ->where('programme', '!=', '')
+            ->distinct()
+            ->orderBy('programme')
+            ->pluck('programme')
+            ->values();
+
+        $intakeYears = Student::query()
+            ->whereNotNull('intake_year')
+            ->distinct()
+            ->orderByDesc('intake_year')
+            ->pluck('intake_year')
+            ->values();
+
+        $semesters = Course::query()
+            ->whereNotNull('semester')
+            ->where('semester', '!=', '')
+            ->distinct()
+            ->orderBy('semester')
+            ->pluck('semester')
+            ->values();
+
+        if ($filters['programme'] !== 'all' && ! $programmes->contains($filters['programme'])) {
+            $filters['programme'] = 'all';
+        }
+        if ($filters['intake_year'] !== 'all' && ! $intakeYears->map(fn ($year) => (string) $year)->contains($filters['intake_year'])) {
+            $filters['intake_year'] = 'all';
+        }
+        if ($filters['semester'] !== 'all' && ! $semesters->contains($filters['semester'])) {
+            $filters['semester'] = 'all';
+        }
+
+        return [$filters, $programmes, $intakeYears, $semesters];
     }
 }

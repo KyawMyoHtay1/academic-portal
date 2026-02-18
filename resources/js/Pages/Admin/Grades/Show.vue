@@ -71,6 +71,14 @@ const badgeClass = (status) => {
     if (status === "rejected") return "bg-red-100 text-red-800";
     return "bg-amber-100 text-amber-800";
 };
+
+const exportUrl = (format) =>
+    route("admin.grades.export", {
+        subject: props.subject.id,
+        format,
+        status: statusFilter.value,
+        search: searchQuery.value || undefined,
+    });
 </script>
 
 <template>
@@ -94,12 +102,26 @@ const badgeClass = (status) => {
                 <h2 class="text-xl font-semibold leading-tight text-slate-900">
                     Review Grades
                 </h2>
-                <Link
-                    :href="route('admin.grades.index')"
-                    class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
-                >
-                    Back
-                </Link>
+                <div class="flex items-center gap-2">
+                    <a
+                        :href="exportUrl('csv')"
+                        class="rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 shadow-sm hover:bg-emerald-100"
+                    >
+                        Export CSV
+                    </a>
+                    <a
+                        :href="exportUrl('pdf')"
+                        class="rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-100"
+                    >
+                        Export PDF
+                    </a>
+                    <Link
+                        :href="route('admin.grades.index')"
+                        class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                    >
+                        Back
+                    </Link>
+                </div>
             </div>
         </template>
 
@@ -278,5 +300,4 @@ const badgeClass = (status) => {
         </div>
     </AuthenticatedLayout>
 </template>
-
 

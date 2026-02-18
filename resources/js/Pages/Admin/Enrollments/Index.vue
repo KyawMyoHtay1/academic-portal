@@ -37,6 +37,8 @@ const activeStatus = ref(props.filters.status || "pending");
 const query = ref(props.filters.search || "");
 const sortBy = ref(props.filters.sort_by || "requested_at");
 const sortDir = ref(props.filters.sort_dir || "desc");
+const dateFrom = ref(props.filters.date_from || "");
+const dateTo = ref(props.filters.date_to || "");
 const quickViewEnrollment = ref(null);
 
 const stats = computed(() => ({
@@ -70,6 +72,8 @@ const hasActiveFilters = computed(
     () =>
         query.value.trim() !== "" ||
         activeStatus.value !== "pending" ||
+        dateFrom.value !== "" ||
+        dateTo.value !== "" ||
         sortBy.value !== "requested_at" ||
         sortDir.value !== "desc"
 );
@@ -88,6 +92,12 @@ const activeFilterChips = computed(() => {
             label: `Search: ${query.value.trim()}`,
         });
     }
+    if (dateFrom.value !== "" || dateTo.value !== "") {
+        chips.push({
+            key: "date_range",
+            label: `Date: ${dateFrom.value || "Any"} to ${dateTo.value || "Any"}`,
+        });
+    }
     return chips;
 });
 
@@ -99,6 +109,8 @@ const applyFilters = () => {
             search: query.value || undefined,
             sort_by: sortBy.value,
             sort_dir: sortDir.value,
+            date_from: dateFrom.value || undefined,
+            date_to: dateTo.value || undefined,
         },
         {
             preserveState: true,
@@ -127,7 +139,7 @@ watch(
 );
 
 watch(
-    () => [sortBy.value, sortDir.value],
+    () => [sortBy.value, sortDir.value, dateFrom.value, dateTo.value],
     () => {
         applyFilters();
     }
@@ -156,6 +168,8 @@ const clearFilters = () => {
     query.value = "";
     sortBy.value = "requested_at";
     sortDir.value = "desc";
+    dateFrom.value = "";
+    dateTo.value = "";
 };
 
 const removeFilterChip = (key) => {
@@ -165,8 +179,24 @@ const removeFilterChip = (key) => {
     }
     if (key === "search") {
         query.value = "";
+        return;
+    }
+    if (key === "date_range") {
+        dateFrom.value = "";
+        dateTo.value = "";
     }
 };
+
+const exportUrl = (format) =>
+    route("admin.enrollments.export", {
+        format,
+        status: activeStatus.value,
+        search: query.value || undefined,
+        sort_by: sortBy.value,
+        sort_dir: sortDir.value,
+        date_from: dateFrom.value || undefined,
+        date_to: dateTo.value || undefined,
+    });
 
 const approveEnrollment = (enrollmentId) => {
     if (!confirm("Are you sure you want to approve this enrollment?")) {
@@ -365,7 +395,7 @@ const closeQuickView = () => {
                                     </span>
                                 </button>
                             </div>
-                            <div class="flex w-full items-center gap-2 sm:w-auto">
+                            <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                                 <div class="relative w-full sm:w-80">
                                     <input
                                         v-model="query"
@@ -383,6 +413,30 @@ const closeQuickView = () => {
                                         x
                                     </button>
                                 </div>
+                                <input
+                                    v-model="dateFrom"
+                                    type="date"
+                                    class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-40"
+                                    title="From date"
+                                />
+                                <input
+                                    v-model="dateTo"
+                                    type="date"
+                                    class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-40"
+                                    title="To date"
+                                />
+                                <a
+                                    :href="exportUrl('csv')"
+                                    class="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                                >
+                                    Export CSV
+                                </a>
+                                <a
+                                    :href="exportUrl('pdf')"
+                                    class="rounded-md border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                                >
+                                    Export PDF
+                                </a>
                                 <button
                                     v-if="hasActiveFilters"
                                     type="button"

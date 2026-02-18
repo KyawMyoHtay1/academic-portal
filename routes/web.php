@@ -376,6 +376,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Student Attendance Report
         Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
+        Route::get('/student/attendance/export/{format}', [StudentAttendanceController::class, 'export'])->name('student.attendance.export');
 
         // Student Assignments
         Route::get('/student/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignments.index');
@@ -454,6 +455,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Enrollment Management (staff only)
         Route::get('/admin/enrollments', [StaffEnrollmentController::class, 'index'])->name('admin.enrollments.index');
+        Route::get('/admin/enrollments/export/{format}', [StaffEnrollmentController::class, 'export'])->name('admin.enrollments.export');
         Route::post('/admin/enrollments/{enrollment}/approve', [StaffEnrollmentController::class, 'approve'])->name('admin.enrollments.approve');
         Route::post('/admin/enrollments/{enrollment}/reject', [StaffEnrollmentController::class, 'reject'])->name('admin.enrollments.reject');
         Route::post('/admin/enrollments/{enrollment}/approve-withdrawal', [StaffEnrollmentController::class, 'approveWithdrawal'])->name('admin.enrollments.approve-withdrawal');
@@ -499,6 +501,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Grades Review & Approval (staff only)
         Route::get('/admin/grades', [StaffGradesController::class, 'index'])->name('admin.grades.index');
+        Route::get('/admin/grades/{subject}/export/{format}', [StaffGradesController::class, 'export'])->name('admin.grades.export');
         Route::get('/admin/grades/{subject}', [StaffGradesController::class, 'show'])->name('admin.grades.show');
         Route::post('/admin/grades/{grade}/approve', [StaffGradesController::class, 'approve'])->name('admin.grades.approve');
         Route::post('/admin/grades/{grade}/reject', [StaffGradesController::class, 'reject'])->name('admin.grades.reject');
@@ -525,6 +528,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Attendance Reports (staff only)
         Route::get('/admin/attendance/report', [StaffAttendanceReportController::class, 'index'])->name('admin.attendance.report');
+        Route::get('/admin/attendance/report/export/{format}', [StaffAttendanceReportController::class, 'export'])->name('admin.attendance.report.export');
 
         // Attendance Alerts (staff only)
         Route::post('/admin/attendance/alerts/run', StaffAttendanceAlertsController::class)->name('admin.attendance.alerts.run');

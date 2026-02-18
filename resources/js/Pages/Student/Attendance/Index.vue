@@ -74,6 +74,9 @@ const filteredRecent = computed(() => {
 const trendPeak = computed(() =>
     Math.max(...props.trendWeekly.map((week) => week.total ?? 0), 0)
 );
+
+const exportUrl = (format) =>
+    route("student.attendance.export", { format });
 </script>
 
 <template>
@@ -81,9 +84,25 @@ const trendPeak = computed(() =>
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-slate-900">
-                My Attendance Report
-            </h2>
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-slate-900">
+                    My Attendance Report
+                </h2>
+                <div class="flex items-center gap-2">
+                    <a
+                        :href="exportUrl('csv')"
+                        class="rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 shadow-sm hover:bg-emerald-100"
+                    >
+                        Export CSV
+                    </a>
+                    <a
+                        :href="exportUrl('pdf')"
+                        class="rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm hover:bg-blue-100"
+                    >
+                        Export PDF
+                    </a>
+                </div>
+            </div>
         </template>
 
         <template #breadcrumb>

@@ -10,6 +10,8 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\GradePublished;
 use App\Notifications\GradeReviewOutcome;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -58,50 +60,7 @@ class StaffGradesController extends Controller
     {
         $this->authorize('viewAny', Grade::class);
 
-        $students = $subject->course->students()
-            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
-            ->orderBy('students.full_name')
-            ->get([
-                'students.id',
-                'students.student_no',
-                'students.full_name',
-                'students.photo',
-            ]);
-
-        $grades = Grade::query()
-            ->where('subject_id', $subject->id)
-            ->whereIn('student_id', $students->pluck('id'))
-            ->whereIn('status', [
-                Grade::STATUS_PENDING,
-                Grade::STATUS_APPROVED,
-                Grade::STATUS_REJECTED,
-            ])
-            ->with(['grader:id,name', 'reviewer:id,name'])
-            ->get()
-            ->keyBy('student_id');
-
-        $studentRows = $students->map(function ($student) use ($grades) {
-            $grade = $grades->get($student->id);
-
-            return [
-                'student' => [
-                    'id' => $student->id,
-                    'student_no' => $student->student_no,
-                    'full_name' => $student->full_name,
-                    'photo' => $student->photo,
-                ],
-                'grade' => $grade ? [
-                    'id' => $grade->id,
-                    'score' => $grade->score,
-                    'status' => $grade->status,
-                    'graded_by' => $grade->grader?->name,
-                    'submitted_at' => $grade->updated_at?->toDateTimeString(),
-                    'reviewed_by' => $grade->reviewer?->name,
-                    'reviewed_at' => $grade->reviewed_at?->toDateTimeString(),
-                    'rejection_reason' => $grade->rejection_reason,
-                ] : null,
-            ];
-        });
+        $studentRows = $this->buildSubjectRows($subject);
 
         return Inertia::render('Admin/Grades/Show', [
             'subject' => [
@@ -113,6 +72,117 @@ class StaffGradesController extends Controller
             ],
             'rows' => $studentRows,
         ]);
+    }
+
+    /**
+     * Export grade sheet for a subject.
+     */
+    public function export(Subject $subject, Request $request, string $format)
+    {
+        $this->authorize('viewAny', Grade::class);
+
+        $format = strtolower($format);
+        if (! in_array($format, ['csv', 'pdf'], true)) {
+            abort(404);
+        }
+
+        $status = trim((string) $request->input('status', 'all'));
+        $search = trim((string) $request->input('search', ''));
+        $allowedStatuses = ['pending', 'approved', 'rejected', 'all'];
+        if (! in_array($status, $allowedStatuses, true)) {
+            $status = 'all';
+        }
+
+        $rows = $this->buildSubjectRows($subject)
+            ->filter(function (array $row) use ($status, $search) {
+                $grade = $row['grade'];
+                if (! $grade) {
+                    return false;
+                }
+
+                if ($status !== 'all' && ($grade['status'] ?? null) !== $status) {
+                    return false;
+                }
+
+                if ($search === '') {
+                    return true;
+                }
+
+                $needle = strtolower($search);
+                $haystack = strtolower(sprintf(
+                    '%s %s',
+                    (string) ($row['student']['student_no'] ?? ''),
+                    (string) ($row['student']['full_name'] ?? '')
+                ));
+
+                return str_contains($haystack, $needle);
+            })
+            ->values();
+
+        $timestamp = now()->format('Ymd_His');
+        $safeSubjectCode = preg_replace('/[^A-Za-z0-9_-]/', '-', $subject->subject_code);
+        $safeSubjectCode = $safeSubjectCode !== '' ? $safeSubjectCode : 'subject';
+
+        if ($format === 'csv') {
+            $filename = "grade_sheet_{$safeSubjectCode}_{$timestamp}.csv";
+
+            return response()->streamDownload(function () use ($rows): void {
+                $handle = fopen('php://output', 'w');
+                if ($handle === false) {
+                    return;
+                }
+
+                fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($handle, [
+                    'Student No',
+                    'Student Name',
+                    'Score',
+                    'Letter Grade',
+                    'Status',
+                    'Graded By',
+                    'Submitted At',
+                    'Reviewed By',
+                    'Reviewed At',
+                    'Rejection Reason',
+                ]);
+
+                foreach ($rows as $row) {
+                    $grade = $row['grade'] ?? [];
+                    fputcsv($handle, [
+                        $row['student']['student_no'] ?? '',
+                        $row['student']['full_name'] ?? '',
+                        $grade['score'] ?? '',
+                        $grade['letter_grade'] ?? '',
+                        $grade['status'] ?? '',
+                        $grade['graded_by'] ?? '',
+                        $grade['submitted_at'] ?? '',
+                        $grade['reviewed_by'] ?? '',
+                        $grade['reviewed_at'] ?? '',
+                        $grade['rejection_reason'] ?? '',
+                    ]);
+                }
+
+                fclose($handle);
+            }, $filename, [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        $pdf = Pdf::loadView('grades.subject_sheet', [
+            'subject' => [
+                'code' => $subject->subject_code,
+                'title' => $subject->title,
+                'course_code' => $subject->course->course_code,
+                'course_title' => $subject->course->title,
+                'semester' => $subject->course->semester,
+            ],
+            'rows' => $rows,
+            'status' => $status,
+            'search' => $search,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download("grade_sheet_{$safeSubjectCode}_{$timestamp}.pdf");
     }
 
     public function approve(ApproveGradeRequest $request, Grade $grade): RedirectResponse
@@ -195,5 +265,58 @@ class StaffGradesController extends Controller
         }
 
         return back()->with('success', 'Grade rejected.');
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     */
+    private function buildSubjectRows(Subject $subject)
+    {
+        $students = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->orderBy('students.full_name')
+            ->get([
+                'students.id',
+                'students.student_no',
+                'students.full_name',
+                'students.photo',
+            ]);
+
+        $grades = Grade::query()
+            ->where('subject_id', $subject->id)
+            ->whereIn('student_id', $students->pluck('id'))
+            ->whereIn('status', [
+                Grade::STATUS_PENDING,
+                Grade::STATUS_APPROVED,
+                Grade::STATUS_REJECTED,
+            ])
+            ->with(['grader:id,name', 'reviewer:id,name'])
+            ->get()
+            ->keyBy('student_id');
+
+        return $students->map(function ($student) use ($grades) {
+            $grade = $grades->get($student->id);
+            $letterGrade = $grade?->letter_grade;
+
+            return [
+                'student' => [
+                    'id' => $student->id,
+                    'student_no' => $student->student_no,
+                    'full_name' => $student->full_name,
+                    'photo' => $student->photo,
+                ],
+                'grade' => $grade ? [
+                    'id' => $grade->id,
+                    'score' => $grade->score,
+                    'letter_grade' => $letterGrade,
+                    'status' => $grade->status,
+                    'graded_by' => $grade->grader?->name,
+                    'submitted_at' => $grade->updated_at?->toDateTimeString(),
+                    'reviewed_by' => $grade->reviewer?->name,
+                    'reviewed_at' => $grade->reviewed_at?->toDateTimeString(),
+                    'rejection_reason' => $grade->rejection_reason,
+                ] : null,
+            ];
+        });
     }
 }
