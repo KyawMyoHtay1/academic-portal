@@ -19,6 +19,8 @@ class EnrollmentService
     public function requestEnrollment(Student $student, Course $course): array
     {
         return DB::transaction(function () use ($student, $course): array {
+            $reapplyAfterRejection = false;
+
             $existingEnrollment = DB::table('course_student')
                 ->where('student_id', $student->id)
                 ->where('course_id', $course->id)
@@ -61,66 +63,49 @@ class EnrollmentService
                 }
 
                 if ($status === 'rejected') {
-                    DB::table('course_student')
-                        ->where('student_id', $student->id)
-                        ->where('course_id', $course->id)
-                        ->update(['status' => 'pending', 'updated_at' => now()]);
-
-                    Log::info('enrollment.request_submitted', [
-                        'student_id' => $student->id,
-                        'course_id' => $course->id,
-                        'mode' => 'resubmission_after_rejection',
-                    ]);
-
-                    return $this->result(
-                        'success',
-                        "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval."
-                    );
+                    $reapplyAfterRejection = true;
                 }
             }
 
-            $enrolledCourseIds = $student->courses()
-                ->wherePivot('status', 'approved')
-                ->pluck('courses.id')
-                ->toArray();
+            $approvedCourseIds = DB::table('course_student')
+                ->where('student_id', $student->id)
+                ->where('status', 'approved')
+                ->lockForUpdate()
+                ->pluck('course_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
 
-            if (! empty($enrolledCourseIds)) {
-                $newCourseTimetables = Timetable::with('subject.course')
-                    ->whereHas('subject', fn ($q) => $q->where('course_id', $course->id))
-                    ->get();
+            $conflict = $this->findScheduleConflict($course, $approvedCourseIds);
+            if ($conflict !== null) {
+                Log::info('enrollment.request_blocked', [
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'reason' => 'schedule_conflict',
+                    'conflict_course_id' => $conflict['conflict_course_id'],
+                ]);
 
-                $existingTimetables = Timetable::with('subject.course')
-                    ->whereHas('subject', fn ($q) => $q->whereIn('course_id', $enrolledCourseIds))
-                    ->get();
+                return $this->result(
+                    'error',
+                    $this->scheduleConflictMessage($conflict)
+                );
+            }
 
-                foreach ($newCourseTimetables as $newTimetable) {
-                    foreach ($existingTimetables as $existingTimetable) {
-                        if ($newTimetable->day_of_week !== $existingTimetable->day_of_week) {
-                            continue;
-                        }
+            if ($reapplyAfterRejection) {
+                DB::table('course_student')
+                    ->where('student_id', $student->id)
+                    ->where('course_id', $course->id)
+                    ->update(['status' => 'pending', 'updated_at' => now()]);
 
-                        $newStart = strtotime($newTimetable->start_time);
-                        $newEnd = strtotime($newTimetable->end_time);
-                        $existingStart = strtotime($existingTimetable->start_time);
-                        $existingEnd = strtotime($existingTimetable->end_time);
+                Log::info('enrollment.request_submitted', [
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'mode' => 'resubmission_after_rejection',
+                ]);
 
-                        if ($newStart < $existingEnd && $newEnd > $existingStart) {
-                            $conflictingCourse = $existingTimetable->subject->course;
-
-                            Log::info('enrollment.request_blocked', [
-                                'student_id' => $student->id,
-                                'course_id' => $course->id,
-                                'reason' => 'schedule_conflict',
-                                'conflict_course_id' => $conflictingCourse?->id,
-                            ]);
-
-                            return $this->result(
-                                'error',
-                                "Schedule conflict detected! This course conflicts with {$conflictingCourse->course_code} on {$newTimetable->day_of_week} ({$newTimetable->start_time} - {$newTimetable->end_time}). Please choose a different course or contact administration."
-                            );
-                        }
-                    }
-                }
+                return $this->result(
+                    'success',
+                    "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval."
+                );
             }
 
             try {
@@ -230,15 +215,46 @@ class EnrollmentService
                 return $this->result('error', 'Enrollment not found or already processed.');
             }
 
+            // Lock all enrollment rows for this student so concurrent approvals
+            // for the same student are serialized.
+            $studentEnrollments = DB::table('course_student')
+                ->where('student_id', $enrollment->student_id)
+                ->lockForUpdate()
+                ->get(['id', 'course_id', 'status']);
+
+            $approvedCourseIds = $studentEnrollments
+                ->where('status', 'approved')
+                ->pluck('course_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            $course = Course::find($enrollment->course_id);
+            $student = Student::find($enrollment->student_id);
+
+            if ($course !== null) {
+                $conflict = $this->findScheduleConflict($course, $approvedCourseIds);
+                if ($conflict !== null) {
+                    Log::info('enrollment.review_blocked', [
+                        'enrollment_id' => $enrollmentId,
+                        'student_id' => $enrollment->student_id,
+                        'course_id' => $enrollment->course_id,
+                        'reason' => 'schedule_conflict',
+                        'conflict_course_id' => $conflict['conflict_course_id'],
+                    ]);
+
+                    return $this->result(
+                        'error',
+                        "Cannot approve enrollment for {$this->studentLabel($student)} in {$this->courseLabel($course)}. ".$this->scheduleConflictMessage($conflict)
+                    );
+                }
+            }
+
             DB::table('course_student')
                 ->where('id', $enrollmentId)
                 ->update([
                     'status' => 'approved',
                     'updated_at' => now(),
                 ]);
-
-            $course = Course::find($enrollment->course_id);
-            $student = Student::find($enrollment->student_id);
 
             Log::info('enrollment.review_decision', [
                 'enrollment_id' => $enrollmentId,
@@ -400,5 +416,81 @@ class EnrollmentService
         }
 
         return "{$course->course_code} - {$course->title}";
+    }
+
+    /**
+     * @param  array<int, int>  $approvedCourseIds
+     * @return array<string, mixed>|null
+     */
+    private function findScheduleConflict(Course $course, array $approvedCourseIds): ?array
+    {
+        if ($approvedCourseIds === []) {
+            return null;
+        }
+
+        $newCourseTimetables = Timetable::query()
+            ->whereHas('subject', fn ($q) => $q->where('course_id', $course->id))
+            ->get(['subject_id', 'day_of_week', 'start_time', 'end_time']);
+
+        if ($newCourseTimetables->isEmpty()) {
+            return null;
+        }
+
+        $existingTimetables = Timetable::query()
+            ->with('subject.course:id,course_code,title')
+            ->whereHas('subject', fn ($q) => $q->whereIn('course_id', $approvedCourseIds))
+            ->get(['subject_id', 'day_of_week', 'start_time', 'end_time']);
+
+        foreach ($newCourseTimetables as $newTimetable) {
+            foreach ($existingTimetables as $existingTimetable) {
+                if ($newTimetable->day_of_week !== $existingTimetable->day_of_week) {
+                    continue;
+                }
+
+                $newStart = strtotime((string) $newTimetable->start_time);
+                $newEnd = strtotime((string) $newTimetable->end_time);
+                $existingStart = strtotime((string) $existingTimetable->start_time);
+                $existingEnd = strtotime((string) $existingTimetable->end_time);
+
+                if (
+                    $newStart === false ||
+                    $newEnd === false ||
+                    $existingStart === false ||
+                    $existingEnd === false
+                ) {
+                    continue;
+                }
+
+                if ($newStart < $existingEnd && $newEnd > $existingStart) {
+                    $conflictingCourse = $existingTimetable->subject?->course;
+
+                    return [
+                        'course_code' => $conflictingCourse?->course_code ?? 'UNKNOWN',
+                        'course_title' => $conflictingCourse?->title ?? 'Unknown Course',
+                        'conflict_course_id' => $conflictingCourse?->id,
+                        'day_of_week' => (string) $newTimetable->day_of_week,
+                        'start_time' => (string) $newTimetable->start_time,
+                        'end_time' => (string) $newTimetable->end_time,
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  array<string, mixed>  $conflict
+     */
+    private function scheduleConflictMessage(array $conflict): string
+    {
+        return sprintf(
+            'Schedule conflict detected with %s - %s on %s (%s - %s). Please choose a different course or contact administration.',
+            (string) $conflict['course_code'],
+            (string) $conflict['course_title'],
+            (string) $conflict['day_of_week'],
+            (string) $conflict['start_time'],
+            (string) $conflict['end_time']
+        );
     }
 }
