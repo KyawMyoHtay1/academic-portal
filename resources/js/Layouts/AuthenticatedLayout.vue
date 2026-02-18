@@ -5,6 +5,7 @@ import GlobalSearch from "@/Components/GlobalSearch.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import GoogleTranslate from "@/Components/GoogleTranslate.vue";
+import PageLoadingIndicator from "@/Components/PageLoadingIndicator.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 
 const showingMobileSidebar = ref(false);
@@ -471,6 +472,8 @@ const userRoleMeta = computed(() => {
 
 <template>
     <div class="min-h-screen bg-portal-background">
+        <PageLoadingIndicator />
+
         <!-- Flash messages -->
         <div
             class="fixed top-4 right-4 z-50 max-w-md space-y-2"

@@ -1,6 +1,7 @@
 <script setup>
 import PortalLogo from "@/Components/PortalLogo.vue";
 import GoogleTranslate from "@/Components/GoogleTranslate.vue";
+import PageLoadingIndicator from "@/Components/PageLoadingIndicator.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 
@@ -91,6 +92,8 @@ const quickStats = [
 
 <template>
     <div class="guest-shell relative isolate flex min-h-screen flex-col overflow-hidden">
+        <PageLoadingIndicator />
+
         <div aria-hidden="true" class="guest-ambient">
             <span class="guest-orb guest-orb--a"></span>
             <span class="guest-orb guest-orb--b"></span>
