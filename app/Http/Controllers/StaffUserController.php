@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\ImageService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
@@ -22,9 +23,19 @@ class StaffUserController extends Controller
      */
     public function index(): Response
     {
-        $query = User::orderBy('name');
+        $filters = request()->only(['search', 'role', 'sort_by', 'sort_dir']);
+        $search = trim((string) ($filters['search'] ?? ''));
+        $role = trim((string) ($filters['role'] ?? 'all'));
 
-        if ($search = request('search')) {
+        $allowedSorts = ['name', 'email', 'role', 'created_at'];
+        $sortBy = in_array($filters['sort_by'] ?? 'name', $allowedSorts, true)
+            ? (string) $filters['sort_by']
+            : 'name';
+        $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+        $query = User::query();
+
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
@@ -32,13 +43,14 @@ class StaffUserController extends Controller
             });
         }
 
-        if ($role = request('role')) {
-            if ($role !== 'all') {
-                $query->where('role', $role);
-            }
+        if ($role !== '' && $role !== 'all') {
+            $query->where('role', $role);
         }
 
-        $users = $query->paginate(10)
+        $users = $query
+            ->orderBy($sortBy, $sortDir)
+            ->orderBy('id')
+            ->paginate(10)
             ->withQueryString()
             ->through(function ($user) {
                 return [
@@ -60,7 +72,12 @@ class StaffUserController extends Controller
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
-            'filters' => request()->only(['search', 'role']),
+            'filters' => [
+                'search' => $search,
+                'role' => $role,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
+            ],
             'stats' => $stats,
         ]);
     }
@@ -207,5 +224,44 @@ class StaffUserController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'User deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:users,id'],
+        ]);
+
+        $ids = collect($data['ids'])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('info', 'No users selected for deletion.');
+        }
+
+        if (auth()->id() && $ids->contains((int) auth()->id())) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'You cannot delete your own account in bulk actions.');
+        }
+
+        $users = User::query()
+            ->whereIn('id', $ids->all())
+            ->get(['id', 'photo']);
+
+        foreach ($users as $user) {
+            ImageService::delete($user->photo);
+        }
+
+        User::query()->whereIn('id', $ids->all())->delete();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "{$users->count()} user(s) deleted successfully.");
     }
 }

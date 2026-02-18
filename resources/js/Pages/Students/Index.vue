@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import debounce from "lodash/debounce";
 
 const props = defineProps({
@@ -28,6 +28,9 @@ const query = ref(props.filters.search || "");
 const programmeFilter = ref(props.filters.programme || "all");
 const intakeYearFilter = ref(props.filters.intake_year || "all");
 const statusFilter = ref(props.filters.status || "all");
+const sortBy = ref(props.filters.sort_by || "student_no");
+const sortDir = ref(props.filters.sort_dir || "asc");
+const selectedIds = ref([]);
 
 const rows = computed(() => props.students?.data ?? []);
 
@@ -49,6 +52,43 @@ const stats = computed(() => {
     };
 });
 
+const hasActiveFilters = computed(
+    () =>
+        query.value.trim() !== "" ||
+        programmeFilter.value !== "all" ||
+        intakeYearFilter.value !== "all" ||
+        statusFilter.value !== "all"
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+    if (programmeFilter.value !== "all") {
+        chips.push({
+            key: "programme",
+            label: `Programme: ${programmeFilter.value}`,
+        });
+    }
+    if (intakeYearFilter.value !== "all") {
+        chips.push({
+            key: "intake_year",
+            label: `Intake: ${intakeYearFilter.value}`,
+        });
+    }
+    if (statusFilter.value !== "all") {
+        chips.push({
+            key: "status",
+            label: `Status: ${statusFilter.value}`,
+        });
+    }
+    if (query.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${query.value.trim()}`,
+        });
+    }
+    return chips;
+});
+
 const applyFilters = debounce(() => {
     router.get(
         route("students.index"),
@@ -57,6 +97,8 @@ const applyFilters = debounce(() => {
             programme: programmeFilter.value === "all" ? null : programmeFilter.value,
             intake_year: intakeYearFilter.value === "all" ? null : intakeYearFilter.value,
             status: statusFilter.value === "all" ? null : statusFilter.value,
+            sort_by: sortBy.value,
+            sort_dir: sortDir.value,
         },
         {
             preserveState: true,
@@ -67,11 +109,29 @@ const applyFilters = debounce(() => {
 }, 300);
 
 watch(
-    () => [query.value, programmeFilter.value, intakeYearFilter.value, statusFilter.value],
+    () => [
+        query.value,
+        programmeFilter.value,
+        intakeYearFilter.value,
+        statusFilter.value,
+        sortBy.value,
+        sortDir.value,
+    ],
     () => {
         applyFilters();
     }
 );
+
+watch(
+    () => props.students?.data,
+    () => {
+        selectedIds.value = [];
+    }
+);
+
+onBeforeUnmount(() => {
+    applyFilters.cancel();
+});
 
 const deleteStudent = (id) => {
     if (
@@ -84,6 +144,84 @@ const deleteStudent = (id) => {
 
     router.delete(route("students.destroy", id), {
         preserveScroll: true,
+    });
+};
+
+const toggleSort = (column) => {
+    if (sortBy.value === column) {
+        sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
+        return;
+    }
+    sortBy.value = column;
+    sortDir.value = "asc";
+};
+
+const sortLabel = (column) => {
+    if (sortBy.value !== column) return "sort";
+    return sortDir.value === "asc" ? "asc" : "desc";
+};
+
+const clearFilters = () => {
+    query.value = "";
+    programmeFilter.value = "all";
+    intakeYearFilter.value = "all";
+    statusFilter.value = "all";
+};
+
+const removeFilterChip = (key) => {
+    if (key === "programme") {
+        programmeFilter.value = "all";
+        return;
+    }
+    if (key === "intake_year") {
+        intakeYearFilter.value = "all";
+        return;
+    }
+    if (key === "status") {
+        statusFilter.value = "all";
+        return;
+    }
+    if (key === "search") {
+        query.value = "";
+    }
+};
+
+const allRowsSelected = computed(
+    () => rows.value.length > 0 && rows.value.every((student) => selectedIds.value.includes(student.id))
+);
+
+const toggleSelectAll = () => {
+    if (allRowsSelected.value) {
+        selectedIds.value = [];
+        return;
+    }
+    selectedIds.value = rows.value.map((student) => student.id);
+};
+
+const toggleRowSelection = (id) => {
+    if (selectedIds.value.includes(id)) {
+        selectedIds.value = selectedIds.value.filter((selectedId) => selectedId !== id);
+        return;
+    }
+    selectedIds.value = [...selectedIds.value, id];
+};
+
+const bulkDeleteStudents = () => {
+    if (selectedIds.value.length === 0) return;
+    if (
+        !confirm(
+            `Delete ${selectedIds.value.length} selected student record(s)? This action cannot be undone.`
+        )
+    ) {
+        return;
+    }
+
+    router.delete(route("students.bulk-destroy"), {
+        data: { ids: selectedIds.value },
+        preserveScroll: true,
+        onSuccess: () => {
+            selectedIds.value = [];
+        },
     });
 };
 </script>
@@ -218,7 +356,7 @@ export default {
                             <input
                                 v-model="query"
                                 type="text"
-                                placeholder="Search student no, name, email…"
+                                placeholder="Search student no, name, email..."
                                 class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             />
                             <button
@@ -228,10 +366,54 @@ export default {
                                 @click="query = ''"
                             >
                                 <span class="sr-only">Clear</span>
-                                ✕
+                                x
                             </button>
                         </div>
                     </div>
+                    <button
+                        v-if="hasActiveFilters"
+                        type="button"
+                        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        @click="clearFilters"
+                    >
+                        Clear all filters
+                    </button>
+                </div>
+
+                <div
+                    v-if="activeFilterChips.length > 0"
+                    class="mt-3 flex flex-wrap items-center gap-2"
+                >
+                    <span
+                        v-for="chip in activeFilterChips"
+                        :key="chip.key"
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                    >
+                        {{ chip.label }}
+                        <button
+                            type="button"
+                            class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                            @click="removeFilterChip(chip.key)"
+                        >
+                            x
+                        </button>
+                    </span>
+                </div>
+
+                <div
+                    v-if="selectedIds.length > 0"
+                    class="mt-3 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2"
+                >
+                    <p class="text-xs font-semibold text-red-700">
+                        {{ selectedIds.length }} selected
+                    </p>
+                    <button
+                        type="button"
+                        class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                        @click="bulkDeleteStudents"
+                    >
+                        Bulk delete
+                    </button>
                 </div>
             </div>
 
@@ -243,19 +425,45 @@ export default {
                                 scope="col"
                                 class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
+                                <input
+                                    type="checkbox"
+                                    class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    :checked="allRowsSelected"
+                                    :disabled="rows.length === 0"
+                                    @change="toggleSelectAll"
+                                />
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
                                 Photo
                             </th>
                             <th
                                 scope="col"
                                 class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Student No
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-1 hover:text-slate-700"
+                                    @click="toggleSort('student_no')"
+                                >
+                                    Student No
+                                    <span class="text-[10px] text-slate-400">{{ sortLabel("student_no") }}</span>
+                                </button>
                             </th>
                             <th
                                 scope="col"
                                 class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Name
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-1 hover:text-slate-700"
+                                    @click="toggleSort('full_name')"
+                                >
+                                    Name
+                                    <span class="text-[10px] text-slate-400">{{ sortLabel("full_name") }}</span>
+                                </button>
                             </th>
                             <th
                                 scope="col"
@@ -267,19 +475,40 @@ export default {
                                 scope="col"
                                 class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Programme
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-1 hover:text-slate-700"
+                                    @click="toggleSort('programme')"
+                                >
+                                    Programme
+                                    <span class="text-[10px] text-slate-400">{{ sortLabel("programme") }}</span>
+                                </button>
                             </th>
                             <th
                                 scope="col"
                                 class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                Intake Year
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-1 hover:text-slate-700"
+                                    @click="toggleSort('intake_year')"
+                                >
+                                    Intake Year
+                                    <span class="text-[10px] text-slate-400">{{ sortLabel("intake_year") }}</span>
+                                </button>
                             </th>
                         <th
                             scope="col"
                             class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
                         >
-                            Status
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-1 hover:text-slate-700"
+                                @click="toggleSort('status')"
+                            >
+                                Status
+                                <span class="text-[10px] text-slate-400">{{ sortLabel("status") }}</span>
+                            </button>
                         </th>
                             <th
                                 scope="col"
@@ -291,6 +520,14 @@ export default {
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
                         <tr v-for="student in rows" :key="student.id">
+                            <td class="px-3 py-2">
+                                <input
+                                    type="checkbox"
+                                    class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    :checked="selectedIds.includes(student.id)"
+                                    @change="toggleRowSelection(student.id)"
+                                />
+                            </td>
                             <td class="px-3 py-2">
                                 <div class="flex items-center">
                                     <div
@@ -365,7 +602,7 @@ export default {
                         </tr>
                         <tr v-if="rows.length === 0">
                             <td
-                                colspan="7"
+                                colspan="9"
                                 class="px-3 py-6 text-center text-sm text-slate-500"
                             >
                                 {{

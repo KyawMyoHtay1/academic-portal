@@ -17,9 +17,22 @@ class StaffEnrollmentController extends Controller
      */
     public function index(): Response
     {
-        $filters = request()->only(['status', 'search']);
+        $filters = request()->only(['status', 'search', 'sort_by', 'sort_dir']);
         $status = $filters['status'] ?? 'pending';
         $search = trim((string) ($filters['search'] ?? ''));
+        $allowedSorts = [
+            'requested_at' => 'course_student.updated_at',
+            'student_no' => 'students.student_no',
+            'student_name' => 'students.full_name',
+            'programme' => 'students.programme',
+            'status' => 'course_student.status',
+            'course_code' => 'courses.course_code',
+            'semester' => 'courses.semester',
+        ];
+        $sortBy = array_key_exists($filters['sort_by'] ?? 'requested_at', $allowedSorts)
+            ? (string) $filters['sort_by']
+            : 'requested_at';
+        $sortDir = ($filters['sort_dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
 
         // Base query for enrollments with student and course details
         $query = DB::table('course_student')
@@ -62,8 +75,9 @@ class StaffEnrollmentController extends Controller
             $query->where('course_student.status', $status);
         }
 
-        // Order by most recent request/update
-        $query->orderByDesc('course_student.updated_at')
+        // Order by requested sort + stable fallback.
+        $query->orderBy($allowedSorts[$sortBy], $sortDir)
+            ->orderByDesc('course_student.updated_at')
             ->orderByDesc('course_student.created_at');
 
         $perPage = 15;
@@ -106,13 +120,40 @@ class StaffEnrollmentController extends Controller
 
         $statusCounts['all'] = array_sum($statusCounts);
 
+        $today = now()->toDateString();
+        $startOfWeek = now()->copy()->startOfWeek();
+        $now = now();
+        $totalEnrollments = DB::table('course_student')->count();
+        $approvalsToday = DB::table('course_student')
+            ->where('status', 'approved')
+            ->whereDate('updated_at', $today)
+            ->count();
+        $approvalsWeek = DB::table('course_student')
+            ->where('status', 'approved')
+            ->whereBetween('updated_at', [$startOfWeek, $now])
+            ->count();
+        $rejectionsTotal = DB::table('course_student')
+            ->where('status', 'rejected')
+            ->count();
+        $rejectionRate = $totalEnrollments > 0
+            ? round(($rejectionsTotal / $totalEnrollments) * 100, 1)
+            : 0;
+
         return Inertia::render('Admin/Enrollments/Index', [
             'enrollments' => $enrollments,
             'filters' => [
                 'status' => $status,
                 'search' => $search,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
             ],
             'counts' => $statusCounts,
+            'overview' => [
+                'total' => $totalEnrollments,
+                'approvals_today' => $approvalsToday,
+                'approvals_week' => $approvalsWeek,
+                'rejection_rate' => $rejectionRate,
+            ],
         ]);
     }
 

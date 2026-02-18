@@ -3,7 +3,8 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
     enrollments: {
@@ -15,6 +16,10 @@ const props = defineProps({
         default: () => ({}),
     },
     counts: {
+        type: Object,
+        default: () => ({}),
+    },
+    overview: {
         type: Object,
         default: () => ({}),
     },
@@ -30,6 +35,9 @@ const statusTabs = [
 
 const activeStatus = ref(props.filters.status || "pending");
 const query = ref(props.filters.search || "");
+const sortBy = ref(props.filters.sort_by || "requested_at");
+const sortDir = ref(props.filters.sort_dir || "desc");
+const quickViewEnrollment = ref(null);
 
 const stats = computed(() => ({
     total: props.counts.all ?? 0,
@@ -58,12 +66,39 @@ const filteredEnrollments = computed(() => {
     });
 });
 
+const hasActiveFilters = computed(
+    () =>
+        query.value.trim() !== "" ||
+        activeStatus.value !== "pending" ||
+        sortBy.value !== "requested_at" ||
+        sortDir.value !== "desc"
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+    if (activeStatus.value !== "pending") {
+        chips.push({
+            key: "status",
+            label: `Status: ${activeStatus.value}`,
+        });
+    }
+    if (query.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${query.value.trim()}`,
+        });
+    }
+    return chips;
+});
+
 const applyFilters = () => {
     router.get(
         route("admin.enrollments.index"),
         {
             status: activeStatus.value,
             search: query.value || undefined,
+            sort_by: sortBy.value,
+            sort_dir: sortDir.value,
         },
         {
             preserveState: true,
@@ -73,6 +108,10 @@ const applyFilters = () => {
     );
 };
 
+const debouncedApplyFilters = debounce(() => {
+    applyFilters();
+}, 300);
+
 watch(
     () => activeStatus.value,
     () => {
@@ -80,10 +119,53 @@ watch(
     }
 );
 
-const clearSearch = () => {
-    if (!query.value) return;
+watch(
+    () => query.value,
+    () => {
+        debouncedApplyFilters();
+    }
+);
+
+watch(
+    () => [sortBy.value, sortDir.value],
+    () => {
+        applyFilters();
+    }
+);
+
+onBeforeUnmount(() => {
+    debouncedApplyFilters.cancel();
+});
+
+const toggleSort = (column) => {
+    if (sortBy.value === column) {
+        sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
+        return;
+    }
+    sortBy.value = column;
+    sortDir.value = column === "requested_at" ? "desc" : "asc";
+};
+
+const sortLabel = (column) => {
+    if (sortBy.value !== column) return "sort";
+    return sortDir.value === "asc" ? "asc" : "desc";
+};
+
+const clearFilters = () => {
+    activeStatus.value = "pending";
     query.value = "";
-    applyFilters();
+    sortBy.value = "requested_at";
+    sortDir.value = "desc";
+};
+
+const removeFilterChip = (key) => {
+    if (key === "status") {
+        activeStatus.value = "pending";
+        return;
+    }
+    if (key === "search") {
+        query.value = "";
+    }
 };
 
 const approveEnrollment = (enrollmentId) => {
@@ -178,6 +260,14 @@ const getStatusBadgeClass = (status) => {
             return "bg-slate-100 text-slate-700";
     }
 };
+
+const openQuickView = (enrollment) => {
+    quickViewEnrollment.value = enrollment;
+};
+
+const closeQuickView = () => {
+    quickViewEnrollment.value = null;
+};
 </script>
 
 <template>
@@ -198,6 +288,41 @@ const getStatusBadgeClass = (status) => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+                <div class="grid gap-4 md:grid-cols-4">
+                    <div class="portal-card p-5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Total Enrollments
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ overview.total ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                            Approvals Today
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ overview.approvals_today ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-blue-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+                            Approvals This Week
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-blue-900">
+                            {{ overview.approvals_week ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-rose-50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-rose-700">
+                            Rejection Rate
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-rose-900">
+                            {{ overview.rejection_rate ?? 0 }}%
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Summary + controls -->
                 <div class="portal-card p-5">
                     <div
@@ -240,25 +365,54 @@ const getStatusBadgeClass = (status) => {
                                     </span>
                                 </button>
                             </div>
-                            <div class="relative w-full sm:w-80">
-                                <input
-                                    v-model="query"
-                                    type="text"
-                                    placeholder="Search student, course, programme…"
-                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                                    @keyup.enter="applyFilters"
-                                />
+                            <div class="flex w-full items-center gap-2 sm:w-auto">
+                                <div class="relative w-full sm:w-80">
+                                    <input
+                                        v-model="query"
+                                        type="text"
+                                        placeholder="Search student, course, programme..."
+                                        class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                    />
+                                    <button
+                                        v-if="query"
+                                        type="button"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                        @click="query = ''"
+                                    >
+                                        <span class="sr-only">Clear</span>
+                                        x
+                                    </button>
+                                </div>
                                 <button
-                                    v-if="query"
+                                    v-if="hasActiveFilters"
                                     type="button"
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                    @click="clearSearch"
+                                    class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                    @click="clearFilters"
                                 >
-                                    <span class="sr-only">Clear</span>
-                                    ✕
+                                    Clear all
                                 </button>
                             </div>
                         </div>
+                    </div>
+
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="mt-4 flex flex-wrap items-center gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
                     </div>
                 </div>
 
@@ -295,31 +449,66 @@ const getStatusBadgeClass = (status) => {
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Student
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 hover:text-slate-900"
+                                            @click="toggleSort('student_name')"
+                                        >
+                                            Student
+                                            <span class="text-[10px] text-slate-400">{{ sortLabel("student_name") }}</span>
+                                        </button>
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Course
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 hover:text-slate-900"
+                                            @click="toggleSort('course_code')"
+                                        >
+                                            Course
+                                            <span class="text-[10px] text-slate-400">{{ sortLabel("course_code") }}</span>
+                                        </button>
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Programme
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 hover:text-slate-900"
+                                            @click="toggleSort('programme')"
+                                        >
+                                            Programme
+                                            <span class="text-[10px] text-slate-400">{{ sortLabel("programme") }}</span>
+                                        </button>
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Status
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 hover:text-slate-900"
+                                            @click="toggleSort('status')"
+                                        >
+                                            Status
+                                            <span class="text-[10px] text-slate-400">{{ sortLabel("status") }}</span>
+                                        </button>
                                     </th>
                                     <th
                                         scope="col"
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Requested On
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 hover:text-slate-900"
+                                            @click="toggleSort('requested_at')"
+                                        >
+                                            Requested On
+                                            <span class="text-[10px] text-slate-400">{{ sortLabel("requested_at") }}</span>
+                                        </button>
                                     </th>
                                     <th
                                         scope="col"
@@ -440,7 +629,7 @@ const getStatusBadgeClass = (status) => {
                                                     {{
                                                         enrollment.credits
                                                     }}
-                                                    credits ·
+                                                    credits |
                                                     {{ enrollment.semester }}
                                                 </div>
                                             </div>
@@ -483,6 +672,13 @@ const getStatusBadgeClass = (status) => {
                                         <div
                                             class="flex items-center justify-end gap-2"
                                         >
+                                            <button
+                                                type="button"
+                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                                @click="openQuickView(enrollment)"
+                                            >
+                                                Quick view
+                                            </button>
                                             <template
                                                 v-if="
                                                     enrollment.status ===
@@ -555,6 +751,87 @@ const getStatusBadgeClass = (status) => {
                         v-if="enrollments.links?.length"
                     >
                         <Pagination :links="enrollments.links" />
+                    </div>
+                </div>
+
+                <div
+                    v-if="quickViewEnrollment"
+                    class="fixed inset-0 z-40 flex"
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    <button
+                        type="button"
+                        class="absolute inset-0 bg-slate-900/40"
+                        @click="closeQuickView"
+                    ></button>
+                    <div
+                        class="relative ml-auto h-full w-full max-w-md overflow-y-auto border-l border-slate-200 bg-white p-5 shadow-xl"
+                    >
+                        <div class="mb-4 flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Quick View
+                                </p>
+                                <h3 class="mt-1 text-lg font-semibold text-slate-900">
+                                    Enrollment #{{ quickViewEnrollment.enrollment_id }}
+                                </h3>
+                            </div>
+                            <button
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="closeQuickView"
+                            >
+                                Close
+                            </button>
+                        </div>
+
+                        <div class="space-y-4 text-sm">
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Student
+                                </p>
+                                <p class="mt-1 font-semibold text-slate-900">
+                                    {{ quickViewEnrollment.student_name }}
+                                </p>
+                                <p class="text-slate-600">{{ quickViewEnrollment.student_no }}</p>
+                                <p class="text-slate-500">{{ quickViewEnrollment.student_email }}</p>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Programme: {{ quickViewEnrollment.programme || "-" }}
+                                </p>
+                            </div>
+
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Course
+                                </p>
+                                <p class="mt-1 font-semibold text-slate-900">
+                                    {{ quickViewEnrollment.course_code }} - {{ quickViewEnrollment.course_title }}
+                                </p>
+                                <p class="text-slate-600">
+                                    Semester: {{ quickViewEnrollment.semester }} | Credits: {{ quickViewEnrollment.credits }}
+                                </p>
+                            </div>
+
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Status
+                                </p>
+                                <span
+                                    class="mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize"
+                                    :class="getStatusBadgeClass(quickViewEnrollment.status)"
+                                >
+                                    {{
+                                        quickViewEnrollment.status === "withdrawal_pending"
+                                            ? "Withdrawal Pending"
+                                            : quickViewEnrollment.status
+                                    }}
+                                </span>
+                                <p class="mt-2 text-xs text-slate-500">
+                                    Requested on: {{ formatDate(quickViewEnrollment.requested_at) }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -431,6 +431,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
         Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
         Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+        Route::delete('/students/bulk', [StudentController::class, 'bulkDestroy'])->name('students.bulk-destroy');
         Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
         Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
         Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
@@ -477,6 +478,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');
         Route::get('/admin/users/create', [StaffUserController::class, 'create'])->name('admin.users.create');
         Route::post('/admin/users', [StaffUserController::class, 'store'])->name('admin.users.store');
+        Route::delete('/admin/users/bulk', [StaffUserController::class, 'bulkDestroy'])->name('admin.users.bulk-destroy');
         Route::get('/admin/users/{user}/edit', [StaffUserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/admin/users/{user}', [StaffUserController::class, 'update'])->name('admin.users.update');
         Route::delete('/admin/users/{user}', [StaffUserController::class, 'destroy'])->name('admin.users.destroy');

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\ImageService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -18,11 +19,21 @@ class StudentController extends Controller
 {
     public function index(): Response
     {
-        $filters = request()->only(['search', 'programme', 'intake_year', 'status']);
+        $filters = request()->only(['search', 'programme', 'intake_year', 'status', 'sort_by', 'sort_dir']);
+        $search = trim((string) ($filters['search'] ?? ''));
+        $programme = trim((string) ($filters['programme'] ?? 'all'));
+        $intakeYear = trim((string) ($filters['intake_year'] ?? 'all'));
+        $status = trim((string) ($filters['status'] ?? 'all'));
+
+        $allowedSorts = ['student_no', 'full_name', 'programme', 'intake_year', 'status'];
+        $sortBy = in_array($filters['sort_by'] ?? 'student_no', $allowedSorts, true)
+            ? (string) $filters['sort_by']
+            : 'student_no';
+        $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
         $studentsQuery = Student::query()->with('user');
 
-        if ($search = trim((string) ($filters['search'] ?? ''))) {
+        if ($search !== '') {
             $studentsQuery->where(function ($query) use ($search): void {
                 $query->where('student_no', 'like', "%{$search}%")
                     ->orWhere('full_name', 'like', "%{$search}%")
@@ -31,20 +42,21 @@ class StudentController extends Controller
             });
         }
 
-        if (($filters['programme'] ?? 'all') !== 'all') {
-            $studentsQuery->where('programme', $filters['programme']);
+        if ($programme !== '' && $programme !== 'all') {
+            $studentsQuery->where('programme', $programme);
         }
 
-        if (($filters['intake_year'] ?? 'all') !== 'all') {
-            $studentsQuery->where('intake_year', $filters['intake_year']);
+        if ($intakeYear !== '' && $intakeYear !== 'all') {
+            $studentsQuery->where('intake_year', $intakeYear);
         }
 
-        if (($filters['status'] ?? 'all') !== 'all') {
-            $studentsQuery->where('status', $filters['status']);
+        if ($status !== '' && $status !== 'all') {
+            $studentsQuery->where('status', $status);
         }
 
         $students = $studentsQuery
-            ->orderBy('student_no')
+            ->orderBy($sortBy, $sortDir)
+            ->orderBy('id')
             ->paginate(10)
             ->withQueryString()
             ->through(function (Student $student) {
@@ -78,7 +90,14 @@ class StudentController extends Controller
 
         return Inertia::render('Students/Index', [
             'students' => $students,
-            'filters' => $filters,
+            'filters' => [
+                'search' => $search,
+                'programme' => $programme,
+                'intake_year' => $intakeYear,
+                'status' => $status,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
+            ],
             'filterOptions' => [
                 'programmes' => $programmes,
                 'intakeYears' => $intakeYears,
@@ -269,6 +288,43 @@ class StudentController extends Controller
         return redirect()
             ->route('students.index')
             ->with('success', 'Student deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:students,id'],
+        ]);
+
+        $ids = collect($data['ids'])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return redirect()
+                ->route('students.index')
+                ->with('info', 'No students selected for deletion.');
+        }
+
+        $students = Student::query()
+            ->whereIn('id', $ids->all())
+            ->get(['id', 'photo', 'id_card', 'transcript']);
+
+        foreach ($students as $student) {
+            $this->cleanupUploadedStudentFiles([
+                'photo' => $student->photo,
+                'id_card' => $student->id_card,
+                'transcript' => $student->transcript,
+            ]);
+        }
+
+        Student::query()->whereIn('id', $ids->all())->delete();
+
+        return redirect()
+            ->route('students.index')
+            ->with('success', "{$students->count()} student(s) deleted successfully.");
     }
 
     /**
