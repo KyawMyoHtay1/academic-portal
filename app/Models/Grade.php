@@ -44,6 +44,14 @@ class Grade extends Model
     }
 
     /**
+     * The subject this grade belongs to.
+     */
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
+    /**
      * The student this grade belongs to.
      */
     public function student()

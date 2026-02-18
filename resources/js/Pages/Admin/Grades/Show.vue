@@ -38,7 +38,7 @@ const approve = (gradeId) => {
 };
 
 const reject = (gradeId) => {
-    rejectForm.reason = rejectReason.value[gradeId] ?? "";
+    rejectForm.reason = (rejectReason.value[gradeId] ?? "").trim();
     rejectForm.post(route("admin.grades.reject", gradeId), {
         preserveScroll: true,
         onFinish: () => {
@@ -182,7 +182,7 @@ const badgeClass = (status) => {
                                                 <button
                                                     type="button"
                                                     class="rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
-                                                    :disabled="approveForm.processing || rejectForm.processing"
+                                                    :disabled="approveForm.processing || rejectForm.processing || !(rejectReason[row.grade.id] ?? '').trim()"
                                                     @click="reject(row.grade.id)"
                                                 >
                                                     Reject
@@ -191,9 +191,19 @@ const badgeClass = (status) => {
                                             <input
                                                 v-model="rejectReason[row.grade.id]"
                                                 type="text"
-                                                placeholder="Optional rejection reason…"
+                                                placeholder="Rejection reason (required)"
+                                                required
                                                 class="w-72 rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                             />
+                                            <p class="text-[11px] text-slate-500">
+                                                Reason is required to reject.
+                                            </p>
+                                            <p
+                                                v-if="rejectForm.errors.reason"
+                                                class="text-[11px] text-red-600"
+                                            >
+                                                {{ rejectForm.errors.reason }}
+                                            </p>
                                         </div>
                                         <div v-else class="text-xs text-slate-500">
                                             <div v-if="row.grade?.reviewed_by">
@@ -224,4 +234,5 @@ const badgeClass = (status) => {
         </div>
     </AuthenticatedLayout>
 </template>
+
 

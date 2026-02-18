@@ -9,6 +9,7 @@ use App\Models\GradeReviewLog;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\GradePublished;
+use App\Notifications\GradeReviewOutcome;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -58,6 +59,7 @@ class StaffGradesController extends Controller
         $this->authorize('viewAny', Grade::class);
 
         $students = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->orderBy('students.full_name')
             ->get([
                 'students.id',
@@ -114,6 +116,11 @@ class StaffGradesController extends Controller
         $this->authorize('review', $grade);
 
         $request->validated();
+        $grade->loadMissing([
+            'student.user:id,name,email',
+            'grader:id,name,email',
+            'subject:id,subject_code,title',
+        ]);
 
         if ($grade->status !== Grade::STATUS_PENDING) {
             return back()->with('info', 'Grade is not pending review.');
@@ -140,6 +147,9 @@ class StaffGradesController extends Controller
         if ($student && $student->user) {
             $student->user->notify(new GradePublished($grade));
         }
+        if ($grade->grader && $grade->grader->id !== Auth::id()) {
+            $grade->grader->notify(new GradeReviewOutcome($grade, 'approved'));
+        }
 
         return back()->with('success', 'Grade approved and published.');
     }
@@ -149,6 +159,11 @@ class StaffGradesController extends Controller
         $this->authorize('review', $grade);
 
         $data = $request->validated();
+        $grade->loadMissing([
+            'student.user:id,name,email',
+            'grader:id,name,email',
+            'subject:id,subject_code,title',
+        ]);
 
         if ($grade->status !== Grade::STATUS_PENDING) {
             return back()->with('info', 'Grade is not pending review.');
@@ -171,6 +186,9 @@ class StaffGradesController extends Controller
             'reason' => $data['reason'] ?? null,
             'reviewed_by' => Auth::id(),
         ]);
+        if ($grade->grader && $grade->grader->id !== Auth::id()) {
+            $grade->grader->notify(new GradeReviewOutcome($grade, 'rejected', $data['reason'] ?? null));
+        }
 
         return back()->with('success', 'Grade rejected.');
     }
