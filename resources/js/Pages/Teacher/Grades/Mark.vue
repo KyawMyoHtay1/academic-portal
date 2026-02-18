@@ -108,13 +108,15 @@ const getAuditActionClass = (action) => {
     return "bg-slate-100 text-slate-700";
 };
 
+const studentsById = computed(
+    () => new Map((props.students ?? []).map((student) => [student.id, student])),
+);
+
 const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
     return form.grades
         .map((record) => {
-            const student = props.students.find(
-                (s) => s.id === record.student_id,
-            );
+            const student = studentsById.value.get(record.student_id);
             return { record, student };
         })
         .filter((entry) => {
@@ -125,6 +127,100 @@ const gradeEntries = computed(() => {
             return name.includes(q) || no.includes(q);
         });
 });
+
+const subjectDashboard = computed(() => {
+    const workflow = {
+        unstarted: 0,
+        draft: 0,
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+    };
+
+    const letters = {
+        A: 0,
+        B: 0,
+        C: 0,
+        D: 0,
+        E: 0,
+        F: 0,
+    };
+
+    form.grades.forEach((record) => {
+        const student = studentsById.value.get(record.student_id);
+        const status = student?.status ?? null;
+
+        if (status && workflow[status] !== undefined) {
+            workflow[status] += 1;
+        } else {
+            workflow.unstarted += 1;
+        }
+
+        const score = parseFloat(record.score);
+        if (Number.isNaN(score)) {
+            return;
+        }
+
+        if (score >= 80) letters.A += 1;
+        else if (score >= 70) letters.B += 1;
+        else if (score >= 60) letters.C += 1;
+        else if (score >= 50) letters.D += 1;
+        else if (score >= 40) letters.E += 1;
+        else letters.F += 1;
+    });
+
+    const maxLetterCount = Math.max(...Object.values(letters), 1);
+    const scoredCount = Object.values(letters).reduce((sum, value) => sum + value, 0);
+
+    return {
+        workflow,
+        letters,
+        maxLetterCount,
+        scoredCount,
+    };
+});
+
+const workflowItems = computed(() => [
+    {
+        key: "unstarted",
+        label: "No submission",
+        value: subjectDashboard.value.workflow.unstarted,
+        barClass: "bg-slate-400",
+    },
+    {
+        key: "draft",
+        label: "Draft",
+        value: subjectDashboard.value.workflow.draft,
+        barClass: "bg-slate-700",
+    },
+    {
+        key: "pending",
+        label: "Pending review",
+        value: subjectDashboard.value.workflow.pending,
+        barClass: "bg-amber-500",
+    },
+    {
+        key: "approved",
+        label: "Approved",
+        value: subjectDashboard.value.workflow.approved,
+        barClass: "bg-emerald-500",
+    },
+    {
+        key: "rejected",
+        label: "Rejected",
+        value: subjectDashboard.value.workflow.rejected,
+        barClass: "bg-red-500",
+    },
+]);
+
+const letterItems = computed(() => [
+    { letter: "A", range: "80-100", value: subjectDashboard.value.letters.A, barClass: "bg-emerald-500" },
+    { letter: "B", range: "70-79", value: subjectDashboard.value.letters.B, barClass: "bg-blue-500" },
+    { letter: "C", range: "60-69", value: subjectDashboard.value.letters.C, barClass: "bg-amber-500" },
+    { letter: "D", range: "50-59", value: subjectDashboard.value.letters.D, barClass: "bg-yellow-500" },
+    { letter: "E", range: "40-49", value: subjectDashboard.value.letters.E, barClass: "bg-orange-500" },
+    { letter: "F", range: "0-39", value: subjectDashboard.value.letters.F, barClass: "bg-red-500" },
+]);
 
 const stats = computed(() => {
     const list = props.students ?? [];
@@ -283,6 +379,86 @@ const submit = () => {
                             {{ stats.highest ? `High: ${stats.highest}` : "" }}
                             {{ stats.lowest ? `Low: ${stats.lowest}` : "" }}
                         </p>
+                    </div>
+                </div>
+
+                <div class="mb-6 grid gap-4 lg:grid-cols-2">
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Review workflow
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            Draft to approval status for this subject.
+                        </p>
+                        <div class="mt-4 space-y-3">
+                            <div
+                                v-for="item in workflowItems"
+                                :key="item.key"
+                            >
+                                <div
+                                    class="flex items-center justify-between text-xs text-slate-600"
+                                >
+                                    <span>{{ item.label }}</span>
+                                    <span class="font-semibold text-slate-900">
+                                        {{ item.value }}
+                                    </span>
+                                </div>
+                                <div
+                                    class="mt-1 h-2 overflow-hidden rounded-full bg-slate-100"
+                                >
+                                    <div
+                                        class="h-full rounded-full transition-all duration-300"
+                                        :class="item.barClass"
+                                        :style="{
+                                            width: `${stats.total > 0 ? (item.value / stats.total) * 100 : 0}%`,
+                                        }"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="portal-card p-5 bg-indigo-50/50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                        >
+                            Letter grade distribution
+                        </p>
+                        <p class="mt-1 text-xs text-indigo-700">
+                            Based on entered scores ({{ subjectDashboard.scoredCount }} student(s)).
+                        </p>
+                        <div class="mt-4 space-y-2.5">
+                            <div
+                                v-for="item in letterItems"
+                                :key="item.letter"
+                                class="flex items-center gap-3"
+                            >
+                                <div class="w-20 text-xs text-slate-700">
+                                    <span class="font-semibold">{{ item.letter }}</span>
+                                    <span class="ml-1 text-slate-500">({{ item.range }})</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div
+                                        class="h-2 overflow-hidden rounded-full bg-indigo-100"
+                                    >
+                                        <div
+                                            class="h-full rounded-full transition-all duration-300"
+                                            :class="item.barClass"
+                                            :style="{
+                                                width: `${(item.value / subjectDashboard.maxLetterCount) * 100}%`,
+                                            }"
+                                        ></div>
+                                    </div>
+                                </div>
+                                <span
+                                    class="w-6 text-right text-xs font-semibold text-slate-700"
+                                >
+                                    {{ item.value }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

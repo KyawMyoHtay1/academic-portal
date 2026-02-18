@@ -128,6 +128,70 @@ const gradeSummary = computed(() => {
     };
 });
 
+const semesterSortWeight = (semesterLabel) => {
+    const text = String(semesterLabel ?? "").toLowerCase();
+    const numericMatch = text.match(/(\d+)/);
+    if (numericMatch) {
+        return parseInt(numericMatch[1], 10);
+    }
+
+    return Number.MAX_SAFE_INTEGER;
+};
+
+const gradeTrend = computed(() => {
+    const buckets = new Map();
+
+    props.courses.forEach((course) => {
+        const semesterLabel = course.semester || "Unspecified";
+        if (!buckets.has(semesterLabel)) {
+            buckets.set(semesterLabel, {
+                label: semesterLabel,
+                sortWeight: semesterSortWeight(semesterLabel),
+                sum: 0,
+                count: 0,
+            });
+        }
+
+        const bucket = buckets.get(semesterLabel);
+        (course.subjects || []).forEach((subject) => {
+            if (subject.score === null || subject.score === undefined || subject.score === "") {
+                return;
+            }
+
+            const numericScore = Number(subject.score);
+            if (Number.isNaN(numericScore)) {
+                return;
+            }
+
+            bucket.sum += numericScore;
+            bucket.count += 1;
+        });
+    });
+
+    return Array.from(buckets.values())
+        .filter((bucket) => bucket.count > 0)
+        .sort(
+            (a, b) =>
+                a.sortWeight - b.sortWeight || a.label.localeCompare(b.label),
+        )
+        .map((bucket) => ({
+            label: bucket.label,
+            average: bucket.sum / bucket.count,
+            count: bucket.count,
+        }));
+});
+
+const gradeTrendDelta = computed(() => {
+    if (gradeTrend.value.length < 2) {
+        return null;
+    }
+
+    const previous = gradeTrend.value[gradeTrend.value.length - 2];
+    const current = gradeTrend.value[gradeTrend.value.length - 1];
+
+    return current.average - previous.average;
+});
+
 const hasFinalScore = (subject) =>
     subject?.score !== null &&
     subject?.score !== undefined &&
@@ -253,6 +317,69 @@ const getLetterGrade = (score) => {
                             <p class="mt-1 text-xs text-indigo-700">
                                 Based on {{ totalGrades }} grade(s)
                             </p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="gradeTrend.length > 0"
+                        class="mb-6 rounded-lg border border-indigo-200 bg-indigo-50/40 p-4"
+                    >
+                        <div
+                            class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"
+                        >
+                            <div>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
+                                >
+                                    Grade Trend by Semester
+                                </p>
+                                <p class="mt-1 text-xs text-indigo-700">
+                                    Average approved score across each semester.
+                                </p>
+                            </div>
+                            <p
+                                v-if="gradeTrendDelta !== null"
+                                class="text-xs font-semibold"
+                                :class="
+                                    gradeTrendDelta >= 0
+                                        ? 'text-emerald-700'
+                                        : 'text-red-700'
+                                "
+                            >
+                                {{
+                                    gradeTrendDelta >= 0
+                                        ? `+${gradeTrendDelta.toFixed(1)}`
+                                        : gradeTrendDelta.toFixed(1)
+                                }} pts vs previous semester
+                            </p>
+                        </div>
+
+                        <div
+                            class="mt-4 flex items-end gap-3 overflow-x-auto pb-1"
+                        >
+                            <div
+                                v-for="point in gradeTrend"
+                                :key="point.label"
+                                class="min-w-[72px] text-center"
+                            >
+                                <div
+                                    class="mx-auto flex h-28 w-8 items-end overflow-hidden rounded-md bg-indigo-100"
+                                >
+                                    <div
+                                        class="w-full rounded-md bg-indigo-500 transition-all duration-500"
+                                        :style="{
+                                            height: `${Math.max(Math.min(point.average, 100), 4)}%`,
+                                        }"
+                                        :title="`${point.label}: ${point.average.toFixed(1)}% (${point.count} subject(s))`"
+                                    ></div>
+                                </div>
+                                <p class="mt-2 text-[11px] text-slate-600">
+                                    {{ point.label }}
+                                </p>
+                                <p class="text-xs font-semibold text-slate-900">
+                                    {{ point.average.toFixed(1) }}%
+                                </p>
+                            </div>
                         </div>
                     </div>
 

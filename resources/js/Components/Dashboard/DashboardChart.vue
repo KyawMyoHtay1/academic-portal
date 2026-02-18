@@ -62,7 +62,12 @@ const props = defineProps({
         type: Number,
         default: null,
     },
+    interactive: {
+        type: Boolean,
+        default: false,
+    },
 });
+const emit = defineEmits(["chart-click"]);
 
 const formatValue = (rawValue) => {
     const value = Number(rawValue ?? 0);
@@ -87,10 +92,36 @@ const formatValue = (rawValue) => {
     }).format(value);
 };
 
+const handleChartClick = (_event, elements) => {
+    if (!props.interactive || !Array.isArray(elements) || elements.length === 0) {
+        return;
+    }
+
+    const target = elements[0];
+    const datasetIndex = target?.datasetIndex ?? 0;
+    const dataIndex = target?.index;
+
+    if (dataIndex === undefined || dataIndex === null) {
+        return;
+    }
+
+    const label = props.chartData?.labels?.[dataIndex] ?? null;
+    const rawValue = props.chartData?.datasets?.[datasetIndex]?.data?.[dataIndex] ?? null;
+
+    emit("chart-click", {
+        datasetIndex,
+        dataIndex,
+        label,
+        value: rawValue === null ? null : Number(rawValue),
+        rawValue,
+    });
+};
+
 const options = computed(() => {
     const base = {
         responsive: true,
         maintainAspectRatio: false,
+        onClick: handleChartClick,
         plugins: {
             legend: {
                 position: "bottom",
@@ -202,7 +233,7 @@ const accentDotClass = computed(() => {
 <template>
     <div
         class="relative rounded-2xl border p-5 transition-all duration-300"
-        :class="chartCardClass"
+        :class="[chartCardClass, interactive ? 'cursor-pointer' : '']"
     >
         <span
             class="absolute right-4 top-4 h-2 w-2 rounded-full"

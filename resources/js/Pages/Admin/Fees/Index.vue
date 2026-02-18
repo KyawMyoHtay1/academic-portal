@@ -387,7 +387,7 @@ export default {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr
-                                    v-if="filtered.length === 0"
+                                    v-if="entries.length === 0"
                                     class="bg-white"
                                 >
                                     <td

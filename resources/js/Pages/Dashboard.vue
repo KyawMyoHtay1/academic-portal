@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeroBanner from "@/Components/Dashboard/HeroBanner.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import DashboardChart from "@/Components/Dashboard/DashboardChart.vue";
-import { Head, Link, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -57,6 +57,20 @@ const hasChartData = (chart) => {
     return chart.datasets.some(
         (dataset) => Array.isArray(dataset?.data) && dataset.data.length > 0
     );
+};
+
+const feeStatusByChartIndex = ["pending", "payment_pending", "paid"];
+const onStaffFeeStatusClick = (payload) => {
+    if (props.role !== "staff") {
+        return;
+    }
+
+    const status = feeStatusByChartIndex[payload?.dataIndex ?? -1];
+    if (!status) {
+        return;
+    }
+
+    router.get(route("admin.fees.index"), { status });
 };
 
 const cards = computed(() => {
@@ -1543,6 +1557,9 @@ const quickActions = computed(() => {
                             <p class="mt-1 text-sm font-medium text-emerald-900">
                                 Institution-wide snapshots for review, enrollment, and finance.
                             </p>
+                            <p class="mt-1 text-xs text-emerald-700">
+                                Tip: click a fee status slice to open filtered fee records.
+                            </p>
                         </div>
                     </div>
                     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -1552,6 +1569,8 @@ const quickActions = computed(() => {
                         :chart-data="charts.feeStatus"
                         title="Fee status (all fees)"
                         :variant="role"
+                        :interactive="true"
+                        @chart-click="onStaffFeeStatusClick"
                     />
                     <DashboardChart
                         v-if="hasChartData(charts.gradeStatus)"
