@@ -92,12 +92,14 @@ class SubjectGradeCalculatorTest extends TestCase
         $this->assertEquals(65.0, $result[$studentA->id]['computed_grade']);
         $this->assertSame(2, $result[$studentA->id]['graded_assignments']);
         $this->assertSame(2, $result[$studentA->id]['total_assignments']);
+        $this->assertSame($teacher->name, $result[$studentA->id]['breakdown'][0]['graded_by']);
 
         $this->assertEquals(0.0, $result[$studentB->id]['computed_grade']);
         $this->assertSame(1, $result[$studentB->id]['graded_assignments']);
         $this->assertSame(2, $result[$studentB->id]['total_assignments']);
         $this->assertTrue($result[$studentB->id]['breakdown'][1]['submitted']);
         $this->assertFalse($result[$studentB->id]['breakdown'][1]['graded']);
+        $this->assertNull($result[$studentB->id]['breakdown'][1]['graded_by']);
     }
 
     public function test_it_calculates_subject_breakdown_for_one_student_across_many_subjects(): void
@@ -169,6 +171,7 @@ class SubjectGradeCalculatorTest extends TestCase
         $this->assertEquals(75.0, $result[$subjectTwo->id]['computed_grade']);
         $this->assertSame(1, $result[$subjectOne->id]['total_assignments']);
         $this->assertSame(1, $result[$subjectTwo->id]['total_assignments']);
+        $this->assertSame($teacher->name, $result[$subjectOne->id]['breakdown'][0]['graded_by']);
     }
 
     /**

@@ -858,6 +858,12 @@ const submit = () => {
                                                                             <th
                                                                                 class="px-3 py-2 text-center text-xs font-medium text-slate-600"
                                                                             >
+                                                                                Graded
+                                                                                By
+                                                                            </th>
+                                                                            <th
+                                                                                class="px-3 py-2 text-center text-xs font-medium text-slate-600"
+                                                                            >
                                                                                 Score
                                                                             </th>
                                                                             <th
@@ -918,6 +924,24 @@ const submit = () => {
                                                                                     Not
                                                                                     submitted
                                                                                 </span>
+                                                                            </td>
+                                                                            <td
+                                                                                class="px-3 py-2 text-center text-sm text-slate-700"
+                                                                            >
+                                                                                <span
+                                                                                    v-if="
+                                                                                        assignment.graded_by
+                                                                                    "
+                                                                                >
+                                                                                    {{
+                                                                                        assignment.graded_by
+                                                                                    }}
+                                                                                </span>
+                                                                                <span
+                                                                                    v-else
+                                                                                    class="text-slate-400"
+                                                                                    >-</span
+                                                                                >
                                                                             </td>
                                                                             <td
                                                                                 class="px-3 py-2 text-center text-sm"

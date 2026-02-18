@@ -46,6 +46,7 @@ class SubjectGradeCalculator
         $submissionsByStudent = collect();
         if ($assignmentIds !== []) {
             $submissionsByStudent = AssignmentSubmission::query()
+                ->with('grader:id,name')
                 ->whereIn('assignment_id', $assignmentIds)
                 ->whereIn('student_id', $studentIds)
                 ->get([
@@ -54,6 +55,7 @@ class SubjectGradeCalculator
                     'student_id',
                     'score',
                     'feedback',
+                    'graded_by',
                     'graded_at',
                     'status',
                 ])
@@ -95,6 +97,7 @@ class SubjectGradeCalculator
         $submissionsByAssignment = collect();
         if ($assignmentIds !== []) {
             $submissionsByAssignment = AssignmentSubmission::query()
+                ->with('grader:id,name')
                 ->whereIn('assignment_id', $assignmentIds)
                 ->where('student_id', $studentId)
                 ->get([
@@ -103,6 +106,7 @@ class SubjectGradeCalculator
                     'student_id',
                     'score',
                     'feedback',
+                    'graded_by',
                     'graded_at',
                     'status',
                 ])
@@ -153,6 +157,7 @@ class SubjectGradeCalculator
                 'score' => null,
                 'percentage' => null,
                 'graded' => false,
+                'graded_by' => null,
             ];
 
             if ($submission && $submission->isGraded() && $submission->score !== null) {
@@ -164,6 +169,7 @@ class SubjectGradeCalculator
                 $assignmentData['score'] = (float) $submission->score;
                 $assignmentData['percentage'] = $percentage;
                 $assignmentData['graded'] = true;
+                $assignmentData['graded_by'] = $submission->grader?->name;
                 $assignmentData['graded_at'] = $submission->graded_at?->format('Y-m-d H:i');
                 $assignmentData['feedback'] = $submission->feedback;
 
