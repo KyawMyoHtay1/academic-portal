@@ -30,6 +30,8 @@ class StudentAttendanceController extends Controller
                 'byCourse' => [],
                 'bySubject' => [],
                 'recentRecords' => [],
+                'trendWeekly' => [],
+                'subjectRisk' => [],
                 'message' => 'No student record found. Please contact administration.',
             ]);
         }
@@ -130,6 +132,45 @@ class StudentAttendanceController extends Controller
                 ];
             });
 
+        // Last 12 weeks trend (lightweight reporting for student dashboard view)
+        $firstWeek = now()->startOfWeek()->subWeeks(11);
+        $trendRows = Attendance::query()
+            ->where('student_id', $student->id)
+            ->whereDate('date', '>=', $firstWeek)
+            ->get(['date', 'status']);
+
+        $trendByWeek = $trendRows->groupBy(function ($attendance) {
+            return $attendance->date->copy()->startOfWeek()->toDateString();
+        });
+
+        $trendWeekly = collect(range(0, 11))
+            ->map(function ($offset) use ($firstWeek, $trendByWeek) {
+                $weekStart = $firstWeek->copy()->addWeeks($offset);
+                $weekKey = $weekStart->toDateString();
+                $rows = $trendByWeek->get($weekKey, collect());
+                $total = $rows->count();
+                $present = $rows->where('status', 'present')->count();
+                $absent = max($total - $present, 0);
+
+                return [
+                    'week_start' => $weekKey,
+                    'label' => $weekStart->format('M d'),
+                    'total' => $total,
+                    'present' => $present,
+                    'absent' => $absent,
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                ];
+            })
+            ->values();
+
+        $subjectRisk = $attendanceBySubject
+            ->filter(function ($subject) {
+                return (int) ($subject['total'] ?? 0) > 0 && (float) ($subject['rate'] ?? 0) < 75;
+            })
+            ->sortBy('rate')
+            ->take(5)
+            ->values();
+
         return Inertia::render('Student/Attendance/Index', [
             'overall' => [
                 'total' => $totalRecords,
@@ -140,6 +181,8 @@ class StudentAttendanceController extends Controller
             'byCourse' => $attendanceByCourse,
             'bySubject' => $attendanceBySubject,
             'recentRecords' => $recentRecords,
+            'trendWeekly' => $trendWeekly,
+            'subjectRisk' => $subjectRisk,
         ]);
     }
 }

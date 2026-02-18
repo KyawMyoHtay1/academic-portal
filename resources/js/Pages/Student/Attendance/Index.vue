@@ -21,6 +21,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    trendWeekly: {
+        type: Array,
+        default: () => [],
+    },
+    subjectRisk: {
+        type: Array,
+        default: () => [],
+    },
     message: {
         type: String,
         default: null,
@@ -30,6 +38,7 @@ const props = defineProps({
 const searchCourses = ref("");
 const searchSubjects = ref("");
 const searchRecent = ref("");
+const recentStatus = ref("all");
 
 const filteredCourses = computed(() => {
     const q = searchCourses.value.trim().toLowerCase();
@@ -51,12 +60,20 @@ const filteredSubjects = computed(() => {
 
 const filteredRecent = computed(() => {
     const q = searchRecent.value.trim().toLowerCase();
-    if (!q) return props.recentRecords;
-    return props.recentRecords.filter((r) => {
+    let list = props.recentRecords;
+    if (recentStatus.value !== "all") {
+        list = list.filter((record) => record.status === recentStatus.value);
+    }
+    if (!q) return list;
+    return list.filter((r) => {
         const hay = `${r.subject_code} ${r.subject_title} ${r.course_code} ${r.date}`.toLowerCase();
         return hay.includes(q);
     });
 });
+
+const trendPeak = computed(() =>
+    Math.max(...props.trendWeekly.map((week) => week.total ?? 0), 0)
+);
 </script>
 
 <template>
@@ -151,6 +168,85 @@ const filteredRecent = computed(() => {
                     </div>
                 </div>
 
+                <div class="mb-6 grid gap-4 lg:grid-cols-3">
+                    <div class="portal-card p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Trend
+                                </p>
+                                <h3 class="mt-1 text-lg font-semibold text-slate-900">
+                                    Weekly Attendance (Last 12 Weeks)
+                                </h3>
+                            </div>
+                            <p class="text-xs text-slate-500">
+                                Present rate by week
+                            </p>
+                        </div>
+
+                        <div v-if="trendWeekly.length === 0" class="mt-4 rounded-lg bg-slate-50 p-4 text-sm text-slate-500">
+                            No trend data available yet.
+                        </div>
+
+                        <div v-else class="mt-4 space-y-2">
+                            <div
+                                v-for="week in trendWeekly"
+                                :key="week.week_start"
+                                class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+                            >
+                                <div class="mb-1 flex items-center justify-between text-xs">
+                                    <span class="font-medium text-slate-700">{{ week.label }}</span>
+                                    <span class="text-slate-500">
+                                        {{ week.present }}/{{ week.total }} present ({{ week.rate }}%)
+                                    </span>
+                                </div>
+                                <div class="h-2 overflow-hidden rounded-full bg-slate-200">
+                                    <div
+                                        class="h-full rounded-full bg-emerald-500"
+                                        :style="{
+                                            width: `${
+                                                trendPeak > 0
+                                                    ? (week.present / trendPeak) * 100
+                                                    : 0
+                                            }%`,
+                                        }"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="portal-card p-6">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Risk Hints
+                        </p>
+                        <h3 class="mt-1 text-lg font-semibold text-slate-900">
+                            Low-Attendance Subjects
+                        </h3>
+                        <p class="mt-1 text-xs text-slate-500">
+                            Subjects below 75% are listed here.
+                        </p>
+
+                        <div v-if="subjectRisk.length === 0" class="mt-4 rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
+                            No immediate attendance risk detected.
+                        </div>
+                        <div v-else class="mt-4 space-y-2">
+                            <div
+                                v-for="subject in subjectRisk"
+                                :key="subject.id"
+                                class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2"
+                            >
+                                <p class="text-xs font-semibold text-amber-900">
+                                    {{ subject.subject_code }} - {{ subject.title }}
+                                </p>
+                                <p class="mt-1 text-xs text-amber-800">
+                                    {{ subject.present }}/{{ subject.total }} present ({{ subject.rate }}%)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Attendance by Course -->
                 <div class="mb-6 portal-card p-6">
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -162,7 +258,7 @@ const filteredRecent = computed(() => {
                             <input
                                 v-model="searchCourses"
                                 type="search"
-                                placeholder="Search by course code, title…"
+                                placeholder="Search by course code, title..."
                                 class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             />
                         </div>
@@ -261,7 +357,7 @@ const filteredRecent = computed(() => {
                             <input
                                 v-model="searchSubjects"
                                 type="search"
-                                placeholder="Search by subject code, title, course…"
+                                placeholder="Search by subject code, title, course..."
                                 class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             />
                         </div>
@@ -363,14 +459,27 @@ const filteredRecent = computed(() => {
                         <h3 class="text-lg font-semibold text-slate-900">
                             Recent Attendance Records (Last 30 Days)
                         </h3>
-                        <div class="w-full sm:w-80">
-                            <label class="block text-xs font-medium text-slate-600">Search</label>
-                            <input
-                                v-model="searchRecent"
-                                type="search"
-                                placeholder="Search by subject, course, date…"
-                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                            />
+                        <div class="grid w-full gap-2 sm:w-auto sm:grid-cols-2">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600">Status</label>
+                                <select
+                                    v-model="recentStatus"
+                                    class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                >
+                                    <option value="all">All</option>
+                                    <option value="present">Present</option>
+                                    <option value="absent">Absent</option>
+                                </select>
+                            </div>
+                            <div class="w-full sm:w-80">
+                                <label class="block text-xs font-medium text-slate-600">Search</label>
+                                <input
+                                    v-model="searchRecent"
+                                    type="search"
+                                    placeholder="Search by subject, course, date..."
+                                    class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                            </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
