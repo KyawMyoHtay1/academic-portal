@@ -50,7 +50,7 @@ class CourseController extends Controller
                 'semester' => $course->semester,
                 'photo' => $course->photo,
                 'enrollment_status' => $status,
-                'is_enrolled' => $status === 'approved',
+                'is_enrolled' => in_array($status, ['approved', 'withdrawal_pending'], true),
             ];
         });
 

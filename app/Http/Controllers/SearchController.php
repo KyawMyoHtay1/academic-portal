@@ -319,11 +319,17 @@ class SearchController extends Controller
     {
         $results = [];
         $student = $user->student;
-        if (! $student) {
-            return $results;
+        $enrolledCourseIds = collect();
+
+        if ($student) {
+            $enrolledCourseIds = $student->courses()
+                ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+                ->pluck('courses.id');
         }
 
-        $enrolledCourseIds = $student->courses()->wherePivot('status', 'approved')->pluck('courses.id');
+        $enrolledCourseIdsArray = $enrolledCourseIds
+            ->map(fn ($id) => (int) $id)
+            ->all();
 
         // Courses (enrolled and available)
         $courses = Course::where(function ($query) use ($term) {
@@ -333,7 +339,7 @@ class SearchController extends Controller
             ->get(['id', 'course_code', 'title']);
 
         foreach ($courses as $c) {
-            $url = in_array($c->id, $enrolledCourseIds->toArray())
+            $url = in_array($c->id, $enrolledCourseIdsArray, true)
                 ? route('my-courses.index')
                 : route('courses.index');
             $results[] = [
@@ -346,24 +352,26 @@ class SearchController extends Controller
         }
 
         // Assignments (for enrolled courses/subjects)
-        $assignmentIds = Assignment::whereHas('subject', function ($q) use ($enrolledCourseIds) {
-            $q->whereIn('course_id', $enrolledCourseIds);
-        })
-            ->where('title', 'like', $term)
-            ->where('status', Assignment::STATUS_PUBLISHED)
-            ->orderByDesc('created_at')
-            ->limit(self::LIMIT_PER_TYPE)
-            ->pluck('id');
+        if (! empty($enrolledCourseIdsArray)) {
+            $assignmentIds = Assignment::whereHas('subject', function ($q) use ($enrolledCourseIdsArray) {
+                $q->whereIn('course_id', $enrolledCourseIdsArray);
+            })
+                ->where('title', 'like', $term)
+                ->where('status', Assignment::STATUS_PUBLISHED)
+                ->orderByDesc('created_at')
+                ->limit(self::LIMIT_PER_TYPE)
+                ->pluck('id');
 
-        $assignments = Assignment::whereIn('id', $assignmentIds)->get(['id', 'title']);
-        foreach ($assignments as $a) {
-            $results[] = [
-                'type' => 'assignment',
-                'id' => $a->id,
-                'title' => $a->title,
-                'subtitle' => 'Assignment',
-                'url' => route('student.assignments.show', $a),
-            ];
+            $assignments = Assignment::whereIn('id', $assignmentIds)->get(['id', 'title']);
+            foreach ($assignments as $a) {
+                $results[] = [
+                    'type' => 'assignment',
+                    'id' => $a->id,
+                    'title' => $a->title,
+                    'subtitle' => 'Assignment',
+                    'url' => route('student.assignments.show', $a),
+                ];
+            }
         }
 
         // Announcements

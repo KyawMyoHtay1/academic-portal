@@ -355,43 +355,46 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
-    // Timebox 1: Student Profile (student self-view)
-    Route::get('/student/profile', [StudentProfileController::class, 'show'])->name('student.profile.show');
-    Route::patch('/student/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
-    Route::delete('/student/profile/photo', [StudentProfileController::class, 'removePhoto'])->name('student.profile.remove-photo');
+    Route::middleware('role:student')->group(function () {
+        // Timebox 1: Student Profile (student self-view)
+        Route::get('/student/profile', [StudentProfileController::class, 'show'])->name('student.profile.show');
+        Route::patch('/student/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
+        Route::delete('/student/profile/photo', [StudentProfileController::class, 'removePhoto'])->name('student.profile.remove-photo');
 
-    // Timebox 1: Courses (with enrollment)
-    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+        // Timebox 1: Courses (with enrollment)
+        Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
 
-    // Timebox 1: Course Registration
-    Route::post('/courses/{course}/enroll', [CourseRegistrationController::class, 'enroll'])->name('courses.enroll');
-    Route::delete('/courses/{course}/unenroll', [CourseRegistrationController::class, 'unenroll'])->name('courses.unenroll');
+        // Timebox 1: Course Registration
+        Route::post('/courses/{course}/enroll', [CourseRegistrationController::class, 'enroll'])->name('courses.enroll');
+        Route::delete('/courses/{course}/unenroll', [CourseRegistrationController::class, 'unenroll'])->name('courses.unenroll');
 
-    // Timebox 1: My Courses (student's enrolled courses)
-    Route::get('/my-courses', [MyCoursesController::class, 'index'])->name('my-courses.index');
+        // Timebox 1: My Courses (student's enrolled courses)
+        Route::get('/my-courses', [MyCoursesController::class, 'index'])->name('my-courses.index');
 
-    // Student Grades (read-only)
-    Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
+        // Student Grades (read-only)
+        Route::get('/student/grades', [StudentGradesController::class, 'index'])->name('student.grades.index');
 
-    // Student Attendance Report
-    Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
+        // Student Attendance Report
+        Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
 
-    // Student Assignments
-    Route::get('/student/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignments.index');
-    Route::get('/student/assignments/{assignment}', [StudentAssignmentController::class, 'show'])->name('student.assignments.show');
-    Route::post('/student/assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('student.assignments.submit');
-    Route::get('/student/assignments/submissions/{submission}/download', [StudentAssignmentController::class, 'download'])->name('student.assignments.download');
+        // Student Assignments
+        Route::get('/student/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignments.index');
+        Route::get('/student/assignments/{assignment}', [StudentAssignmentController::class, 'show'])->name('student.assignments.show');
+        Route::post('/student/assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('student.assignments.submit');
+        Route::get('/student/assignments/submissions/{submission}/download', [StudentAssignmentController::class, 'download'])->name('student.assignments.download');
 
-    // Student Fees
-    Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
-    Route::post('/student/fees/{fee}/submit-payment', [StudentFeeController::class, 'submitPayment'])->name('student.fees.submit-payment');
+        // Student Fees
+        Route::get('/student/fees', [StudentFeeController::class, 'index'])->name('student.fees.index');
+        Route::post('/student/fees/{fee}/submit-payment', [StudentFeeController::class, 'submitPayment'])->name('student.fees.submit-payment');
 
-    // Payment Gateway (Stripe)
-    Route::post('/payment/{fee}/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
-    Route::get('/payment/{fee}/success', [PaymentController::class, 'success'])->name('payment.success');
-    Route::get('/payment/{fee}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
-    // Student Timetable (read-only)
-    Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
+        // Payment Gateway (Stripe)
+        Route::post('/payment/{fee}/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
+        Route::get('/payment/{fee}/success', [PaymentController::class, 'success'])->name('payment.success');
+        Route::get('/payment/{fee}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+
+        // Student Timetable (read-only)
+        Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
+    });
 
     // Announcements (all authenticated users)
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');

@@ -38,7 +38,7 @@ class MyCoursesController extends Controller
                 'courses.credits',
                 'courses.semester',
                 'courses.photo',
-                'course_student.updated_at as enrolled_at',
+                'course_student.created_at as enrolled_at',
                 'course_student.status as enrollment_status',
             ]);
 

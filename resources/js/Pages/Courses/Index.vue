@@ -20,14 +20,19 @@ const semesterFilter = ref("all");
 const availabilityFilter = ref("all");
 const sortBy = ref("code");
 
+const isEnrolledStatus = (status) =>
+    status === "approved" || status === "withdrawal_pending";
+
+const isOpenToEnroll = (status) => !status || status === "rejected";
+
 const stats = computed(() => {
     const list = props.courses ?? [];
 
     return {
         total: list.length,
-        enrolled: list.filter((c) => c.enrollment_status === "approved").length,
+        enrolled: list.filter((c) => isEnrolledStatus(c.enrollment_status)).length,
         pending: list.filter((c) => c.enrollment_status === "pending").length,
-        available: list.filter((c) => c.enrollment_status !== "approved").length,
+        available: list.filter((c) => isOpenToEnroll(c.enrollment_status)).length,
     };
 });
 
@@ -58,11 +63,11 @@ const filteredCourses = computed(() => {
         }
 
         if (availabilityFilter.value === "enrolled") {
-            return course.enrollment_status === "approved";
+            return isEnrolledStatus(course.enrollment_status);
         }
 
         if (availabilityFilter.value === "not-enrolled") {
-            return course.enrollment_status !== "approved";
+            return isOpenToEnroll(course.enrollment_status);
         }
 
         return true;
@@ -110,6 +115,10 @@ const statusClass = (status) => {
         return "bg-amber-100 text-amber-800";
     }
 
+    if (status === "withdrawal_pending") {
+        return "bg-orange-100 text-orange-800";
+    }
+
     if (status === "rejected") {
         return "bg-red-100 text-red-800";
     }
@@ -120,6 +129,7 @@ const statusClass = (status) => {
 const statusLabel = (status) => {
     if (status === "approved") return "Enrolled";
     if (status === "pending") return "Pending";
+    if (status === "withdrawal_pending") return "Withdrawal Pending";
     if (status === "rejected") return "Rejected";
     return "Open";
 };
@@ -293,18 +303,11 @@ const statusLabel = (status) => {
                                     </td>
                                     <td v-if="hasStudentRecord" class="px-4 py-4 text-right text-sm">
                                         <button
-                                            v-if="!course.enrollment_status"
+                                            v-if="isOpenToEnroll(course.enrollment_status)"
                                             @click="enroll(course.id)"
                                             class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
                                         >
-                                            Enroll
-                                        </button>
-                                        <button
-                                            v-else-if="course.enrollment_status === 'rejected'"
-                                            @click="enroll(course.id)"
-                                            class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
-                                        >
-                                            Reapply
+                                            {{ course.enrollment_status === "rejected" ? "Reapply" : "Enroll" }}
                                         </button>
                                     </td>
                                 </tr>
@@ -338,18 +341,11 @@ const statusLabel = (status) => {
 
                             <div v-if="hasStudentRecord" class="mt-3">
                                 <button
-                                    v-if="!course.enrollment_status"
+                                    v-if="isOpenToEnroll(course.enrollment_status)"
                                     @click="enroll(course.id)"
                                     class="w-full rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white hover:bg-portal-navy-dark"
                                 >
-                                    Enroll
-                                </button>
-                                <button
-                                    v-else-if="course.enrollment_status === 'rejected'"
-                                    @click="enroll(course.id)"
-                                    class="w-full rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white hover:bg-portal-navy-dark"
-                                >
-                                    Reapply
+                                    {{ course.enrollment_status === "rejected" ? "Reapply" : "Enroll" }}
                                 </button>
                             </div>
                         </div>
