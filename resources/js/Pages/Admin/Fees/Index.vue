@@ -2,12 +2,16 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     fees: {
         type: Object,
         required: true,
+    },
+    filters: {
+        type: Object,
+        default: () => ({}),
     },
     latePayments: {
         type: Array,
@@ -19,9 +23,8 @@ const props = defineProps({
     },
 });
 
-const query = ref("");
-const statusFilter = ref("all");
-const studentFilter = ref("");
+const status = ref(props.filters.status || "all");
+const search = ref(props.filters.search || "");
 
 const entries = computed(() => props.fees?.data ?? []);
 
@@ -47,32 +50,23 @@ const stats = computed(() => {
     };
 });
 
-const filtered = computed(() => {
-    const q = query.value.trim().toLowerCase();
-    const s = studentFilter.value.trim().toLowerCase();
-    let list = entries.value;
+const applyFilters = () => {
+    router.get(
+        route("admin.fees.index"),
+        {
+            status: status.value,
+            search: search.value,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        }
+    );
+};
 
-    if (statusFilter.value !== "all") {
-        list = list.filter((f) => f.status === statusFilter.value);
-    }
-
-    if (q) {
-        list = list.filter((f) => {
-            const desc = (f.description ?? "").toLowerCase();
-            const amount = String(f.amount ?? "").toLowerCase();
-            const student = `${f.student_name ?? ""} ${f.student_no ?? ""}`.toLowerCase();
-            return desc.includes(q) || amount.includes(q) || student.includes(q);
-        });
-    }
-
-    if (s) {
-        list = list.filter((f) => {
-            const student = `${f.student_name ?? ""} ${f.student_no ?? ""}`.toLowerCase();
-            return student.includes(s);
-        });
-    }
-
-    return list;
+watch(status, () => {
+    applyFilters();
 });
 
 const deleteFee = (feeId) => {
@@ -296,7 +290,7 @@ export default {
                     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                             <select
-                                v-model="statusFilter"
+                                v-model="status"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-48"
                             >
                                 <option value="all">All statuses</option>
@@ -307,16 +301,21 @@ export default {
 
                             <div class="relative w-full sm:w-72">
                                 <input
-                                    v-model="query"
+                                    v-model="search"
                                     type="text"
                                     placeholder="Search student, description, amount…"
                                     class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                                 <button
-                                    v-if="query"
+                                    v-if="search"
                                     type="button"
                                     class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                    @click="query = ''"
+                                    @click="
+                                        () => {
+                                            search = '';
+                                            applyFilters();
+                                        }
+                                    "
                                 >
                                     <span class="sr-only">Clear</span>
                                     ✕
@@ -399,7 +398,7 @@ export default {
                                     </td>
                                 </tr>
                                 <tr
-                                    v-for="fee in filtered"
+                                    v-for="fee in entries"
                                     :key="fee.id"
                                     class="bg-white hover:bg-slate-50 transition-colors"
                                     :class="{

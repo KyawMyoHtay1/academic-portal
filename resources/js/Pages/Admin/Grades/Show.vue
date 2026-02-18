@@ -17,14 +17,33 @@ const props = defineProps({
 
 const rejectReason = ref({});
 const searchQuery = ref("");
+const statusFilter = ref("pending");
+
+const statusTabs = [
+    { key: "pending", label: "Pending" },
+    { key: "approved", label: "Approved" },
+    { key: "rejected", label: "Rejected" },
+    { key: "all", label: "All Reviewed" },
+];
 
 const approveForm = useForm({});
 const rejectForm = useForm({ reason: "" });
 
 const filteredRows = computed(() => {
     const q = searchQuery.value.trim().toLowerCase();
-    if (!q) return props.rows;
-    return props.rows.filter((row) => {
+    let list = props.rows;
+
+    if (statusFilter.value !== "all") {
+        list = list.filter(
+            (row) => row.grade && row.grade.status === statusFilter.value
+        );
+    } else {
+        list = list.filter((row) => row.grade);
+    }
+
+    if (!q) return list;
+
+    return list.filter((row) => {
         const name = (row.student?.full_name ?? "").toLowerCase();
         const studentNo = (row.student?.student_no ?? "").toLowerCase();
         return name.includes(q) || studentNo.includes(q);
@@ -99,17 +118,42 @@ const badgeClass = (status) => {
                         </p>
                     </div>
 
-                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <div
+                        class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+                    >
+                        <div class="space-y-2">
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
                                 Student Grades
                             </p>
                             <p class="mt-1 text-sm text-slate-600">
-                                Review and approve or reject submitted grades for each student.
+                                Use the tabs to switch between pending, approved,
+                                and rejected grades. Only pending grades can be
+                                approved or rejected.
                             </p>
+                            <div class="inline-flex flex-wrap gap-2">
+                                <button
+                                    v-for="tab in statusTabs"
+                                    :key="tab.key"
+                                    type="button"
+                                    class="rounded-full px-3 py-1 text-xs font-semibold transition"
+                                    :class="
+                                        statusFilter === tab.key
+                                            ? 'bg-portal-navy text-white shadow'
+                                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                    "
+                                    @click="statusFilter = tab.key"
+                                >
+                                    {{ tab.label }}
+                                </button>
+                            </div>
                         </div>
                         <div class="w-full sm:w-80">
-                            <label class="block text-xs font-medium text-slate-600">Search Students</label>
+                            <label
+                                class="block text-xs font-medium text-slate-600"
+                                >Search Students</label
+                            >
                             <input
                                 v-model="searchQuery"
                                 type="search"

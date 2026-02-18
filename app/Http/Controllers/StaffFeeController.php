@@ -22,6 +22,10 @@ class StaffFeeController extends Controller
     {
         $this->authorize('viewAny', Fee::class);
 
+        $filters = request()->only(['status', 'search']);
+        $status = $filters['status'] ?? 'all';
+        $search = trim((string) ($filters['search'] ?? ''));
+
         // Get late payments (due_date < today and status = pending)
         $latePayments = Fee::with('student')
             ->where('status', 'pending')
@@ -40,9 +44,27 @@ class StaffFeeController extends Controller
                 ];
             });
 
-        $fees = Fee::with(['student', 'processor:id,name'])
+        $query = Fee::with(['student', 'processor:id,name']);
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', '%'.$search.'%')
+                    ->orWhere('amount', 'like', '%'.$search.'%')
+                    ->orWhereHas('student', function ($sq) use ($search) {
+                        $sq->where('full_name', 'like', '%'.$search.'%')
+                            ->orWhere('student_no', 'like', '%'.$search.'%');
+                    });
+            });
+        }
+
+        $fees = $query
             ->orderBy('created_at', 'desc')
             ->paginate(15)
+            ->withQueryString()
             ->through(function (Fee $fee) {
                 $isLate = $fee->status === 'pending' && $fee->due_date < now();
 
@@ -66,6 +88,10 @@ class StaffFeeController extends Controller
 
         return Inertia::render('Admin/Fees/Index', [
             'fees' => $fees,
+            'filters' => [
+                'status' => $status,
+                'search' => $search,
+            ],
             'latePayments' => $latePayments,
             'latePaymentsCount' => $latePayments->count(),
         ]);

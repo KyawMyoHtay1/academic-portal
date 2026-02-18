@@ -71,7 +71,11 @@ class StaffGradesController extends Controller
         $grades = Grade::query()
             ->where('subject_id', $subject->id)
             ->whereIn('student_id', $students->pluck('id'))
-            ->where('status', Grade::STATUS_PENDING)
+            ->whereIn('status', [
+                Grade::STATUS_PENDING,
+                Grade::STATUS_APPROVED,
+                Grade::STATUS_REJECTED,
+            ])
             ->with(['grader:id,name', 'reviewer:id,name'])
             ->get()
             ->keyBy('student_id');
