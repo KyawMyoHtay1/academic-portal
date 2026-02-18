@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Students;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreStudentRequest extends FormRequest
 {
@@ -17,7 +18,13 @@ class StoreStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'exists:users,id', 'unique:students,user_id'],
+            'user_id' => [
+                'required',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', 'student');
+                }),
+                'unique:students,user_id',
+            ],
             'student_no' => ['nullable', 'string', 'max:50', 'unique:students,student_no'],
             'full_name' => ['required', 'string', 'max:255'],
             'dob' => ['required', 'date', 'before:today'],
@@ -37,6 +44,16 @@ class StoreStudentRequest extends FormRequest
             'previous_qualification' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:active,suspended,graduated'],
             'notes' => ['nullable', 'string', 'max:5000'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'user_id.exists' => 'The selected linked user must be a student account.',
         ];
     }
 }

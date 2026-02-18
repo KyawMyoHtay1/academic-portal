@@ -7,7 +7,9 @@ use App\Http\Requests\Students\UpdateStudentRequest;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ImageService;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -55,9 +57,6 @@ class StudentController extends Controller
     {
         $data = $request->validated();
 
-        // Auto-generate student number if not provided
-        $data['student_no'] = $data['student_no'] ?? $this->generateStudentNo();
-
         if ($request->hasFile('photo')) {
             $data['photo'] = ImageService::store($request->file('photo'), 'students');
         }
@@ -70,11 +69,58 @@ class StudentController extends Controller
             $data['transcript'] = $this->storeDocument($request->file('transcript'), 'students/documents');
         }
 
-        Student::create($data);
+        $userProvidedStudentNo = filled($data['student_no'] ?? null);
+        $maxAttempts = $userProvidedStudentNo ? 1 : 5;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                DB::transaction(function () use ($userProvidedStudentNo, &$data): void {
+                    if (! $userProvidedStudentNo) {
+                        // Generate inside transaction to reduce race conditions.
+                        $data['student_no'] = $this->generateStudentNo(lockForUpdate: true);
+                    }
+
+                    Student::create($data);
+                });
+
+                return redirect()
+                    ->route('students.index')
+                    ->with('success', 'Student created successfully.');
+            } catch (QueryException $e) {
+                if ($this->isDuplicateUserIdException($e)) {
+                    $this->cleanupUploadedStudentFiles($data);
+
+                    return back()
+                        ->withErrors([
+                            'user_id' => 'This user already has a student profile.',
+                        ])
+                        ->withInput();
+                }
+
+                if ($this->isDuplicateStudentNoException($e)) {
+                    if (! $userProvidedStudentNo && $attempt < $maxAttempts) {
+                        continue;
+                    }
+
+                    $this->cleanupUploadedStudentFiles($data);
+
+                    return back()
+                        ->withErrors([
+                            'student_no' => 'This student number is already in use. Please try again.',
+                        ])
+                        ->withInput();
+                }
+
+                throw $e;
+            }
+        }
 
         return redirect()
-            ->route('students.index')
-            ->with('success', 'Student created successfully.');
+            ->back()
+            ->withErrors([
+                'student_no' => 'Unable to generate a unique student number. Please try again.',
+            ])
+            ->withInput();
     }
 
     public function edit(Student $student): Response
@@ -173,9 +219,14 @@ class StudentController extends Controller
     /**
      * Generate the next student number in the format STU0001, STU0002, ...
      */
-    protected function generateStudentNo(): string
+    protected function generateStudentNo(bool $lockForUpdate = false): string
     {
-        $latest = Student::orderByDesc('id')->value('student_no');
+        $query = Student::query()->orderByDesc('id');
+        if ($lockForUpdate) {
+            $query->lockForUpdate();
+        }
+
+        $latest = $query->value('student_no');
 
         if ($latest && preg_match('/(\d+)$/', $latest, $matches)) {
             $next = (int) $matches[1] + 1;
@@ -184,6 +235,42 @@ class StudentController extends Controller
         }
 
         return 'STU'.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    protected function isDuplicateStudentNoException(QueryException $e): bool
+    {
+        $message = strtolower($e->getMessage());
+
+        return str_contains($message, 'students_student_no_unique')
+            || str_contains($message, 'unique constraint failed: students.student_no')
+            || (str_contains($message, 'duplicate') && str_contains($message, 'student_no'));
+    }
+
+    protected function isDuplicateUserIdException(QueryException $e): bool
+    {
+        $message = strtolower($e->getMessage());
+
+        return str_contains($message, 'students_user_id_unique')
+            || str_contains($message, 'unique constraint failed: students.user_id')
+            || (str_contains($message, 'duplicate') && str_contains($message, 'user_id'));
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function cleanupUploadedStudentFiles(array $data): void
+    {
+        if (! empty($data['photo']) && is_string($data['photo'])) {
+            ImageService::delete($data['photo']);
+        }
+
+        if (! empty($data['id_card']) && is_string($data['id_card'])) {
+            $this->deleteDocument($data['id_card']);
+        }
+
+        if (! empty($data['transcript']) && is_string($data['transcript'])) {
+            $this->deleteDocument($data['transcript']);
+        }
     }
 
     /**
