@@ -84,8 +84,29 @@ const isGradeLocked = (status) =>
     status === "pending" || status === "approved";
 
 const canSubmitFinal = (student) =>
+    student?.can_edit_score !== false &&
     !isGradeLocked(student?.status) &&
     (student?.computed_grade !== null || hasFinalScore(student));
+
+const hasStudentDetails = (student) =>
+    Boolean(
+        student?.has_assignments ||
+            (student?.grade_audit_trail?.length ?? 0) > 0,
+    );
+
+const formatAuditAction = (action) => {
+    if (action === "submitted") return "Submitted for review";
+    if (action === "approved") return "Approved";
+    if (action === "rejected") return "Rejected";
+    return action;
+};
+
+const getAuditActionClass = (action) => {
+    if (action === "approved") return "bg-emerald-100 text-emerald-800";
+    if (action === "rejected") return "bg-red-100 text-red-800";
+    if (action === "submitted") return "bg-indigo-100 text-indigo-800";
+    return "bg-slate-100 text-slate-700";
+};
 
 const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -454,11 +475,9 @@ const submit = () => {
                                                                 max="100"
                                                                 step="0.01"
                                                                 :disabled="
-                                                                    isGradeLocked(
-                                                                        entry
-                                                                            .student
-                                                                            ?.status,
-                                                                    )
+                                                                    !entry
+                                                                        .student
+                                                                        ?.can_edit_score
                                                                 "
                                                                 class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy disabled:cursor-not-allowed disabled:opacity-60"
                                                                 :class="{
@@ -685,17 +704,36 @@ const submit = () => {
                                                     <td
                                                         class="whitespace-nowrap px-4 py-4 text-center text-sm text-slate-700"
                                                     >
-                                                        <span
+                                                        <div
                                                             v-if="
                                                                 entry.student
                                                                     ?.graded_by
                                                             "
+                                                            class="flex flex-col items-center gap-0.5"
                                                         >
-                                                            {{
-                                                                entry.student
-                                                                    .graded_by
-                                                            }}
-                                                        </span>
+                                                            <span>
+                                                                {{
+                                                                    entry
+                                                                        .student
+                                                                        .graded_by
+                                                                }}
+                                                            </span>
+                                                            <span
+                                                                v-if="
+                                                                    entry
+                                                                        .student
+                                                                        ?.grade_updated_at
+                                                                "
+                                                                class="text-[11px] text-slate-500"
+                                                            >
+                                                                Updated:
+                                                                {{
+                                                                    entry
+                                                                        .student
+                                                                        .grade_updated_at
+                                                                }}
+                                                            </span>
+                                                        </div>
                                                         <span
                                                             v-else
                                                             class="text-slate-400"
@@ -710,9 +748,9 @@ const submit = () => {
                                                         >
                                                             <button
                                                                 v-if="
-                                                                    entry
-                                                                        .student
-                                                                        ?.has_assignments
+                                                                    hasStudentDetails(
+                                                                        entry.student,
+                                                                    )
                                                                 "
                                                                 type="button"
                                                                 @click="
@@ -734,11 +772,11 @@ const submit = () => {
                                                                     "
                                                                 >
                                                                     Hide
-                                                                    Assignments
+                                                                    Details
                                                                 </span>
                                                                 <span v-else>
                                                                     View
-                                                                    Assignments
+                                                                    Details
                                                                 </span>
                                                             </button>
                                                             <button
@@ -756,15 +794,31 @@ const submit = () => {
                                                             </button>
                                                             <span
                                                                 v-else-if="
-                                                                    isGradeLocked(
-                                                                        entry
-                                                                            .student
-                                                                            ?.status,
-                                                                    )
+                                                                    !entry
+                                                                        .student
+                                                                        ?.can_edit_score
                                                                 "
                                                                 class="text-[11px] font-medium text-slate-500"
                                                             >
-                                                                Locked
+                                                                <span
+                                                                    v-if="
+                                                                        entry
+                                                                            .student
+                                                                            ?.edit_lock_reason ===
+                                                                        'owned_by_other_teacher'
+                                                                    "
+                                                                >
+                                                                    Locked by
+                                                                    {{
+                                                                        entry
+                                                                            .student
+                                                                            ?.graded_by ??
+                                                                        "another teacher"
+                                                                    }}
+                                                                </span>
+                                                                <span v-else>
+                                                                    Locked
+                                                                </span>
                                                             </span>
                                                         </div>
                                                     </td>
@@ -775,8 +829,9 @@ const submit = () => {
                                                         expandedStudents.has(
                                                             entry.student?.id,
                                                         ) &&
-                                                        entry.student
-                                                            ?.has_assignments
+                                                        hasStudentDetails(
+                                                            entry.student,
+                                                        )
                                                     "
                                                     class="bg-slate-50"
                                                 >
@@ -791,8 +846,9 @@ const submit = () => {
                                                                 <h4
                                                                     class="text-sm font-semibold text-slate-900"
                                                                 >
-                                                                    Assignment
-                                                                    Breakdown
+                                                                    Assignment &
+                                                                    Review
+                                                                    Details
                                                                 </h4>
                                                                 <div
                                                                     class="flex flex-wrap items-center gap-2 text-xs sm:gap-4"
@@ -1034,6 +1090,104 @@ const submit = () => {
                                                                 No assignments
                                                                 found for this
                                                                 subject.
+                                                            </div>
+                                                            <div
+                                                                class="rounded-md border border-slate-200 bg-white p-3"
+                                                            >
+                                                                <div
+                                                                    class="mb-2 flex items-center justify-between"
+                                                                >
+                                                                    <h5
+                                                                        class="text-xs font-semibold uppercase tracking-wide text-slate-600"
+                                                                    >
+                                                                        Audit Trail
+                                                                    </h5>
+                                                                    <span
+                                                                        class="text-[11px] text-slate-500"
+                                                                    >
+                                                                        {{
+                                                                            entry
+                                                                                .student
+                                                                                ?.grade_audit_trail
+                                                                                ?.length ??
+                                                                            0
+                                                                        }}
+                                                                        event(s)
+                                                                    </span>
+                                                                </div>
+                                                                <div
+                                                                    v-if="
+                                                                        entry
+                                                                            .student
+                                                                            ?.grade_audit_trail
+                                                                            ?.length >
+                                                                        0
+                                                                    "
+                                                                    class="space-y-2"
+                                                                >
+                                                                    <div
+                                                                        v-for="log in entry
+                                                                            .student
+                                                                            .grade_audit_trail"
+                                                                        :key="
+                                                                            log.id
+                                                                        "
+                                                                        class="rounded-md bg-slate-50 px-3 py-2 text-xs"
+                                                                    >
+                                                                        <div
+                                                                            class="flex flex-wrap items-center gap-2"
+                                                                        >
+                                                                            <span
+                                                                                class="inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                                                                                :class="
+                                                                                    getAuditActionClass(
+                                                                                        log.action,
+                                                                                    )
+                                                                                "
+                                                                            >
+                                                                                {{
+                                                                                    formatAuditAction(
+                                                                                        log.action,
+                                                                                    )
+                                                                                }}
+                                                                            </span>
+                                                                            <span
+                                                                                class="text-slate-700"
+                                                                            >
+                                                                                {{
+                                                                                    log.performed_by ??
+                                                                                    "System"
+                                                                                }}
+                                                                            </span>
+                                                                            <span
+                                                                                class="text-slate-500"
+                                                                            >
+                                                                                {{
+                                                                                    log.performed_at ??
+                                                                                    "-"
+                                                                                }}
+                                                                            </span>
+                                                                        </div>
+                                                                        <p
+                                                                            v-if="
+                                                                                log.reason
+                                                                            "
+                                                                            class="mt-1 text-[11px] text-red-700"
+                                                                        >
+                                                                            Reason:
+                                                                            {{
+                                                                                log.reason
+                                                                            }}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <p
+                                                                    v-else
+                                                                    class="text-xs text-slate-500"
+                                                                >
+                                                                    No review
+                                                                    history yet.
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     </td>

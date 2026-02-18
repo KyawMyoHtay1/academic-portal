@@ -78,7 +78,13 @@ class TeacherGradesController extends Controller
 
         // Fetch existing grades keyed by student_id
         $grades = Grade::where('subject_id', $subject->id)
-            ->with('grader:id,name')
+            ->with([
+                'grader:id,name',
+                'reviewLogs' => function ($query) {
+                    $query->with('performer:id,name')
+                        ->latest('created_at');
+                },
+            ])
             ->whereIn('student_id', $studentIds)
             ->get([
                 'id',
@@ -88,6 +94,7 @@ class TeacherGradesController extends Controller
                 'status',
                 'rejection_reason',
                 'graded_by',
+                'updated_at',
             ])
             ->keyBy('student_id');
 
@@ -95,7 +102,7 @@ class TeacherGradesController extends Controller
         $calculator = new SubjectGradeCalculator();
         $assignmentDataByStudent = $calculator->calculateForSubjectStudents($subject->id, $studentIds);
 
-        $studentData = $students->map(function ($student) use ($grades, $assignmentDataByStudent) {
+        $studentData = $students->map(function ($student) use ($grades, $assignmentDataByStudent, $user) {
             $assignmentData = $assignmentDataByStudent[$student->id] ?? [
                 'computed_grade' => null,
                 'breakdown' => [],
@@ -104,16 +111,48 @@ class TeacherGradesController extends Controller
                 'ungraded_assignments' => 0,
                 'has_assignments' => false,
             ];
+            $grade = $grades[$student->id] ?? null;
+            $isWorkflowLocked = $grade && in_array($grade->status, [Grade::STATUS_PENDING, Grade::STATUS_APPROVED], true);
+            $isLockedByDraftOwner = $grade &&
+                $grade->status === Grade::STATUS_DRAFT &&
+                $grade->graded_by !== null &&
+                (int) $grade->graded_by !== (int) $user->id;
+
+            $editLockReason = null;
+            if ($isWorkflowLocked) {
+                $editLockReason = 'workflow_locked';
+            } elseif ($isLockedByDraftOwner) {
+                $editLockReason = 'owned_by_other_teacher';
+            }
 
             return [
                 'id' => $student->id,
                 'student_no' => $student->student_no,
                 'full_name' => $student->full_name,
                 'photo' => $student->photo,
-                'score' => $grades[$student->id]->score ?? null,
-                'status' => $grades[$student->id]->status ?? null,
-                'rejection_reason' => $grades[$student->id]->rejection_reason ?? null,
-                'graded_by' => $grades[$student->id]?->grader?->name,
+                'score' => $grade?->score,
+                'status' => $grade?->status,
+                'rejection_reason' => $grade?->rejection_reason,
+                'graded_by' => $grade?->grader?->name,
+                'graded_by_id' => $grade?->graded_by,
+                'grade_updated_at' => $grade?->updated_at?->format('Y-m-d H:i'),
+                'can_edit_score' => $editLockReason === null,
+                'edit_lock_reason' => $editLockReason,
+                'grade_audit_trail' => $grade
+                    ? $grade->reviewLogs
+                        ->map(function ($log) {
+                            return [
+                                'id' => $log->id,
+                                'action' => $log->action,
+                                'reason' => $log->reason,
+                                'performed_by' => $log->performer?->name,
+                                'performed_at' => $log->created_at?->format('Y-m-d H:i'),
+                                'meta' => $log->meta,
+                            ];
+                        })
+                        ->values()
+                        ->all()
+                    : [],
                 // Assignment-based computed grade
                 'computed_grade' => $assignmentData['computed_grade'],
                 'assignment_breakdown' => $assignmentData['breakdown'],
@@ -160,12 +199,13 @@ class TeacherGradesController extends Controller
         $enrolledStudentIds = $enrolledStudents->pluck('id')->toArray();
         $existingGrades = Grade::where('subject_id', $subject->id)
             ->whereIn('student_id', $enrolledStudentIds)
-            ->get(['id', 'student_id', 'status'])
+            ->get(['id', 'student_id', 'status', 'graded_by'])
             ->keyBy('student_id');
 
         // Filter and save only grades with scores (skip empty ones)
         $savedCount = 0;
         $lockedCount = 0;
+        $ownedByOtherTeacherCount = 0;
         foreach ($data['grades'] as $record) {
             // Skip if student is not enrolled
             if (! in_array($record['student_id'], $enrolledStudentIds)) {
@@ -186,6 +226,16 @@ class TeacherGradesController extends Controller
                 in_array($existingGrade->status, [Grade::STATUS_PENDING, Grade::STATUS_APPROVED], true)
             ) {
                 $lockedCount++;
+
+                continue;
+            }
+            if (
+                $existingGrade &&
+                $existingGrade->status === Grade::STATUS_DRAFT &&
+                $existingGrade->graded_by !== null &&
+                (int) $existingGrade->graded_by !== (int) $user->id
+            ) {
+                $ownedByOtherTeacherCount++;
 
                 continue;
             }
@@ -216,20 +266,34 @@ class TeacherGradesController extends Controller
                 ->route('teacher.grades.show', $subject->id)
                 ->with('success', "Saved {$savedCount} draft grade(s). Use \"Submit Final Grade\" to send for review.");
 
-            if ($lockedCount > 0) {
+            if ($lockedCount > 0 || $ownedByOtherTeacherCount > 0) {
+                $reasons = [];
+                if ($lockedCount > 0) {
+                    $reasons[] = "{$lockedCount} pending/approved grade(s)";
+                }
+                if ($ownedByOtherTeacherCount > 0) {
+                    $reasons[] = "{$ownedByOtherTeacherCount} draft grade(s) owned by another teacher";
+                }
                 $response = $response->with(
                     'info',
-                    "Skipped {$lockedCount} grade(s) because pending/approved grades are locked."
+                    'Skipped '.implode(' and ', $reasons).'.'
                 );
             }
 
             return $response;
         }
 
-        if ($lockedCount > 0) {
+        if ($lockedCount > 0 || $ownedByOtherTeacherCount > 0) {
+            $reasons = [];
+            if ($lockedCount > 0) {
+                $reasons[] = "{$lockedCount} pending/approved grade(s)";
+            }
+            if ($ownedByOtherTeacherCount > 0) {
+                $reasons[] = "{$ownedByOtherTeacherCount} draft grade(s) owned by another teacher";
+            }
             return redirect()
                 ->route('teacher.grades.show', $subject->id)
-                ->with('info', "No grades were saved. {$lockedCount} grade(s) are locked because they are pending/approved.");
+                ->with('info', 'No grades were saved. Skipped '.implode(' and ', $reasons).'.');
         }
 
         return redirect()
@@ -271,6 +335,16 @@ class TeacherGradesController extends Controller
             return redirect()
                 ->back()
                 ->with('info', 'Final grade is already approved and locked.');
+        }
+        if (
+            $existingGrade &&
+            $existingGrade->status === Grade::STATUS_DRAFT &&
+            $existingGrade->graded_by !== null &&
+            (int) $existingGrade->graded_by !== (int) $user->id
+        ) {
+            return redirect()
+                ->back()
+                ->with('info', 'This draft grade is owned by another teacher and cannot be submitted by you.');
         }
 
         $request->validate([
