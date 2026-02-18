@@ -25,6 +25,7 @@ class StudentTimetableController extends Controller
 
         // Get timetables for subjects in enrolled courses
         $courses = $student->courses()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->with(['subjects' => function ($query) {
                 $query->select('subjects.id', 'subjects.course_id', 'subjects.subject_code', 'subjects.title', 'subjects.photo');
             }, 'subjects.timetables' => function ($query) {

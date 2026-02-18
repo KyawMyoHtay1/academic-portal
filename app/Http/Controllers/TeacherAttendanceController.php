@@ -63,6 +63,7 @@ class TeacherAttendanceController extends Controller
 
         // Get enrolled students for the subject's course
         $students = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->orderBy('students.full_name')
             ->get([
                 'students.id',
@@ -130,7 +131,10 @@ class TeacherAttendanceController extends Controller
         $data = $request->validated();
 
         // Verify all students are enrolled in the subject's course
-        $enrolledStudentIds = $subject->course->students()->pluck('students.id')->toArray();
+        $enrolledStudentIds = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->pluck('students.id')
+            ->toArray();
         foreach ($data['attendance'] as $record) {
             if (! in_array($record['student_id'], $enrolledStudentIds)) {
                 return redirect()

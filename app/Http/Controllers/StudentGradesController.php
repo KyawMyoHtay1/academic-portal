@@ -27,6 +27,7 @@ class StudentGradesController extends Controller
 
         // Get courses with subjects and their grades
         $courses = $student->courses()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->with(['subjects' => function ($query) {
                 $query->select('subjects.id', 'subjects.course_id', 'subjects.subject_code', 'subjects.title', 'subjects.photo');
             }, 'subjects.grades' => function ($query) use ($student) {

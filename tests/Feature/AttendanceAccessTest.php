@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -76,6 +77,74 @@ class AttendanceAccessTest extends TestCase
             ->get(route('teacher.attendance.index'));
 
         $response->assertForbidden();
+    }
+
+    public function test_teacher_cannot_mark_attendance_for_pending_enrollment_student(): void
+    {
+        $teacher = User::factory()->create([
+            'role' => 'teacher',
+        ]);
+
+        $studentUser = User::factory()->create([
+            'role' => 'student',
+        ]);
+
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'student_no' => 'STU'.str_pad((string) $studentUser->id, 6, '0', STR_PAD_LEFT),
+            'full_name' => $studentUser->name,
+            'email' => $studentUser->email,
+            'programme' => 'BSc Computing',
+            'intake_year' => '2026',
+        ]);
+
+        $course = Course::create([
+            'course_code' => 'CSE320',
+            'title' => 'Cloud Systems',
+            'credits' => 20,
+            'semester' => 'Semester 1',
+        ]);
+
+        $subject = Subject::create([
+            'course_id' => $course->id,
+            'subject_code' => 'SUB320',
+            'title' => 'Cloud Systems Core',
+            'credits' => 20,
+        ]);
+
+        DB::table('subject_teacher')->insert([
+            'subject_id' => $subject->id,
+            'user_id' => $teacher->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $student->courses()->attach($course->id, [
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this
+            ->actingAs($teacher)
+            ->from(route('teacher.attendance.show', $subject))
+            ->post(route('teacher.attendance.store', $subject), [
+                'date' => now()->toDateString(),
+                'attendance' => [
+                    [
+                        'student_id' => $student->id,
+                        'status' => 'present',
+                    ],
+                ],
+            ])
+            ->assertRedirect(route('teacher.attendance.show', $subject))
+            ->assertSessionHasErrors('attendance');
+
+        $this->assertDatabaseMissing('attendances', [
+            'subject_id' => $subject->id,
+            'student_id' => $student->id,
+            'date' => now()->toDateString(),
+        ]);
     }
 
     /**

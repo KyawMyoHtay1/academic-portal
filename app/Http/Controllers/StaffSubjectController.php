@@ -155,6 +155,9 @@ class StaffSubjectController extends Controller
      */
     public function destroy(Subject $subject): RedirectResponse
     {
+        // Delete photo file first to avoid orphaned storage files.
+        ImageService::delete($subject->photo);
+
         $subject->delete();
 
         return redirect()

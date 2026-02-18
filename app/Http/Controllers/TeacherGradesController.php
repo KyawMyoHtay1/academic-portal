@@ -66,6 +66,7 @@ class TeacherGradesController extends Controller
         }
 
         $students = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->orderBy('students.full_name')
             ->get([
                 'students.id',
@@ -140,10 +141,12 @@ class TeacherGradesController extends Controller
         $data = $request->validated();
 
         // Verify all students are enrolled in the subject's course
-        $enrolledStudents = $subject->course->students()->get([
-            'students.id',
-            'students.full_name',
-        ]);
+        $enrolledStudents = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->get([
+                'students.id',
+                'students.full_name',
+            ]);
         $enrolledStudentIds = $enrolledStudents->pluck('id')->toArray();
         $existingGrades = Grade::where('subject_id', $subject->id)
             ->whereIn('student_id', $enrolledStudentIds)
@@ -237,7 +240,10 @@ class TeacherGradesController extends Controller
         }
 
         // Verify student is enrolled in the subject's course
-        if (! $subject->course->students()->where('students.id', $student->id)->exists()) {
+        if (! $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->where('students.id', $student->id)
+            ->exists()) {
             abort(403, 'Student is not enrolled in this course.');
         }
 

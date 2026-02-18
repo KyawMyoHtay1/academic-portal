@@ -138,6 +138,43 @@ class TeacherFinalGradeSubmissionTest extends TestCase
         ]);
     }
 
+    public function test_teacher_cannot_submit_final_grade_for_pending_enrollment_student(): void
+    {
+        [$teacher, , , $subject, $course] = $this->createTeacherGradeContext();
+
+        $pendingStudentUser = User::factory()->create([
+            'role' => 'student',
+        ]);
+
+        $pendingStudent = Student::create([
+            'user_id' => $pendingStudentUser->id,
+            'student_no' => 'STU'.str_pad((string) $pendingStudentUser->id, 6, '0', STR_PAD_LEFT),
+            'full_name' => $pendingStudentUser->name,
+            'email' => $pendingStudentUser->email,
+            'programme' => 'BSc Computing',
+            'intake_year' => '2026',
+        ]);
+
+        $pendingStudent->courses()->attach($course->id, [
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this
+            ->actingAs($teacher)
+            ->post(route('teacher.grades.submit-final', [$subject->id, $pendingStudent->id]), [
+                'use_computed' => false,
+                'score' => 76,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('grades', [
+            'subject_id' => $subject->id,
+            'student_id' => $pendingStudent->id,
+        ]);
+    }
+
     /**
      * @return array{0: \App\Models\User, 1: \App\Models\User, 2: \App\Models\Student, 3: \App\Models\Subject, 4: \App\Models\Course}
      */

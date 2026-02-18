@@ -45,6 +45,7 @@ class StudentAttendanceController extends Controller
 
         // Attendance by course
         $attendanceByCourse = $student->courses()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->whereHas('attendances', function ($query) use ($student) {
                 $query->where('student_id', $student->id);
             })

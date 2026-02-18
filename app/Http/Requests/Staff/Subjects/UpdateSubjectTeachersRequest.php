@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Staff\Subjects;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSubjectTeachersRequest extends FormRequest
 {
@@ -18,7 +19,11 @@ class UpdateSubjectTeachersRequest extends FormRequest
     {
         return [
             'teacher_ids' => ['required', 'array'],
-            'teacher_ids.*' => ['exists:users,id'],
+            'teacher_ids.*' => [
+                'integer',
+                'distinct',
+                Rule::exists('users', 'id')->where('role', 'teacher'),
+            ],
         ];
     }
 }
