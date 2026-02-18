@@ -18,7 +18,12 @@ class GradeSubmissionRequest extends FormRequest
     {
         return [
             'score' => ['required', 'numeric', 'min:0'],
-            'feedback' => ['nullable', 'string', 'max:5000'],
+            'feedback' => ['nullable', 'string', 'max:8000'],
+            'rubric' => ['nullable', 'array', 'max:12'],
+            'rubric.*.criterion' => ['nullable', 'string', 'max:120'],
+            'rubric.*.score' => ['nullable', 'numeric', 'min:0'],
+            'rubric.*.max_score' => ['nullable', 'numeric', 'min:0.01'],
+            'rubric.*.comment' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

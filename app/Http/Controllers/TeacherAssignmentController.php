@@ -11,8 +11,10 @@ use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use ZipArchive;
 
 class TeacherAssignmentController extends Controller
 {
@@ -316,7 +318,99 @@ class TeacherAssignmentController extends Controller
                 ],
             ],
             'submissions' => $submissions,
+            'gradingTemplates' => [
+                'comment_templates' => [
+                    'Great structure and clarity. Keep this standard.',
+                    'Good attempt. Add more supporting evidence and references.',
+                    'Reasonable work, but key concepts are incomplete.',
+                    'Please revise and resubmit after addressing feedback points.',
+                ],
+                'rubric_criteria' => [
+                    ['criterion' => 'Understanding of concepts', 'max_score' => 25],
+                    ['criterion' => 'Application and analysis', 'max_score' => 25],
+                    ['criterion' => 'Organization and structure', 'max_score' => 25],
+                    ['criterion' => 'Technical accuracy and presentation', 'max_score' => 25],
+                ],
+            ],
         ]);
+    }
+
+    /**
+     * Download all submission files for an assignment as a ZIP archive.
+     */
+    public function downloadAllSubmissions(Assignment $assignment)
+    {
+        $user = Auth::user();
+
+        if ($assignment->created_by !== $user->id) {
+            abort(403, 'You can only download submissions for your own assignments.');
+        }
+
+        if (! class_exists(ZipArchive::class)) {
+            return back()->with('error', 'ZIP export is not available on this server.');
+        }
+
+        $submissions = AssignmentSubmission::where('assignment_id', $assignment->id)
+            ->with('student:id,student_no,full_name')
+            ->orderBy('created_at')
+            ->get();
+
+        if ($submissions->isEmpty()) {
+            return back()->with('info', 'No submissions found for this assignment.');
+        }
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'assignment_zip_');
+        if ($tmpPath === false) {
+            return back()->with('error', 'Failed to initialize ZIP export.');
+        }
+
+        $zipPath = $tmpPath.'.zip';
+        @unlink($tmpPath);
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return back()->with('error', 'Failed to create ZIP archive.');
+        }
+
+        $added = 0;
+        foreach ($submissions as $submission) {
+            if (! Storage::disk('public')->exists($submission->file_path)) {
+                continue;
+            }
+
+            $absolutePath = Storage::disk('public')->path($submission->file_path);
+            $studentNo = (string) ($submission->student?->student_no ?? 'unknown');
+            $studentName = Str::slug((string) ($submission->student?->full_name ?? 'student'));
+            $safeOriginalName = Str::slug(pathinfo($submission->original_filename, PATHINFO_FILENAME));
+            $extension = pathinfo($submission->original_filename, PATHINFO_EXTENSION);
+            $safeOriginalName = $safeOriginalName !== '' ? $safeOriginalName : 'submission';
+
+            $fileName = sprintf(
+                '%s_%s_submission_%d_%s%s',
+                $studentNo,
+                $studentName !== '' ? $studentName : 'student',
+                $submission->id,
+                $safeOriginalName,
+                $extension !== '' ? '.'.$extension : ''
+            );
+
+            $zip->addFile($absolutePath, $fileName);
+            $added++;
+        }
+
+        $zip->close();
+
+        if ($added === 0) {
+            @unlink($zipPath);
+
+            return back()->with('error', 'No submission files could be added to ZIP.');
+        }
+
+        $subjectCode = Str::slug((string) ($assignment->subject?->subject_code ?? 'subject'));
+        $timestamp = now()->format('Ymd_His');
+        $downloadName = "assignment_submissions_{$subjectCode}_{$assignment->id}_{$timestamp}.zip";
+
+        return response()->download($zipPath, $downloadName)->deleteFileAfterSend(true);
     }
 
     /**
@@ -338,9 +432,15 @@ class TeacherAssignmentController extends Controller
             return back()->withErrors(['score' => "Score cannot exceed maximum score of {$maxScore}."]);
         }
 
+        $feedback = trim((string) ($data['feedback'] ?? ''));
+        $rubricFeedback = $this->formatRubricFeedback($data['rubric'] ?? []);
+        if ($rubricFeedback !== '') {
+            $feedback = trim($feedback !== '' ? $feedback."\n\n".$rubricFeedback : $rubricFeedback);
+        }
+
         $submission->update([
             'score' => $data['score'],
-            'feedback' => $data['feedback'] ?? null,
+            'feedback' => $feedback !== '' ? $feedback : null,
             'graded_by' => $user->id,
             'graded_at' => now(),
             'status' => AssignmentSubmission::STATUS_GRADED,
@@ -368,5 +468,47 @@ class TeacherAssignmentController extends Controller
             $submission->file_path,
             $submission->original_filename
         );
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rubricRows
+     */
+    private function formatRubricFeedback(array $rubricRows): string
+    {
+        $rows = collect($rubricRows)
+            ->map(function ($row) {
+                $criterion = trim((string) ($row['criterion'] ?? ''));
+                $score = $row['score'] ?? null;
+                $maxScore = $row['max_score'] ?? null;
+                $comment = trim((string) ($row['comment'] ?? ''));
+
+                $hasScore = $score !== null && $score !== '' && is_numeric($score);
+                $hasMax = $maxScore !== null && $maxScore !== '' && is_numeric($maxScore);
+                if ($criterion === '' && ! $hasScore && $comment === '') {
+                    return null;
+                }
+
+                $scorePart = '';
+                if ($hasScore && $hasMax) {
+                    $scorePart = sprintf(' (%s/%s)', (float) $score, (float) $maxScore);
+                } elseif ($hasScore) {
+                    $scorePart = sprintf(' (%s)', (float) $score);
+                }
+
+                return trim(sprintf(
+                    '- %s%s%s',
+                    $criterion !== '' ? $criterion : 'Criterion',
+                    $scorePart,
+                    $comment !== '' ? ': '.$comment : ''
+                ));
+            })
+            ->filter()
+            ->values();
+
+        if ($rows->isEmpty()) {
+            return '';
+        }
+
+        return "Rubric feedback:\n".$rows->implode("\n");
     }
 }

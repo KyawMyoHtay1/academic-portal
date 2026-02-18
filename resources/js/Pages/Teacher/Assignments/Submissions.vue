@@ -13,11 +13,33 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    gradingTemplates: {
+        type: Object,
+        default: () => ({
+            comment_templates: [],
+            rubric_criteria: [],
+        }),
+    },
 });
 
 const searchQuery = ref("");
-const gradingForm = useForm({ score: "", feedback: "" });
+const selectedTemplate = ref("");
+const gradingForm = useForm({ score: "", feedback: "", rubric: [] });
 const activeGrading = ref(null);
+
+const createRubricRows = () => {
+    const criteria = props.gradingTemplates?.rubric_criteria ?? [];
+    if (!Array.isArray(criteria) || criteria.length === 0) {
+        return [];
+    }
+
+    return criteria.map((row) => ({
+        criterion: row.criterion ?? "",
+        max_score: row.max_score ?? null,
+        score: "",
+        comment: "",
+    }));
+};
 
 const filtered = computed(() => {
     const q = searchQuery.value.trim().toLowerCase();
@@ -79,11 +101,15 @@ const startGrading = (submission) => {
     activeGrading.value = submission.id;
     gradingForm.score = submission.score ?? "";
     gradingForm.feedback = submission.feedback ?? "";
+    gradingForm.rubric = createRubricRows();
+    selectedTemplate.value = "";
 };
 
 const cancelGrading = () => {
     activeGrading.value = null;
     gradingForm.reset();
+    gradingForm.rubric = [];
+    selectedTemplate.value = "";
 };
 
 const submitGrade = (submissionId) => {
@@ -92,12 +118,29 @@ const submitGrade = (submissionId) => {
         onSuccess: () => {
             activeGrading.value = null;
             gradingForm.reset();
+            gradingForm.rubric = [];
+            selectedTemplate.value = "";
         },
     });
 };
 
 const downloadFile = (submissionId) => {
     window.location.href = route("teacher.assignments.download", submissionId);
+};
+
+const downloadAllSubmissions = () => {
+    window.location.href = route("teacher.assignments.download-all", props.assignment.id);
+};
+
+const applyCommentTemplate = () => {
+    const selected = selectedTemplate.value?.trim();
+    if (!selected) {
+        return;
+    }
+
+    const current = (gradingForm.feedback ?? "").trim();
+    gradingForm.feedback = current === "" ? selected : `${current}\n\n${selected}`;
+    selectedTemplate.value = "";
 };
 </script>
 
@@ -125,12 +168,21 @@ const downloadFile = (submissionId) => {
                 <h2 class="text-xl font-semibold leading-tight text-slate-900">
                     Assignment Submissions
                 </h2>
-                <Link
-                    :href="route('teacher.assignments.show', props.assignment.subject.id)"
-                    class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
-                >
-                    Back
-                </Link>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        class="rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 shadow-sm hover:bg-emerald-100"
+                        @click="downloadAllSubmissions"
+                    >
+                        Download All (ZIP)
+                    </button>
+                    <Link
+                        :href="route('teacher.assignments.show', props.assignment.subject.id)"
+                        class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                    >
+                        Back
+                    </Link>
+                </div>
             </div>
         </template>
 
@@ -275,7 +327,7 @@ const downloadFile = (submissionId) => {
                                     </div>
                                     <div
                                         v-if="submission.feedback"
-                                        class="mt-2 max-w-xs rounded-md bg-slate-50 p-2 text-xs text-slate-700"
+                                        class="mt-2 max-w-xs whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs text-slate-700"
                                     >
                                         {{ submission.feedback }}
                                     </div>
@@ -318,6 +370,102 @@ const downloadFile = (submissionId) => {
                                                 rows="3"
                                                 class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                             ></textarea>
+                                        </div>
+
+                                        <div
+                                            v-if="(props.gradingTemplates?.comment_templates?.length ?? 0) > 0"
+                                            class="rounded-md border border-slate-200 bg-white p-3"
+                                        >
+                                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                Comment Templates
+                                            </p>
+                                            <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                                                <select
+                                                    v-model="selectedTemplate"
+                                                    class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                >
+                                                    <option value="">Select a template...</option>
+                                                    <option
+                                                        v-for="template in props.gradingTemplates.comment_templates"
+                                                        :key="template"
+                                                        :value="template"
+                                                    >
+                                                        {{ template }}
+                                                    </option>
+                                                </select>
+                                                <button
+                                                    type="button"
+                                                    class="rounded-md bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                                                    @click="applyCommentTemplate"
+                                                >
+                                                    Insert
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            v-if="(gradingForm.rubric?.length ?? 0) > 0"
+                                            class="rounded-md border border-indigo-200 bg-indigo-50 p-3"
+                                        >
+                                            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+                                                Rubric Feedback (optional)
+                                            </p>
+                                            <p class="mt-1 text-[11px] text-indigo-700">
+                                                You can score criteria and add short notes. This will be appended to feedback.
+                                            </p>
+
+                                            <div class="mt-3 space-y-2">
+                                                <div
+                                                    v-for="(row, idx) in gradingForm.rubric"
+                                                    :key="`rubric-${idx}-${row.criterion}`"
+                                                    class="grid gap-2 rounded-md border border-indigo-100 bg-white p-2 md:grid-cols-12"
+                                                >
+                                                    <div class="md:col-span-4">
+                                                        <label class="block text-[11px] font-medium text-slate-600">
+                                                            Criterion
+                                                        </label>
+                                                        <input
+                                                            v-model="row.criterion"
+                                                            type="text"
+                                                            class="mt-1 block w-full rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                        />
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-[11px] font-medium text-slate-600">
+                                                            Score
+                                                        </label>
+                                                        <input
+                                                            v-model.number="row.score"
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            class="mt-1 block w-full rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                        />
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-[11px] font-medium text-slate-600">
+                                                            Max
+                                                        </label>
+                                                        <input
+                                                            v-model.number="row.max_score"
+                                                            type="number"
+                                                            min="0.01"
+                                                            step="0.01"
+                                                            class="mt-1 block w-full rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                        />
+                                                    </div>
+                                                    <div class="md:col-span-4">
+                                                        <label class="block text-[11px] font-medium text-slate-600">
+                                                            Comment
+                                                        </label>
+                                                        <input
+                                                            v-model="row.comment"
+                                                            type="text"
+                                                            class="mt-1 block w-full rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="flex items-center justify-end gap-2">

@@ -568,6 +568,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::post('/teacher/assignments/{assignment}/publish', [TeacherAssignmentController::class, 'publish'])->name('teacher.assignments.publish');
         Route::delete('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('teacher.assignments.destroy');
         Route::get('/teacher/assignments/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])->name('teacher.assignments.submissions');
+        Route::get('/teacher/assignments/{assignment}/submissions/download-all', [TeacherAssignmentController::class, 'downloadAllSubmissions'])->name('teacher.assignments.download-all');
         Route::post('/teacher/assignments/submissions/{submission}/grade', [TeacherAssignmentController::class, 'grade'])->name('teacher.assignments.grade');
         Route::get('/teacher/assignments/submissions/{submission}/download', [TeacherAssignmentController::class, 'downloadSubmission'])->name('teacher.assignments.download');
 
