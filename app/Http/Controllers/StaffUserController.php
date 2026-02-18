@@ -28,8 +28,9 @@ class StaffUserController extends Controller
         $role = trim((string) ($filters['role'] ?? 'all'));
 
         $allowedSorts = ['name', 'email', 'role', 'created_at'];
-        $sortBy = in_array($filters['sort_by'] ?? 'name', $allowedSorts, true)
-            ? (string) $filters['sort_by']
+        $requestedSortBy = (string) ($filters['sort_by'] ?? 'name');
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true)
+            ? $requestedSortBy
             : 'name';
         $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 

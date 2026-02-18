@@ -29,8 +29,9 @@ class StaffEnrollmentController extends Controller
             'course_code' => 'courses.course_code',
             'semester' => 'courses.semester',
         ];
-        $sortBy = array_key_exists($filters['sort_by'] ?? 'requested_at', $allowedSorts)
-            ? (string) $filters['sort_by']
+        $requestedSortBy = (string) ($filters['sort_by'] ?? 'requested_at');
+        $sortBy = array_key_exists($requestedSortBy, $allowedSorts)
+            ? $requestedSortBy
             : 'requested_at';
         $sortDir = ($filters['sort_dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
 

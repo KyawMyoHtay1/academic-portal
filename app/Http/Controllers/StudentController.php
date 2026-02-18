@@ -26,8 +26,9 @@ class StudentController extends Controller
         $status = trim((string) ($filters['status'] ?? 'all'));
 
         $allowedSorts = ['student_no', 'full_name', 'programme', 'intake_year', 'status'];
-        $sortBy = in_array($filters['sort_by'] ?? 'student_no', $allowedSorts, true)
-            ? (string) $filters['sort_by']
+        $requestedSortBy = (string) ($filters['sort_by'] ?? 'student_no');
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true)
+            ? $requestedSortBy
             : 'student_no';
         $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
