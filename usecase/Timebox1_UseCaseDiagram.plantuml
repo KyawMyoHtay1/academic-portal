@@ -41,6 +41,7 @@ rectangle "University Academic Portal\nTimebox 1: Student Registration & Course 
     usecase "Update Course" as UC8b
     usecase "Delete Course" as UC8c
     usecase "Search Course" as UC8d
+    usecase "Assign Teacher to Course" as UC8e
   }
 
   rectangle "Manage Subject" #LavenderBlush {
@@ -97,6 +98,7 @@ Staff -[#16A34A]-> UC8
 Staff -[#16A34A]-> UC8b
 Staff -[#16A34A]-> UC8c
 Staff -[#16A34A]-> UC8d
+Staff -[#16A34A]-> UC8e
 ' Staff - Subject
 Staff -[#16A34A]-> UC9
 Staff -[#16A34A]-> UC9b
