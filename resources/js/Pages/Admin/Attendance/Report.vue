@@ -2,8 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Head, Link } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     overall: {
@@ -26,12 +26,56 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    filters: {
+        type: Object,
+        default: () => ({}),
+    },
+    options: {
+        type: Object,
+        default: () => ({
+            programmes: [],
+            intakeYears: [],
+            semesters: [],
+        }),
+    },
 });
 
 const searchStudents = ref("");
 const searchCourses = ref("");
 const searchSubjects = ref("");
 const searchRecent = ref("");
+const programmeFilter = ref(props.filters?.programme || "all");
+const intakeYearFilter = ref(props.filters?.intake_year || "all");
+const semesterFilter = ref(props.filters?.semester || "all");
+
+const applyFilters = () => {
+    router.get(
+        route("admin.attendance.report"),
+        {
+            programme:
+                programmeFilter.value !== "all"
+                    ? programmeFilter.value
+                    : undefined,
+            intake_year:
+                intakeYearFilter.value !== "all"
+                    ? intakeYearFilter.value
+                    : undefined,
+            semester:
+                semesterFilter.value !== "all"
+                    ? semesterFilter.value
+                    : undefined,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        }
+    );
+};
+
+watch([programmeFilter, intakeYearFilter, semesterFilter], () => {
+    applyFilters();
+});
 
 const filteredStudents = computed(() => {
     const q = searchStudents.value.trim().toLowerCase();
@@ -62,8 +106,9 @@ const filteredSubjects = computed(() => {
 
 const filteredRecent = computed(() => {
     const q = searchRecent.value.trim().toLowerCase();
-    if (!q) return props.recentRecords.data;
-    return props.recentRecords.data.filter((r) => {
+    const recentRows = props.recentRecords?.data ?? [];
+    if (!q) return recentRows;
+    return recentRows.filter((r) => {
         const hay = `${r.student_no} ${r.student_name} ${r.subject_code} ${r.course_code} ${r.date}`.toLowerCase();
         return hay.includes(q);
     });
@@ -111,6 +156,60 @@ const filteredRecent = computed(() => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Report Filters
+                            </p>
+                            <p class="mt-1 text-sm text-slate-600">
+                                Narrow attendance analytics by programme, intake year, and semester.
+                            </p>
+                        </div>
+                        <div class="grid w-full gap-2 sm:w-auto sm:grid-cols-3">
+                            <select
+                                v-model="programmeFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All programmes</option>
+                                <option
+                                    v-for="programme in options.programmes"
+                                    :key="programme"
+                                    :value="programme"
+                                >
+                                    {{ programme }}
+                                </option>
+                            </select>
+                            <select
+                                v-model="intakeYearFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All intake years</option>
+                                <option
+                                    v-for="year in options.intakeYears"
+                                    :key="year"
+                                    :value="String(year)"
+                                >
+                                    {{ year }}
+                                </option>
+                            </select>
+                            <select
+                                v-model="semesterFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All semesters</option>
+                                <option
+                                    v-for="semester in options.semesters"
+                                    :key="semester"
+                                    :value="semester"
+                                >
+                                    {{ semester }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Overall Statistics -->
                 <div class="mb-6 grid gap-4 md:grid-cols-4">
                     <div class="portal-card p-5">

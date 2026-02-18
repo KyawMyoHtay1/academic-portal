@@ -7,6 +7,14 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 const props = defineProps({
     messages: { type: Object, required: true },
     unreadCount: { type: Number, required: true },
+    statusCounts: {
+        type: Object,
+        default: () => ({ unread: 0, read: 0, replied: 0 }),
+    },
+    typeOptions: {
+        type: Array,
+        default: () => [],
+    },
     filters: { type: Object, default: () => ({}) },
 });
 
@@ -15,22 +23,35 @@ const items = computed(() => [
 ]);
 
 const search = ref(props.filters?.q ?? "");
+const selectedStatus = ref(props.filters?.status ?? "all");
+const selectedType = ref(props.filters?.type ?? "all");
 let searchTimer = null;
 
-watch(
-    search,
-    (value) => {
-        if (searchTimer) window.clearTimeout(searchTimer);
-        searchTimer = window.setTimeout(() => {
-            router.get(
-                route("admin.feedback-messages.index"),
-                { q: value || undefined },
-                { preserveState: true, replace: true, preserveScroll: true }
-            );
-        }, 250);
-    },
-    { flush: "post" }
-);
+function applyFilters(qValue = search.value) {
+    router.get(
+        route("admin.feedback-messages.index"),
+        {
+            q: qValue || undefined,
+            status:
+                selectedStatus.value !== "all"
+                    ? selectedStatus.value
+                    : undefined,
+            type: selectedType.value !== "all" ? selectedType.value : undefined,
+        },
+        { preserveState: true, replace: true, preserveScroll: true }
+    );
+}
+
+watch(search, (value) => {
+    if (searchTimer) window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => {
+        applyFilters(value);
+    }, 250);
+}, { flush: "post" });
+
+watch([selectedStatus, selectedType], () => {
+    applyFilters();
+});
 
 function markRead(messageId) {
     router.post(route("admin.feedback-messages.read", messageId), {}, { preserveScroll: true });
@@ -84,12 +105,45 @@ export default {
                     class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200"
                 >
                     <div class="border-b border-slate-200 px-6 py-4">
+                        <div class="mb-3 grid gap-2 sm:grid-cols-3">
+                            <div class="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                                Unread: <span class="font-semibold">{{ statusCounts.unread ?? 0 }}</span>
+                            </div>
+                            <div class="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
+                                Read: <span class="font-semibold">{{ statusCounts.read ?? 0 }}</span>
+                            </div>
+                            <div class="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                                Replied: <span class="font-semibold">{{ statusCounts.replied ?? 0 }}</span>
+                            </div>
+                        </div>
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <p class="text-sm text-slate-600">
                                 Feedback submitted from the public Feedback & Suggestions page.
                             </p>
 
-                            <div class="w-full sm:max-w-sm">
+                            <div class="grid w-full gap-2 sm:max-w-3xl sm:grid-cols-3">
+                                <select
+                                    v-model="selectedStatus"
+                                    class="w-full rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                >
+                                    <option value="all">All statuses</option>
+                                    <option value="unread">Unread</option>
+                                    <option value="read">Read</option>
+                                    <option value="replied">Replied</option>
+                                </select>
+                                <select
+                                    v-model="selectedType"
+                                    class="w-full rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                >
+                                    <option value="all">All types</option>
+                                    <option
+                                        v-for="type in typeOptions"
+                                        :key="type"
+                                        :value="type"
+                                    >
+                                        {{ type }}
+                                    </option>
+                                </select>
                                 <div class="relative">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +160,7 @@ export default {
                                         v-if="search"
                                         type="button"
                                         class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-700"
-                                        @click="search = ''"
+                                        @click="() => { search = ''; applyFilters(''); }"
                                         aria-label="Clear search"
                                     >
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,4 +301,3 @@ export default {
         </div>
     </AuthenticatedLayout>
 </template>
-

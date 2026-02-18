@@ -7,6 +7,7 @@ use App\Http\Requests\Staff\Timetables\UpdateTimetableRequest;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\Timetable;
+use App\Models\User;
 use App\Notifications\TimetableUpdated;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -20,10 +21,63 @@ class StaffTimetableController extends Controller
      */
     public function index(): Response
     {
-        $timetables = Timetable::with(['subject.course', 'creator:id,name,email'])
+        $filters = [
+            'q' => trim((string) request('q', '')),
+            'day' => trim((string) request('day', 'all')),
+            'course_id' => trim((string) request('course_id', 'all')),
+            'teacher_id' => trim((string) request('teacher_id', 'all')),
+        ];
+        if (! in_array($filters['day'], ['all', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], true)) {
+            $filters['day'] = 'all';
+        }
+
+        $query = Timetable::with(['subject.course', 'creator:id,name,email']);
+
+        if ($filters['day'] !== '' && $filters['day'] !== 'all') {
+            $query->where('day_of_week', $filters['day']);
+        }
+
+        if ($filters['course_id'] !== '' && $filters['course_id'] !== 'all') {
+            $query->whereHas('subject', function ($subjectQuery) use ($filters) {
+                $subjectQuery->where('course_id', (int) $filters['course_id']);
+            });
+        }
+
+        if ($filters['teacher_id'] !== '' && $filters['teacher_id'] !== 'all') {
+            $query->whereHas('subject.teachers', function ($teacherQuery) use ($filters) {
+                $teacherQuery->where('users.id', (int) $filters['teacher_id']);
+            });
+        }
+
+        if ($filters['q'] !== '') {
+            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['q']).'%';
+
+            $query->where(function ($inner) use ($like) {
+                $inner->where('location', 'like', $like)
+                    ->orWhereHas('subject', function ($subjectQuery) use ($like) {
+                        $subjectQuery
+                            ->where('subject_code', 'like', $like)
+                            ->orWhere('title', 'like', $like)
+                            ->orWhereHas('course', function ($courseQuery) use ($like) {
+                                $courseQuery
+                                    ->where('course_code', 'like', $like)
+                                    ->orWhere('title', 'like', $like);
+                            })
+                            ->orWhereHas('teachers', function ($teacherQuery) use ($like) {
+                                $teacherQuery->where('name', 'like', $like);
+                            });
+                    })
+                    ->orWhereHas('creator', function ($creatorQuery) use ($like) {
+                        $creatorQuery->where('name', 'like', $like);
+                    });
+            });
+        }
+
+        $timetables = $query
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->paginate(15)
+            ->withQueryString()
             ->through(function (Timetable $entry) {
                 $subject = $entry->subject;
                 $course = $subject?->course;
@@ -46,8 +100,28 @@ class StaffTimetableController extends Controller
                 ];
             });
 
+        $courses = Course::query()
+            ->orderBy('course_code')
+            ->get(['id', 'course_code', 'title'])
+            ->map(function (Course $course) {
+                return [
+                    'id' => $course->id,
+                    'course_code' => $course->course_code,
+                    'title' => $course->title,
+                ];
+            });
+
+        $teachers = User::query()
+            ->where('role', 'teacher')
+            ->whereHas('teachingSubjects')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         return Inertia::render('Admin/Timetables/Index', [
             'timetables' => $timetables,
+            'filters' => $filters,
+            'courses' => $courses,
+            'teachers' => $teachers,
         ]);
     }
 

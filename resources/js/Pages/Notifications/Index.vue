@@ -15,8 +15,10 @@ const tabs = [
     { key: "all", label: "All" },
     { key: "unread", label: "Unread" },
     { key: "grade", label: "Grades" },
+    { key: "grade_review", label: "Grade Review" },
     { key: "fee", label: "Fees" },
     { key: "attendance", label: "Attendance" },
+    { key: "timetable", label: "Timetable" },
 ];
 
 const activeTab = ref("all");
@@ -30,8 +32,10 @@ const stats = computed(() => {
         total: list.length,
         unread: list.filter(isUnread).length,
         grade: list.filter((n) => n.type === "grade").length,
+        gradeReview: list.filter((n) => n.type === "grade_review").length,
         fee: list.filter((n) => n.type === "fee").length,
         attendance: list.filter((n) => n.type === "attendance").length,
+        timetable: list.filter((n) => n.type === "timetable").length,
     };
 });
 
@@ -40,7 +44,13 @@ const filtered = computed(() => {
     let list = [...(props.notifications ?? [])];
 
     if (activeTab.value === "unread") list = list.filter(isUnread);
-    if (["grade", "fee", "attendance"].includes(activeTab.value)) {
+    if ([
+        "grade",
+        "grade_review",
+        "fee",
+        "attendance",
+        "timetable",
+    ].includes(activeTab.value)) {
         list = list.filter((n) => n.type === activeTab.value);
     }
 
@@ -72,6 +82,7 @@ const clearSearch = () => {
 
 const typeBadgeClass = (type) => {
     if (type === "grade") return "bg-emerald-100 text-emerald-800";
+    if (type === "grade_review") return "bg-violet-100 text-violet-800";
     if (type === "fee") return "bg-blue-100 text-blue-800";
     if (type === "attendance") return "bg-amber-100 text-amber-800";
     if (type === "timetable") return "bg-indigo-100 text-indigo-800";
@@ -80,6 +91,7 @@ const typeBadgeClass = (type) => {
 
 const iconWrapperClass = (type) => {
     if (type === "grade") return "bg-emerald-100";
+    if (type === "grade_review") return "bg-violet-100";
     if (type === "fee") return "bg-blue-100";
     if (type === "attendance") return "bg-amber-100";
     if (type === "timetable") return "bg-indigo-100";
@@ -88,6 +100,7 @@ const iconWrapperClass = (type) => {
 
 const iconClass = (type) => {
     if (type === "grade") return "text-emerald-600";
+    if (type === "grade_review") return "text-violet-600";
     if (type === "fee") return "text-blue-600";
     if (type === "attendance") return "text-amber-600";
     if (type === "timetable") return "text-indigo-600";
@@ -126,7 +139,7 @@ const iconClass = (type) => {
                     <p class="mt-2 text-sm text-indigo-900/80">Review unread alerts and quickly clear items after checking grades, fees, and attendance notices.</p>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-7">
                     <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Total</p>
                         <p class="mt-2 text-2xl font-bold text-blue-900">{{ stats.total }}</p>
@@ -139,6 +152,10 @@ const iconClass = (type) => {
                         <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Grades</p>
                         <p class="mt-2 text-2xl font-bold text-emerald-900">{{ stats.grade }}</p>
                     </div>
+                    <div class="rounded-xl border border-violet-200 bg-violet-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-violet-700">Grade Review</p>
+                        <p class="mt-2 text-2xl font-bold text-violet-900">{{ stats.gradeReview }}</p>
+                    </div>
                     <div class="rounded-xl border border-blue-200 bg-blue-50/60 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Fees</p>
                         <p class="mt-2 text-2xl font-bold text-blue-900">{{ stats.fee }}</p>
@@ -146,6 +163,10 @@ const iconClass = (type) => {
                     <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Attendance</p>
                         <p class="mt-2 text-2xl font-bold text-amber-900">{{ stats.attendance }}</p>
+                    </div>
+                    <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Timetable</p>
+                        <p class="mt-2 text-2xl font-bold text-indigo-900">{{ stats.timetable }}</p>
                     </div>
                 </div>
 

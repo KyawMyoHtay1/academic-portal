@@ -6,6 +6,8 @@ use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -14,23 +16,75 @@ class StaffAttendanceReportController extends Controller
     /**
      * Display attendance summary report.
      */
-    public function index(): InertiaResponse
+    public function index(Request $request): InertiaResponse
     {
+        $filters = [
+            'programme' => trim((string) $request->input('programme', 'all')),
+            'intake_year' => trim((string) $request->input('intake_year', 'all')),
+            'semester' => trim((string) $request->input('semester', 'all')),
+        ];
+
+        $programmes = Student::query()
+            ->whereNotNull('programme')
+            ->where('programme', '!=', '')
+            ->distinct()
+            ->orderBy('programme')
+            ->pluck('programme')
+            ->values();
+
+        $intakeYears = Student::query()
+            ->whereNotNull('intake_year')
+            ->distinct()
+            ->orderByDesc('intake_year')
+            ->pluck('intake_year')
+            ->values();
+
+        $semesters = Course::query()
+            ->whereNotNull('semester')
+            ->where('semester', '!=', '')
+            ->distinct()
+            ->orderBy('semester')
+            ->pluck('semester')
+            ->values();
+
+        if ($filters['programme'] !== 'all' && ! $programmes->contains($filters['programme'])) {
+            $filters['programme'] = 'all';
+        }
+        if ($filters['intake_year'] !== 'all' && ! $intakeYears->map(fn ($year) => (string) $year)->contains($filters['intake_year'])) {
+            $filters['intake_year'] = 'all';
+        }
+        if ($filters['semester'] !== 'all' && ! $semesters->contains($filters['semester'])) {
+            $filters['semester'] = 'all';
+        }
+
+        $attendanceScope = Attendance::query();
+        $this->applyAttendanceFilters($attendanceScope, $filters);
+
         // Overall statistics
-        $totalRecords = Attendance::count();
-        $totalPresent = Attendance::where('status', 'present')->count();
-        $totalAbsent = Attendance::where('status', 'absent')->count();
+        $totalRecords = (clone $attendanceScope)->count();
+        $totalPresent = (clone $attendanceScope)->where('status', 'present')->count();
+        $totalAbsent = (clone $attendanceScope)->where('status', 'absent')->count();
         $attendanceRate = $totalRecords > 0
             ? round(($totalPresent / $totalRecords) * 100, 2)
             : 0;
 
         // Attendance by course
-        $attendanceByCourse = Course::withCount([
-            'attendances as total_attendances',
-            'attendances as present_attendances' => function ($query) {
-                $query->where('status', 'present');
-            },
-        ])
+        $attendanceByCourse = Course::query()
+            ->when(
+                $filters['semester'] !== '' && $filters['semester'] !== 'all',
+                function (Builder $query) use ($filters) {
+                    $query->where('semester', $filters['semester']);
+                }
+            )
+            ->withCount([
+                'attendances as total_attendances' => function ($query) use ($filters) {
+                    $this->applyAttendanceFilters($query, $filters, applySemesterFilter: false);
+                },
+                'attendances as present_attendances' => function ($query) use ($filters) {
+                    $this->applyAttendanceFilters($query, $filters, applySemesterFilter: false);
+                    $query->where('status', 'present');
+                },
+            ])
             ->having('total_attendances', '>', 0)
             ->orderBy('course_code')
             ->get()
@@ -51,12 +105,42 @@ class StaffAttendanceReportController extends Controller
             });
 
         // Students with low attendance (< 75%)
-        $studentsWithLowAttendance = Student::with('courses')
+        $studentsWithLowAttendance = Student::query()
+            ->when(
+                $filters['programme'] !== '' && $filters['programme'] !== 'all',
+                function (Builder $query) use ($filters) {
+                    $query->where('programme', $filters['programme']);
+                }
+            )
+            ->when(
+                $filters['intake_year'] !== '' && $filters['intake_year'] !== 'all',
+                function (Builder $query) use ($filters) {
+                    $query->where('intake_year', $filters['intake_year']);
+                }
+            )
+            ->when(
+                $filters['semester'] !== '' && $filters['semester'] !== 'all',
+                function (Builder $query) use ($filters) {
+                    $query->whereHas('courses', function (Builder $courseQuery) use ($filters) {
+                        $courseQuery->where('semester', $filters['semester']);
+                    });
+                }
+            )
             ->get()
-            ->map(function ($student) {
-                $attendances = Attendance::where('student_id', $student->id)->get();
-                $total = $attendances->count();
-                $present = $attendances->where('status', 'present')->count();
+            ->map(function ($student) use ($filters) {
+                $studentAttendance = Attendance::query()
+                    ->where('student_id', $student->id);
+                $this->applyAttendanceFilters(
+                    $studentAttendance,
+                    $filters,
+                    applyStudentFilters: false,
+                    applyIntakeFilter: false
+                );
+
+                $total = (clone $studentAttendance)->count();
+                $present = (clone $studentAttendance)
+                    ->where('status', 'present')
+                    ->count();
                 $rate = $total > 0 ? round(($present / $total) * 100, 2) : null;
 
                 return [
@@ -79,10 +163,22 @@ class StaffAttendanceReportController extends Controller
             ->take(20); // Top 20 students with lowest attendance
 
         // Attendance by subject
-        $attendanceBySubject = Subject::with('course')
+        $attendanceBySubject = Subject::query()
+            ->with('course')
+            ->when(
+                $filters['semester'] !== '' && $filters['semester'] !== 'all',
+                function (Builder $query) use ($filters) {
+                    $query->whereHas('course', function (Builder $courseQuery) use ($filters) {
+                        $courseQuery->where('semester', $filters['semester']);
+                    });
+                }
+            )
             ->withCount([
-                'attendances as total_attendances',
-                'attendances as present_attendances' => function ($query) {
+                'attendances as total_attendances' => function ($query) use ($filters) {
+                    $this->applyAttendanceFilters($query, $filters, applySemesterFilter: false);
+                },
+                'attendances as present_attendances' => function ($query) use ($filters) {
+                    $this->applyAttendanceFilters($query, $filters, applySemesterFilter: false);
                     $query->where('status', 'present');
                 },
             ])
@@ -107,10 +203,15 @@ class StaffAttendanceReportController extends Controller
             });
 
         // Recent attendance records (last 30 days)
-        $recentRecords = Attendance::with(['student', 'subject.course'])
+        $recentRecords = Attendance::query()
+            ->with(['student', 'subject.course'])
             ->where('date', '>=', now()->subDays(30))
+            ->tap(function ($query) use ($filters) {
+                $this->applyAttendanceFilters($query, $filters);
+            })
             ->orderBy('date', 'desc')
             ->paginate(20)
+            ->withQueryString()
             ->through(function ($attendance) {
                 $courseCode = $attendance->subject?->course?->course_code ?? 'N/A';
 
@@ -136,6 +237,43 @@ class StaffAttendanceReportController extends Controller
             'bySubject' => $attendanceBySubject,
             'lowAttendanceStudents' => $studentsWithLowAttendance,
             'recentRecords' => $recentRecords,
+            'filters' => $filters,
+            'options' => [
+                'programmes' => $programmes,
+                'intakeYears' => $intakeYears,
+                'semesters' => $semesters,
+            ],
         ]);
+    }
+
+    /**
+     * Apply shared attendance filters to a query.
+     *
+     * @param  array<string, string>  $filters
+     */
+    private function applyAttendanceFilters(
+        Builder $query,
+        array $filters,
+        bool $applyStudentFilters = true,
+        bool $applyIntakeFilter = true,
+        bool $applySemesterFilter = true
+    ): void {
+        if ($applyStudentFilters && $filters['programme'] !== '' && $filters['programme'] !== 'all') {
+            $query->whereHas('student', function (Builder $studentQuery) use ($filters) {
+                $studentQuery->where('programme', $filters['programme']);
+            });
+        }
+
+        if ($applyIntakeFilter && $filters['intake_year'] !== '' && $filters['intake_year'] !== 'all') {
+            $query->whereHas('student', function (Builder $studentQuery) use ($filters) {
+                $studentQuery->where('intake_year', $filters['intake_year']);
+            });
+        }
+
+        if ($applySemesterFilter && $filters['semester'] !== '' && $filters['semester'] !== 'all') {
+            $query->whereHas('subject.course', function (Builder $courseQuery) use ($filters) {
+                $courseQuery->where('semester', $filters['semester']);
+            });
+        }
     }
 }

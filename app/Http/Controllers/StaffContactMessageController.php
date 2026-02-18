@@ -16,8 +16,21 @@ class StaffContactMessageController extends Controller
     public function index(): Response
     {
         $q = trim((string) request('q', ''));
+        $status = trim((string) request('status', 'all'));
+        if (! in_array($status, ['all', 'unread', 'read', 'replied'], true)) {
+            $status = 'all';
+        }
 
         $messages = ContactMessage::query()
+            ->when($status === 'unread', function ($query) {
+                $query->where('is_read', false)->whereNull('replied_at');
+            })
+            ->when($status === 'read', function ($query) {
+                $query->where('is_read', true)->whereNull('replied_at');
+            })
+            ->when($status === 'replied', function ($query) {
+                $query->whereNotNull('replied_at');
+            })
             ->when($q !== '', function ($query) use ($q) {
                 $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q).'%';
 
@@ -37,12 +50,25 @@ class StaffContactMessageController extends Controller
         $unreadCount = ContactMessage::query()
             ->where('is_read', false)
             ->count();
+        $readCount = ContactMessage::query()
+            ->where('is_read', true)
+            ->whereNull('replied_at')
+            ->count();
+        $repliedCount = ContactMessage::query()
+            ->whereNotNull('replied_at')
+            ->count();
 
         return Inertia::render('Admin/ContactMessages/Index', [
             'messages' => $messages,
             'unreadCount' => $unreadCount,
+            'statusCounts' => [
+                'unread' => $unreadCount,
+                'read' => $readCount,
+                'replied' => $repliedCount,
+            ],
             'filters' => [
                 'q' => $q,
+                'status' => $status,
             ],
         ]);
     }

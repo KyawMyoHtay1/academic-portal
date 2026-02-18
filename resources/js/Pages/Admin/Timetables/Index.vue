@@ -1,42 +1,74 @@
-<script setup>
+﻿<script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import TimetableWeekGrid from "@/Components/TimetableWeekGrid.vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     timetables: {
         type: Object,
         required: true,
     },
+    filters: {
+        type: Object,
+        default: () => ({}),
+    },
+    courses: {
+        type: Array,
+        default: () => [],
+    },
+    teachers: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const viewMode = ref("table"); // table | week
-const query = ref("");
-const selectedDay = ref("all");
+const query = ref(props.filters?.q ?? "");
+const selectedDay = ref(props.filters?.day ?? "all");
+const selectedCourse = ref(props.filters?.course_id ?? "all");
+const selectedTeacher = ref(props.filters?.teacher_id ?? "all");
+let searchTimer = null;
 
 const entries = computed(() => props.timetables?.data ?? []);
+const filteredEntries = computed(() => entries.value);
 
-const filteredEntries = computed(() => {
-    const q = query.value.trim().toLowerCase();
-    let list = entries.value;
+const applyFilters = () => {
+    router.get(
+        route("admin.timetables.index"),
+        {
+            q: query.value.trim() || undefined,
+            day: selectedDay.value !== "all" ? selectedDay.value : undefined,
+            course_id:
+                selectedCourse.value !== "all" ? selectedCourse.value : undefined,
+            teacher_id:
+                selectedTeacher.value !== "all"
+                    ? selectedTeacher.value
+                    : undefined,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        }
+    );
+};
 
-    if (selectedDay.value !== "all") {
-        list = list.filter((e) => e.day_of_week === selectedDay.value);
-    }
-
-    if (q) {
-        list = list.filter((e) => {
-            const subj = `${e.subject_code ?? ""} ${e.subject_title ?? ""}`.toLowerCase();
-            const course = `${e.course_code ?? ""} ${e.course_title ?? ""}`.toLowerCase();
-            const loc = (e.location ?? "").toLowerCase();
-            return subj.includes(q) || course.includes(q) || loc.includes(q);
-        });
-    }
-
-    return list;
+watch([selectedDay, selectedCourse, selectedTeacher], () => {
+    applyFilters();
 });
+
+watch(
+    query,
+    () => {
+        if (searchTimer) window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(() => {
+            applyFilters();
+        }, 300);
+    },
+    { flush: "post" }
+);
 
 const deleteEntry = (id) => {
     if (
@@ -103,27 +135,27 @@ export default {
 
                     <!-- Controls -->
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                            <div class="relative w-full sm:w-80">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                            <div class="relative w-full">
                                 <input
                                     v-model="query"
                                     type="text"
-                                    placeholder="Search subject, course, location…"
+                                    placeholder="Search subject, course, teacher, location..."
                                     class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                                 <button
                                     v-if="query"
                                     type="button"
                                     class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                    @click="query = ''"
+                                    @click="() => { query = ''; applyFilters(); }"
                                 >
                                     <span class="sr-only">Clear</span>
-                                    ✕
+                                    x
                                 </button>
                             </div>
                             <select
                                 v-model="selectedDay"
-                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-48"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             >
                                 <option value="all">All days</option>
                                 <option>Monday</option>
@@ -133,6 +165,32 @@ export default {
                                 <option>Friday</option>
                                 <option>Saturday</option>
                                 <option>Sunday</option>
+                            </select>
+                            <select
+                                v-model="selectedCourse"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All courses</option>
+                                <option
+                                    v-for="course in courses"
+                                    :key="course.id"
+                                    :value="String(course.id)"
+                                >
+                                    {{ course.course_code }} - {{ course.title }}
+                                </option>
+                            </select>
+                            <select
+                                v-model="selectedTeacher"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All teachers</option>
+                                <option
+                                    v-for="teacher in teachers"
+                                    :key="teacher.id"
+                                    :value="String(teacher.id)"
+                                >
+                                    {{ teacher.name }}
+                                </option>
                             </select>
                         </div>
 
@@ -315,7 +373,7 @@ export default {
                                     <td
                                         class="px-4 py-4 text-sm text-slate-600"
                                     >
-                                        {{ entry.creator_name || "—" }}
+                                        {{ entry.creator_name || "â€”" }}
                                     </td>
                                     <td class="px-4 py-4 text-right text-sm">
                                         <div
@@ -357,3 +415,4 @@ export default {
         </div>
     </AuthenticatedLayout>
 </template>
+
