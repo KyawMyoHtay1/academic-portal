@@ -5,35 +5,54 @@ actor Student
 actor Staff as "Staff/Admin"
 
 participant "Course" as Course
-participant "Enrolment" as Enrolment
+participant "EnrollmentService" as EnrollmentService
 
 Student -> Course: Browse available courses
 Course --> Student: Show course list
 
-Student -> Enrolment: Request enrolment\n(studentId, courseId)
-Enrolment -> Enrolment: Check existing enrolment\nand pending requests
-Enrolment -> Enrolment: Check schedule conflicts
+Student -> EnrollmentService: Request enrolment\n(studentId, courseId)
+EnrollmentService -> EnrollmentService: Check existing enrolment\nand pending requests
+EnrollmentService -> EnrollmentService: Check schedule conflicts
 alt request valid
-  Enrolment -> Enrolment: Create/update record\nstatus = pending
-  Enrolment --> Student: Success, status = pending
+  EnrollmentService -> EnrollmentService: Create course_student record\nstatus = pending
+  EnrollmentService --> Student: Success, status = pending
 else already enrolled / pending / conflict
-  Enrolment --> Student: Error message
+  EnrollmentService --> Student: Error message
 end
 
-Staff -> Enrolment: View pending enrolment requests
-Enrolment --> Staff: Display pending list
+Staff -> EnrollmentService: View pending enrolment requests
+EnrollmentService --> Staff: Display pending list
 
 alt Staff approves request
-  Staff -> Enrolment: Approve enrolment\n(enrolmentId)
-  Enrolment -> Enrolment: Update status\npending -> approved
-  Enrolment --> Staff: Confirm approval
+  Staff -> EnrollmentService: Approve enrolment\n(enrolmentId)
+  EnrollmentService -> EnrollmentService: Update status\npending -> approved
+  EnrollmentService --> Staff: Confirm approval
 else Staff rejects request
-  Staff -> Enrolment: Reject enrolment\n(enrolmentId)
-  Enrolment -> Enrolment: Update status\npending -> rejected
-  Enrolment --> Staff: Confirm rejection
+  Staff -> EnrollmentService: Reject enrolment\n(enrolmentId)
+  EnrollmentService -> EnrollmentService: Update status\npending -> rejected
+  EnrollmentService --> Staff: Confirm rejection
 end
 
-Student -> Enrolment: View my registration status
-Enrolment --> Student: Show updated status\n(approved/rejected)
+Student -> EnrollmentService: View my registration status
+EnrollmentService --> Student: Show updated status\n(approved/rejected/withdrawal_pending)
+
+== Withdrawal Request Flow ==
+
+Student -> EnrollmentService: Request withdrawal\n(studentId, courseId)
+EnrollmentService -> EnrollmentService: Update status\napproved -> withdrawal_pending
+EnrollmentService --> Student: Success, status = withdrawal_pending
+
+Staff -> EnrollmentService: View withdrawal requests
+EnrollmentService --> Staff: Display pending list
+
+alt Staff approves withdrawal
+  Staff -> EnrollmentService: Approve withdrawal\n(enrolmentId)
+  EnrollmentService -> EnrollmentService: Remove enrolment record
+  EnrollmentService --> Staff: Confirm withdrawal
+else Staff rejects withdrawal
+  Staff -> EnrollmentService: Reject withdrawal\n(enrolmentId)
+  EnrollmentService -> EnrollmentService: Update status\nwithdrawal_pending -> approved
+  EnrollmentService --> Staff: Confirm rejection
+end
 
 @enduml

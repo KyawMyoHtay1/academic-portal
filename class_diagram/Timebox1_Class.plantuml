@@ -3,6 +3,14 @@ hide circle
 skinparam classAttributeIconSize 0
 title Timebox 1 - Student Registration and Course Registration
 
+note right of User
+  **Implementation note:**
+  Methods shown are conceptual design-level operations.
+  Actual implementation uses Laravel Eloquent ORM,
+  Controllers (e.g. RegisteredUserController, SettingsController),
+  and Laravel Auth for Login/Logout/Password.
+end note
+
 class User {
   +id: bigint
   +name: varchar
@@ -145,7 +153,7 @@ class Course_Student {
   +id: bigint
   +course_id: bigint
   +student_id: bigint
-  +status: enum
+  +status: enum (pending, approved, rejected, withdrawal_pending)
   +created_at: timestamp
   +updated_at: timestamp
   --
@@ -170,5 +178,10 @@ Subject "1" -- "0..*" Subject_Teacher
 User "1" -- "0..*" Subject_Teacher : teaches
 Course "1" -- "0..*" Course_Student
 Student "1" -- "0..*" Course_Student
+
+note bottom of Course_Student
+  Approve/Reject implemented in
+  EnrollmentService + StaffEnrollmentController
+end note
 
 @enduml

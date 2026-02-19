@@ -4,62 +4,50 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam dpi 300
 
-' Detailed diagram - covers full FR list 5.1.1 (ML level)
-scale 0.85
+' Core, but still showing main sub‑use cases
+scale 0.9
 skinparam defaultFontSize 9
-skinparam ranksep 8
+skinparam ranksep 10
 skinparam nodesep 8
-skinparam RectanglePadding 5
+skinparam RectanglePadding 8
 
 actor Guest #LightGray
 actor Student #LightBlue
 actor Staff #LightGreen
 
-rectangle "University Academic Portal\nTimebox 1: Student Registration & Course Registration (Detailed)" #White {
+rectangle "University Academic Portal\nTimebox 1: Student Registration & Course Registration" #White {
 
   rectangle "Manage User" #AliceBlue {
     usecase "Register User" as UC1
     usecase "Login" as UC2
-    usecase "Update User" as UC1b
-    usecase "Delete User" as UC1c
-    usecase "Search User" as UC1d
+    usecase "Global Search" as UC5
     usecase "Password Management" as UC3
     usecase "User Settings / Preferences" as UC4
-    usecase "Global Search" as UC5
   }
 
   rectangle "Manage Student" #MintCream {
-    usecase "Register Student" as UC6
-    usecase "Update Student" as UC6b
-    usecase "Delete Student" as UC6c
-    usecase "Search Student" as UC6d
     usecase "Manage Self Profile" as UC7
+    usecase "Register Student" as UC6
+  }
+
+  rectangle "Manage Course Registration" #Beige {
+    usecase "View My Courses" as UC13
+    usecase "Request Withdrawal" as UC12
+    usecase "Request Enrolment" as UC11
+    usecase "Reject Enrolment" as UC15
+    usecase "Approve Enrolment" as UC14
+    usecase "Search & Manage Enrolments" as UC18
+    usecase "Reject Withdrawal" as UC17
+    usecase "Approve Withdrawal" as UC16
   }
 
   rectangle "Manage Course" #Honeydew {
     usecase "Register Course" as UC8
-    usecase "Update Course" as UC8b
-    usecase "Delete Course" as UC8c
-    usecase "Search Course" as UC8d
-    usecase "Assign Teacher to Course" as UC8e
   }
 
   rectangle "Manage Subject" #LavenderBlush {
-    usecase "Register Subject" as UC9
-    usecase "Update Subject" as UC9b
-    usecase "Delete Subject" as UC9c
     usecase "Assign Teacher to Subject" as UC10
-  }
-
-  rectangle "Manage Course Registration" #Beige {
-    usecase "Request Enrolment" as UC11
-    usecase "Request Withdrawal" as UC12
-    usecase "View My Courses" as UC13
-    usecase "Approve Enrolment" as UC14
-    usecase "Reject Enrolment" as UC15
-    usecase "Approve Withdrawal" as UC16
-    usecase "Reject Withdrawal" as UC17
-    usecase "Search & Manage Enrolments" as UC18
+    usecase "Register Subject" as UC9
   }
 }
 
@@ -72,7 +60,6 @@ Guest -[#808080]-> UC5
 ' Student
 Student -[#2563EB]-> UC2
 Student -[#2563EB]-> UC3
-Student -[#2563EB]-> UC4
 Student -[#2563EB]-> UC5
 Student -[#2563EB]-> UC7
 Student -[#2563EB]-> UC11
@@ -81,33 +68,26 @@ Student -[#2563EB]-> UC13
 
 ' Staff - User
 Staff -[#16A34A]-> UC1
-Staff -[#16A34A]-> UC1b
-Staff -[#16A34A]-> UC1c
-Staff -[#16A34A]-> UC1d
 Staff -[#16A34A]-> UC2
 Staff -[#16A34A]-> UC3
 Staff -[#16A34A]-> UC4
 Staff -[#16A34A]-> UC5
+
 ' Staff - Student
 Staff -[#16A34A]-> UC6
-Staff -[#16A34A]-> UC6b
-Staff -[#16A34A]-> UC6c
-Staff -[#16A34A]-> UC6d
-' Staff - Course
-Staff -[#16A34A]-> UC8
-Staff -[#16A34A]-> UC8b
-Staff -[#16A34A]-> UC8c
-Staff -[#16A34A]-> UC8d
-Staff -[#16A34A]-> UC8e
-' Staff - Subject
-Staff -[#16A34A]-> UC9
-Staff -[#16A34A]-> UC9b
-Staff -[#16A34A]-> UC9c
-Staff -[#16A34A]-> UC10
-' Staff - Enrolment
+
+' Staff - Course Registration
 Staff -[#16A34A]-> UC14
 Staff -[#16A34A]-> UC15
 Staff -[#16A34A]-> UC16
 Staff -[#16A34A]-> UC17
 Staff -[#16A34A]-> UC18
+
+' Staff - Course
+Staff -[#16A34A]-> UC8
+
+' Staff - Subject
+Staff -[#16A34A]-> UC9
+Staff -[#16A34A]-> UC10
+
 @enduml
