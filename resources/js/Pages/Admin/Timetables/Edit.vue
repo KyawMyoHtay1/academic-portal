@@ -100,23 +100,33 @@ const submit = () => {
                                     Day of Week
                                     <span class="text-red-500">*</span>
                                 </label>
-                                <input
+                                <select
                                     id="day_of_week"
                                     v-model="form.day_of_week"
-                                    type="text"
-                                    placeholder="e.g., Monday"
                                     required
                                     class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
                                     :class="{
                                         'border-red-300 focus:border-red-500 focus:ring-red-500':
                                             form.errors.day_of_week,
                                     }"
-                                />
+                                >
+                                    <option value="">Select day</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
                                 <p
                                     v-if="form.errors.day_of_week"
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.day_of_week }}
+                                </p>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Conflict details will be shown if this update overlaps with another session.
                                 </p>
                             </div>
 
@@ -162,9 +172,9 @@ const submit = () => {
                                         v-model="form.end_time"
                                         type="time"
                                         required
-                                        class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
-                                        :class="{
-                                            'border-red-300 focus-border-red-500 focus:ring-red-500':
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
+                                    :class="{
+                                            'border-red-300 focus:border-red-500 focus:ring-red-500':
                                                 form.errors.end_time,
                                         }"
                                     />

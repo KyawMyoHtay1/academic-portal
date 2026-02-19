@@ -15,6 +15,8 @@ const props = defineProps({
 const viewMode = ref("week"); // week | list
 const query = ref("");
 const selectedCourseId = ref("all");
+const weekRange = ref("weekdays");
+const timeFormat = ref("12h");
 
 const allEntries = computed(() => {
     const list = [];
@@ -67,6 +69,18 @@ const dayOrder = [
     "Sunday",
 ];
 
+const visibleDays = computed(() => {
+    if (weekRange.value === "full_week") {
+        return [...dayOrder];
+    }
+
+    if (weekRange.value === "six_days") {
+        return dayOrder.slice(0, 6);
+    }
+
+    return dayOrder.slice(0, 5);
+});
+
 const timeToMinutes = (timeValue) => {
     if (!timeValue) return 0;
     const [hh = "0", mm = "0"] = String(timeValue).split(":");
@@ -75,6 +89,28 @@ const timeToMinutes = (timeValue) => {
 
 const sessionDurationMinutes = (entry) =>
     Math.max(timeToMinutes(entry?.end_time) - timeToMinutes(entry?.start_time), 0);
+
+const parseTimeParts = (value) => {
+    if (!value) return null;
+    const [hhRaw = "0", mmRaw = "0"] = String(value).split(":");
+    const hh = Number.parseInt(hhRaw, 10);
+    const mm = Number.parseInt(mmRaw, 10);
+    if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+    return { hh, mm };
+};
+
+const formatTime = (value) => {
+    const parts = parseTimeParts(value);
+    if (!parts) return String(value ?? "-");
+    if (timeFormat.value === "24h") {
+        return `${String(parts.hh).padStart(2, "0")}:${String(parts.mm).padStart(2, "0")}`;
+    }
+    const suffix = parts.hh >= 12 ? "PM" : "AM";
+    const hour12 = parts.hh % 12 || 12;
+    return `${hour12}:${String(parts.mm).padStart(2, "0")} ${suffix}`;
+};
+
+const formatRange = (entry) => `${formatTime(entry?.start_time)} - ${formatTime(entry?.end_time)}`;
 
 const timetableStats = computed(() => {
     const rows = filteredEntries.value;
@@ -117,6 +153,75 @@ const timetableStats = computed(() => {
 });
 
 const printTimetable = () => window.print();
+
+const workloadByCourse = computed(() => {
+    const map = new Map();
+    for (const entry of filteredEntries.value) {
+        const key = `${entry.course_id}-${entry.course_code}`;
+        const current = map.get(key) ?? {
+            course_id: entry.course_id,
+            course_code: entry.course_code,
+            course_title: entry.course_title,
+            sessions: 0,
+            minutes: 0,
+            subjects: new Set(),
+        };
+        current.sessions += 1;
+        current.minutes += sessionDurationMinutes(entry);
+        if (entry.subject_code) current.subjects.add(entry.subject_code);
+        map.set(key, current);
+    }
+
+    return Array.from(map.values())
+        .map((item) => ({
+            ...item,
+            hours: item.minutes / 60,
+            subjects_count: item.subjects.size,
+        }))
+        .sort((a, b) => b.sessions - a.sessions);
+});
+
+const workloadBySubject = computed(() =>
+    filteredEntries.value
+        .reduce((acc, entry) => {
+            const key = `${entry.subject_code}-${entry.course_code}`;
+            if (!acc[key]) {
+                acc[key] = {
+                    subject_code: entry.subject_code,
+                    subject_title: entry.subject_title,
+                    course_code: entry.course_code,
+                    sessions: 0,
+                    minutes: 0,
+                };
+            }
+            acc[key].sessions += 1;
+            acc[key].minutes += sessionDurationMinutes(entry);
+            return acc;
+        }, {})
+);
+
+const workloadBySubjectList = computed(() =>
+    Object.values(workloadBySubject.value)
+        .map((item) => ({
+            ...item,
+            hours: item.minutes / 60,
+        }))
+        .sort((a, b) => b.sessions - a.sessions)
+);
+
+const exportPdfUrl = computed(() =>
+    route("teacher.timetable.export", {
+        format: "pdf",
+        course_id: selectedCourseId.value !== "all" ? selectedCourseId.value : undefined,
+    })
+);
+
+const exportCsvUrl = computed(() =>
+    route("teacher.timetable.export", {
+        format: "csv",
+        course_id: selectedCourseId.value !== "all" ? selectedCourseId.value : undefined,
+    })
+);
 </script>
 
 <template>
@@ -186,10 +291,10 @@ const printTimetable = () => window.print();
 
                     <!-- Controls -->
                     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
                             <select
                                 v-model="selectedCourseId"
-                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-64"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             >
                                 <option value="all">All courses</option>
                                 <option
@@ -200,8 +305,23 @@ const printTimetable = () => window.print();
                                     {{ c.course_code }} - {{ c.title }}
                                 </option>
                             </select>
+                            <select
+                                v-model="weekRange"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="weekdays">Weekdays (Mon-Fri)</option>
+                                <option value="six_days">Mon-Sat</option>
+                                <option value="full_week">Full week (Mon-Sun)</option>
+                            </select>
+                            <select
+                                v-model="timeFormat"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="12h">12-hour time</option>
+                                <option value="24h">24-hour time</option>
+                            </select>
 
-                            <div class="relative w-full sm:w-72">
+                            <div class="relative w-full">
                                 <input
                                     v-model="query"
                                     type="text"
@@ -221,6 +341,19 @@ const printTimetable = () => window.print();
                         </div>
 
                         <div class="flex items-center gap-2">
+                            <a
+                                :href="exportPdfUrl"
+                                target="_blank"
+                                class="rounded-md bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
+                            >
+                                Export PDF
+                            </a>
+                            <a
+                                :href="exportCsvUrl"
+                                class="rounded-md bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                            >
+                                Export CSV
+                            </a>
                             <div class="inline-flex rounded-md bg-slate-100 p-1">
                                 <button
                                     type="button"
@@ -293,6 +426,67 @@ const printTimetable = () => window.print();
                     </div>
 
                     <div
+                        v-if="filteredEntries.length > 0"
+                        class="mb-5 grid gap-4 lg:grid-cols-2"
+                    >
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <div class="mb-3 flex items-center justify-between gap-2">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Workload by Course
+                                </p>
+                                <p class="text-xs text-slate-500">
+                                    Sessions and hours
+                                </p>
+                            </div>
+                            <div class="space-y-2">
+                                <div
+                                    v-for="row in workloadByCourse"
+                                    :key="`course-${row.course_id}`"
+                                    class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-700"
+                                >
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-semibold">
+                                            {{ row.course_code }}
+                                        </span>
+                                        <span>{{ row.sessions }} sessions | {{ row.hours.toFixed(1) }}h</span>
+                                    </div>
+                                    <p class="mt-1 text-[11px] text-slate-500">
+                                        {{ row.course_title }} - {{ row.subjects_count }} subject(s)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <div class="mb-3 flex items-center justify-between gap-2">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Workload by Subject
+                                </p>
+                                <p class="text-xs text-slate-500">
+                                    Teaching sessions
+                                </p>
+                            </div>
+                            <div class="space-y-2">
+                                <div
+                                    v-for="row in workloadBySubjectList"
+                                    :key="`subject-${row.subject_code}-${row.course_code}`"
+                                    class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-700"
+                                >
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-semibold">
+                                            {{ row.subject_code }}
+                                        </span>
+                                        <span>{{ row.sessions }} sessions | {{ row.hours.toFixed(1) }}h</span>
+                                    </div>
+                                    <p class="mt-1 text-[11px] text-slate-500">
+                                        {{ row.subject_title }} ({{ row.course_code }})
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
                         v-if="courses.length === 0"
                         class="rounded-lg bg-slate-50 p-8 text-center"
                     >
@@ -314,6 +508,9 @@ const printTimetable = () => window.print();
                             v-if="viewMode === 'week' && filteredEntries.length > 0"
                             :entries="filteredEntries"
                             :showCourse="selectedCourseId === 'all'"
+                            :days="visibleDays"
+                            :timeFormat="timeFormat"
+                            :highlightToday="true"
                         />
 
                         <div v-else-if="viewMode === 'list' && filteredEntries.length > 0" class="overflow-hidden rounded-md border border-slate-200">
@@ -352,7 +549,7 @@ const printTimetable = () => window.print();
                                             {{ e.day_of_week }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-slate-700">
-                                            {{ e.start_time }} - {{ e.end_time }}
+                                            {{ formatRange(e) }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-slate-700">
                                             {{ e.location || "-" }}

@@ -22,11 +22,12 @@ class StaffEnrollmentController extends Controller
     {
         $filters = $this->resolveFilters($request);
         $allowedSorts = $this->allowedSorts();
+        $sortColumn = $allowedSorts[$filters['sort_by']] ?? $allowedSorts['requested_at'];
 
         $query = $this->baseEnrollmentQuery($filters);
 
         // Order by requested sort + stable fallback.
-        $query->orderBy($allowedSorts[$filters['sort_by']], $filters['sort_dir'])
+        $query->orderBy($sortColumn, $filters['sort_dir'])
             ->orderByDesc('course_student.updated_at')
             ->orderByDesc('course_student.created_at');
 
@@ -103,9 +104,10 @@ class StaffEnrollmentController extends Controller
 
         $filters = $this->resolveFilters($request);
         $allowedSorts = $this->allowedSorts();
+        $sortColumn = $allowedSorts[$filters['sort_by']] ?? $allowedSorts['requested_at'];
 
         $rows = $this->baseEnrollmentQuery($filters)
-            ->orderBy($allowedSorts[$filters['sort_by']], $filters['sort_dir'])
+            ->orderBy($sortColumn, $filters['sort_dir'])
             ->orderByDesc('course_student.updated_at')
             ->orderByDesc('course_student.created_at')
             ->get()

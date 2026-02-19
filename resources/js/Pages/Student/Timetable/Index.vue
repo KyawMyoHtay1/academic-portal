@@ -19,6 +19,8 @@ const props = defineProps({
 const viewMode = ref("week"); // week | list
 const query = ref("");
 const selectedCourseId = ref("all");
+const weekRange = ref("weekdays");
+const timeFormat = ref("12h");
 
 const allEntries = computed(() => {
     const list = [];
@@ -71,6 +73,18 @@ const dayOrder = [
     "Sunday",
 ];
 
+const visibleDays = computed(() => {
+    if (weekRange.value === "full_week") {
+        return [...dayOrder];
+    }
+
+    if (weekRange.value === "six_days") {
+        return dayOrder.slice(0, 6);
+    }
+
+    return dayOrder.slice(0, 5);
+});
+
 const timeToMinutes = (timeValue) => {
     if (!timeValue) return 0;
     const [hh = "0", mm = "0"] = String(timeValue).split(":");
@@ -79,6 +93,28 @@ const timeToMinutes = (timeValue) => {
 
 const sessionDurationMinutes = (entry) =>
     Math.max(timeToMinutes(entry?.end_time) - timeToMinutes(entry?.start_time), 0);
+
+const parseTimeParts = (value) => {
+    if (!value) return null;
+    const [hhRaw = "0", mmRaw = "0"] = String(value).split(":");
+    const hh = Number.parseInt(hhRaw, 10);
+    const mm = Number.parseInt(mmRaw, 10);
+    if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+    return { hh, mm };
+};
+
+const formatTime = (value) => {
+    const parts = parseTimeParts(value);
+    if (!parts) return String(value ?? "-");
+    if (timeFormat.value === "24h") {
+        return `${String(parts.hh).padStart(2, "0")}:${String(parts.mm).padStart(2, "0")}`;
+    }
+    const suffix = parts.hh >= 12 ? "PM" : "AM";
+    const hour12 = parts.hh % 12 || 12;
+    return `${hour12}:${String(parts.mm).padStart(2, "0")} ${suffix}`;
+};
+
+const formatRange = (entry) => `${formatTime(entry?.start_time)} - ${formatTime(entry?.end_time)}`;
 
 const timetableStats = computed(() => {
     const rows = filteredEntries.value;
@@ -121,6 +157,20 @@ const timetableStats = computed(() => {
 });
 
 const printTimetable = () => window.print();
+
+const exportPdfUrl = computed(() =>
+    route("student.timetable.export", {
+        format: "pdf",
+        course_id: selectedCourseId.value !== "all" ? selectedCourseId.value : undefined,
+    })
+);
+
+const exportCsvUrl = computed(() =>
+    route("student.timetable.export", {
+        format: "csv",
+        course_id: selectedCourseId.value !== "all" ? selectedCourseId.value : undefined,
+    })
+);
 </script>
 
 <template>
@@ -221,10 +271,10 @@ const printTimetable = () => window.print();
 
                     <!-- Controls -->
                     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
                             <select
                                 v-model="selectedCourseId"
-                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-64"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             >
                                 <option value="all">All courses</option>
                                 <option
@@ -235,8 +285,23 @@ const printTimetable = () => window.print();
                                     {{ c.course_code }} - {{ c.title }}
                                 </option>
                             </select>
+                            <select
+                                v-model="weekRange"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="weekdays">Weekdays (Mon-Fri)</option>
+                                <option value="six_days">Mon-Sat</option>
+                                <option value="full_week">Full week (Mon-Sun)</option>
+                            </select>
+                            <select
+                                v-model="timeFormat"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="12h">12-hour time</option>
+                                <option value="24h">24-hour time</option>
+                            </select>
 
-                            <div class="relative w-full sm:w-72">
+                            <div class="relative w-full">
                                 <input
                                     v-model="query"
                                     type="text"
@@ -256,6 +321,19 @@ const printTimetable = () => window.print();
                         </div>
 
                         <div class="flex items-center gap-2">
+                            <a
+                                :href="exportPdfUrl"
+                                target="_blank"
+                                class="rounded-md bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
+                            >
+                                Export PDF
+                            </a>
+                            <a
+                                :href="exportCsvUrl"
+                                class="rounded-md bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                            >
+                                Export CSV
+                            </a>
                             <div class="inline-flex rounded-md bg-slate-100 p-1">
                                 <button
                                     type="button"
@@ -349,6 +427,9 @@ const printTimetable = () => window.print();
                             v-if="viewMode === 'week' && filteredEntries.length > 0"
                             :entries="filteredEntries"
                             :showCourse="selectedCourseId === 'all'"
+                            :days="visibleDays"
+                            :timeFormat="timeFormat"
+                            :highlightToday="true"
                         />
 
                         <div v-else-if="viewMode === 'list' && filteredEntries.length > 0" class="overflow-hidden rounded-md border border-slate-200">
@@ -387,7 +468,7 @@ const printTimetable = () => window.print();
                                             {{ e.day_of_week }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-slate-700">
-                                            {{ e.start_time }} - {{ e.end_time }}
+                                            {{ formatRange(e) }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-slate-700">
                                             {{ e.location || "-" }}

@@ -29,10 +29,68 @@ const query = ref(props.filters?.q ?? "");
 const selectedDay = ref(props.filters?.day ?? "all");
 const selectedCourse = ref(props.filters?.course_id ?? "all");
 const selectedTeacher = ref(props.filters?.teacher_id ?? "all");
+const weekRange = ref("weekdays");
+const timeFormat = ref("12h");
 let searchTimer = null;
 
 const entries = computed(() => props.timetables?.data ?? []);
 const filteredEntries = computed(() => entries.value);
+const visibleDays = computed(() => {
+    if (weekRange.value === "full_week") {
+        return [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ];
+    }
+
+    if (weekRange.value === "six_days") {
+        return [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ];
+    }
+
+    return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+});
+
+const hasActiveFilters = computed(
+    () =>
+        query.value.trim() !== "" ||
+        selectedDay.value !== "all" ||
+        selectedCourse.value !== "all" ||
+        selectedTeacher.value !== "all"
+);
+
+const parseTimeParts = (value) => {
+    if (!value) return null;
+    const [hhRaw = "0", mmRaw = "0"] = String(value).split(":");
+    const hh = Number.parseInt(hhRaw, 10);
+    const mm = Number.parseInt(mmRaw, 10);
+    if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+    return { hh, mm };
+};
+
+const formatTime = (value) => {
+    const parts = parseTimeParts(value);
+    if (!parts) return String(value ?? "-");
+    if (timeFormat.value === "24h") {
+        return `${String(parts.hh).padStart(2, "0")}:${String(parts.mm).padStart(2, "0")}`;
+    }
+    const suffix = parts.hh >= 12 ? "PM" : "AM";
+    const hour12 = parts.hh % 12 || 12;
+    return `${hour12}:${String(parts.mm).padStart(2, "0")} ${suffix}`;
+};
+
+const formatRange = (entry) => `${formatTime(entry?.start_time)} - ${formatTime(entry?.end_time)}`;
 
 const applyFilters = () => {
     router.get(
@@ -54,6 +112,34 @@ const applyFilters = () => {
         }
     );
 };
+
+const clearFilters = () => {
+    query.value = "";
+    selectedDay.value = "all";
+    selectedCourse.value = "all";
+    selectedTeacher.value = "all";
+    applyFilters();
+};
+
+const exportPdfUrl = computed(() =>
+    route("admin.timetables.export", {
+        format: "pdf",
+        q: query.value.trim() || undefined,
+        day: selectedDay.value !== "all" ? selectedDay.value : undefined,
+        course_id: selectedCourse.value !== "all" ? selectedCourse.value : undefined,
+        teacher_id: selectedTeacher.value !== "all" ? selectedTeacher.value : undefined,
+    })
+);
+
+const exportCsvUrl = computed(() =>
+    route("admin.timetables.export", {
+        format: "csv",
+        q: query.value.trim() || undefined,
+        day: selectedDay.value !== "all" ? selectedDay.value : undefined,
+        course_id: selectedCourse.value !== "all" ? selectedCourse.value : undefined,
+        teacher_id: selectedTeacher.value !== "all" ? selectedTeacher.value : undefined,
+    })
+);
 
 watch([selectedDay, selectedCourse, selectedTeacher], () => {
     applyFilters();
@@ -135,7 +221,7 @@ export default {
 
                     <!-- Controls -->
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-6">
                             <div class="relative w-full">
                                 <input
                                     v-model="query"
@@ -192,9 +278,45 @@ export default {
                                     {{ teacher.name }}
                                 </option>
                             </select>
+                            <select
+                                v-model="weekRange"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="weekdays">Weekdays (Mon-Fri)</option>
+                                <option value="six_days">Mon-Sat</option>
+                                <option value="full_week">Full week (Mon-Sun)</option>
+                            </select>
+                            <select
+                                v-model="timeFormat"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="12h">12-hour time</option>
+                                <option value="24h">24-hour time</option>
+                            </select>
                         </div>
 
                         <div class="flex items-center gap-2">
+                            <button
+                                v-if="hasActiveFilters"
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                @click="clearFilters"
+                            >
+                                Clear filters
+                            </button>
+                            <a
+                                :href="exportPdfUrl"
+                                target="_blank"
+                                class="rounded-md bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
+                            >
+                                Export PDF
+                            </a>
+                            <a
+                                :href="exportCsvUrl"
+                                class="rounded-md bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                            >
+                                Export CSV
+                            </a>
                             <div class="inline-flex rounded-md bg-slate-100 p-1">
                                 <button
                                     type="button"
@@ -224,7 +346,9 @@ export default {
                             v-else
                             :entries="filteredEntries"
                             :showCourse="true"
-                            :days="['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']"
+                            :days="visibleDays"
+                            :timeFormat="timeFormat"
+                            :highlightToday="true"
                         />
                     </div>
 
@@ -362,8 +486,7 @@ export default {
                                     <td
                                         class="px-4 py-4 text-sm text-slate-700"
                                     >
-                                        {{ entry.start_time }} -
-                                        {{ entry.end_time }}
+                                        {{ formatRange(entry) }}
                                     </td>
                                     <td
                                         class="px-4 py-4 text-sm text-slate-700"
@@ -373,7 +496,7 @@ export default {
                                     <td
                                         class="px-4 py-4 text-sm text-slate-600"
                                     >
-                                        {{ entry.creator_name || "â€”" }}
+                                        {{ entry.creator_name || "-" }}
                                     </td>
                                     <td class="px-4 py-4 text-right text-sm">
                                         <div

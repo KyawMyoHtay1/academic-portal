@@ -9,96 +9,44 @@ use App\Models\Subject;
 use App\Models\Timetable;
 use App\Models\User;
 use App\Notifications\TimetableUpdated;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StaffTimetableController extends Controller
 {
+    private const DAY_ORDER = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+    ];
+
     /**
      * Display a listing of timetable entries.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $filters = [
-            'q' => trim((string) request('q', '')),
-            'day' => trim((string) request('day', 'all')),
-            'course_id' => trim((string) request('course_id', 'all')),
-            'teacher_id' => trim((string) request('teacher_id', 'all')),
-        ];
-        if (! in_array($filters['day'], ['all', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], true)) {
-            $filters['day'] = 'all';
-        }
+        $filters = $this->resolveFilters($request);
 
         $query = Timetable::with(['subject.course', 'creator:id,name,email']);
-
-        if ($filters['day'] !== '' && $filters['day'] !== 'all') {
-            $query->where('day_of_week', $filters['day']);
-        }
-
-        if ($filters['course_id'] !== '' && $filters['course_id'] !== 'all') {
-            $query->whereHas('subject', function ($subjectQuery) use ($filters) {
-                $subjectQuery->where('course_id', (int) $filters['course_id']);
-            });
-        }
-
-        if ($filters['teacher_id'] !== '' && $filters['teacher_id'] !== 'all') {
-            $query->whereHas('subject.teachers', function ($teacherQuery) use ($filters) {
-                $teacherQuery->where('users.id', (int) $filters['teacher_id']);
-            });
-        }
-
-        if ($filters['q'] !== '') {
-            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['q']).'%';
-
-            $query->where(function ($inner) use ($like) {
-                $inner->where('location', 'like', $like)
-                    ->orWhereHas('subject', function ($subjectQuery) use ($like) {
-                        $subjectQuery
-                            ->where('subject_code', 'like', $like)
-                            ->orWhere('title', 'like', $like)
-                            ->orWhereHas('course', function ($courseQuery) use ($like) {
-                                $courseQuery
-                                    ->where('course_code', 'like', $like)
-                                    ->orWhere('title', 'like', $like);
-                            })
-                            ->orWhereHas('teachers', function ($teacherQuery) use ($like) {
-                                $teacherQuery->where('name', 'like', $like);
-                            });
-                    })
-                    ->orWhereHas('creator', function ($creatorQuery) use ($like) {
-                        $creatorQuery->where('name', 'like', $like);
-                    });
-            });
-        }
+        $this->applyIndexFilters($query, $filters);
 
         $timetables = $query
-            ->orderBy('day_of_week')
+            ->orderByRaw($this->dayOrderSql())
             ->orderBy('start_time')
             ->paginate(15)
             ->withQueryString()
-            ->through(function (Timetable $entry) {
-                $subject = $entry->subject;
-                $course = $subject?->course;
-
-                return [
-                    'id' => $entry->id,
-                    'subject_id' => $entry->subject_id,
-                    'subject_code' => $subject?->subject_code,
-                    'subject_title' => $subject?->title,
-                    'subject_photo' => $subject?->photo,
-                    'course_code' => $course?->course_code,
-                    'course_title' => $course?->title,
-                    'course_photo' => $course?->photo,
-                    'day_of_week' => $entry->day_of_week,
-                    'start_time' => $entry->start_time,
-                    'end_time' => $entry->end_time,
-                    'location' => $entry->location,
-                    'created_by' => $entry->created_by,
-                    'creator_name' => $entry->creator?->name ?? null,
-                ];
-            });
+            ->through(fn (Timetable $entry) => $this->mapTimetableRow($entry));
 
         $courses = Course::query()
             ->orderBy('course_code')
@@ -123,6 +71,43 @@ class StaffTimetableController extends Controller
             'courses' => $courses,
             'teachers' => $teachers,
         ]);
+    }
+
+    /**
+     * Export timetable report for current filters.
+     */
+    public function export(Request $request, string $format)
+    {
+        $format = strtolower($format);
+        if (! in_array($format, ['csv', 'pdf'], true)) {
+            abort(404);
+        }
+
+        $filters = $this->resolveFilters($request);
+        $query = Timetable::with(['subject.course', 'creator:id,name,email']);
+        $this->applyIndexFilters($query, $filters);
+
+        $rows = $query
+            ->orderByRaw($this->dayOrderSql())
+            ->orderBy('start_time')
+            ->get()
+            ->map(fn (Timetable $entry) => $this->mapTimetableRow($entry));
+
+        $timestamp = now()->format('Ymd_His');
+
+        if ($format === 'csv') {
+            return $this->exportCsv($rows, $timestamp);
+        }
+
+        $pdf = Pdf::loadView('timetables.report', [
+            'title' => 'Timetable Report (Staff)',
+            'rows' => $rows,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+            'owner' => auth()->user()?->name,
+            'filters' => $filters,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download("timetables_{$timestamp}.pdf");
     }
 
     /**
@@ -157,24 +142,11 @@ class StaffTimetableController extends Controller
 
         $subject = Subject::findOrFail($data['subject_id']);
 
-        // Basic conflict detection (same course + same day + overlapping time) via subject
-        $overlap = Timetable::query()
-            ->whereHas('subject', fn ($q) => $q->where('course_id', $subject->course_id))
-            ->where('day_of_week', $data['day_of_week'])
-            ->where(function ($q) use ($data) {
-                $q->whereBetween('start_time', [$data['start_time'], $data['end_time']])
-                    ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
-                    ->orWhere(function ($q2) use ($data) {
-                        $q2->where('start_time', '<=', $data['start_time'])
-                            ->where('end_time', '>=', $data['end_time']);
-                    });
-            })
-            ->exists();
-
-        if ($overlap) {
+        $conflicts = $this->overlapQuery($subject, $data)->get();
+        if ($conflicts->isNotEmpty()) {
             return back()
                 ->withErrors([
-                    'start_time' => 'This entry overlaps with an existing session for the same course/day.',
+                    'start_time' => $this->buildConflictMessage($data['day_of_week'], $conflicts),
                 ])
                 ->withInput();
         }
@@ -247,24 +219,11 @@ class StaffTimetableController extends Controller
 
         $subject = Subject::findOrFail($data['subject_id']);
 
-        $overlap = Timetable::query()
-            ->where('id', '!=', $timetable->id)
-            ->whereHas('subject', fn ($q) => $q->where('course_id', $subject->course_id))
-            ->where('day_of_week', $data['day_of_week'])
-            ->where(function ($q) use ($data) {
-                $q->whereBetween('start_time', [$data['start_time'], $data['end_time']])
-                    ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
-                    ->orWhere(function ($q2) use ($data) {
-                        $q2->where('start_time', '<=', $data['start_time'])
-                            ->where('end_time', '>=', $data['end_time']);
-                    });
-            })
-            ->exists();
-
-        if ($overlap) {
+        $conflicts = $this->overlapQuery($subject, $data, $timetable->id)->get();
+        if ($conflicts->isNotEmpty()) {
             return back()
                 ->withErrors([
-                    'start_time' => 'This entry overlaps with an existing session for the same course/day.',
+                    'start_time' => $this->buildConflictMessage($data['day_of_week'], $conflicts),
                 ])
                 ->withInput();
         }
@@ -302,5 +261,204 @@ class StaffTimetableController extends Controller
         return redirect()
             ->route('admin.timetables.index')
             ->with('success', 'Timetable entry deleted successfully.');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function resolveFilters(Request $request): array
+    {
+        $filters = [
+            'q' => trim((string) $request->input('q', '')),
+            'day' => trim((string) $request->input('day', 'all')),
+            'course_id' => trim((string) $request->input('course_id', 'all')),
+            'teacher_id' => trim((string) $request->input('teacher_id', 'all')),
+        ];
+
+        if (! in_array($filters['day'], ['all', ...self::DAY_ORDER], true)) {
+            $filters['day'] = 'all';
+        }
+
+        return $filters;
+    }
+
+    /**
+     * @param  Builder<Timetable>  $query
+     * @param  array<string, string>  $filters
+     */
+    private function applyIndexFilters(Builder $query, array $filters): void
+    {
+        if ($filters['day'] !== '' && $filters['day'] !== 'all') {
+            $query->where('day_of_week', $filters['day']);
+        }
+
+        if ($filters['course_id'] !== '' && $filters['course_id'] !== 'all') {
+            $query->whereHas('subject', function ($subjectQuery) use ($filters) {
+                $subjectQuery->where('course_id', (int) $filters['course_id']);
+            });
+        }
+
+        if ($filters['teacher_id'] !== '' && $filters['teacher_id'] !== 'all') {
+            $query->whereHas('subject.teachers', function ($teacherQuery) use ($filters) {
+                $teacherQuery->where('users.id', (int) $filters['teacher_id']);
+            });
+        }
+
+        if ($filters['q'] !== '') {
+            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['q']).'%';
+
+            $query->where(function ($inner) use ($like) {
+                $inner->where('location', 'like', $like)
+                    ->orWhereHas('subject', function ($subjectQuery) use ($like) {
+                        $subjectQuery
+                            ->where('subject_code', 'like', $like)
+                            ->orWhere('title', 'like', $like)
+                            ->orWhereHas('course', function ($courseQuery) use ($like) {
+                                $courseQuery
+                                    ->where('course_code', 'like', $like)
+                                    ->orWhere('title', 'like', $like);
+                            })
+                            ->orWhereHas('teachers', function ($teacherQuery) use ($like) {
+                                $teacherQuery->where('name', 'like', $like);
+                            });
+                    })
+                    ->orWhereHas('creator', function ($creatorQuery) use ($like) {
+                        $creatorQuery->where('name', 'like', $like);
+                    });
+            });
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return Builder<Timetable>
+     */
+    private function overlapQuery(Subject $subject, array $data, ?int $excludeTimetableId = null): Builder
+    {
+        $query = Timetable::query()
+            ->with(['subject.course'])
+            ->whereHas('subject', fn ($q) => $q->where('course_id', $subject->course_id))
+            ->where('day_of_week', $data['day_of_week'])
+            // strict overlap check: existing_start < new_end AND existing_end > new_start
+            ->where('start_time', '<', $data['end_time'])
+            ->where('end_time', '>', $data['start_time']);
+
+        if ($excludeTimetableId !== null) {
+            $query->where('id', '!=', $excludeTimetableId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  Collection<int, Timetable>  $conflicts
+     */
+    private function buildConflictMessage(string $day, Collection $conflicts): string
+    {
+        $preview = $conflicts
+            ->take(3)
+            ->map(function (Timetable $entry): string {
+                $subjectCode = $entry->subject?->subject_code ?? 'Unknown subject';
+                $start = Carbon::parse($entry->start_time)->format('H:i');
+                $end = Carbon::parse($entry->end_time)->format('H:i');
+                $location = $entry->location ? " @ {$entry->location}" : '';
+
+                return "{$subjectCode} {$start}-{$end}{$location}";
+            })
+            ->implode('; ');
+
+        $message = "Schedule conflict on {$day}. It clashes with: {$preview}.";
+        $remaining = $conflicts->count() - min($conflicts->count(), 3);
+        if ($remaining > 0) {
+            $message .= " (+{$remaining} more)";
+        }
+
+        return $message;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function mapTimetableRow(Timetable $entry): array
+    {
+        $subject = $entry->subject;
+        $course = $subject?->course;
+
+        return [
+            'id' => $entry->id,
+            'subject_id' => $entry->subject_id,
+            'subject_code' => $subject?->subject_code,
+            'subject_title' => $subject?->title,
+            'subject_photo' => $subject?->photo,
+            'course_code' => $course?->course_code,
+            'course_title' => $course?->title,
+            'course_photo' => $course?->photo,
+            'day_of_week' => $entry->day_of_week,
+            'start_time' => $entry->start_time,
+            'end_time' => $entry->end_time,
+            'location' => $entry->location,
+            'created_by' => $entry->created_by,
+            'creator_name' => $entry->creator?->name ?? null,
+        ];
+    }
+
+    private function dayOrderSql(): string
+    {
+        return "CASE day_of_week
+            WHEN 'Monday' THEN 1
+            WHEN 'Tuesday' THEN 2
+            WHEN 'Wednesday' THEN 3
+            WHEN 'Thursday' THEN 4
+            WHEN 'Friday' THEN 5
+            WHEN 'Saturday' THEN 6
+            WHEN 'Sunday' THEN 7
+            ELSE 8
+        END";
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $rows
+     */
+    private function exportCsv(Collection $rows, string $timestamp): StreamedResponse
+    {
+        $filename = "timetables_{$timestamp}.csv";
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            if ($handle === false) {
+                return;
+            }
+
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, [
+                'Subject Code',
+                'Subject Title',
+                'Course Code',
+                'Course Title',
+                'Day',
+                'Start Time',
+                'End Time',
+                'Location',
+                'Created By',
+            ]);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row['subject_code'],
+                    $row['subject_title'],
+                    $row['course_code'],
+                    $row['course_title'],
+                    $row['day_of_week'],
+                    $row['start_time'],
+                    $row['end_time'],
+                    $row['location'],
+                    $row['creator_name'],
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 }

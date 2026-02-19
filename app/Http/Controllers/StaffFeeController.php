@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Notifications\FeePaymentReminder;
 use App\Notifications\FeeStatusUpdated;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,32 +69,55 @@ class StaffFeeController extends Controller
             'amount' => (float) (clone $query)->sum('amount'),
         ];
 
-        $fees = $query
-            ->orderBy('created_at', 'desc')
-            ->paginate(15)
-            ->withQueryString()
-            ->through(function (Fee $fee) use ($today) {
-                $isLate = in_array($fee->status, [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING], true)
-                    && $fee->due_date < $today;
+        try {
+            $fees = $query
+                ->orderBy('created_at', 'desc')
+                ->paginate(15)
+                ->withQueryString();
+        } catch (QueryException $e) {
+            if (! $this->isMissingFeeStatusLogTableException($e)) {
+                throw $e;
+            }
 
-                return [
-                    'id' => $fee->id,
-                    'student_no' => $fee->student->student_no,
-                    'student_name' => $fee->student->full_name,
-                    'student_photo' => $fee->student->photo,
-                    'amount' => $fee->amount,
-                    'description' => $fee->description,
-                    'status' => $fee->status,
-                    'due_date' => $fee->due_date->format('Y-m-d'),
-                    'paid_date' => $fee->paid_date?->format('Y-m-d'),
-                    'processed_by' => $fee->processor?->name,
-                    'payment_processed_at' => $fee->payment_processed_at?->toDateTimeString(),
-                    'created_at' => $fee->created_at->format('Y-m-d'),
-                    'is_late' => $isLate,
-                    'days_overdue' => $isLate ? $fee->due_date->diffInDays($today) : null,
-                    'timeline' => $this->mapFeeTimeline($fee),
-                ];
-            });
+            $fallbackQuery = Fee::with([
+                'student',
+                'processor:id,name',
+            ]);
+            $this->applyIndexFilters($fallbackQuery, $filters, $todayDate);
+
+            $filteredSummary = [
+                'count' => (int) (clone $fallbackQuery)->count(),
+                'amount' => (float) (clone $fallbackQuery)->sum('amount'),
+            ];
+
+            $fees = $fallbackQuery
+                ->orderBy('created_at', 'desc')
+                ->paginate(15)
+                ->withQueryString();
+        }
+
+        $fees = $fees->through(function (Fee $fee) use ($today) {
+            $isLate = in_array($fee->status, [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING], true)
+                && $fee->due_date < $today;
+
+            return [
+                'id' => $fee->id,
+                'student_no' => $fee->student->student_no,
+                'student_name' => $fee->student->full_name,
+                'student_photo' => $fee->student->photo,
+                'amount' => $fee->amount,
+                'description' => $fee->description,
+                'status' => $fee->status,
+                'due_date' => $fee->due_date->format('Y-m-d'),
+                'paid_date' => $fee->paid_date?->format('Y-m-d'),
+                'processed_by' => $fee->processor?->name,
+                'payment_processed_at' => $fee->payment_processed_at?->toDateTimeString(),
+                'created_at' => $fee->created_at->format('Y-m-d'),
+                'is_late' => $isLate,
+                'days_overdue' => $isLate ? $fee->due_date->diffInDays($today) : null,
+                'timeline' => $this->mapFeeTimeline($fee),
+            ];
+        });
 
         return Inertia::render('Admin/Fees/Index', [
             'fees' => $fees,
@@ -557,5 +581,13 @@ class StaffFeeController extends Controller
         }
 
         return ucfirst(str_replace('_', ' ', $action));
+    }
+
+    private function isMissingFeeStatusLogTableException(QueryException $e): bool
+    {
+        $sqlState = (string) $e->getCode();
+        $message = strtolower($e->getMessage());
+
+        return $sqlState === '42S02' && str_contains($message, 'fee_status_logs');
     }
 }

@@ -11,18 +11,32 @@ const props = defineProps({
         required: true,
     },
     /**
-     * Optional: show course info in blocks
+     * Optional: show course info in blocks.
      */
     showCourse: {
         type: Boolean,
         default: false,
     },
     /**
-     * Optional: limit to these days (e.g. ["Monday","Tuesday",...])
+     * Optional: limit to these days (for example ["Monday", "Tuesday", ...]).
      */
     days: {
         type: Array,
         default: null,
+    },
+    /**
+     * Highlight the current weekday column.
+     */
+    highlightToday: {
+        type: Boolean,
+        default: true,
+    },
+    /**
+     * Display format for times.
+     */
+    timeFormat: {
+        type: String,
+        default: "12h", // 12h | 24h
     },
 });
 
@@ -30,11 +44,19 @@ const DEFAULT_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 const dayColumns = computed(() => props.days ?? DEFAULT_DAYS);
 
+const parseTimeParts = (value) => {
+    if (!value) return null;
+    const [hhRaw = "0", mmRaw = "0"] = String(value).split(":");
+    const hh = Number.parseInt(hhRaw, 10);
+    const mm = Number.parseInt(mmRaw, 10);
+    if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+    return { hh, mm };
+};
+
 const toMinutes = (hhmm) => {
-    if (!hhmm) return null;
-    const [h, m] = String(hhmm).split(":").map((x) => parseInt(x, 10));
-    if (Number.isNaN(h) || Number.isNaN(m)) return null;
-    return h * 60 + m;
+    const parts = parseTimeParts(hhmm);
+    if (!parts) return null;
+    return parts.hh * 60 + parts.mm;
 };
 
 const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
@@ -58,27 +80,51 @@ const bounds = computed(() => {
     const starts = normalized.value.map((e) => e._start);
     const ends = normalized.value.map((e) => e._end);
 
-    // Default school day bounds if empty
+    // Default school day bounds if empty.
     let minStart = starts.length ? Math.min(...starts) : 9 * 60;
     let maxEnd = ends.length ? Math.max(...ends) : 17 * 60;
 
-    // Pad to nearest hour
+    // Pad to nearest hour.
     minStart = Math.floor(minStart / 60) * 60;
     maxEnd = Math.ceil(maxEnd / 60) * 60;
 
-    // Clamp to reasonable window
+    // Clamp to a reasonable timetable window.
     minStart = clamp(minStart, 6 * 60, 12 * 60);
     maxEnd = clamp(maxEnd, 13 * 60, 22 * 60);
 
     return { minStart, maxEnd };
 });
 
+const formatMinutes = (minutes) => {
+    const safe = Number(minutes);
+    if (!Number.isFinite(safe)) return "-";
+
+    const hh = Math.floor(safe / 60);
+    const mm = safe % 60;
+    const mmLabel = String(mm).padStart(2, "0");
+
+    if (props.timeFormat === "24h") {
+        return `${String(hh).padStart(2, "0")}:${mmLabel}`;
+    }
+
+    const suffix = hh >= 12 ? "PM" : "AM";
+    const hour12 = hh % 12 || 12;
+    return `${hour12}:${mmLabel} ${suffix}`;
+};
+
+const formatTime = (value) => {
+    const parts = parseTimeParts(value);
+    if (!parts) return String(value ?? "-");
+    return formatMinutes(parts.hh * 60 + parts.mm);
+};
+
+const formatRange = (entry) => `${formatTime(entry?.start_time)} - ${formatTime(entry?.end_time)}`;
+
 const timeSlots = computed(() => {
     const { minStart, maxEnd } = bounds.value;
     const slots = [];
     for (let t = minStart; t <= maxEnd; t += 60) {
-        const h = Math.floor(t / 60);
-        slots.push({ minutes: t, label: `${String(h).padStart(2, "0")}:00` });
+        slots.push({ minutes: t, label: formatMinutes(t) });
     }
     return slots;
 });
@@ -86,21 +132,25 @@ const timeSlots = computed(() => {
 const laneByDay = computed(() => {
     const map = {};
     for (const d of dayColumns.value) map[d] = [];
+
     for (const e of normalized.value) {
         if (!map[e.day_of_week]) map[e.day_of_week] = [];
         map[e.day_of_week].push(e);
     }
+
     for (const d of Object.keys(map)) {
         map[d].sort((a, b) => a._start - b._start);
     }
+
     return map;
 });
 
 const colorClass = (subjectCode) => {
-    // Stable pseudo-hash from subject code to color family
+    // Stable pseudo-hash from subject code to color family.
     const s = String(subjectCode ?? "");
     let hash = 0;
     for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+
     const palette = [
         "bg-blue-100 text-blue-900 ring-blue-200",
         "bg-emerald-100 text-emerald-900 ring-emerald-200",
@@ -110,23 +160,45 @@ const colorClass = (subjectCode) => {
         "bg-indigo-100 text-indigo-900 ring-indigo-200",
         "bg-cyan-100 text-cyan-900 ring-cyan-200",
     ];
+
     return palette[hash % palette.length];
 };
 
-const blockStyle = (e) => {
+const blockStyle = (entry) => {
     const { minStart, maxEnd } = bounds.value;
     const total = maxEnd - minStart;
-    const top = ((e._start - minStart) / total) * 100;
-    const height = ((e._end - e._start) / total) * 100;
+    const top = ((entry._start - minStart) / total) * 100;
+    const height = ((entry._end - entry._start) / total) * 100;
     return {
         top: `${top}%`,
         height: `${height}%`,
     };
 };
+
+const todayName = computed(() => {
+    if (!props.highlightToday) return null;
+    try {
+        return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(new Date());
+    } catch {
+        return null;
+    }
+});
+
+const browserTimezone = computed(() => {
+    try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
+    } catch {
+        return "Local";
+    }
+});
 </script>
 
 <template>
     <div class="portal-card overflow-hidden">
+        <div class="border-b border-slate-200 bg-slate-50 px-4 py-2 text-[11px] text-slate-600">
+            Times are shown in schedule local time. Browser timezone: {{ browserTimezone }}
+        </div>
+
         <!-- Desktop: week grid -->
         <div class="hidden md:block">
             <div class="grid grid-cols-[96px,1fr]">
@@ -153,9 +225,18 @@ const blockStyle = (e) => {
                     >
                         <div
                             class="flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4"
+                            :class="{
+                                'bg-amber-50 ring-1 ring-inset ring-amber-200': todayName === d,
+                            }"
                         >
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">
                                 {{ d }}
+                                <span
+                                    v-if="todayName === d"
+                                    class="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800"
+                                >
+                                    Today
+                                </span>
                             </p>
                             <p class="text-[10px] text-slate-400">
                                 {{ (laneByDay[d] ?? []).length }} session(s)
@@ -172,22 +253,25 @@ const blockStyle = (e) => {
 
                             <!-- blocks -->
                             <div
-                                v-for="e in laneByDay[d] ?? []"
-                                :key="e.id"
+                                v-for="entry in laneByDay[d] ?? []"
+                                :key="entry.id"
                                 class="absolute left-2 right-2 rounded-lg p-2 text-xs shadow-sm ring-1"
-                                :class="colorClass(e.subject_code)"
-                                :style="blockStyle(e)"
-                                :title="`${e.subject_code} ${e.start_time}-${e.end_time}`"
+                                :class="colorClass(entry.subject_code)"
+                                :style="blockStyle(entry)"
+                                :title="`${entry.subject_code} ${formatRange(entry)}`"
                             >
                                 <p class="truncate font-semibold">
-                                    {{ e.subject_code }} <span class="font-normal" v-if="showCourse && e.course_code">· {{ e.course_code }}</span>
+                                    {{ entry.subject_code }}
+                                    <span class="font-normal" v-if="showCourse && entry.course_code">
+                                        - {{ entry.course_code }}
+                                    </span>
                                 </p>
                                 <p class="mt-0.5 line-clamp-2 text-[11px] text-slate-700/80">
-                                    {{ e.subject_title }}
+                                    {{ entry.subject_title }}
                                 </p>
                                 <p class="mt-1 flex items-center gap-2 text-[10px] text-slate-700/80">
-                                    <span>{{ e.start_time }}–{{ e.end_time }}</span>
-                                    <span v-if="e.location">· {{ e.location }}</span>
+                                    <span>{{ formatRange(entry) }}</span>
+                                    <span v-if="entry.location">- {{ entry.location }}</span>
                                 </p>
                             </div>
                         </div>
@@ -217,21 +301,23 @@ const blockStyle = (e) => {
                     </div>
                     <div v-else class="mt-3 space-y-2">
                         <div
-                            v-for="e in laneByDay[d]"
-                            :key="`m-${e.id}`"
+                            v-for="entry in laneByDay[d]"
+                            :key="`m-${entry.id}`"
                             class="rounded-lg p-3 ring-1"
-                            :class="colorClass(e.subject_code)"
+                            :class="colorClass(entry.subject_code)"
                         >
                             <p class="text-sm font-semibold text-slate-900">
-                                {{ e.subject_code }}
-                                <span class="font-normal" v-if="showCourse && e.course_code">· {{ e.course_code }}</span>
+                                {{ entry.subject_code }}
+                                <span class="font-normal" v-if="showCourse && entry.course_code">
+                                    - {{ entry.course_code }}
+                                </span>
                             </p>
                             <p class="mt-1 text-xs text-slate-700/80">
-                                {{ e.subject_title }}
+                                {{ entry.subject_title }}
                             </p>
                             <p class="mt-2 text-xs text-slate-700/80">
-                                {{ e.start_time }}–{{ e.end_time }}
-                                <span v-if="e.location">· {{ e.location }}</span>
+                                {{ formatRange(entry) }}
+                                <span v-if="entry.location">- {{ entry.location }}</span>
                             </p>
                         </div>
                     </div>
@@ -249,4 +335,3 @@ const blockStyle = (e) => {
     overflow: hidden;
 }
 </style>
-

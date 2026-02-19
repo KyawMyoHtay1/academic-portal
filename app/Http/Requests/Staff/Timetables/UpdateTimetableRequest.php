@@ -18,7 +18,7 @@ class UpdateTimetableRequest extends FormRequest
     {
         return [
             'subject_id' => ['required', 'exists:subjects,id'],
-            'day_of_week' => ['required', 'string', 'max:255'],
+            'day_of_week' => ['required', 'in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'location' => ['nullable', 'string', 'max:255'],

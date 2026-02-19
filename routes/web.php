@@ -395,6 +395,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Student Timetable (read-only)
         Route::get('/student/timetable', [StudentTimetableController::class, 'index'])->name('student.timetable.index');
+        Route::get('/student/timetable/export/{format}', [StudentTimetableController::class, 'export'])->name('student.timetable.export');
     });
 
     // Announcements (all authenticated users)
@@ -516,7 +517,8 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'edit' => 'admin.timetables.edit',
             'update' => 'admin.timetables.update',
             'destroy' => 'admin.timetables.destroy',
-        ]);
+        ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::get('/admin/timetables/export/{format}', [StaffTimetableController::class, 'export'])->name('admin.timetables.export');
 
         // Announcements (staff only)
         Route::resource('admin/announcements', StaffAnnouncementController::class)->names([
@@ -574,6 +576,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
 
         // Timetable View
         Route::get('/teacher/timetable', [TeacherTimetableController::class, 'index'])->name('teacher.timetable.index');
+        Route::get('/teacher/timetable/export/{format}', [TeacherTimetableController::class, 'export'])->name('teacher.timetable.export');
 
         // Teacher Announcements (manage own announcements)
         Route::resource('teacher/announcements', TeacherAnnouncementController::class)->names([
