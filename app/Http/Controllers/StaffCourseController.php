@@ -46,7 +46,9 @@ class StaffCourseController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/Courses/Create');
+        return Inertia::render('Admin/Courses/Create', [
+            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
+        ]);
     }
 
     /**
@@ -79,10 +81,12 @@ class StaffCourseController extends Controller
                 'title' => $course->title,
                 'credits' => $course->credits,
                 'semester' => $course->semester,
+                'attendance_threshold' => $course->attendance_threshold,
                 'photo_url' => $course->photo
                     ? asset('storage/'.$course->photo)
                     : null,
             ],
+            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
         ]);
     }
 

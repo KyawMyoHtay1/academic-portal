@@ -16,6 +16,7 @@ class Subject extends Model
         'credits',
         'description',
         'photo',
+        'attendance_threshold',
     ];
 
     /**

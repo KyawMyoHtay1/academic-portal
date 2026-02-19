@@ -78,6 +78,7 @@ class StaffSubjectController extends Controller
 
         return Inertia::render('Admin/Subjects/Create', [
             'courses' => $courses,
+            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
         ]);
     }
 
@@ -115,11 +116,13 @@ class StaffSubjectController extends Controller
                 'title' => $subject->title,
                 'credits' => $subject->credits,
                 'description' => $subject->description,
+                'attendance_threshold' => $subject->attendance_threshold,
                 'photo_url' => $subject->photo
                     ? asset('storage/'.$subject->photo)
                     : null,
             ],
             'courses' => $courses,
+            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
         ]);
     }
 

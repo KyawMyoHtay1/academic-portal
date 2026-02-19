@@ -15,6 +15,7 @@ class Course extends Model
         'credits',
         'semester',
         'photo',
+        'attendance_threshold',
     ];
 
     /**

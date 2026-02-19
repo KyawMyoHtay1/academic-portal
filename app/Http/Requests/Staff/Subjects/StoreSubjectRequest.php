@@ -22,6 +22,7 @@ class StoreSubjectRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'credits' => ['required', 'integer', 'min:1', 'max:10'],
             'description' => ['nullable', 'string'],
+            'attendance_threshold' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ];
     }

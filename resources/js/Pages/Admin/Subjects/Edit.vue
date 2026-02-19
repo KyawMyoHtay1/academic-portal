@@ -14,6 +14,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    globalThreshold: {
+        type: Number,
+        default: 75,
+    },
 });
 
 const form = useForm({
@@ -22,6 +26,7 @@ const form = useForm({
     title: props.subject.title,
     credits: props.subject.credits || "",
     description: props.subject.description || "",
+    attendance_threshold: props.subject.attendance_threshold ?? null,
     photo: null,
 });
 
@@ -264,6 +269,38 @@ const removePhoto = () => {
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.description }}
+                                </p>
+                            </div>
+
+                            <!-- Attendance Threshold -->
+                            <div>
+                                <label
+                                    for="attendance_threshold"
+                                    class="block text-sm font-medium text-slate-700"
+                                >
+                                    Attendance Threshold (%)
+                                </label>
+                                <input
+                                    id="attendance_threshold"
+                                    v-model="form.attendance_threshold"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
+                                    :class="{
+                                        'border-red-300 focus:border-red-500 focus:ring-red-500':
+                                            form.errors.attendance_threshold,
+                                    }"
+                                />
+                                <p
+                                    v-if="form.errors.attendance_threshold"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.attendance_threshold }}
+                                </p>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Minimum attendance percentage for this subject. Leave empty to use course threshold or global threshold ({{ globalThreshold }}%).
                                 </p>
                             </div>
 
