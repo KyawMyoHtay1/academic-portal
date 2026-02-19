@@ -19,6 +19,11 @@ const form = useForm({
     photo: null,
 });
 
+const semesterOptions = Array.from(
+    { length: 8 },
+    (_, index) => `Semester ${index + 1}`
+);
+
 const submit = () => {
     form.post(route("admin.courses.store"), {
         forceFormData: true,
@@ -151,18 +156,27 @@ const submit = () => {
                                 >
                                     Semester <span class="text-red-500">*</span>
                                 </label>
-                                <input
+                                <select
                                     id="semester"
                                     v-model="form.semester"
-                                    type="text"
                                     required
                                     class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
                                     :class="{
                                         'border-red-300 focus:border-red-500 focus:ring-red-500':
                                             form.errors.semester,
                                     }"
-                                    placeholder="e.g., Semester 1"
-                                />
+                                >
+                                    <option value="" disabled>
+                                        Select semester
+                                    </option>
+                                    <option
+                                        v-for="semester in semesterOptions"
+                                        :key="semester"
+                                        :value="semester"
+                                    >
+                                        {{ semester }}
+                                    </option>
+                                </select>
                                 <p
                                     v-if="form.errors.semester"
                                     class="mt-1 text-sm text-red-600"
