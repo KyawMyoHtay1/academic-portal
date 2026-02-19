@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { computed, watch } from "vue";
 
 const props = defineProps({
     timetable: {
@@ -25,6 +26,33 @@ const form = useForm({
 const submit = () => {
     form.put(route("admin.timetables.update", props.timetable.id));
 };
+
+const conflictDetails = computed(() => {
+    const raw = form.errors.conflict_details;
+    if (!raw) {
+        return [];
+    }
+
+    if (Array.isArray(raw)) {
+        return raw;
+    }
+
+    try {
+        const parsed = JSON.parse(String(raw));
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+});
+
+watch(
+    () => [form.subject_id, form.day_of_week, form.start_time, form.end_time],
+    () => {
+        if (form.errors.conflict_details || form.errors.start_time) {
+            form.clearErrors("conflict_details", "start_time");
+        }
+    }
+);
 </script>
 
 <template>
@@ -184,6 +212,35 @@ const submit = () => {
                                     >
                                         {{ form.errors.end_time }}
                                     </p>
+                                </div>
+                            </div>
+
+                            <div
+                                v-if="conflictDetails.length > 0"
+                                class="rounded-lg border border-red-200 bg-red-50 p-4"
+                            >
+                                <p class="text-xs font-semibold uppercase tracking-wide text-red-700">
+                                    Conflict Details
+                                </p>
+                                <p class="mt-1 text-xs text-red-700">
+                                    This update overlaps with the following timetable entries:
+                                </p>
+                                <div class="mt-3 space-y-2">
+                                    <div
+                                        v-for="(item, index) in conflictDetails"
+                                        :key="`${item.subject_code}-${item.time_range}-${index}`"
+                                        class="rounded-md border border-red-200 bg-white px-3 py-2 text-xs text-slate-700"
+                                    >
+                                        <p class="font-semibold text-slate-900">
+                                            {{ item.subject_code }} - {{ item.subject_title }}
+                                        </p>
+                                        <p class="mt-0.5 text-slate-600">
+                                            {{ item.course_code }} - {{ item.course_title }}
+                                        </p>
+                                        <p class="mt-0.5 text-slate-600">
+                                            {{ item.day_of_week }} | {{ item.time_range }} | {{ item.location }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 

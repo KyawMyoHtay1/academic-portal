@@ -476,6 +476,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         // Teacher Assignment to Subjects (staff only)
         Route::get('/admin/subjects/{subject}/assign-teachers', [StaffSubjectTeacherController::class, 'edit'])->name('admin.subjects.assign-teachers');
         Route::put('/admin/subjects/{subject}/assign-teachers', [StaffSubjectTeacherController::class, 'update'])->name('admin.subjects.assign-teachers.update');
+        Route::post('/admin/subjects/assign-teachers/bulk', [StaffSubjectTeacherController::class, 'bulkAssign'])->name('admin.subjects.assign-teachers.bulk');
 
         // User Management (role assignment)
         Route::get('/admin/users', [StaffUserController::class, 'index'])->name('admin.users.index');

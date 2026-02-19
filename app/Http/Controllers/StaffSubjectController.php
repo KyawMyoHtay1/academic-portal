@@ -6,6 +6,7 @@ use App\Http\Requests\Staff\Subjects\StoreSubjectRequest;
 use App\Http\Requests\Staff\Subjects\UpdateSubjectRequest;
 use App\Models\Course;
 use App\Models\Subject;
+use App\Models\User;
 use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -55,6 +56,15 @@ class StaffSubjectController extends Controller
 
         return Inertia::render('Admin/Subjects/Index', [
             'subjects' => $subjects,
+            'teachers' => User::query()
+                ->where('role', 'teacher')
+                ->orderBy('name')
+                ->get(['id', 'name', 'email'])
+                ->map(fn (User $teacher) => [
+                    'id' => $teacher->id,
+                    'name' => $teacher->name,
+                    'email' => $teacher->email,
+                ]),
         ]);
     }
 

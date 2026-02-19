@@ -49,19 +49,10 @@ class StaffFeeController extends Controller
                 ];
             });
 
-        $with = [
+        $query = Fee::with([
             'student',
             'processor:id,name',
-        ];
-        if ($this->hasFeeStatusLogTable()) {
-            $with['statusLogs'] = function ($q) {
-                $q->with('performer:id,name')
-                    ->latest('created_at')
-                    ->limit(10);
-            };
-        }
-
-        $query = Fee::with($with);
+        ]);
 
         $this->applyIndexFilters($query, $filters, $todayDate);
 
@@ -70,31 +61,25 @@ class StaffFeeController extends Controller
             'amount' => (float) (clone $query)->sum('amount'),
         ];
 
-        try {
-            $fees = $query
-                ->orderBy('created_at', 'desc')
-                ->paginate(15)
-                ->withQueryString();
-        } catch (QueryException $e) {
-            if (! $this->isMissingFeeStatusLogTableException($e)) {
-                throw $e;
+        $fees = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        if ($this->hasFeeStatusLogTable()) {
+            try {
+                $fees->load([
+                    'statusLogs' => function ($q) {
+                        $q->with('performer:id,name')
+                            ->latest('created_at')
+                            ->limit(10);
+                    },
+                ]);
+            } catch (QueryException $e) {
+                if (! $this->isMissingFeeStatusLogTableException($e)) {
+                    throw $e;
+                }
             }
-
-            $fallbackQuery = Fee::with([
-                'student',
-                'processor:id,name',
-            ]);
-            $this->applyIndexFilters($fallbackQuery, $filters, $todayDate);
-
-            $filteredSummary = [
-                'count' => (int) (clone $fallbackQuery)->count(),
-                'amount' => (float) (clone $fallbackQuery)->sum('amount'),
-            ];
-
-            $fees = $fallbackQuery
-                ->orderBy('created_at', 'desc')
-                ->paginate(15)
-                ->withQueryString();
         }
 
         $fees = $fees->through(function (Fee $fee) use ($today) {
@@ -657,7 +642,11 @@ class StaffFeeController extends Controller
         static $exists = null;
 
         if ($exists === null) {
-            $exists = Schema::hasTable('fee_status_logs');
+            try {
+                $exists = Schema::hasTable('fee_status_logs');
+            } catch (\Throwable) {
+                $exists = false;
+            }
         }
 
         return (bool) $exists;

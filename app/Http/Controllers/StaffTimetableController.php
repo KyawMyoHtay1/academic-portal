@@ -154,9 +154,12 @@ class StaffTimetableController extends Controller
 
         $conflicts = $this->overlapQuery($subject, $data)->get();
         if ($conflicts->isNotEmpty()) {
+            $conflictDetails = $this->mapConflictDetails($conflicts);
+
             return back()
                 ->withErrors([
                     'start_time' => $this->buildConflictMessage($data['day_of_week'], $conflicts),
+                    'conflict_details' => json_encode($conflictDetails, JSON_UNESCAPED_UNICODE),
                 ])
                 ->withInput();
         }
@@ -231,9 +234,12 @@ class StaffTimetableController extends Controller
 
         $conflicts = $this->overlapQuery($subject, $data, $timetable->id)->get();
         if ($conflicts->isNotEmpty()) {
+            $conflictDetails = $this->mapConflictDetails($conflicts);
+
             return back()
                 ->withErrors([
                     'start_time' => $this->buildConflictMessage($data['day_of_week'], $conflicts),
+                    'conflict_details' => json_encode($conflictDetails, JSON_UNESCAPED_UNICODE),
                 ])
                 ->withInput();
         }
@@ -394,6 +400,35 @@ class StaffTimetableController extends Controller
         }
 
         return $message;
+    }
+
+    /**
+     * @param  Collection<int, Timetable>  $conflicts
+     * @return array<int, array<string, string>>
+     */
+    private function mapConflictDetails(Collection $conflicts): array
+    {
+        return $conflicts
+            ->map(function (Timetable $entry) {
+                $subjectCode = $entry->subject?->subject_code ?? 'Unknown subject';
+                $subjectTitle = $entry->subject?->title ?? 'Unknown subject';
+                $courseCode = $entry->subject?->course?->course_code ?? 'N/A';
+                $courseTitle = $entry->subject?->course?->title ?? 'N/A';
+                $start = Carbon::parse($entry->start_time)->format('H:i');
+                $end = Carbon::parse($entry->end_time)->format('H:i');
+
+                return [
+                    'subject_code' => $subjectCode,
+                    'subject_title' => $subjectTitle,
+                    'course_code' => $courseCode,
+                    'course_title' => $courseTitle,
+                    'day_of_week' => (string) $entry->day_of_week,
+                    'time_range' => "{$start} - {$end}",
+                    'location' => $entry->location ?? '-',
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     /**
