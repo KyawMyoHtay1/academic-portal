@@ -500,6 +500,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::post('/admin/fees/{fee}/approve-payment', [StaffFeeController::class, 'approvePayment'])->name('admin.fees.approve-payment');
         Route::post('/admin/fees/{fee}/reject-payment', [StaffFeeController::class, 'rejectPayment'])->name('admin.fees.reject-payment');
         Route::post('/admin/fees/{fee}/send-reminder', [StaffFeeController::class, 'sendReminder'])->name('admin.fees.send-reminder');
+        Route::post('/admin/fees/send-overdue-reminders', [StaffFeeController::class, 'sendOverdueReminders'])->name('admin.fees.send-overdue-reminders');
         Route::get('/admin/fees/{fee}/receipt', [StaffFeeController::class, 'receipt'])->name('admin.fees.receipt');
         Route::get('/admin/fees/export/{format}', [StaffFeeController::class, 'export'])->name('admin.fees.export');
 

@@ -104,6 +104,8 @@ class EnrollmentService
                     'performed_by' => $performedBy,
                     'meta' => [
                         'conflict_course_id' => $conflict['conflict_course_id'] ?? null,
+                        'conflict_subject_code' => $conflict['conflict_subject_code'] ?? null,
+                        'conflict_day_of_week' => $conflict['day_of_week'] ?? null,
                     ],
                 ]);
 
@@ -317,6 +319,8 @@ class EnrollmentService
                         'performed_by' => $performedBy,
                         'meta' => [
                             'conflict_course_id' => $conflict['conflict_course_id'] ?? null,
+                            'conflict_subject_code' => $conflict['conflict_subject_code'] ?? null,
+                            'conflict_day_of_week' => $conflict['day_of_week'] ?? null,
                         ],
                     ]);
 
@@ -621,6 +625,7 @@ class EnrollmentService
         }
 
         $newCourseTimetables = Timetable::query()
+            ->with('subject:id,course_id,subject_code,title')
             ->whereHas('subject', fn ($q) => $q->where('course_id', $course->id))
             ->get(['subject_id', 'day_of_week', 'start_time', 'end_time']);
 
@@ -629,7 +634,10 @@ class EnrollmentService
         }
 
         $existingTimetables = Timetable::query()
-            ->with('subject.course:id,course_code,title')
+            ->with([
+                'subject:id,course_id,subject_code,title',
+                'subject.course:id,course_code,title',
+            ])
             ->whereHas('subject', fn ($q) => $q->whereIn('course_id', $approvedCourseIds))
             ->get(['subject_id', 'day_of_week', 'start_time', 'end_time']);
 
@@ -660,9 +668,17 @@ class EnrollmentService
                         'course_code' => $conflictingCourse?->course_code ?? 'UNKNOWN',
                         'course_title' => $conflictingCourse?->title ?? 'Unknown Course',
                         'conflict_course_id' => $conflictingCourse?->id,
+                        'requested_course_code' => $course->course_code,
+                        'requested_course_title' => $course->title,
+                        'requested_subject_code' => $newTimetable->subject?->subject_code,
+                        'requested_subject_title' => $newTimetable->subject?->title,
+                        'conflict_subject_code' => $existingTimetable->subject?->subject_code,
+                        'conflict_subject_title' => $existingTimetable->subject?->title,
                         'day_of_week' => (string) $newTimetable->day_of_week,
                         'start_time' => (string) $newTimetable->start_time,
                         'end_time' => (string) $newTimetable->end_time,
+                        'conflict_start_time' => (string) $existingTimetable->start_time,
+                        'conflict_end_time' => (string) $existingTimetable->end_time,
                     ];
                 }
             }
@@ -676,13 +692,64 @@ class EnrollmentService
      */
     private function scheduleConflictMessage(array $conflict): string
     {
-        return sprintf(
-            'Schedule conflict detected with %s - %s on %s (%s - %s). Please choose a different course or contact administration.',
-            (string) $conflict['course_code'],
-            (string) $conflict['course_title'],
-            (string) $conflict['day_of_week'],
-            (string) $conflict['start_time'],
-            (string) $conflict['end_time']
+        $requestedCourse = trim(sprintf(
+            '%s - %s',
+            (string) ($conflict['requested_course_code'] ?? ''),
+            (string) ($conflict['requested_course_title'] ?? '')
+        ));
+        $requestedSubject = trim(sprintf(
+            '%s%s',
+            (string) ($conflict['requested_subject_code'] ?? ''),
+            filled($conflict['requested_subject_title'] ?? null)
+                ? ' ('.(string) $conflict['requested_subject_title'].')'
+                : ''
+        ));
+        $conflictCourse = trim(sprintf(
+            '%s - %s',
+            (string) ($conflict['course_code'] ?? ''),
+            (string) ($conflict['course_title'] ?? '')
+        ));
+        $conflictSubject = trim(sprintf(
+            '%s%s',
+            (string) ($conflict['conflict_subject_code'] ?? ''),
+            filled($conflict['conflict_subject_title'] ?? null)
+                ? ' ('.(string) $conflict['conflict_subject_title'].')'
+                : ''
+        ));
+        $requestedRange = sprintf(
+            '%s-%s',
+            $this->formatTimeLabel((string) ($conflict['start_time'] ?? '')),
+            $this->formatTimeLabel((string) ($conflict['end_time'] ?? ''))
         );
+        $conflictRange = sprintf(
+            '%s-%s',
+            $this->formatTimeLabel((string) ($conflict['conflict_start_time'] ?? '')),
+            $this->formatTimeLabel((string) ($conflict['conflict_end_time'] ?? ''))
+        );
+
+        return sprintf(
+            'Schedule conflict on %s. Requested %s %s (%s) overlaps with enrolled %s %s (%s). Please choose a different course or contact administration.',
+            (string) $conflict['day_of_week'],
+            $requestedCourse !== '-' ? $requestedCourse : 'course',
+            $requestedSubject !== '' ? $requestedSubject : '',
+            $requestedRange,
+            $conflictCourse !== '-' ? $conflictCourse : 'course',
+            $conflictSubject !== '' ? $conflictSubject : '',
+            $conflictRange
+        );
+    }
+
+    private function formatTimeLabel(string $value): string
+    {
+        $raw = trim($value);
+        if ($raw === '') {
+            return '-';
+        }
+
+        if (preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $raw) === 1) {
+            return substr($raw, 0, 5);
+        }
+
+        return $raw;
     }
 }

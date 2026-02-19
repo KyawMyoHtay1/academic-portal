@@ -166,6 +166,25 @@ const sendReminder = (feeId) => {
     );
 };
 
+const sendFilteredOverdueReminders = () => {
+    if (!confirm("Send overdue reminders for the current filtered result?")) {
+        return;
+    }
+
+    router.post(
+        route("admin.fees.send-overdue-reminders"),
+        {
+            status: status.value,
+            search: search.value || undefined,
+            overdue_only: overdueOnly.value ? 1 : undefined,
+            due_bucket: dueBucket.value !== "all" ? dueBucket.value : undefined,
+        },
+        {
+            preserveScroll: true,
+        }
+    );
+};
+
 const getStatusBadgeClass = (value) => {
     if (value === "paid") {
         return "bg-emerald-100 text-emerald-800";
@@ -322,6 +341,13 @@ const timelineEventClass = (action) => {
                             </p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
+                            <button
+                                type="button"
+                                class="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100"
+                                @click="sendFilteredOverdueReminders"
+                            >
+                                Remind Filtered Overdue
+                            </button>
                             <a
                                 :href="exportUrl('csv')"
                                 class="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"

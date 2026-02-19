@@ -345,6 +345,82 @@ class StaffFeeController extends Controller
     }
 
     /**
+     * Send reminders for all overdue fees in the current filtered result.
+     */
+    public function sendOverdueReminders(Request $request): RedirectResponse
+    {
+        $this->authorize('viewAny', Fee::class);
+
+        $today = now()->startOfDay();
+        $todayDate = $today->toDateString();
+        $filters = $this->resolveFilters($request);
+
+        $query = Fee::query()->with('student.user');
+        $this->applyIndexFilters($query, $filters, $todayDate);
+
+        $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+            ->whereDate('due_date', '<', $todayDate);
+
+        $feeIds = $request->input('fee_ids');
+        if (is_array($feeIds) && $feeIds !== []) {
+            $normalizedIds = collect($feeIds)
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn ($id) => $id > 0)
+                ->unique()
+                ->values()
+                ->all();
+
+            if ($normalizedIds !== []) {
+                $query->whereIn('id', $normalizedIds);
+            }
+        }
+
+        $fees = $query->get();
+
+        if ($fees->isEmpty()) {
+            return back()->with('info', 'No overdue fees found for reminders in the current filter.');
+        }
+
+        $sent = 0;
+        $skipped = 0;
+
+        foreach ($fees as $fee) {
+            $this->authorize('update', $fee);
+
+            $student = $fee->student;
+            if (! $student || ! $student->user) {
+                $skipped++;
+                continue;
+            }
+
+            $daysOverdue = $fee->due_date->diffInDays($today);
+            $student->user->notify(new FeePaymentReminder($fee, $daysOverdue));
+
+            $fee->logStatusChange(
+                $fee->status,
+                $fee->status,
+                'reminder_sent',
+                Auth::id(),
+                'Overdue reminder sent to student (bulk).',
+                ['days_overdue' => $daysOverdue]
+            );
+
+            $sent++;
+        }
+
+        if ($sent === 0) {
+            return back()->with('info', 'No reminders were sent. Student user accounts may be missing.');
+        }
+
+        $message = "Sent {$sent} overdue reminder(s).";
+        if ($skipped > 0) {
+            $message .= " Skipped {$skipped} fee(s) without a linked student user.";
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
      * Generate and download a receipt PDF for a paid fee.
      */
     public function receipt(Fee $fee)
