@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\LowAttendanceAlertState;
 use App\Models\Student;
 use App\Notifications\LowAttendanceAlert;
+use App\Support\AttendanceAlertSettings;
 use DateTimeInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -48,8 +49,8 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
 
     public function handle(): void
     {
-        $threshold = $this->thresholdOverride ?? (float) config('attendance_alerts.low_threshold', 75);
-        $cooldownDays = $this->cooldownDaysOverride ?? (int) config('attendance_alerts.cooldown_days', 7);
+        $threshold = $this->thresholdOverride ?? AttendanceAlertSettings::lowThreshold();
+        $cooldownDays = $this->cooldownDaysOverride ?? AttendanceAlertSettings::cooldownDays();
         $threshold = max(1, min(100, (float) $threshold));
         $cooldownDays = max(0, min(90, (int) $cooldownDays));
         $now = now();

@@ -6,6 +6,7 @@ use App\Http\Requests\Staff\Courses\StoreCourseRequest;
 use App\Http\Requests\Staff\Courses\UpdateCourseRequest;
 use App\Models\Course;
 use App\Services\ImageService;
+use App\Support\AttendanceAlertSettings;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,7 +48,7 @@ class StaffCourseController extends Controller
     public function create(): Response
     {
         return Inertia::render('Admin/Courses/Create', [
-            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
+            'globalThreshold' => AttendanceAlertSettings::lowThreshold(),
         ]);
     }
 
@@ -86,7 +87,7 @@ class StaffCourseController extends Controller
                     ? asset('storage/'.$course->photo)
                     : null,
             ],
-            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
+            'globalThreshold' => AttendanceAlertSettings::lowThreshold(),
         ]);
     }
 

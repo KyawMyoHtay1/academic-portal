@@ -16,7 +16,7 @@ class UpdateSettingsRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'email_announcements' => ['sometimes', 'boolean'],
             'email_messages' => ['sometimes', 'boolean'],
             'email_notifications' => ['sometimes', 'boolean'],
@@ -26,5 +26,18 @@ class UpdateSettingsRequest extends FormRequest
             'notify_grade_review' => ['sometimes', 'boolean'],
             'notify_fees' => ['sometimes', 'boolean'],
         ];
+
+        $role = (string) ($this->user()?->role ?? '');
+        $canManageAttendanceAlertDefaults = in_array($role, ['staff', 'admin'], true);
+
+        if ($canManageAttendanceAlertDefaults) {
+            $rules['attendance_low_threshold'] = ['sometimes', 'numeric', 'min:1', 'max:100'];
+            $rules['attendance_cooldown_days'] = ['sometimes', 'integer', 'min:0', 'max:90'];
+        } else {
+            $rules['attendance_low_threshold'] = ['prohibited'];
+            $rules['attendance_cooldown_days'] = ['prohibited'];
+        }
+
+        return $rules;
     }
 }

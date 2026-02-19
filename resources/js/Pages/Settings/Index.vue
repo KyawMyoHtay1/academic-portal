@@ -21,7 +21,19 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    attendanceAlerts: {
+        type: Object,
+        default: () => ({
+            low_threshold: 75,
+            cooldown_days: 7,
+            can_manage_defaults: false,
+        }),
+    },
 });
+
+const canManageAttendanceAlertDefaults = Boolean(
+    props.attendanceAlerts?.can_manage_defaults ?? false
+);
 
 const form = useForm({
     email_announcements: props.preferences.email_announcements ?? true,
@@ -32,6 +44,14 @@ const form = useForm({
     notify_grades: props.preferences.notify_grades ?? true,
     notify_grade_review: props.preferences.notify_grade_review ?? true,
     notify_fees: props.preferences.notify_fees ?? true,
+    ...(canManageAttendanceAlertDefaults
+        ? {
+              attendance_low_threshold:
+                  props.attendanceAlerts.low_threshold ?? 75,
+              attendance_cooldown_days:
+                  props.attendanceAlerts.cooldown_days ?? 7,
+          }
+        : {}),
 });
 
 const roleLabel = computed(() => {
@@ -221,6 +241,8 @@ const submit = () => {
                         <InputError class="mt-2" :message="form.errors.notify_grades" />
                         <InputError class="mt-2" :message="form.errors.notify_grade_review" />
                         <InputError class="mt-2" :message="form.errors.notify_fees" />
+                        <InputError class="mt-2" :message="form.errors.attendance_low_threshold" />
+                        <InputError class="mt-2" :message="form.errors.attendance_cooldown_days" />
 
                         <div class="mt-6 border-t border-slate-200 pt-6">
                             <h4 class="text-sm font-semibold text-slate-900">
@@ -319,6 +341,60 @@ const submit = () => {
                                         v-model:checked="form.notify_fees"
                                         class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
                                     />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="canManageAttendanceAlertDefaults"
+                            class="mt-6 border-t border-slate-200 pt-6"
+                        >
+                            <h4 class="text-sm font-semibold text-slate-900">
+                                Low-attendance alert defaults
+                            </h4>
+                            <p class="mt-1 text-sm text-slate-500">
+                                Set global defaults used by attendance reports and alert jobs.
+                            </p>
+
+                            <div class="mt-4 grid gap-4 md:grid-cols-2">
+                                <div class="rounded-lg border border-slate-200 bg-white p-4">
+                                    <InputLabel
+                                        for="attendance_low_threshold"
+                                        value="Default threshold (%)"
+                                        class="font-medium text-slate-900"
+                                    />
+                                    <input
+                                        id="attendance_low_threshold"
+                                        v-model.number="form.attendance_low_threshold"
+                                        type="number"
+                                        min="1"
+                                        max="100"
+                                        step="0.1"
+                                        class="mt-2 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                    />
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        Used when no course/subject threshold override is set.
+                                    </p>
+                                </div>
+
+                                <div class="rounded-lg border border-slate-200 bg-white p-4">
+                                    <InputLabel
+                                        for="attendance_cooldown_days"
+                                        value="Default cooldown (days)"
+                                        class="font-medium text-slate-900"
+                                    />
+                                    <input
+                                        id="attendance_cooldown_days"
+                                        v-model.number="form.attendance_cooldown_days"
+                                        type="number"
+                                        min="0"
+                                        max="90"
+                                        step="1"
+                                        class="mt-2 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                    />
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        Minimum wait before sending another low-attendance alert.
+                                    </p>
                                 </div>
                             </div>
                         </div>

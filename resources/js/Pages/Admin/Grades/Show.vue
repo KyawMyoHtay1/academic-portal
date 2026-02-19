@@ -31,6 +31,25 @@ const statusFilter = ref("pending");
 const selectedGradeIds = ref([]);
 const bulkAction = ref("approve");
 const bulkReason = ref("");
+const bulkReasonTemplate = ref("");
+const bulkReasonTemplates = [
+    {
+        value: "Score does not match grading rubric criteria.",
+        label: "Rubric mismatch",
+    },
+    {
+        value: "Evidence and remarks are incomplete for this score.",
+        label: "Missing evidence",
+    },
+    {
+        value: "Computation and final score are inconsistent.",
+        label: "Computation inconsistency",
+    },
+    {
+        value: "Please revise and resubmit with complete justification.",
+        label: "Resubmission required",
+    },
+];
 
 const statusTabs = [
     { key: "pending", label: "Pending" },
@@ -178,6 +197,7 @@ const submitBulkReview = () => {
         onSuccess: () => {
             selectedGradeIds.value = [];
             bulkReason.value = "";
+            bulkReasonTemplate.value = "";
         },
     });
 };
@@ -185,6 +205,19 @@ const submitBulkReview = () => {
 watch([statusFilter, searchQuery], () => {
     const visibleSet = new Set(visiblePendingGradeIds.value);
     selectedGradeIds.value = selectedGradeIds.value.filter((id) => visibleSet.has(id));
+});
+
+watch(bulkAction, (nextAction) => {
+    if (nextAction !== "reject") {
+        bulkReason.value = "";
+        bulkReasonTemplate.value = "";
+    }
+});
+
+watch(bulkReasonTemplate, (templateValue) => {
+    if (bulkAction.value === "reject" && templateValue) {
+        bulkReason.value = templateValue;
+    }
 });
 
 const badgeClass = (status) => {
@@ -441,6 +474,21 @@ const exportUrl = (format) =>
                             >
                                 <option value="approve">Approve selected</option>
                                 <option value="reject">Reject selected</option>
+                            </select>
+
+                            <select
+                                v-if="bulkAction === 'reject'"
+                                v-model="bulkReasonTemplate"
+                                class="rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy lg:w-64"
+                            >
+                                <option value="">Choose reason template (optional)</option>
+                                <option
+                                    v-for="template in bulkReasonTemplates"
+                                    :key="template.value"
+                                    :value="template.value"
+                                >
+                                    {{ template.label }}
+                                </option>
                             </select>
 
                             <input

@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Subject;
 use App\Models\User;
 use App\Services\ImageService;
+use App\Support\AttendanceAlertSettings;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -78,7 +79,7 @@ class StaffSubjectController extends Controller
 
         return Inertia::render('Admin/Subjects/Create', [
             'courses' => $courses,
-            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
+            'globalThreshold' => AttendanceAlertSettings::lowThreshold(),
         ]);
     }
 
@@ -122,7 +123,7 @@ class StaffSubjectController extends Controller
                     : null,
             ],
             'courses' => $courses,
-            'globalThreshold' => (float) config('attendance_alerts.low_threshold', 75),
+            'globalThreshold' => AttendanceAlertSettings::lowThreshold(),
         ]);
     }
 

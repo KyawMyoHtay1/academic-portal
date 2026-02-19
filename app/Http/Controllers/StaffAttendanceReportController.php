@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Support\AttendanceAlertSettings;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +23,7 @@ class StaffAttendanceReportController extends Controller
     public function index(Request $request): InertiaResponse
     {
         [$filters, $programmes, $intakeYears, $semesters, $courses, $subjects] = $this->resolveReportFilters($request);
-        $thresholdContext = $this->resolveThresholdContext($filters);
+        $thresholdContext = $this->resolveThresholdContext($filters, $courses, $subjects);
         $effectiveThreshold = $thresholdContext['value'];
 
         $attendanceScope = Attendance::query();
@@ -224,8 +225,8 @@ class StaffAttendanceReportController extends Controller
             ],
             'sessionDrilldown' => $sessionDrilldown,
             'defaults' => [
-                'threshold' => (float) config('attendance_alerts.low_threshold', 75),
-                'cooldown_days' => (int) config('attendance_alerts.cooldown_days', 7),
+                'threshold' => $this->defaultLowThreshold(),
+                'cooldown_days' => $this->defaultCooldownDays(),
             ],
             'thresholdContext' => $thresholdContext,
             'options' => [
@@ -405,8 +406,8 @@ class StaffAttendanceReportController extends Controller
      */
     private function resolveReportFilters(Request $request): array
     {
-        $defaultThreshold = (float) config('attendance_alerts.low_threshold', 75);
-        $defaultCooldown = (int) config('attendance_alerts.cooldown_days', 7);
+        $defaultThreshold = $this->defaultLowThreshold();
+        $defaultCooldown = $this->defaultCooldownDays();
         $threshold = (float) $request->input('threshold', $defaultThreshold);
         if ($threshold < 1 || $threshold > 100) {
             $threshold = $defaultThreshold;
@@ -495,12 +496,15 @@ class StaffAttendanceReportController extends Controller
 
         $courses = Course::query()
             ->orderBy('course_code')
-            ->get(['id', 'course_code', 'title'])
+            ->get(['id', 'course_code', 'title', 'attendance_threshold'])
             ->map(function (Course $course) {
                 return [
                     'id' => $course->id,
                     'course_code' => $course->course_code,
                     'title' => $course->title,
+                    'attendance_threshold' => $course->attendance_threshold !== null
+                        ? round((float) $course->attendance_threshold, 2)
+                        : null,
                 ];
             })
             ->values();
@@ -508,7 +512,7 @@ class StaffAttendanceReportController extends Controller
         $subjects = Subject::query()
             ->with('course:id,course_code')
             ->orderBy('subject_code')
-            ->get(['id', 'course_id', 'subject_code', 'title'])
+            ->get(['id', 'course_id', 'subject_code', 'title', 'attendance_threshold'])
             ->map(function (Subject $subject) {
                 return [
                     'id' => $subject->id,
@@ -516,6 +520,9 @@ class StaffAttendanceReportController extends Controller
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
                     'course_code' => $subject->course?->course_code,
+                    'attendance_threshold' => $subject->attendance_threshold !== null
+                        ? round((float) $subject->attendance_threshold, 2)
+                        : null,
                 ];
             })
             ->values();
@@ -555,33 +562,74 @@ class StaffAttendanceReportController extends Controller
 
     /**
      * @param  array<string, mixed>  $filters
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>  $courses
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>  $subjects
      * @return array{value: float, source: string, label: string}
      */
-    private function resolveThresholdContext(array $filters): array
+    private function resolveThresholdContext(array $filters, \Illuminate\Support\Collection $courses, \Illuminate\Support\Collection $subjects): array
     {
-        $baseThreshold = (float) ($filters['threshold'] ?? config('attendance_alerts.low_threshold', 75));
-        $courseThreshold = $filters['course_threshold'] !== null
-            ? (float) $filters['course_threshold']
-            : null;
-        $subjectThreshold = $filters['subject_threshold'] !== null
-            ? (float) $filters['subject_threshold']
-            : null;
+        $normalizeThreshold = static function (mixed $value): ?float {
+            if ($value === null || $value === '') {
+                return null;
+            }
+
+            $numeric = (float) $value;
+
+            if ($numeric < 1 || $numeric > 100) {
+                return null;
+            }
+
+            return round($numeric, 2);
+        };
+
+        $baseThreshold = $normalizeThreshold($filters['threshold'] ?? $this->defaultLowThreshold())
+            ?? $this->defaultLowThreshold();
+        $courseThreshold = $normalizeThreshold($filters['course_threshold'] ?? null);
+        $subjectThreshold = $normalizeThreshold($filters['subject_threshold'] ?? null);
         $hasCourse = ($filters['course_id'] ?? null) !== null;
         $hasSubject = ($filters['subject_id'] ?? null) !== null;
+        $selectedCourse = $hasCourse
+            ? $courses->firstWhere('id', (int) $filters['course_id'])
+            : null;
+        $selectedSubject = $hasSubject
+            ? $subjects->firstWhere('id', (int) $filters['subject_id'])
+            : null;
+        $configuredCourseThreshold = is_array($selectedCourse)
+            ? $normalizeThreshold($selectedCourse['attendance_threshold'] ?? null)
+            : null;
+        $configuredSubjectThreshold = is_array($selectedSubject)
+            ? $normalizeThreshold($selectedSubject['attendance_threshold'] ?? null)
+            : null;
 
         if ($hasSubject && $subjectThreshold !== null) {
             return [
                 'value' => $subjectThreshold,
-                'source' => 'subject',
-                'label' => 'subject',
+                'source' => 'subject_override',
+                'label' => 'subject override',
+            ];
+        }
+
+        if ($hasSubject && $configuredSubjectThreshold !== null) {
+            return [
+                'value' => $configuredSubjectThreshold,
+                'source' => 'subject_configured',
+                'label' => 'subject configured',
             ];
         }
 
         if ($hasCourse && $courseThreshold !== null) {
             return [
                 'value' => $courseThreshold,
-                'source' => 'course',
-                'label' => 'course',
+                'source' => 'course_override',
+                'label' => 'course override',
+            ];
+        }
+
+        if ($hasCourse && $configuredCourseThreshold !== null) {
+            return [
+                'value' => $configuredCourseThreshold,
+                'source' => 'course_configured',
+                'label' => 'course configured',
             ];
         }
 
@@ -760,5 +808,15 @@ class StaffAttendanceReportController extends Controller
             ],
             'records' => $records->all(),
         ];
+    }
+
+    private function defaultLowThreshold(): float
+    {
+        return AttendanceAlertSettings::lowThreshold();
+    }
+
+    private function defaultCooldownDays(): int
+    {
+        return AttendanceAlertSettings::cooldownDays();
     }
 }

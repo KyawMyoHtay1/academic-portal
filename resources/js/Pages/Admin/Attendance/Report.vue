@@ -132,6 +132,8 @@ const normalizedCourseThreshold = () =>
     normalizedScopedThreshold(courseThresholdFilter.value);
 const normalizedSubjectThreshold = () =>
     normalizedScopedThreshold(subjectThresholdFilter.value);
+const configuredThreshold = (rawValue) =>
+    normalizedScopedThreshold(rawValue);
 
 const subjectOptions = computed(() => {
     const allSubjects = props.options?.subjects ?? [];
@@ -144,13 +146,48 @@ const subjectOptions = computed(() => {
     );
 });
 
+const selectedCourseOption = computed(() => {
+    if (courseFilter.value === "all") {
+        return null;
+    }
+
+    return (
+        (props.options?.courses ?? []).find(
+            (course) => String(course.id) === String(courseFilter.value)
+        ) ?? null
+    );
+});
+
+const selectedSubjectOption = computed(() => {
+    if (subjectFilter.value === "all") {
+        return null;
+    }
+
+    return (
+        (props.options?.subjects ?? []).find(
+            (subject) => String(subject.id) === String(subjectFilter.value)
+        ) ?? null
+    );
+});
+
 const effectiveThreshold = computed(() => {
     const subjectValue = normalizedSubjectThreshold();
     if (subjectFilter.value !== "all" && subjectValue !== undefined) {
         return {
             value: subjectValue,
-            source: "subject",
-            label: "subject",
+            source: "subject_override",
+            label: "subject override",
+        };
+    }
+
+    const subjectConfigured = configuredThreshold(
+        selectedSubjectOption.value?.attendance_threshold
+    );
+    if (subjectFilter.value !== "all" && subjectConfigured !== undefined) {
+        return {
+            value: subjectConfigured,
+            source: "subject_configured",
+            label: "subject configured",
         };
     }
 
@@ -158,8 +195,19 @@ const effectiveThreshold = computed(() => {
     if (courseFilter.value !== "all" && courseValue !== undefined) {
         return {
             value: courseValue,
-            source: "course",
-            label: "course",
+            source: "course_override",
+            label: "course override",
+        };
+    }
+
+    const courseConfigured = configuredThreshold(
+        selectedCourseOption.value?.attendance_threshold
+    );
+    if (courseFilter.value !== "all" && courseConfigured !== undefined) {
+        return {
+            value: courseConfigured,
+            source: "course_configured",
+            label: "course configured",
         };
     }
 
