@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -203,6 +204,7 @@ class StaffAttendanceReportController extends Controller
 
         $trendWeekly = $this->buildWeeklyTrend($filters);
         $trendMonthly = $this->buildMonthlyTrend($filters);
+        $sessionDrilldown = $this->buildSessionDrilldown($filters);
 
         return Inertia::render('Admin/Attendance/Report', [
             'overall' => [
@@ -220,6 +222,7 @@ class StaffAttendanceReportController extends Controller
                 'weekly' => $trendWeekly,
                 'monthly' => $trendMonthly,
             ],
+            'sessionDrilldown' => $sessionDrilldown,
             'defaults' => [
                 'threshold' => (float) config('attendance_alerts.low_threshold', 75),
                 'cooldown_days' => (int) config('attendance_alerts.cooldown_days', 7),
@@ -416,11 +419,15 @@ class StaffAttendanceReportController extends Controller
 
         $dateFrom = trim((string) $request->input('date_from', ''));
         $dateTo = trim((string) $request->input('date_to', ''));
+        $sessionDate = trim((string) $request->input('session_date', ''));
         if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
             $dateFrom = '';
         }
         if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
             $dateTo = '';
+        }
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $sessionDate)) {
+            $sessionDate = '';
         }
         if ($dateFrom !== '' && $dateTo !== '' && $dateFrom > $dateTo) {
             [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
@@ -455,6 +462,7 @@ class StaffAttendanceReportController extends Controller
             'subject_id' => $subjectId,
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
+            'session_date' => $sessionDate,
             'threshold' => round($threshold, 2),
             'course_threshold' => $courseThreshold !== null ? round($courseThreshold, 2) : null,
             'subject_threshold' => $subjectThreshold !== null ? round($subjectThreshold, 2) : null,
@@ -664,5 +672,93 @@ class StaffAttendanceReportController extends Controller
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    private function buildSessionDrilldown(array $filters): array
+    {
+        $sessionRows = Attendance::query()
+            ->select(
+                DB::raw('DATE(`date`) as attendance_date'),
+                DB::raw('COUNT(*) as total_count'),
+                DB::raw("SUM(CASE WHEN `status` = 'present' THEN 1 ELSE 0 END) as present_count")
+            )
+            ->tap(function ($query) use ($filters) {
+                $this->applyAttendanceFilters($query, $filters);
+            })
+            ->groupBy('attendance_date')
+            ->orderByDesc('attendance_date')
+            ->limit(60)
+            ->get()
+            ->map(function ($row) {
+                $date = (string) ($row->attendance_date ?? '');
+                $total = (int) ($row->total_count ?? 0);
+                $present = (int) ($row->present_count ?? 0);
+
+                return [
+                    'date' => $date,
+                    'total' => $total,
+                    'present' => $present,
+                    'absent' => max($total - $present, 0),
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+                ];
+            })
+            ->values();
+
+        $selectedDate = '';
+        if ($sessionRows->isNotEmpty()) {
+            $requestedDate = trim((string) ($filters['session_date'] ?? ''));
+            $selectedDate = $sessionRows->pluck('date')->contains($requestedDate)
+                ? $requestedDate
+                : (string) ($sessionRows->first()['date'] ?? '');
+        }
+
+        $records = collect();
+        if ($selectedDate !== '') {
+            $records = Attendance::query()
+                ->with(['student:id,student_no,full_name,programme', 'subject.course:id,course_code'])
+                ->tap(function ($query) use ($filters) {
+                    $this->applyAttendanceFilters($query, $filters);
+                })
+                ->whereDate('date', $selectedDate)
+                ->orderBy('status')
+                ->orderBy('student_id')
+                ->get()
+                ->map(function ($attendance) {
+                    $student = $attendance->student;
+                    $subject = $attendance->subject;
+                    $course = $subject?->course;
+
+                    return [
+                        'id' => $attendance->id,
+                        'student_no' => $student?->student_no ?? 'N/A',
+                        'student_name' => $student?->full_name ?? 'N/A',
+                        'programme' => $student?->programme ?? 'N/A',
+                        'subject_code' => $subject?->subject_code ?? 'N/A',
+                        'course_code' => $course?->course_code ?? 'N/A',
+                        'status' => (string) ($attendance->status ?? 'absent'),
+                    ];
+                })
+                ->values();
+        }
+
+        $total = $records->count();
+        $present = $records->where('status', 'present')->count();
+        $absent = $records->where('status', 'absent')->count();
+
+        return [
+            'sessions' => $sessionRows->all(),
+            'selected_date' => $selectedDate !== '' ? $selectedDate : null,
+            'summary' => [
+                'total' => $total,
+                'present' => $present,
+                'absent' => $absent,
+                'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+            ],
+            'records' => $records->all(),
+        ];
     }
 }

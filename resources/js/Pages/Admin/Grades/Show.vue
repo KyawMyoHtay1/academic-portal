@@ -2,8 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-import debounce from "lodash/debounce";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     subject: {
@@ -25,38 +24,19 @@ const props = defineProps({
     },
 });
 
-const queryParam = (key) => {
-    if (typeof window === "undefined") return null;
-    return new URLSearchParams(window.location.search).get(key);
-};
-
 const rejectReason = ref({});
+const searchQuery = ref("");
+const statusFilter = ref("pending");
+
 const selectedGradeIds = ref([]);
 const bulkAction = ref("approve");
 const bulkReason = ref("");
-const bulkReasonTemplate = ref("");
 
 const statusTabs = [
     { key: "pending", label: "Pending" },
     { key: "approved", label: "Approved" },
     { key: "rejected", label: "Rejected" },
     { key: "all", label: "All Reviewed" },
-];
-
-const allowedStatusFilters = new Set(statusTabs.map((tab) => tab.key));
-const searchInput = ref(queryParam("search") ?? "");
-const searchQuery = ref(searchInput.value.trim());
-const statusFilter = ref(
-    allowedStatusFilters.has(queryParam("status") || "")
-        ? queryParam("status")
-        : "pending"
-);
-
-const bulkReasonTemplates = [
-    "Insufficient grading evidence. Please update assignment marks/comments first.",
-    "Score mismatch with assignment weighting. Recheck computed vs submitted grade.",
-    "Submitted score requires clearer justification before approval.",
-    "Grade entry appears incomplete; please provide final validated score and details.",
 ];
 
 const approveForm = useForm({});
@@ -198,7 +178,6 @@ const submitBulkReview = () => {
         onSuccess: () => {
             selectedGradeIds.value = [];
             bulkReason.value = "";
-            bulkReasonTemplate.value = "";
         },
     });
 };
@@ -206,7 +185,6 @@ const submitBulkReview = () => {
 watch([statusFilter, searchQuery], () => {
     const visibleSet = new Set(visiblePendingGradeIds.value);
     selectedGradeIds.value = selectedGradeIds.value.filter((id) => visibleSet.has(id));
-    persistFiltersToUrl();
 });
 
 const badgeClass = (status) => {
@@ -221,100 +199,8 @@ const exportUrl = (format) =>
         subject: props.subject.id,
         format,
         status: statusFilter.value,
-        search: searchQuery.value.trim() || undefined,
+        search: searchQuery.value || undefined,
     });
-
-const hasActiveFilters = computed(
-    () => statusFilter.value !== "pending" || searchQuery.value.trim() !== ""
-);
-
-const activeFilterChips = computed(() => {
-    const chips = [];
-
-    if (statusFilter.value !== "pending") {
-        const statusLabel =
-            statusTabs.find((tab) => tab.key === statusFilter.value)?.label ??
-            statusFilter.value;
-        chips.push({
-            key: "status",
-            label: `Status: ${statusLabel}`,
-        });
-    }
-
-    if (searchQuery.value.trim() !== "") {
-        chips.push({
-            key: "search",
-            label: `Search: ${searchQuery.value.trim()}`,
-        });
-    }
-
-    return chips;
-});
-
-const clearFilters = () => {
-    statusFilter.value = "pending";
-    searchInput.value = "";
-    searchQuery.value = "";
-};
-
-const removeFilterChip = (key) => {
-    if (key === "status") {
-        statusFilter.value = "pending";
-        return;
-    }
-
-    if (key === "search") {
-        searchInput.value = "";
-        searchQuery.value = "";
-    }
-};
-
-const applySearch = debounce(() => {
-    searchQuery.value = searchInput.value.trim();
-}, 250);
-
-const persistFiltersToUrl = debounce(() => {
-    if (typeof window === "undefined") return;
-
-    const url = new URL(window.location.href);
-    const params = url.searchParams;
-
-    if (statusFilter.value !== "pending") {
-        params.set("status", statusFilter.value);
-    } else {
-        params.delete("status");
-    }
-
-    if (searchQuery.value.trim() !== "") {
-        params.set("search", searchQuery.value.trim());
-    } else {
-        params.delete("search");
-    }
-
-    const queryString = params.toString();
-    window.history.replaceState(
-        {},
-        "",
-        queryString ? `${url.pathname}?${queryString}` : url.pathname
-    );
-}, 200);
-
-watch(searchInput, () => {
-    applySearch();
-});
-
-watch(bulkReasonTemplate, (template) => {
-    if (!template) {
-        return;
-    }
-
-    bulkReason.value = template;
-});
-
-onBeforeUnmount(() => {
-    applySearch.cancel();
-    persistFiltersToUrl.cancel();
-});
 </script>
 
 <template>
@@ -493,61 +379,18 @@ onBeforeUnmount(() => {
                                 </button>
                             </div>
                         </div>
-                        <div class="w-full space-y-2 sm:w-80">
-                            <div class="flex items-center justify-between gap-2">
-                                <label
-                                    class="block text-xs font-medium text-slate-600"
-                                    >Search Students</label
-                                >
-                                <button
-                                    v-if="hasActiveFilters"
-                                    type="button"
-                                    class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
-                                    @click="clearFilters"
-                                >
-                                    Clear all filters
-                                </button>
-                            </div>
-                            <div class="relative">
-                                <input
-                                    v-model="searchInput"
-                                    type="search"
-                                    placeholder="Search by student name or number..."
-                                    class="mt-1 block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
-                                />
-                                <button
-                                    v-if="searchInput"
-                                    type="button"
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                    @click="
-                                        searchInput = '';
-                                        searchQuery = '';
-                                    "
-                                >
-                                    <span class="sr-only">Clear</span>
-                                    x
-                                </button>
-                            </div>
+                        <div class="w-full sm:w-80">
+                            <label
+                                class="block text-xs font-medium text-slate-600"
+                                >Search Students</label
+                            >
+                            <input
+                                v-model="searchQuery"
+                                type="search"
+                                placeholder="Search by student name or number..."
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
                         </div>
-                    </div>
-
-                    <div
-                        v-if="activeFilterChips.length > 0"
-                        class="mb-4 flex flex-wrap items-center gap-2"
-                    >
-                        <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Active filters:
-                        </span>
-                        <button
-                            v-for="chip in activeFilterChips"
-                            :key="chip.key"
-                            type="button"
-                            class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200"
-                            @click="removeFilterChip(chip.key)"
-                        >
-                            {{ chip.label }}
-                            <span aria-hidden="true">x</span>
-                        </button>
                     </div>
 
                     <div
@@ -607,21 +450,6 @@ onBeforeUnmount(() => {
                                 placeholder="Shared rejection reason (required)"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy lg:max-w-md"
                             />
-
-                            <select
-                                v-if="bulkAction === 'reject'"
-                                v-model="bulkReasonTemplate"
-                                class="rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy lg:w-80"
-                            >
-                                <option value="">Pick a reason template</option>
-                                <option
-                                    v-for="template in bulkReasonTemplates"
-                                    :key="template"
-                                    :value="template"
-                                >
-                                    {{ template }}
-                                </option>
-                            </select>
 
                             <div class="flex items-center gap-2">
                                 <button

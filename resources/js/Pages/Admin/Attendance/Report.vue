@@ -38,6 +38,20 @@ const props = defineProps({
             monthly: [],
         }),
     },
+    sessionDrilldown: {
+        type: Object,
+        default: () => ({
+            sessions: [],
+            selected_date: null,
+            summary: {
+                total: 0,
+                present: 0,
+                absent: 0,
+                rate: 0,
+            },
+            records: [],
+        }),
+    },
     defaults: {
         type: Object,
         default: () => ({
@@ -69,6 +83,7 @@ const searchStudents = ref("");
 const searchCourses = ref("");
 const searchSubjects = ref("");
 const searchRecent = ref("");
+const searchSessionRecords = ref("");
 const programmeFilter = ref(props.filters?.programme || "all");
 const intakeYearFilter = ref(props.filters?.intake_year || "all");
 const semesterFilter = ref(props.filters?.semester || "all");
@@ -92,6 +107,11 @@ const subjectThresholdFilter = ref(
 const alertCooldownDays = ref(Number(props.filters?.cooldown_days ?? defaultCooldownDays));
 const trendMode = ref(props.filters?.trend_mode || "weekly");
 const sendingAlerts = ref(false);
+const selectedSessionDate = ref(
+    props.filters?.session_date ||
+        props.sessionDrilldown?.selected_date ||
+        ""
+);
 
 const normalizedThreshold = () => {
     const value = Number(thresholdFilter.value);
@@ -190,6 +210,7 @@ const applyFilters = () => {
                     : undefined,
             date_from: dateFrom.value || undefined,
             date_to: dateTo.value || undefined,
+            session_date: selectedSessionDate.value || undefined,
             threshold: normalizedThreshold(),
             course_threshold: normalizedCourseThreshold(),
             subject_threshold: normalizedSubjectThreshold(),
@@ -212,6 +233,7 @@ const clearReportFilters = () => {
     subjectFilter.value = "all";
     dateFrom.value = "";
     dateTo.value = "";
+    selectedSessionDate.value = "";
     thresholdFilter.value = defaultThreshold;
     courseThresholdFilter.value = "";
     subjectThresholdFilter.value = "";
@@ -270,6 +292,13 @@ watch(courseFilter, () => {
         subjectFilter.value = "all";
     }
 });
+
+watch(
+    () => props.sessionDrilldown?.selected_date,
+    (nextDate) => {
+        selectedSessionDate.value = nextDate ?? "";
+    }
+);
 
 watch([programmeFilter, intakeYearFilter, semesterFilter, courseFilter, subjectFilter], () => {
     applyFilters();
@@ -332,6 +361,35 @@ const filteredRecent = computed(() => {
         return hay.includes(q);
     });
 });
+
+const sessionDates = computed(() => props.sessionDrilldown?.sessions ?? []);
+const sessionSummary = computed(() => {
+    const fallback = { total: 0, present: 0, absent: 0, rate: 0 };
+    return props.sessionDrilldown?.summary ?? fallback;
+});
+const sessionRecords = computed(() => props.sessionDrilldown?.records ?? []);
+const filteredSessionRecords = computed(() => {
+    const q = searchSessionRecords.value.trim().toLowerCase();
+    const rows = sessionRecords.value;
+    if (!q) return rows;
+
+    return rows.filter((row) => {
+        const haystack = `${row.student_no} ${row.student_name} ${row.programme} ${row.subject_code} ${row.course_code} ${row.status}`.toLowerCase();
+        return haystack.includes(q);
+    });
+});
+const absentInSession = computed(() =>
+    filteredSessionRecords.value.filter((row) => row.status === "absent")
+);
+
+const selectSessionDate = (date) => {
+    if (!date || selectedSessionDate.value === date) {
+        return;
+    }
+
+    selectedSessionDate.value = date;
+    applyFilters();
+};
 </script>
 
 <template>
@@ -1010,6 +1068,161 @@ const filteredRecent = computed(() => {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Per-session Drilldown -->
+                <div class="mb-6 portal-card p-6">
+                    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">
+                                Session Drilldown
+                            </h3>
+                            <p class="mt-1 text-sm text-slate-600">
+                                Pick a session date to inspect who was absent for that specific day.
+                            </p>
+                        </div>
+                        <div class="w-full sm:w-80">
+                            <label class="block text-xs font-medium text-slate-600">Search selected session</label>
+                            <input
+                                v-model="searchSessionRecords"
+                                type="search"
+                                placeholder="Search by student, subject, status..."
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            />
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="sessionDates.length === 0"
+                        class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500"
+                    >
+                        No sessions available for the current filter range.
+                    </div>
+
+                    <div v-else class="grid gap-4 lg:grid-cols-[320px,1fr]">
+                        <div class="max-h-[420px] space-y-2 overflow-auto rounded-lg border border-slate-200 bg-slate-50 p-2">
+                            <button
+                                v-for="session in sessionDates"
+                                :key="session.date"
+                                type="button"
+                                class="w-full rounded-md border px-3 py-2 text-left transition"
+                                :class="
+                                    selectedSessionDate === session.date
+                                        ? 'border-portal-navy bg-indigo-50 ring-1 ring-portal-navy'
+                                        : 'border-slate-200 bg-white hover:bg-slate-50'
+                                "
+                                @click="selectSessionDate(session.date)"
+                            >
+                                <p class="text-sm font-semibold text-slate-900">
+                                    {{ session.date }}
+                                </p>
+                                <p class="mt-1 text-[11px] text-slate-600">
+                                    {{ session.present }} present / {{ session.absent }} absent / {{ session.total }} total
+                                </p>
+                                <p class="mt-1 text-[11px] font-semibold text-slate-700">
+                                    {{ session.rate }}% attendance
+                                </p>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="grid gap-3 sm:grid-cols-4">
+                                <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Date</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-900">
+                                        {{ selectedSessionDate || "-" }}
+                                    </p>
+                                </div>
+                                <div class="rounded-md border border-blue-200 bg-blue-50 px-3 py-2">
+                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-blue-700">Total</p>
+                                    <p class="mt-1 text-sm font-semibold text-blue-900">
+                                        {{ sessionSummary.total }}
+                                    </p>
+                                </div>
+                                <div class="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2">
+                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">Present</p>
+                                    <p class="mt-1 text-sm font-semibold text-emerald-900">
+                                        {{ sessionSummary.present }}
+                                    </p>
+                                </div>
+                                <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2">
+                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-red-700">Absent</p>
+                                    <p class="mt-1 text-sm font-semibold text-red-900">
+                                        {{ sessionSummary.absent }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Student
+                                            </th>
+                                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Programme
+                                            </th>
+                                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Subject
+                                            </th>
+                                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Course
+                                            </th>
+                                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                                Status
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 bg-white">
+                                        <tr
+                                            v-for="record in filteredSessionRecords"
+                                            :key="record.id"
+                                            class="hover:bg-slate-50"
+                                        >
+                                            <td class="px-4 py-3 text-sm text-slate-700">
+                                                {{ record.student_name }} ({{ record.student_no }})
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-slate-700">
+                                                {{ record.programme }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-slate-700">
+                                                {{ record.subject_code }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-slate-700">
+                                                {{ record.course_code }}
+                                            </td>
+                                            <td class="px-4 py-3 text-center text-sm">
+                                                <span
+                                                    class="inline-flex rounded-full px-2 py-1 text-xs font-semibold capitalize"
+                                                    :class="
+                                                        record.status === 'present'
+                                                            ? 'bg-emerald-100 text-emerald-800'
+                                                            : 'bg-red-100 text-red-800'
+                                                    "
+                                                >
+                                                    {{ record.status }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="filteredSessionRecords.length === 0">
+                                            <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                {{ searchSessionRecords.trim() ? "No records match your search." : "No records found for this session." }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div
+                                v-if="selectedSessionDate && absentInSession.length > 0"
+                                class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800"
+                            >
+                                <span class="font-semibold">Absent students in selected session:</span>
+                                {{ absentInSession.map((row) => `${row.student_name} (${row.student_no})`).join(", ") }}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
