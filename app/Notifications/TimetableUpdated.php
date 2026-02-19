@@ -15,6 +15,11 @@ class TimetableUpdated extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
+        $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_timetable'] ?? true) === false) {
+            return [];
+        }
+
         return ['database'];
     }
 
@@ -32,6 +37,29 @@ class TimetableUpdated extends Notification implements ShouldQueue
                 $this->timetable->end_time,
                 $this->action
             ),
+            'timetable_id' => $this->timetable->id,
+            'subject_id' => $this->timetable->subject_id,
+            'course_id' => $this->timetable->subject?->course_id,
+            'url' => $this->resolveUrl($notifiable),
         ];
+    }
+
+    private function resolveUrl(object $notifiable): ?string
+    {
+        $role = $notifiable->role ?? null;
+
+        if ($role === 'teacher') {
+            return route('teacher.timetable.index');
+        }
+
+        if ($role === 'student') {
+            return route('student.timetable.index');
+        }
+
+        if (in_array($role, ['staff', 'admin'], true)) {
+            return route('admin.timetables.index');
+        }
+
+        return null;
     }
 }

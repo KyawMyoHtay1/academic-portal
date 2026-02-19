@@ -21,6 +21,11 @@ class GradeReviewRequested extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
+        $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_grade_review'] ?? true) === false) {
+            return [];
+        }
+
         return ['database'];
     }
 

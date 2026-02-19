@@ -15,6 +15,11 @@ class FeeStatusUpdated extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
+        $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_fees'] ?? true) === false) {
+            return [];
+        }
+
         return ['database'];
     }
 
@@ -29,6 +34,23 @@ class FeeStatusUpdated extends Notification implements ShouldQueue
                 $this->fee->due_date->format('Y-m-d'),
                 ucfirst($this->fee->status)
             ),
+            'fee_id' => $this->fee->id,
+            'url' => $this->resolveUrl($notifiable),
         ];
+    }
+
+    private function resolveUrl(object $notifiable): ?string
+    {
+        $role = $notifiable->role ?? null;
+
+        if ($role === 'student') {
+            return route('student.fees.index');
+        }
+
+        if (in_array($role, ['staff', 'admin'], true)) {
+            return route('admin.fees.index');
+        }
+
+        return null;
     }
 }

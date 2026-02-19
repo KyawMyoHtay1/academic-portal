@@ -15,6 +15,11 @@ class GradePublished extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
+        $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_grades'] ?? true) === false) {
+            return [];
+        }
+
         return ['database'];
     }
 
@@ -29,6 +34,28 @@ class GradePublished extends Notification implements ShouldQueue
                 $this->grade->course->course_code,
                 $this->grade->score ?? 'N/A'
             ),
+            'grade_id' => $this->grade->id,
+            'subject_id' => $this->grade->subject_id,
+            'url' => $this->resolveUrl($notifiable),
         ];
+    }
+
+    private function resolveUrl(object $notifiable): ?string
+    {
+        $role = $notifiable->role ?? null;
+
+        if (in_array($role, ['staff', 'admin'], true)) {
+            return route('admin.grades.index');
+        }
+
+        if ($role === 'teacher' && $this->grade->subject_id) {
+            return route('teacher.grades.show', $this->grade->subject_id);
+        }
+
+        if ($role === 'student') {
+            return route('student.grades.index');
+        }
+
+        return null;
     }
 }

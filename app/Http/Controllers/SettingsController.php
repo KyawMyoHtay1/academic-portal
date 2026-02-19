@@ -18,6 +18,11 @@ class SettingsController extends Controller
         'email_announcements' => true,
         'email_messages' => true,
         'email_notifications' => true,
+        'notify_timetable' => true,
+        'notify_attendance' => true,
+        'notify_grades' => true,
+        'notify_grade_review' => true,
+        'notify_fees' => true,
     ];
 
     /**

@@ -20,7 +20,17 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_attendance'] ?? true) === false) {
+            return [];
+        }
+
+        $channels = ['database'];
+        if (($preferences['email_notifications'] ?? true) === true) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -53,6 +63,7 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
             'rate' => round($this->rate, 2),
             'threshold' => round($this->threshold, 2),
             'student_id' => $this->student->id,
+            'url' => route('student.attendance.index'),
         ];
     }
 }

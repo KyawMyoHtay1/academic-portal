@@ -248,15 +248,24 @@ const iconClass = (type) => {
                                 </div>
                             </div>
 
-                            <button
-                                v-if="!notification.read_at"
-                                type="button"
-                                @click="markAsRead(notification.id)"
-                                class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
-                            >
-                                Mark as read
-                            </button>
-                            <span v-else class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">Read</span>
+                            <div class="flex items-center gap-2">
+                                <a
+                                    v-if="notification.url"
+                                    :href="notification.url"
+                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                                >
+                                    Open
+                                </a>
+                                <button
+                                    v-if="!notification.read_at"
+                                    type="button"
+                                    @click="markAsRead(notification.id)"
+                                    class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
+                                >
+                                    Mark as read
+                                </button>
+                                <span v-else class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">Read</span>
+                            </div>
                         </div>
                     </div>
                 </div>

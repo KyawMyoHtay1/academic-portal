@@ -15,6 +15,11 @@ class AttendanceAlert extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
+        $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_attendance'] ?? true) === false) {
+            return [];
+        }
+
         return ['database'];
     }
 
@@ -30,6 +35,29 @@ class AttendanceAlert extends Notification implements ShouldQueue
                 $this->attendance->date->format('Y-m-d'),
                 ucfirst($this->attendance->status)
             ),
+            'attendance_id' => $this->attendance->id,
+            'subject_id' => $this->attendance->subject_id,
+            'student_id' => $this->attendance->student_id,
+            'url' => $this->resolveUrl($notifiable),
         ];
+    }
+
+    private function resolveUrl(object $notifiable): ?string
+    {
+        $role = $notifiable->role ?? null;
+
+        if ($role === 'student') {
+            return route('student.attendance.index');
+        }
+
+        if ($role === 'teacher') {
+            return route('teacher.attendance.index');
+        }
+
+        if (in_array($role, ['staff', 'admin'], true)) {
+            return route('admin.attendance.report');
+        }
+
+        return null;
     }
 }

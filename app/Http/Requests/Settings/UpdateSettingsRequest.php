@@ -20,6 +20,11 @@ class UpdateSettingsRequest extends FormRequest
             'email_announcements' => ['sometimes', 'boolean'],
             'email_messages' => ['sometimes', 'boolean'],
             'email_notifications' => ['sometimes', 'boolean'],
+            'notify_timetable' => ['sometimes', 'boolean'],
+            'notify_attendance' => ['sometimes', 'boolean'],
+            'notify_grades' => ['sometimes', 'boolean'],
+            'notify_grade_review' => ['sometimes', 'boolean'],
+            'notify_fees' => ['sometimes', 'boolean'],
         ];
     }
 }

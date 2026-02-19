@@ -27,6 +27,11 @@ const form = useForm({
     email_announcements: props.preferences.email_announcements ?? true,
     email_messages: props.preferences.email_messages ?? true,
     email_notifications: props.preferences.email_notifications ?? true,
+    notify_timetable: props.preferences.notify_timetable ?? true,
+    notify_attendance: props.preferences.notify_attendance ?? true,
+    notify_grades: props.preferences.notify_grades ?? true,
+    notify_grade_review: props.preferences.notify_grade_review ?? true,
+    notify_fees: props.preferences.notify_fees ?? true,
 });
 
 const roleLabel = computed(() => {
@@ -40,7 +45,6 @@ const roleLabel = computed(() => {
 const submit = () => {
     form.patch(route("settings.update"), {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
     });
 };
 </script>
@@ -212,6 +216,113 @@ const submit = () => {
                         <InputError class="mt-2" :message="form.errors.email_announcements" />
                         <InputError class="mt-2" :message="form.errors.email_messages" />
                         <InputError class="mt-2" :message="form.errors.email_notifications" />
+                        <InputError class="mt-2" :message="form.errors.notify_timetable" />
+                        <InputError class="mt-2" :message="form.errors.notify_attendance" />
+                        <InputError class="mt-2" :message="form.errors.notify_grades" />
+                        <InputError class="mt-2" :message="form.errors.notify_grade_review" />
+                        <InputError class="mt-2" :message="form.errors.notify_fees" />
+
+                        <div class="mt-6 border-t border-slate-200 pt-6">
+                            <h4 class="text-sm font-semibold text-slate-900">
+                                In-app notification categories
+                            </h4>
+                            <p class="mt-1 text-sm text-slate-500">
+                                Control which modules create alerts in your notification center.
+                            </p>
+
+                            <div class="mt-4 space-y-4">
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_timetable"
+                                            value="Timetable updates"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            Changes to schedule entries and timetable updates.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_timetable"
+                                        v-model:checked="form.notify_timetable"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_attendance"
+                                            value="Attendance alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            Attendance recording and low-attendance warnings.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_attendance"
+                                        v-model:checked="form.notify_attendance"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_grades"
+                                            value="Grade updates"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            Published grade changes for your records.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_grades"
+                                        v-model:checked="form.notify_grades"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_grade_review"
+                                            value="Grade review workflow"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            Grade review requests and review outcomes.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_grade_review"
+                                        v-model:checked="form.notify_grade_review"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_fees"
+                                            value="Fee alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            Fee status updates and overdue reminders.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_fees"
+                                        v-model:checked="form.notify_fees"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mt-6 flex items-center gap-4">
                             <PrimaryButton :disabled="form.processing">
                                 Save preferences
