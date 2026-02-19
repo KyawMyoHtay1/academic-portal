@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
     courses: {
@@ -23,9 +24,14 @@ const props = defineProps({
     },
 });
 
-const searchTerm = ref("");
-const semesterFilter = ref("all");
-const showOnlyGraded = ref(false);
+const urlParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+);
+
+const searchInput = ref(urlParams.get("search") ?? "");
+const searchTerm = ref(searchInput.value.trim());
+const semesterFilter = ref(urlParams.get("semester") ?? "all");
+const showOnlyGraded = ref(urlParams.get("graded_only") === "1");
 const expandedSubjects = ref(new Set());
 
 const toggleSubjectExpansion = (subjectId) => {
@@ -47,6 +53,19 @@ const semesters = computed(() => {
 
     return Array.from(set).sort();
 });
+
+watch(
+    semesters,
+    (options) => {
+        if (
+            semesterFilter.value !== "all" &&
+            !options.includes(String(semesterFilter.value))
+        ) {
+            semesterFilter.value = "all";
+        }
+    },
+    { immediate: true }
+);
 
 const filteredCourses = computed(() => {
     return props.courses
@@ -90,7 +109,7 @@ const filteredCourses = computed(() => {
         .filter((course) => {
             if (
                 semesterFilter.value !== "all" &&
-                course.semester !== semesterFilter.value
+                String(course.semester ?? "") !== String(semesterFilter.value)
             ) {
                 return false;
             }
@@ -101,6 +120,103 @@ const filteredCourses = computed(() => {
 
             return true;
         });
+});
+
+const hasActiveFilters = computed(
+    () =>
+        searchTerm.value.trim() !== "" ||
+        semesterFilter.value !== "all" ||
+        showOnlyGraded.value
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+    if (searchTerm.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${searchTerm.value.trim()}`,
+        });
+    }
+    if (semesterFilter.value !== "all") {
+        chips.push({
+            key: "semester",
+            label: `Semester: ${semesterFilter.value}`,
+        });
+    }
+    if (showOnlyGraded.value) {
+        chips.push({
+            key: "graded_only",
+            label: "Only graded",
+        });
+    }
+
+    return chips;
+});
+
+const clearFilters = () => {
+    searchInput.value = "";
+    searchTerm.value = "";
+    semesterFilter.value = "all";
+    showOnlyGraded.value = false;
+};
+
+const removeFilterChip = (key) => {
+    if (key === "search") {
+        searchInput.value = "";
+        searchTerm.value = "";
+        return;
+    }
+    if (key === "semester") {
+        semesterFilter.value = "all";
+        return;
+    }
+    if (key === "graded_only") {
+        showOnlyGraded.value = false;
+    }
+};
+
+const applySearch = debounce(() => {
+    searchTerm.value = searchInput.value.trim();
+}, 300);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    const nextParams = new URLSearchParams();
+    if (searchTerm.value.trim() !== "") {
+        nextParams.set("search", searchTerm.value.trim());
+    }
+    if (semesterFilter.value !== "all") {
+        nextParams.set("semester", String(semesterFilter.value));
+    }
+    if (showOnlyGraded.value) {
+        nextParams.set("graded_only", "1");
+    }
+
+    const queryString = nextParams.toString();
+    const targetUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}`;
+    window.history.replaceState(window.history.state, "", targetUrl);
+}, 300);
+
+watch(
+    () => searchInput.value,
+    () => {
+        applySearch();
+    }
+);
+
+watch(
+    () => [searchTerm.value, semesterFilter.value, showOnlyGraded.value],
+    () => {
+        persistFiltersToUrl();
+    }
+);
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
 });
 
 const gradeSummary = computed(() => {
@@ -486,11 +602,23 @@ const getLetterGrade = (score) => {
                                     </div>
                                     <input
                                         id="grades-search"
-                                        v-model="searchTerm"
+                                        v-model="searchInput"
                                         type="search"
-                                        class="block w-full rounded-md border-slate-300 pl-9 pr-3 py-2 text-sm placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500"
+                                        class="block w-full rounded-md border-slate-300 py-2 pl-9 pr-9 text-sm placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500"
                                         placeholder="Search by course or subject name / code"
                                     />
+                                    <button
+                                        v-if="searchInput"
+                                        type="button"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                        @click="
+                                            searchInput = '';
+                                            searchTerm = '';
+                                        "
+                                    >
+                                        <span class="sr-only">Clear search</span>
+                                        x
+                                    </button>
                                 </div>
                             </div>
 
@@ -532,7 +660,35 @@ const getLetterGrade = (score) => {
                                     />
                                     Show only graded subjects
                                 </label>
+                                <button
+                                    v-if="hasActiveFilters"
+                                    type="button"
+                                    class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                    @click="clearFilters"
+                                >
+                                    Clear all filters
+                                </button>
                             </div>
+                        </div>
+
+                        <div
+                            v-if="activeFilterChips.length > 0"
+                            class="mt-2 flex flex-wrap items-center gap-2"
+                        >
+                            <span
+                                v-for="chip in activeFilterChips"
+                                :key="chip.key"
+                                class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                            >
+                                {{ chip.label }}
+                                <button
+                                    type="button"
+                                    class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                    @click="removeFilterChip(chip.key)"
+                                >
+                                    x
+                                </button>
+                            </span>
                         </div>
 
                         <div

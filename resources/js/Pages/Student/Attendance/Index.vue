@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
     overall: {
@@ -35,10 +36,19 @@ const props = defineProps({
     },
 });
 
-const searchCourses = ref("");
-const searchSubjects = ref("");
-const searchRecent = ref("");
-const recentStatus = ref("all");
+const urlParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+);
+
+const parseChoice = (value, allowed, fallback) =>
+    allowed.includes(value) ? value : fallback;
+
+const searchCourses = ref(urlParams.get("course_q") ?? "");
+const searchSubjects = ref(urlParams.get("subject_q") ?? "");
+const searchRecent = ref(urlParams.get("recent_q") ?? "");
+const recentStatus = ref(
+    parseChoice(urlParams.get("recent_status"), ["all", "present", "absent"], "all")
+);
 
 const filteredCourses = computed(() => {
     const q = searchCourses.value.trim().toLowerCase();
@@ -77,6 +87,108 @@ const trendPeak = computed(() =>
 
 const exportUrl = (format) =>
     route("student.attendance.export", { format });
+
+const hasActiveFilters = computed(
+    () =>
+        searchCourses.value.trim() !== "" ||
+        searchSubjects.value.trim() !== "" ||
+        searchRecent.value.trim() !== "" ||
+        recentStatus.value !== "all"
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+    if (searchCourses.value.trim() !== "") {
+        chips.push({
+            key: "course_q",
+            label: `Course search: ${searchCourses.value.trim()}`,
+        });
+    }
+    if (searchSubjects.value.trim() !== "") {
+        chips.push({
+            key: "subject_q",
+            label: `Subject search: ${searchSubjects.value.trim()}`,
+        });
+    }
+    if (searchRecent.value.trim() !== "") {
+        chips.push({
+            key: "recent_q",
+            label: `Recent search: ${searchRecent.value.trim()}`,
+        });
+    }
+    if (recentStatus.value !== "all") {
+        chips.push({
+            key: "recent_status",
+            label: `Recent status: ${recentStatus.value}`,
+        });
+    }
+    return chips;
+});
+
+const clearFilters = () => {
+    searchCourses.value = "";
+    searchSubjects.value = "";
+    searchRecent.value = "";
+    recentStatus.value = "all";
+};
+
+const removeFilterChip = (key) => {
+    if (key === "course_q") {
+        searchCourses.value = "";
+        return;
+    }
+    if (key === "subject_q") {
+        searchSubjects.value = "";
+        return;
+    }
+    if (key === "recent_q") {
+        searchRecent.value = "";
+        return;
+    }
+    if (key === "recent_status") {
+        recentStatus.value = "all";
+    }
+};
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    const nextParams = new URLSearchParams();
+    if (searchCourses.value.trim() !== "") {
+        nextParams.set("course_q", searchCourses.value.trim());
+    }
+    if (searchSubjects.value.trim() !== "") {
+        nextParams.set("subject_q", searchSubjects.value.trim());
+    }
+    if (searchRecent.value.trim() !== "") {
+        nextParams.set("recent_q", searchRecent.value.trim());
+    }
+    if (recentStatus.value !== "all") {
+        nextParams.set("recent_status", recentStatus.value);
+    }
+
+    const queryString = nextParams.toString();
+    const targetUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}`;
+    window.history.replaceState(window.history.state, "", targetUrl);
+}, 300);
+
+watch(
+    () => [
+        searchCourses.value,
+        searchSubjects.value,
+        searchRecent.value,
+        recentStatus.value,
+    ],
+    () => {
+        persistFiltersToUrl();
+    }
+);
+
+onBeforeUnmount(() => {
+    persistFiltersToUrl.cancel();
+});
 </script>
 
 <template>
@@ -264,6 +376,39 @@ const exportUrl = (format) =>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div
+                    v-if="hasActiveFilters || activeFilterChips.length > 0"
+                    class="mb-4 flex flex-wrap items-center justify-between gap-3"
+                >
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="flex flex-wrap items-center gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
+                    </div>
+                    <button
+                        v-if="hasActiveFilters"
+                        type="button"
+                        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        @click="clearFilters"
+                    >
+                        Clear all filters
+                    </button>
                 </div>
 
                 <!-- Attendance by Course -->

@@ -3,7 +3,8 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head } from "@inertiajs/vue3";
 import TimetableWeekGrid from "@/Components/TimetableWeekGrid.vue";
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
     courses: {
@@ -16,12 +17,37 @@ const props = defineProps({
     },
 });
 
-const viewMode = ref("week"); // week | list
-const query = ref("");
-const selectedCourseId = ref("all");
-const selectedSemester = ref("all");
-const weekRange = ref("weekdays");
-const timeFormat = ref("12h");
+const urlParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+);
+
+const parseChoice = (value, allowed, fallback) =>
+    allowed.includes(value) ? value : fallback;
+
+const initialCourseId = urlParams.get("course_id");
+const hasCourseId = (props.courses ?? []).some(
+    (course) => String(course.id) === String(initialCourseId)
+);
+
+const viewMode = ref(
+    parseChoice(urlParams.get("view"), ["week", "list"], "week")
+); // week | list
+const queryInput = ref(urlParams.get("search") ?? "");
+const query = ref(queryInput.value.trim());
+const selectedCourseId = ref(
+    hasCourseId && initialCourseId ? String(initialCourseId) : "all"
+);
+const selectedSemester = ref(urlParams.get("semester") ?? "all");
+const weekRange = ref(
+    parseChoice(
+        urlParams.get("week_range"),
+        ["weekdays", "six_days", "full_week"],
+        "weekdays"
+    )
+);
+const timeFormat = ref(
+    parseChoice(urlParams.get("time_format"), ["12h", "24h"], "12h")
+);
 
 const allEntries = computed(() => {
     const list = [];
@@ -49,6 +75,19 @@ const semesterOptions = computed(() => {
 
     return Array.from(values).sort((a, b) => a.localeCompare(b));
 });
+
+watch(
+    semesterOptions,
+    (options) => {
+        if (
+            selectedSemester.value !== "all" &&
+            !options.includes(String(selectedSemester.value))
+        ) {
+            selectedSemester.value = "all";
+        }
+    },
+    { immediate: true }
+);
 
 const filteredEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -173,7 +212,144 @@ const timetableStats = computed(() => {
     };
 });
 
+const hasActiveFilters = computed(
+    () =>
+        query.value.trim() !== "" ||
+        selectedCourseId.value !== "all" ||
+        selectedSemester.value !== "all" ||
+        weekRange.value !== "weekdays" ||
+        timeFormat.value !== "12h"
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+    if (query.value.trim() !== "") {
+        chips.push({ key: "search", label: `Search: ${query.value.trim()}` });
+    }
+    if (selectedCourseId.value !== "all") {
+        const selectedCourse = (props.courses ?? []).find(
+            (course) => String(course.id) === String(selectedCourseId.value)
+        );
+        chips.push({
+            key: "course_id",
+            label: `Course: ${selectedCourse?.course_code ?? selectedCourseId.value}`,
+        });
+    }
+    if (selectedSemester.value !== "all") {
+        chips.push({
+            key: "semester",
+            label: `Semester: ${selectedSemester.value}`,
+        });
+    }
+    if (weekRange.value !== "weekdays") {
+        const map = {
+            six_days: "Mon-Sat",
+            full_week: "Mon-Sun",
+        };
+        chips.push({
+            key: "week_range",
+            label: `Week range: ${map[weekRange.value] ?? weekRange.value}`,
+        });
+    }
+    if (timeFormat.value !== "12h") {
+        chips.push({ key: "time_format", label: "Time: 24-hour" });
+    }
+    return chips;
+});
+
 const printTimetable = () => window.print();
+
+const clearFilters = () => {
+    queryInput.value = "";
+    query.value = "";
+    selectedCourseId.value = "all";
+    selectedSemester.value = "all";
+    weekRange.value = "weekdays";
+    timeFormat.value = "12h";
+};
+
+const removeFilterChip = (key) => {
+    if (key === "search") {
+        queryInput.value = "";
+        query.value = "";
+        return;
+    }
+    if (key === "course_id") {
+        selectedCourseId.value = "all";
+        return;
+    }
+    if (key === "semester") {
+        selectedSemester.value = "all";
+        return;
+    }
+    if (key === "week_range") {
+        weekRange.value = "weekdays";
+        return;
+    }
+    if (key === "time_format") {
+        timeFormat.value = "12h";
+    }
+};
+
+const applySearch = debounce(() => {
+    query.value = queryInput.value.trim();
+}, 300);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    const nextParams = new URLSearchParams();
+    if (query.value.trim() !== "") {
+        nextParams.set("search", query.value.trim());
+    }
+    if (selectedCourseId.value !== "all") {
+        nextParams.set("course_id", String(selectedCourseId.value));
+    }
+    if (selectedSemester.value !== "all") {
+        nextParams.set("semester", String(selectedSemester.value));
+    }
+    if (weekRange.value !== "weekdays") {
+        nextParams.set("week_range", weekRange.value);
+    }
+    if (timeFormat.value !== "12h") {
+        nextParams.set("time_format", timeFormat.value);
+    }
+    if (viewMode.value !== "week") {
+        nextParams.set("view", viewMode.value);
+    }
+
+    const queryString = nextParams.toString();
+    const targetUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}`;
+    window.history.replaceState(window.history.state, "", targetUrl);
+}, 300);
+
+watch(
+    () => queryInput.value,
+    () => {
+        applySearch();
+    }
+);
+
+watch(
+    () => [
+        query.value,
+        selectedCourseId.value,
+        selectedSemester.value,
+        weekRange.value,
+        timeFormat.value,
+        viewMode.value,
+    ],
+    () => {
+        persistFiltersToUrl();
+    }
+);
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
+});
 
 const exportPdfUrl = computed(() =>
     route("student.timetable.export", {
@@ -335,16 +511,19 @@ const exportCsvUrl = computed(() =>
 
                             <div class="relative w-full">
                                 <input
-                                    v-model="query"
+                                    v-model="queryInput"
                                     type="text"
                                     placeholder="Search subject, course, location..."
                                     class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 />
                                 <button
-                                    v-if="query"
+                                    v-if="queryInput"
                                     type="button"
                                     class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                    @click="query = ''"
+                                    @click="
+                                        queryInput = '';
+                                        query = '';
+                                    "
                                 >
                                     <span class="sr-only">Clear</span>
                                     x
@@ -391,7 +570,35 @@ const exportCsvUrl = computed(() =>
                             >
                                 Print
                             </button>
+                            <button
+                                v-if="hasActiveFilters"
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="clearFilters"
+                            >
+                                Clear all filters
+                            </button>
                         </div>
+                    </div>
+
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="mb-5 flex flex-wrap items-center gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
                     </div>
 
                     <div

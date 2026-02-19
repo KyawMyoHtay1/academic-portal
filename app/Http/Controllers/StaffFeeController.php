@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -66,23 +67,9 @@ class StaffFeeController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        if ($this->hasFeeStatusLogTable()) {
-            try {
-                $fees->load([
-                    'statusLogs' => function ($q) {
-                        $q->with('performer:id,name')
-                            ->latest('created_at')
-                            ->limit(10);
-                    },
-                ]);
-            } catch (QueryException $e) {
-                if (! $this->isMissingFeeStatusLogTableException($e)) {
-                    throw $e;
-                }
-            }
-        }
+        $timelinesByFee = $this->fetchFeeTimelinesForPage($fees->items());
 
-        $fees = $fees->through(function (Fee $fee) use ($today) {
+        $fees = $fees->through(function (Fee $fee) use ($today, $timelinesByFee) {
             $isLate = in_array($fee->status, [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING], true)
                 && $fee->due_date < $today;
 
@@ -101,7 +88,7 @@ class StaffFeeController extends Controller
                 'created_at' => $fee->created_at->format('Y-m-d'),
                 'is_late' => $isLate,
                 'days_overdue' => $isLate ? $fee->due_date->diffInDays($today) : null,
-                'timeline' => $this->mapFeeTimeline($fee),
+                'timeline' => $timelinesByFee[$fee->id] ?? $this->snapshotTimeline($fee),
             ];
         });
 
@@ -594,30 +581,72 @@ class StaffFeeController extends Controller
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function mapFeeTimeline(Fee $fee): array
+    private function fetchFeeTimelinesForPage(array $fees): array
     {
-        if (! $this->hasFeeStatusLogTable() || ! $fee->relationLoaded('statusLogs')) {
-            return $this->snapshotTimeline($fee);
+        if (! $this->hasFeeStatusLogTable()) {
+            return [];
         }
 
-        $timeline = $fee->statusLogs
-            ->sortBy('created_at')
+        $feeIds = collect($fees)
+            ->pluck('id')
+            ->filter(fn ($id) => $id !== null)
+            ->map(fn ($id) => (int) $id)
+            ->unique()
             ->values()
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'action' => $log->action,
-                    'label' => $this->statusActionLabel($log->action, $log->from_status, $log->to_status),
-                    'from_status' => $log->from_status,
-                    'to_status' => $log->to_status,
-                    'performed_by' => $log->performer?->name,
-                    'note' => $log->note,
-                    'created_at' => $log->created_at?->format('Y-m-d H:i'),
-                ];
-            })
             ->all();
 
-        return $timeline !== [] ? $timeline : $this->snapshotTimeline($fee);
+        if ($feeIds === []) {
+            return [];
+        }
+
+        try {
+            $logs = DB::table('fee_status_logs')
+                ->leftJoin('users', 'fee_status_logs.performed_by', '=', 'users.id')
+                ->select(
+                    'fee_status_logs.id',
+                    'fee_status_logs.fee_id',
+                    'fee_status_logs.action',
+                    'fee_status_logs.from_status',
+                    'fee_status_logs.to_status',
+                    'fee_status_logs.note',
+                    'fee_status_logs.created_at',
+                    'users.name as performer_name'
+                )
+                ->whereIn('fee_status_logs.fee_id', $feeIds)
+                ->orderBy('fee_status_logs.created_at')
+                ->orderBy('fee_status_logs.id')
+                ->get();
+        } catch (QueryException $e) {
+            if ($this->isMissingFeeStatusLogTableException($e)) {
+                return [];
+            }
+
+            throw $e;
+        }
+
+        return $logs
+            ->groupBy(fn ($log) => (int) ($log->fee_id ?? 0))
+            ->map(function ($group) {
+                return $group->map(function ($log) {
+                    return [
+                        'id' => $log->id,
+                        'action' => (string) $log->action,
+                        'label' => $this->statusActionLabel(
+                            (string) $log->action,
+                            is_string($log->from_status) ? $log->from_status : null,
+                            is_string($log->to_status) ? $log->to_status : null
+                        ),
+                        'from_status' => is_string($log->from_status) ? $log->from_status : null,
+                        'to_status' => is_string($log->to_status) ? $log->to_status : null,
+                        'performed_by' => $log->performer_name,
+                        'note' => $log->note,
+                        'created_at' => $log->created_at
+                            ? \Illuminate\Support\Carbon::parse($log->created_at)->format('Y-m-d H:i')
+                            : null,
+                    ];
+                })->values()->all();
+            })
+            ->toArray();
     }
 
     /**
