@@ -64,6 +64,10 @@ class StudentTimetableController extends Controller
 
         $courses = $this->buildCourseData($student);
         $courseId = (string) $request->input('course_id', 'all');
+        $semester = trim((string) $request->input('semester', 'all'));
+        if ($semester === '') {
+            $semester = 'all';
+        }
 
         $rows = collect($courses)
             ->filter(function (array $course) use ($courseId): bool {
@@ -72,6 +76,13 @@ class StudentTimetableController extends Controller
                 }
 
                 return (string) $course['id'] === $courseId;
+            })
+            ->filter(function (array $course) use ($semester): bool {
+                if ($semester === 'all') {
+                    return true;
+                }
+
+                return (string) ($course['semester'] ?? '') === $semester;
             })
             ->flatMap(function (array $course): Collection {
                 return collect($course['timetables'])->map(function (array $entry) use ($course): array {
@@ -83,6 +94,7 @@ class StudentTimetableController extends Controller
                         'subject_title' => $entry['subject_title'],
                         'course_code' => $course['course_code'],
                         'course_title' => $course['title'],
+                        'semester' => $course['semester'] ?? null,
                         'location' => $entry['location'],
                     ];
                 });
@@ -102,6 +114,7 @@ class StudentTimetableController extends Controller
             'owner' => $user?->name,
             'filters' => [
                 'course_id' => $courseId,
+                'semester' => $semester,
             ],
         ])->setPaper('a4', 'landscape');
 
@@ -128,6 +141,7 @@ class StudentTimetableController extends Controller
                 'courses.id',
                 'courses.course_code',
                 'courses.title',
+                'courses.semester',
                 'courses.photo',
             ]);
 
@@ -163,6 +177,7 @@ class StudentTimetableController extends Controller
                 'id' => $course->id,
                 'course_code' => $course->course_code,
                 'title' => $course->title,
+                'semester' => $course->semester,
                 'photo' => $course->photo,
                 'timetables' => $timetables,
             ];
@@ -191,6 +206,7 @@ class StudentTimetableController extends Controller
                 'Subject Title',
                 'Course Code',
                 'Course Title',
+                'Semester',
                 'Location',
             ]);
 
@@ -203,6 +219,7 @@ class StudentTimetableController extends Controller
                     $row['subject_title'],
                     $row['course_code'],
                     $row['course_title'],
+                    $row['semester'],
                     $row['location'],
                 ]);
             }

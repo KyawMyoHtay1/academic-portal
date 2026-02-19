@@ -18,6 +18,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    semesters: {
+        type: Array,
+        default: () => [],
+    },
     teachers: {
         type: Array,
         default: () => [],
@@ -27,6 +31,7 @@ const props = defineProps({
 const viewMode = ref("table"); // table | week
 const query = ref(props.filters?.q ?? "");
 const selectedDay = ref(props.filters?.day ?? "all");
+const selectedSemester = ref(props.filters?.semester ?? "all");
 const selectedCourse = ref(props.filters?.course_id ?? "all");
 const selectedTeacher = ref(props.filters?.teacher_id ?? "all");
 const weekRange = ref("weekdays");
@@ -66,6 +71,7 @@ const hasActiveFilters = computed(
     () =>
         query.value.trim() !== "" ||
         selectedDay.value !== "all" ||
+        selectedSemester.value !== "all" ||
         selectedCourse.value !== "all" ||
         selectedTeacher.value !== "all"
 );
@@ -98,6 +104,10 @@ const applyFilters = () => {
         {
             q: query.value.trim() || undefined,
             day: selectedDay.value !== "all" ? selectedDay.value : undefined,
+            semester:
+                selectedSemester.value !== "all"
+                    ? selectedSemester.value
+                    : undefined,
             course_id:
                 selectedCourse.value !== "all" ? selectedCourse.value : undefined,
             teacher_id:
@@ -116,6 +126,7 @@ const applyFilters = () => {
 const clearFilters = () => {
     query.value = "";
     selectedDay.value = "all";
+    selectedSemester.value = "all";
     selectedCourse.value = "all";
     selectedTeacher.value = "all";
     applyFilters();
@@ -126,6 +137,8 @@ const exportPdfUrl = computed(() =>
         format: "pdf",
         q: query.value.trim() || undefined,
         day: selectedDay.value !== "all" ? selectedDay.value : undefined,
+        semester:
+            selectedSemester.value !== "all" ? selectedSemester.value : undefined,
         course_id: selectedCourse.value !== "all" ? selectedCourse.value : undefined,
         teacher_id: selectedTeacher.value !== "all" ? selectedTeacher.value : undefined,
     })
@@ -136,12 +149,14 @@ const exportCsvUrl = computed(() =>
         format: "csv",
         q: query.value.trim() || undefined,
         day: selectedDay.value !== "all" ? selectedDay.value : undefined,
+        semester:
+            selectedSemester.value !== "all" ? selectedSemester.value : undefined,
         course_id: selectedCourse.value !== "all" ? selectedCourse.value : undefined,
         teacher_id: selectedTeacher.value !== "all" ? selectedTeacher.value : undefined,
     })
 );
 
-watch([selectedDay, selectedCourse, selectedTeacher], () => {
+watch([selectedDay, selectedSemester, selectedCourse, selectedTeacher], () => {
     applyFilters();
 });
 
@@ -221,7 +236,7 @@ export default {
 
                     <!-- Controls -->
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-6">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-7">
                             <div class="relative w-full">
                                 <input
                                     v-model="query"
@@ -253,6 +268,19 @@ export default {
                                 <option>Sunday</option>
                             </select>
                             <select
+                                v-model="selectedSemester"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All semesters</option>
+                                <option
+                                    v-for="semester in semesters"
+                                    :key="semester"
+                                    :value="semester"
+                                >
+                                    {{ semester }}
+                                </option>
+                            </select>
+                            <select
                                 v-model="selectedCourse"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             >
@@ -262,7 +290,7 @@ export default {
                                     :key="course.id"
                                     :value="String(course.id)"
                                 >
-                                    {{ course.course_code }} - {{ course.title }}
+                                    {{ course.course_code }} - {{ course.title }}{{ course.semester ? ` (${course.semester})` : "" }}
                                 </option>
                             </select>
                             <select
@@ -475,6 +503,9 @@ export default {
                                             <div>
                                                 {{ entry.course_code }} -
                                                 {{ entry.course_title }}
+                                                <div class="text-xs text-slate-500">
+                                                    Semester: {{ entry.semester || "-" }}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>

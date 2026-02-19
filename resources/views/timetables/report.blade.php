@@ -29,6 +29,9 @@
         @if (!empty($filters['course_id']) && $filters['course_id'] !== 'all')
             <span><strong>Course Filter:</strong> {{ $filters['course_id'] }}</span>
         @endif
+        @if (!empty($filters['semester']) && $filters['semester'] !== 'all')
+            <span><strong>Semester:</strong> {{ $filters['semester'] }}</span>
+        @endif
     </div>
 
     <table>
@@ -50,7 +53,12 @@
                     <td>{{ $row['day_of_week'] ?? '-' }}</td>
                     <td>{{ ($row['start_time'] ?? '-') }} - {{ ($row['end_time'] ?? '-') }}</td>
                     <td>{{ ($row['subject_code'] ?? '-') }} - {{ ($row['subject_title'] ?? '-') }}</td>
-                    <td>{{ ($row['course_code'] ?? '-') }} - {{ ($row['course_title'] ?? '-') }}</td>
+                    <td>
+                        {{ ($row['course_code'] ?? '-') }} - {{ ($row['course_title'] ?? '-') }}
+                        @if (!empty($row['semester']))
+                            <br><small>Semester: {{ $row['semester'] }}</small>
+                        @endif
+                    </td>
                     <td>{{ $row['location'] ?? '-' }}</td>
                     @if ($showCreatorColumn)
                         <td>{{ $row['creator_name'] ?? '-' }}</td>

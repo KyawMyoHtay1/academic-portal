@@ -19,6 +19,7 @@ const props = defineProps({
 const viewMode = ref("week"); // week | list
 const query = ref("");
 const selectedCourseId = ref("all");
+const selectedSemester = ref("all");
 const weekRange = ref("weekdays");
 const timeFormat = ref("12h");
 
@@ -31,10 +32,22 @@ const allEntries = computed(() => {
                 course_id: c.id,
                 course_code: c.course_code,
                 course_title: c.title,
+                semester: c.semester,
             });
         }
     }
     return list;
+});
+
+const semesterOptions = computed(() => {
+    const values = new Set();
+    for (const course of props.courses ?? []) {
+        if (course?.semester) {
+            values.add(String(course.semester));
+        }
+    }
+
+    return Array.from(values).sort((a, b) => a.localeCompare(b));
 });
 
 const filteredEntries = computed(() => {
@@ -43,6 +56,10 @@ const filteredEntries = computed(() => {
 
     if (selectedCourseId.value !== "all") {
         list = list.filter((e) => String(e.course_id) === String(selectedCourseId.value));
+    }
+
+    if (selectedSemester.value !== "all") {
+        list = list.filter((e) => String(e.semester ?? "") === String(selectedSemester.value));
     }
 
     if (q) {
@@ -162,6 +179,7 @@ const exportPdfUrl = computed(() =>
     route("student.timetable.export", {
         format: "pdf",
         course_id: selectedCourseId.value !== "all" ? selectedCourseId.value : undefined,
+        semester: selectedSemester.value !== "all" ? selectedSemester.value : undefined,
     })
 );
 
@@ -169,6 +187,7 @@ const exportCsvUrl = computed(() =>
     route("student.timetable.export", {
         format: "csv",
         course_id: selectedCourseId.value !== "all" ? selectedCourseId.value : undefined,
+        semester: selectedSemester.value !== "all" ? selectedSemester.value : undefined,
     })
 );
 </script>
@@ -271,7 +290,7 @@ const exportCsvUrl = computed(() =>
 
                     <!-- Controls -->
                     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-5">
                             <select
                                 v-model="selectedCourseId"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
@@ -282,7 +301,20 @@ const exportCsvUrl = computed(() =>
                                     :key="c.id"
                                     :value="c.id"
                                 >
-                                    {{ c.course_code }} - {{ c.title }}
+                                    {{ c.course_code }} - {{ c.title }}{{ c.semester ? ` (${c.semester})` : "" }}
+                                </option>
+                            </select>
+                            <select
+                                v-model="selectedSemester"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All semesters</option>
+                                <option
+                                    v-for="semester in semesterOptions"
+                                    :key="semester"
+                                    :value="semester"
+                                >
+                                    {{ semester }}
                                 </option>
                             </select>
                             <select

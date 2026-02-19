@@ -50,14 +50,23 @@ class StaffTimetableController extends Controller
 
         $courses = Course::query()
             ->orderBy('course_code')
-            ->get(['id', 'course_code', 'title'])
+            ->get(['id', 'course_code', 'title', 'semester'])
             ->map(function (Course $course) {
                 return [
                     'id' => $course->id,
                     'course_code' => $course->course_code,
                     'title' => $course->title,
+                    'semester' => $course->semester,
                 ];
             });
+
+        $semesters = Course::query()
+            ->whereNotNull('semester')
+            ->where('semester', '!=', '')
+            ->distinct()
+            ->orderBy('semester')
+            ->pluck('semester')
+            ->values();
 
         $teachers = User::query()
             ->where('role', 'teacher')
@@ -69,6 +78,7 @@ class StaffTimetableController extends Controller
             'timetables' => $timetables,
             'filters' => $filters,
             'courses' => $courses,
+            'semesters' => $semesters,
             'teachers' => $teachers,
         ]);
     }
@@ -271,12 +281,16 @@ class StaffTimetableController extends Controller
         $filters = [
             'q' => trim((string) $request->input('q', '')),
             'day' => trim((string) $request->input('day', 'all')),
+            'semester' => trim((string) $request->input('semester', 'all')),
             'course_id' => trim((string) $request->input('course_id', 'all')),
             'teacher_id' => trim((string) $request->input('teacher_id', 'all')),
         ];
 
         if (! in_array($filters['day'], ['all', ...self::DAY_ORDER], true)) {
             $filters['day'] = 'all';
+        }
+        if ($filters['semester'] === '') {
+            $filters['semester'] = 'all';
         }
 
         return $filters;
@@ -290,6 +304,12 @@ class StaffTimetableController extends Controller
     {
         if ($filters['day'] !== '' && $filters['day'] !== 'all') {
             $query->where('day_of_week', $filters['day']);
+        }
+
+        if ($filters['semester'] !== '' && $filters['semester'] !== 'all') {
+            $query->whereHas('subject.course', function ($courseQuery) use ($filters) {
+                $courseQuery->where('semester', $filters['semester']);
+            });
         }
 
         if ($filters['course_id'] !== '' && $filters['course_id'] !== 'all') {
@@ -392,6 +412,7 @@ class StaffTimetableController extends Controller
             'subject_photo' => $subject?->photo,
             'course_code' => $course?->course_code,
             'course_title' => $course?->title,
+            'semester' => $course?->semester,
             'course_photo' => $course?->photo,
             'day_of_week' => $entry->day_of_week,
             'start_time' => $entry->start_time,
@@ -435,6 +456,7 @@ class StaffTimetableController extends Controller
                 'Subject Title',
                 'Course Code',
                 'Course Title',
+                'Semester',
                 'Day',
                 'Start Time',
                 'End Time',
@@ -448,6 +470,7 @@ class StaffTimetableController extends Controller
                     $row['subject_title'],
                     $row['course_code'],
                     $row['course_title'],
+                    $row['semester'],
                     $row['day_of_week'],
                     $row['start_time'],
                     $row['end_time'],
