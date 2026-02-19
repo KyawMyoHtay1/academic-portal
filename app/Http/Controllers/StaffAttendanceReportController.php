@@ -20,7 +20,9 @@ class StaffAttendanceReportController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
-        [$filters, $programmes, $intakeYears, $semesters] = $this->resolveReportFilters($request);
+        [$filters, $programmes, $intakeYears, $semesters, $courses, $subjects] = $this->resolveReportFilters($request);
+        $thresholdContext = $this->resolveThresholdContext($filters);
+        $effectiveThreshold = $thresholdContext['value'];
 
         $attendanceScope = Attendance::query();
         $this->applyAttendanceFilters($attendanceScope, $filters);
@@ -69,7 +71,7 @@ class StaffAttendanceReportController extends Controller
                 ];
             });
 
-        // Students with low attendance (below selected threshold)
+        // Students with low attendance (below effective threshold)
         $studentsWithLowAttendance = Student::query()
             ->when(
                 $filters['programme'] !== '' && $filters['programme'] !== 'all',
@@ -118,14 +120,18 @@ class StaffAttendanceReportController extends Controller
                     'present' => $present,
                     'absent' => $total - $present,
                     'rate' => $rate,
-                    'deficit' => $rate !== null ? max(round($filters['threshold'] - $rate, 2), 0) : null,
-                    'reason' => $rate !== null && $rate < $filters['threshold']
-                        ? sprintf('%.2f%% below threshold', max(round($filters['threshold'] - $rate, 2), 0))
+                    'deficit' => $rate !== null ? max(round($effectiveThreshold - $rate, 2), 0) : null,
+                    'reason' => $rate !== null && $rate < $effectiveThreshold
+                        ? sprintf(
+                            '%.2f%% below %s threshold',
+                            max(round($effectiveThreshold - $rate, 2), 0),
+                            $thresholdContext['label']
+                        )
                         : null,
                 ];
             })
-            ->filter(function ($student) use ($filters) {
-                return $student['rate'] !== null && $student['rate'] < $filters['threshold'];
+            ->filter(function ($student) use ($effectiveThreshold) {
+                return $student['rate'] !== null && $student['rate'] < $effectiveThreshold;
             })
             ->sortBy('rate')
             ->values()
@@ -218,10 +224,13 @@ class StaffAttendanceReportController extends Controller
                 'threshold' => (float) config('attendance_alerts.low_threshold', 75),
                 'cooldown_days' => (int) config('attendance_alerts.cooldown_days', 7),
             ],
+            'thresholdContext' => $thresholdContext,
             'options' => [
                 'programmes' => $programmes,
                 'intakeYears' => $intakeYears,
                 'semesters' => $semesters,
+                'courses' => $courses,
+                'subjects' => $subjects,
             ],
         ]);
     }
@@ -359,6 +368,17 @@ class StaffAttendanceReportController extends Controller
             });
         }
 
+        if (($filters['course_id'] ?? null) !== null) {
+            $courseId = (int) $filters['course_id'];
+            $query->whereHas('subject', function (Builder $subjectQuery) use ($courseId) {
+                $subjectQuery->where('course_id', $courseId);
+            });
+        }
+
+        if (($filters['subject_id'] ?? null) !== null) {
+            $query->where('subject_id', (int) $filters['subject_id']);
+        }
+
         if (($filters['date_from'] ?? '') !== '') {
             $query->whereDate('date', '>=', $filters['date_from']);
         }
@@ -371,7 +391,14 @@ class StaffAttendanceReportController extends Controller
     /**
      * Resolve and normalize report filters and options.
      *
-     * @return array{0: array<string, mixed>, 1: \Illuminate\Support\Collection<int, string>, 2: \Illuminate\Support\Collection<int, int>, 3: \Illuminate\Support\Collection<int, string>}
+     * @return array{
+     *   0: array<string, mixed>,
+     *   1: \Illuminate\Support\Collection<int, string>,
+     *   2: \Illuminate\Support\Collection<int, int>,
+     *   3: \Illuminate\Support\Collection<int, string>,
+     *   4: \Illuminate\Support\Collection<int, array<string, mixed>>,
+     *   5: \Illuminate\Support\Collection<int, array<string, mixed>>
+     * }
      */
     private function resolveReportFilters(Request $request): array
     {
@@ -404,13 +431,33 @@ class StaffAttendanceReportController extends Controller
             $trendMode = 'weekly';
         }
 
+        $courseId = (int) $request->input('course_id', 0);
+        $subjectId = (int) $request->input('subject_id', 0);
+        $courseId = $courseId > 0 ? $courseId : null;
+        $subjectId = $subjectId > 0 ? $subjectId : null;
+
+        $courseThresholdInput = trim((string) $request->input('course_threshold', ''));
+        $subjectThresholdInput = trim((string) $request->input('subject_threshold', ''));
+        $courseThreshold = is_numeric($courseThresholdInput) ? (float) $courseThresholdInput : null;
+        if ($courseThreshold !== null && ($courseThreshold < 1 || $courseThreshold > 100)) {
+            $courseThreshold = null;
+        }
+        $subjectThreshold = is_numeric($subjectThresholdInput) ? (float) $subjectThresholdInput : null;
+        if ($subjectThreshold !== null && ($subjectThreshold < 1 || $subjectThreshold > 100)) {
+            $subjectThreshold = null;
+        }
+
         $filters = [
             'programme' => trim((string) $request->input('programme', 'all')),
             'intake_year' => trim((string) $request->input('intake_year', 'all')),
             'semester' => trim((string) $request->input('semester', 'all')),
+            'course_id' => $courseId,
+            'subject_id' => $subjectId,
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
             'threshold' => round($threshold, 2),
+            'course_threshold' => $courseThreshold !== null ? round($courseThreshold, 2) : null,
+            'subject_threshold' => $subjectThreshold !== null ? round($subjectThreshold, 2) : null,
             'cooldown_days' => $cooldownDays,
             'trend_mode' => $trendMode,
         ];
@@ -438,6 +485,33 @@ class StaffAttendanceReportController extends Controller
             ->pluck('semester')
             ->values();
 
+        $courses = Course::query()
+            ->orderBy('course_code')
+            ->get(['id', 'course_code', 'title'])
+            ->map(function (Course $course) {
+                return [
+                    'id' => $course->id,
+                    'course_code' => $course->course_code,
+                    'title' => $course->title,
+                ];
+            })
+            ->values();
+
+        $subjects = Subject::query()
+            ->with('course:id,course_code')
+            ->orderBy('subject_code')
+            ->get(['id', 'course_id', 'subject_code', 'title'])
+            ->map(function (Subject $subject) {
+                return [
+                    'id' => $subject->id,
+                    'course_id' => $subject->course_id,
+                    'subject_code' => $subject->subject_code,
+                    'title' => $subject->title,
+                    'course_code' => $subject->course?->course_code,
+                ];
+            })
+            ->values();
+
         if ($filters['programme'] !== 'all' && ! $programmes->contains($filters['programme'])) {
             $filters['programme'] = 'all';
         }
@@ -448,7 +522,66 @@ class StaffAttendanceReportController extends Controller
             $filters['semester'] = 'all';
         }
 
-        return [$filters, $programmes, $intakeYears, $semesters];
+        if ($filters['course_id'] !== null && ! $courses->pluck('id')->contains($filters['course_id'])) {
+            $filters['course_id'] = null;
+        }
+
+        if ($filters['subject_id'] !== null && ! $subjects->pluck('id')->contains($filters['subject_id'])) {
+            $filters['subject_id'] = null;
+        }
+
+        if ($filters['subject_id'] !== null && $filters['course_id'] !== null) {
+            $selectedSubject = $subjects->firstWhere('id', $filters['subject_id']);
+            if (! $selectedSubject || (int) $selectedSubject['course_id'] !== (int) $filters['course_id']) {
+                $filters['subject_id'] = null;
+            }
+        }
+
+        if ($filters['subject_id'] !== null && $filters['course_id'] === null) {
+            $selectedSubject = $subjects->firstWhere('id', $filters['subject_id']);
+            $filters['course_id'] = $selectedSubject ? (int) $selectedSubject['course_id'] : null;
+        }
+
+        return [$filters, $programmes, $intakeYears, $semesters, $courses, $subjects];
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array{value: float, source: string, label: string}
+     */
+    private function resolveThresholdContext(array $filters): array
+    {
+        $baseThreshold = (float) ($filters['threshold'] ?? config('attendance_alerts.low_threshold', 75));
+        $courseThreshold = $filters['course_threshold'] !== null
+            ? (float) $filters['course_threshold']
+            : null;
+        $subjectThreshold = $filters['subject_threshold'] !== null
+            ? (float) $filters['subject_threshold']
+            : null;
+        $hasCourse = ($filters['course_id'] ?? null) !== null;
+        $hasSubject = ($filters['subject_id'] ?? null) !== null;
+
+        if ($hasSubject && $subjectThreshold !== null) {
+            return [
+                'value' => $subjectThreshold,
+                'source' => 'subject',
+                'label' => 'subject',
+            ];
+        }
+
+        if ($hasCourse && $courseThreshold !== null) {
+            return [
+                'value' => $courseThreshold,
+                'source' => 'course',
+                'label' => 'course',
+            ];
+        }
+
+        return [
+            'value' => $baseThreshold,
+            'source' => 'global',
+            'label' => 'global',
+        ];
     }
 
     /**

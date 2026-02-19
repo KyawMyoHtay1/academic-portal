@@ -32,7 +32,13 @@ class StudentGradesController extends Controller
                 $query->select('subjects.id', 'subjects.course_id', 'subjects.subject_code', 'subjects.title', 'subjects.photo');
             }, 'subjects.grades' => function ($query) use ($student) {
                 $query->where('student_id', $student->id)
-                    ->where('status', Grade::STATUS_APPROVED);
+                    ->where('status', Grade::STATUS_APPROVED)
+                    ->with([
+                        'reviewLogs' => function ($reviewLogs) {
+                            $reviewLogs->with('performer:id,name')
+                                ->orderBy('created_at');
+                        },
+                    ]);
             }])
             ->orderBy('course_code')
             ->get([
@@ -79,6 +85,20 @@ class StudentGradesController extends Controller
                     'graded_assignments' => $assignmentData['graded_assignments'],
                     'ungraded_assignments' => $assignmentData['ungraded_assignments'],
                     'has_assignments' => $assignmentData['has_assignments'],
+                    'grade_history' => $grade
+                        ? $grade->reviewLogs
+                            ->map(function ($log) {
+                                return [
+                                    'id' => $log->id,
+                                    'action' => $log->action,
+                                    'reason' => $log->reason,
+                                    'performed_by' => $log->performer?->name,
+                                    'performed_at' => $log->created_at?->format('Y-m-d H:i'),
+                                ];
+                            })
+                            ->values()
+                            ->all()
+                        : [],
                 ];
             });
 

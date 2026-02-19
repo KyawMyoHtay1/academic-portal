@@ -197,6 +197,23 @@ const hasFinalScore = (subject) =>
     subject?.score !== undefined &&
     subject?.score !== "";
 
+const hasSubjectDetails = (subject) =>
+    Boolean(subject?.has_assignments || (subject?.grade_history?.length ?? 0) > 0);
+
+const formatHistoryAction = (action) => {
+    if (action === "submitted") return "Submitted for review";
+    if (action === "approved") return "Approved";
+    if (action === "rejected") return "Rejected";
+    return action;
+};
+
+const historyActionClass = (action) => {
+    if (action === "approved") return "bg-emerald-100 text-emerald-800";
+    if (action === "rejected") return "bg-red-100 text-red-800";
+    if (action === "submitted") return "bg-indigo-100 text-indigo-800";
+    return "bg-slate-100 text-slate-700";
+};
+
 // Convert numeric score to letter grade
 // Grading scale: A: 80-100, B: 70-79, C: 60-69, D: 50-59, E: 40-49, F: 0-39
 const getLetterGrade = (score) => {
@@ -690,30 +707,30 @@ const getLetterGrade = (score) => {
                                                 </td>
                                                 <td class="px-4 py-3 text-center">
                                                     <button
-                                                        v-if="subject.has_assignments"
+                                                        v-if="hasSubjectDetails(subject)"
                                                         type="button"
                                                         @click="toggleSubjectExpansion(subject.id)"
                                                         class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
                                                     >
                                                         <span v-if="expandedSubjects.has(subject.id)">
-                                                            Hide Assignments
+                                                            Hide Details
                                                         </span>
                                                         <span v-else>
-                                                            View Assignments
+                                                            View Details
                                                         </span>
                                                     </button>
                                                 </td>
                                             </tr>
                                             <!-- Assignment Breakdown Row -->
                                             <tr
-                                                v-if="expandedSubjects.has(subject.id) && subject.has_assignments"
+                                                v-if="expandedSubjects.has(subject.id) && hasSubjectDetails(subject)"
                                                 class="bg-slate-50"
                                             >
                                                 <td colspan="3" class="px-4 py-4">
                                                     <div class="space-y-3">
                                                         <div class="flex items-center justify-between">
                                                             <h4 class="text-sm font-semibold text-slate-900">
-                                                                Assignment Breakdown
+                                                                Assignment and Grade Details
                                                             </h4>
                                                             <div class="flex items-center gap-4 text-xs">
                                                                 <span
@@ -850,6 +867,52 @@ const getLetterGrade = (score) => {
                                                             class="rounded-md bg-slate-50 p-3 text-center text-xs text-slate-500"
                                                         >
                                                             No assignments found for this subject.
+                                                        </div>
+
+                                                        <div class="rounded-md border border-slate-200 bg-white p-3">
+                                                            <div class="mb-2 flex items-center justify-between">
+                                                                <h5 class="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Grade History Timeline
+                                                                </h5>
+                                                                <span class="text-[11px] text-slate-500">
+                                                                    {{ subject.grade_history?.length ?? 0 }} event(s)
+                                                                </span>
+                                                            </div>
+
+                                                            <div
+                                                                v-if="subject.grade_history?.length > 0"
+                                                                class="space-y-2"
+                                                            >
+                                                                <div
+                                                                    v-for="event in subject.grade_history"
+                                                                    :key="event.id"
+                                                                    class="rounded-md bg-slate-50 px-3 py-2 text-xs"
+                                                                >
+                                                                    <div class="flex flex-wrap items-center gap-2">
+                                                                        <span
+                                                                            class="inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                                                                            :class="historyActionClass(event.action)"
+                                                                        >
+                                                                            {{ formatHistoryAction(event.action) }}
+                                                                        </span>
+                                                                        <span class="text-slate-700">
+                                                                            {{ event.performed_by ?? "System" }}
+                                                                        </span>
+                                                                        <span class="text-slate-500">
+                                                                            {{ event.performed_at ?? "-" }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p
+                                                                        v-if="event.reason"
+                                                                        class="mt-1 text-[11px] text-red-700"
+                                                                    >
+                                                                        Reason: {{ event.reason }}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <p v-else class="text-xs text-slate-500">
+                                                                No review timeline available yet.
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </td>

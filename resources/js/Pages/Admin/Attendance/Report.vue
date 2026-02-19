@@ -51,6 +51,16 @@ const props = defineProps({
             programmes: [],
             intakeYears: [],
             semesters: [],
+            courses: [],
+            subjects: [],
+        }),
+    },
+    thresholdContext: {
+        type: Object,
+        default: () => ({
+            value: 75,
+            source: "global",
+            label: "global",
         }),
     },
 });
@@ -62,11 +72,23 @@ const searchRecent = ref("");
 const programmeFilter = ref(props.filters?.programme || "all");
 const intakeYearFilter = ref(props.filters?.intake_year || "all");
 const semesterFilter = ref(props.filters?.semester || "all");
+const courseFilter = ref(
+    props.filters?.course_id ? String(props.filters.course_id) : "all"
+);
+const subjectFilter = ref(
+    props.filters?.subject_id ? String(props.filters.subject_id) : "all"
+);
 const dateFrom = ref(props.filters?.date_from || "");
 const dateTo = ref(props.filters?.date_to || "");
 const defaultThreshold = Number(props.defaults?.threshold ?? 75);
 const defaultCooldownDays = Number(props.defaults?.cooldown_days ?? 7);
 const thresholdFilter = ref(Number(props.filters?.threshold ?? defaultThreshold));
+const courseThresholdFilter = ref(
+    props.filters?.course_threshold ?? ""
+);
+const subjectThresholdFilter = ref(
+    props.filters?.subject_threshold ?? ""
+);
 const alertCooldownDays = ref(Number(props.filters?.cooldown_days ?? defaultCooldownDays));
 const trendMode = ref(props.filters?.trend_mode || "weekly");
 const sendingAlerts = ref(false);
@@ -81,17 +103,66 @@ const normalizedCooldownDays = () => {
     return Number.isFinite(value) && value >= 0 && value <= 90 ? value : undefined;
 };
 
-const thresholdLabel = computed(() => {
-    const value = normalizedThreshold();
-    return (value ?? defaultThreshold).toFixed(1);
+const normalizedScopedThreshold = (rawValue) => {
+    const value = Number(rawValue);
+    return Number.isFinite(value) && value >= 1 && value <= 100 ? value : undefined;
+};
+
+const normalizedCourseThreshold = () =>
+    normalizedScopedThreshold(courseThresholdFilter.value);
+const normalizedSubjectThreshold = () =>
+    normalizedScopedThreshold(subjectThresholdFilter.value);
+
+const subjectOptions = computed(() => {
+    const allSubjects = props.options?.subjects ?? [];
+    if (courseFilter.value === "all") {
+        return allSubjects;
+    }
+
+    return allSubjects.filter(
+        (subject) => String(subject.course_id) === String(courseFilter.value)
+    );
 });
+
+const effectiveThreshold = computed(() => {
+    const subjectValue = normalizedSubjectThreshold();
+    if (subjectFilter.value !== "all" && subjectValue !== undefined) {
+        return {
+            value: subjectValue,
+            source: "subject",
+            label: "subject",
+        };
+    }
+
+    const courseValue = normalizedCourseThreshold();
+    if (courseFilter.value !== "all" && courseValue !== undefined) {
+        return {
+            value: courseValue,
+            source: "course",
+            label: "course",
+        };
+    }
+
+    const globalValue = normalizedThreshold();
+    return {
+        value: globalValue ?? defaultThreshold,
+        source: "global",
+        label: "global",
+    };
+});
+
+const thresholdLabel = computed(() => {
+    return Number(effectiveThreshold.value.value).toFixed(1);
+});
+
+const thresholdScopeLabel = computed(() => effectiveThreshold.value.label);
 
 const cooldownLabel = computed(() => {
     const value = normalizedCooldownDays();
     return String(value ?? defaultCooldownDays);
 });
 
-const thresholdValue = computed(() => normalizedThreshold() ?? defaultThreshold);
+const thresholdValue = computed(() => Number(effectiveThreshold.value.value));
 
 const applyFilters = () => {
     router.get(
@@ -109,9 +180,19 @@ const applyFilters = () => {
                 semesterFilter.value !== "all"
                     ? semesterFilter.value
                     : undefined,
+            course_id:
+                courseFilter.value !== "all"
+                    ? Number(courseFilter.value)
+                    : undefined,
+            subject_id:
+                subjectFilter.value !== "all"
+                    ? Number(subjectFilter.value)
+                    : undefined,
             date_from: dateFrom.value || undefined,
             date_to: dateTo.value || undefined,
             threshold: normalizedThreshold(),
+            course_threshold: normalizedCourseThreshold(),
+            subject_threshold: normalizedSubjectThreshold(),
             cooldown_days: normalizedCooldownDays(),
             trend_mode: trendMode.value !== "weekly" ? trendMode.value : undefined,
         },
@@ -127,9 +208,13 @@ const clearReportFilters = () => {
     programmeFilter.value = "all";
     intakeYearFilter.value = "all";
     semesterFilter.value = "all";
+    courseFilter.value = "all";
+    subjectFilter.value = "all";
     dateFrom.value = "";
     dateTo.value = "";
     thresholdFilter.value = defaultThreshold;
+    courseThresholdFilter.value = "";
+    subjectThresholdFilter.value = "";
     alertCooldownDays.value = defaultCooldownDays;
     trendMode.value = "weekly";
     applyFilters();
@@ -140,7 +225,7 @@ const runLowAttendanceAlerts = () => {
     router.post(
         route("admin.attendance.alerts.run"),
         {
-            threshold: normalizedThreshold(),
+            threshold: thresholdValue.value,
             cooldown_days: normalizedCooldownDays(),
         },
         {
@@ -163,11 +248,30 @@ const exportUrl = (format) =>
                 : undefined,
         semester:
             semesterFilter.value !== "all" ? semesterFilter.value : undefined,
+        course_id:
+            courseFilter.value !== "all"
+                ? Number(courseFilter.value)
+                : undefined,
+        subject_id:
+            subjectFilter.value !== "all"
+                ? Number(subjectFilter.value)
+                : undefined,
         date_from: dateFrom.value || undefined,
         date_to: dateTo.value || undefined,
     });
 
-watch([programmeFilter, intakeYearFilter, semesterFilter], () => {
+watch(courseFilter, () => {
+    if (
+        subjectFilter.value !== "all" &&
+        !subjectOptions.value.some(
+            (subject) => String(subject.id) === String(subjectFilter.value)
+        )
+    ) {
+        subjectFilter.value = "all";
+    }
+});
+
+watch([programmeFilter, intakeYearFilter, semesterFilter, courseFilter, subjectFilter], () => {
     applyFilters();
 });
 
@@ -295,7 +399,7 @@ const filteredRecent = computed(() => {
                                 Narrow analytics by cohort, date range, risk threshold, and trend mode.
                             </p>
                         </div>
-                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-5">
                             <select
                                 v-model="programmeFilter"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
@@ -335,6 +439,32 @@ const filteredRecent = computed(() => {
                                     {{ semester }}
                                 </option>
                             </select>
+                            <select
+                                v-model="courseFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All courses</option>
+                                <option
+                                    v-for="course in options.courses"
+                                    :key="course.id"
+                                    :value="String(course.id)"
+                                >
+                                    {{ course.course_code }} - {{ course.title }}
+                                </option>
+                            </select>
+                            <select
+                                v-model="subjectFilter"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="all">All subjects</option>
+                                <option
+                                    v-for="subject in subjectOptions"
+                                    :key="subject.id"
+                                    :value="String(subject.id)"
+                                >
+                                    {{ subject.subject_code }} - {{ subject.title }}
+                                </option>
+                            </select>
                             <input
                                 v-model="dateFrom"
                                 type="date"
@@ -355,6 +485,24 @@ const filteredRecent = computed(() => {
                                 step="0.1"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                 placeholder="Low-attendance threshold %"
+                            />
+                            <input
+                                v-model.number="courseThresholdFilter"
+                                type="number"
+                                min="1"
+                                max="100"
+                                step="0.1"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                placeholder="Course threshold % (optional)"
+                            />
+                            <input
+                                v-model.number="subjectThresholdFilter"
+                                type="number"
+                                min="1"
+                                max="100"
+                                step="0.1"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                placeholder="Subject threshold % (optional)"
                             />
                             <input
                                 v-model.number="alertCooldownDays"
@@ -383,7 +531,9 @@ const filteredRecent = computed(() => {
                     </div>
                     <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
                         <p>
-                            Low-attendance threshold: <span class="font-semibold text-slate-700">{{ thresholdLabel }}%</span>
+                            Active threshold: <span class="font-semibold text-slate-700">{{ thresholdLabel }}%</span>
+                            (<span class="font-semibold text-slate-700">{{ thresholdScopeLabel }}</span>)
+                            | Global threshold: <span class="font-semibold text-slate-700">{{ Number(normalizedThreshold() ?? defaultThreshold).toFixed(1) }}%</span>
                             | Alert cooldown: <span class="font-semibold text-slate-700">{{ cooldownLabel }} day(s)</span>
                         </p>
                         <button
@@ -461,7 +611,7 @@ const filteredRecent = computed(() => {
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold text-slate-900">
-                                Students with Low Attendance (&lt; {{ thresholdLabel }}%)
+                                Students with Low Attendance (&lt; {{ thresholdLabel }}% {{ thresholdScopeLabel }} threshold)
                             </h3>
                             <p class="mt-1 text-sm text-slate-600">
                                 These students may require attention or intervention.
@@ -614,7 +764,7 @@ const filteredRecent = computed(() => {
                                                     Great news!
                                                 </p>
                                                 <p class="mt-1">
-                                                    All students are meeting the attendance threshold (>= {{ thresholdLabel }}%).
+                                                    All students are meeting the attendance threshold (>= {{ thresholdLabel }}% {{ thresholdScopeLabel }} threshold).
                                                 </p>
                                             </div>
                                         </div>

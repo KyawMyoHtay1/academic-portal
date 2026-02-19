@@ -79,6 +79,10 @@ class NotificationController extends Controller
                 return route('teacher.grades.show', $data['subject_id']);
             }
             if (in_array($role, ['staff', 'admin'], true)) {
+                if (! empty($data['subject_id'])) {
+                    return route('admin.grades.show', $data['subject_id']);
+                }
+
                 return route('admin.grades.index');
             }
         }
@@ -109,11 +113,17 @@ class NotificationController extends Controller
             if ($role === 'student') {
                 return route('student.attendance.index');
             }
+            if ($role === 'teacher' && ! empty($data['subject_id'])) {
+                return route('teacher.attendance.show', $data['subject_id']);
+            }
             if ($role === 'teacher') {
                 return route('teacher.attendance.index');
             }
             if (in_array($role, ['staff', 'admin'], true)) {
-                return route('admin.attendance.report');
+                return route('admin.attendance.report', [
+                    'course_id' => $data['course_id'] ?? null,
+                    'subject_id' => $data['subject_id'] ?? null,
+                ]);
             }
         }
 
@@ -125,7 +135,9 @@ class NotificationController extends Controller
                 return route('teacher.timetable.index');
             }
             if (in_array($role, ['staff', 'admin'], true)) {
-                return route('admin.timetables.index');
+                return route('admin.timetables.index', [
+                    'course_id' => $data['course_id'] ?? null,
+                ]);
             }
         }
 

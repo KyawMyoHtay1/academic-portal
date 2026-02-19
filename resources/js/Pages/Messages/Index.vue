@@ -24,6 +24,7 @@ const tabs = [
     { key: "all", label: "All" },
     { key: "inbox", label: "Inbox" },
     { key: "sent", label: "Sent" },
+    { key: "unread", label: "Unread" },
 ];
 
 const activeTab = ref("all");
@@ -80,6 +81,7 @@ const filteredMessages = computed(() => {
     if (!activeConversationData.value) {
         if (activeTab.value === "inbox") list = list.filter((message) => !message.is_sent);
         if (activeTab.value === "sent") list = list.filter((message) => message.is_sent);
+        if (activeTab.value === "unread") list = list.filter((message) => !message.is_sent && !message.read);
     }
 
     if (unreadOnly.value) {
@@ -107,9 +109,23 @@ const filteredMessages = computed(() => {
     return list;
 });
 
+const parseTimestamp = (value) => {
+    if (!value) return 0;
+    if (typeof value === "number") return value;
+
+    const raw = String(value).trim();
+    if (!raw) return 0;
+
+    const normalized = raw.includes("T") ? raw : raw.replace(" ", "T");
+    const parsed = new Date(normalized);
+    const millis = parsed.getTime();
+
+    return Number.isFinite(millis) ? millis : 0;
+};
+
 const threadMessages = computed(() =>
     [...filteredMessages.value].sort(
-        (a, b) => Number(a.created_at || 0) - Number(b.created_at || 0)
+        (a, b) => parseTimestamp(a.created_at) - parseTimestamp(b.created_at)
     )
 );
 
