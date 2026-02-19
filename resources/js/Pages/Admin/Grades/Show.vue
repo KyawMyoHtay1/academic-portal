@@ -13,6 +13,15 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    analytics: {
+        type: Object,
+        default: () => ({
+            status_counts: {},
+            summary: {},
+            distribution: {},
+            trend: [],
+        }),
+    },
 });
 
 const rejectReason = ref({});
@@ -37,6 +46,36 @@ const bulkForm = useForm({
     action: "approve",
     reason: "",
 });
+
+const summary = computed(() => props.analytics?.summary ?? {});
+const statusCounts = computed(() => props.analytics?.status_counts ?? {});
+const distribution = computed(() => props.analytics?.distribution ?? {});
+const trendRows = computed(() => props.analytics?.trend ?? []);
+
+const distributionItems = computed(() => [
+    { letter: "A", value: Number(distribution.value?.A ?? 0), barClass: "bg-emerald-500" },
+    { letter: "B", value: Number(distribution.value?.B ?? 0), barClass: "bg-blue-500" },
+    { letter: "C", value: Number(distribution.value?.C ?? 0), barClass: "bg-amber-500" },
+    { letter: "D", value: Number(distribution.value?.D ?? 0), barClass: "bg-yellow-500" },
+    { letter: "E", value: Number(distribution.value?.E ?? 0), barClass: "bg-orange-500" },
+    { letter: "F", value: Number(distribution.value?.F ?? 0), barClass: "bg-red-500" },
+]);
+const maxDistribution = computed(() =>
+    Math.max(1, ...distributionItems.value.map((item) => item.value))
+);
+const maxTrendAverage = computed(() =>
+    Math.max(
+        1,
+        ...trendRows.value.map((row) =>
+            row?.average_score === null || row?.average_score === undefined
+                ? 0
+                : Number(row.average_score)
+        )
+    )
+);
+
+const formatScore = (value) =>
+    value === null || value === undefined ? "-" : Number(value).toFixed(2);
 
 const filteredRows = computed(() => {
     const q = searchQuery.value.trim().toLowerCase();
@@ -221,6 +260,92 @@ const exportUrl = (format) =>
                         <p class="mt-1 text-xs text-slate-500">
                             {{ subject.course_code }} - {{ subject.course_title }}
                         </p>
+                    </div>
+
+                    <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-700">Draft</p>
+                            <p class="mt-2 text-2xl font-bold text-slate-900">{{ statusCounts.draft ?? 0 }}</p>
+                        </div>
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Pending</p>
+                            <p class="mt-2 text-2xl font-bold text-amber-900">{{ statusCounts.pending ?? 0 }}</p>
+                        </div>
+                        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Approved</p>
+                            <p class="mt-2 text-2xl font-bold text-emerald-900">{{ statusCounts.approved ?? 0 }}</p>
+                        </div>
+                        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Rejected</p>
+                            <p class="mt-2 text-2xl font-bold text-red-900">{{ statusCounts.rejected ?? 0 }}</p>
+                        </div>
+                        <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Average</p>
+                            <p class="mt-2 text-2xl font-bold text-indigo-900">{{ formatScore(summary.average_score) }}</p>
+                            <p class="mt-1 text-[11px] text-indigo-700">
+                                Min: {{ formatScore(summary.lowest_score) }} | Max: {{ formatScore(summary.highest_score) }}
+                            </p>
+                        </div>
+                        <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Pass Rate</p>
+                            <p class="mt-2 text-2xl font-bold text-blue-900">{{ summary.pass_rate ?? 0 }}%</p>
+                            <p class="mt-1 text-[11px] text-blue-700">
+                                {{ summary.scored_count ?? 0 }} scored / {{ summary.total_students ?? 0 }} enrolled
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 grid gap-4 lg:grid-cols-2">
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Score Distribution (A-F)
+                            </p>
+                            <div class="mt-3 space-y-2.5">
+                                <div
+                                    v-for="item in distributionItems"
+                                    :key="item.letter"
+                                    class="flex items-center gap-3"
+                                >
+                                    <div class="w-10 text-xs font-semibold text-slate-700">{{ item.letter }}</div>
+                                    <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                                        <div
+                                            class="h-full rounded-full"
+                                            :class="item.barClass"
+                                            :style="{ width: `${(item.value / maxDistribution) * 100}%` }"
+                                        ></div>
+                                    </div>
+                                    <span class="w-7 text-right text-xs font-semibold text-slate-700">{{ item.value }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Trend (Last 6 Months)
+                            </p>
+                            <div class="mt-3 space-y-2.5">
+                                <div
+                                    v-for="row in trendRows"
+                                    :key="row.month_key"
+                                    class="rounded-md border border-slate-100 bg-slate-50 px-3 py-2"
+                                >
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="font-semibold text-slate-700">{{ row.label }}</span>
+                                        <span class="text-slate-500">
+                                            {{ row.count }} update(s) | Avg {{ row.average_score === null ? "-" : Number(row.average_score).toFixed(2) }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                                        <div
+                                            class="h-full rounded-full bg-portal-navy"
+                                            :style="{
+                                                width: `${row.average_score === null ? 0 : (Number(row.average_score) / maxTrendAverage) * 100}%`,
+                                            }"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div

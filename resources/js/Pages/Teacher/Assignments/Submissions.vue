@@ -13,6 +13,26 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    missingStudents: {
+        type: Array,
+        default: () => [],
+    },
+    lateSubmissions: {
+        type: Array,
+        default: () => [],
+    },
+    reporting: {
+        type: Object,
+        default: () => ({
+            expected_students: 0,
+            submitted: 0,
+            graded: 0,
+            missing: 0,
+            late: 0,
+            submitted_percent: 0,
+            graded_percent: 0,
+        }),
+    },
     gradingTemplates: {
         type: Object,
         default: () => ({
@@ -23,6 +43,7 @@ const props = defineProps({
 });
 
 const searchQuery = ref("");
+const activeFilter = ref("all");
 const selectedTemplate = ref("");
 const gradingForm = useForm({ score: "", feedback: "", rubric: [] });
 const activeGrading = ref(null);
@@ -43,9 +64,28 @@ const createRubricRows = () => {
 
 const filtered = computed(() => {
     const q = searchQuery.value.trim().toLowerCase();
-    if (!q) return props.submissions;
+    let list = props.submissions;
+    if (activeFilter.value === "needs_grading") {
+        list = list.filter(
+            (submission) =>
+                submission.status !== "graded" &&
+                (submission.score === null || submission.score === undefined)
+        );
+    } else if (activeFilter.value === "graded") {
+        list = list.filter(
+            (submission) =>
+                submission.status === "graded" ||
+                (submission.score !== null && submission.score !== undefined)
+        );
+    } else if (activeFilter.value === "late") {
+        list = list.filter((submission) => Boolean(submission.is_late));
+    } else if (activeFilter.value === "missing") {
+        return [];
+    }
 
-    return props.submissions.filter((submission) => {
+    if (!q) return list;
+
+    return list.filter((submission) => {
         const name = (submission.student?.full_name ?? "").toLowerCase();
         const studentNo = (submission.student?.student_no ?? "").toLowerCase();
         return name.includes(q) || studentNo.includes(q);
@@ -53,6 +93,18 @@ const filtered = computed(() => {
 });
 
 const totalSubmissions = computed(() => Number(props.submissions?.length ?? 0));
+const expectedStudents = computed(() => Number(props.reporting?.expected_students ?? 0));
+const missingCount = computed(() => Number(props.reporting?.missing ?? 0));
+const lateCount = computed(() => Number(props.reporting?.late ?? 0));
+const needsGradingCount = computed(() =>
+    Number(
+        (props.submissions ?? []).filter(
+            (submission) =>
+                submission.status !== "graded" &&
+                (submission.score === null || submission.score === undefined)
+        ).length
+    )
+);
 
 const gradedSubmissions = computed(() =>
     Number(
@@ -65,11 +117,20 @@ const gradedSubmissions = computed(() =>
 );
 
 const submissionPercent = computed(() => {
-    if (totalSubmissions.value <= 0) return 0;
+    if (expectedStudents.value <= 0) return 0;
 
     return Math.min(
         100,
-        Math.max(0, Math.round((gradedSubmissions.value / totalSubmissions.value) * 100))
+        Math.max(0, Math.round((totalSubmissions.value / expectedStudents.value) * 100))
+    );
+});
+
+const gradedPercent = computed(() => {
+    if (expectedStudents.value <= 0) return 0;
+
+    return Math.min(
+        100,
+        Math.max(0, Math.round((gradedSubmissions.value / expectedStudents.value) * 100))
     );
 });
 
@@ -193,7 +254,7 @@ const applyCommentTemplate = () => {
                     <p class="mt-2 text-lg font-bold text-slate-900">{{ props.assignment.title }}</p>
                     <p class="mt-1 text-xs text-slate-500">{{ props.assignment.subject.subject_code }}</p>
 
-                    <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                    <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-6">
                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                             <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                 Due
@@ -214,10 +275,10 @@ const applyCommentTemplate = () => {
 
                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                             <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                Submissions
+                                Submission Progress
                             </p>
                             <p class="mt-1 text-xs font-medium text-slate-800">
-                                {{ totalSubmissions }} total, {{ gradedSubmissions }} graded
+                                {{ totalSubmissions }}/{{ expectedStudents }} submitted ({{ submissionPercent }}%)
                             </p>
                             <div class="mt-1 h-1.5 rounded-full bg-slate-200">
                                 <div
@@ -225,6 +286,39 @@ const applyCommentTemplate = () => {
                                     :style="{ width: `${submissionPercent}%` }"
                                 ></div>
                             </div>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Grading Progress
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                {{ gradedSubmissions }}/{{ expectedStudents }} graded ({{ gradedPercent }}%)
+                            </p>
+                            <div class="mt-1 h-1.5 rounded-full bg-slate-200">
+                                <div
+                                    class="h-1.5 rounded-full bg-indigo-500"
+                                    :style="{ width: `${gradedPercent}%` }"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Missing
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-rose-700">
+                                {{ missingCount }} student(s)
+                            </p>
+                        </div>
+
+                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Late
+                            </p>
+                            <p class="mt-1 text-xs font-medium text-amber-700">
+                                {{ lateCount }} submission(s)
+                            </p>
                         </div>
 
                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
@@ -259,11 +353,100 @@ const applyCommentTemplate = () => {
                         </div>
                     </div>
 
+                    <div class="mb-4 flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                            :class="activeFilter === 'all' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                            @click="activeFilter = 'all'"
+                        >
+                            All ({{ totalSubmissions }})
+                        </button>
+                        <button
+                            type="button"
+                            class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                            :class="activeFilter === 'needs_grading' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                            @click="activeFilter = 'needs_grading'"
+                        >
+                            Needs grading ({{ needsGradingCount }})
+                        </button>
+                        <button
+                            type="button"
+                            class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                            :class="activeFilter === 'graded' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                            @click="activeFilter = 'graded'"
+                        >
+                            Graded ({{ gradedSubmissions }})
+                        </button>
+                        <button
+                            type="button"
+                            class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                            :class="activeFilter === 'late' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                            @click="activeFilter = 'late'"
+                        >
+                            Late ({{ lateCount }})
+                        </button>
+                        <button
+                            type="button"
+                            class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-slate-200 transition"
+                            :class="activeFilter === 'missing' ? 'bg-portal-navy text-white ring-portal-navy' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                            @click="activeFilter = 'missing'"
+                        >
+                            Missing ({{ missingCount }})
+                        </button>
+                    </div>
+
                     <div
-                        v-if="filtered.length === 0"
+                        v-if="activeFilter === 'missing'"
+                        class="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                    >
+                        <p class="text-sm font-semibold text-slate-800">
+                            Missing submissions
+                        </p>
+                        <p class="mt-1 text-xs text-slate-500">
+                            Students who have not submitted this assignment yet.
+                        </p>
+                        <div
+                            v-if="missingStudents.length === 0"
+                            class="mt-3 rounded-md bg-white p-4 text-sm text-slate-500"
+                        >
+                            No missing students for this assignment.
+                        </div>
+                        <div v-else class="mt-3 overflow-hidden rounded-md border border-slate-200 bg-white">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                            Student
+                                        </th>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                            Student No
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    <tr
+                                        v-for="student in missingStudents"
+                                        :key="student.id"
+                                        class="hover:bg-slate-50"
+                                    >
+                                        <td class="px-3 py-2 text-sm text-slate-700">
+                                            {{ student.full_name }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-slate-500">
+                                            {{ student.student_no }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else-if="filtered.length === 0"
                         class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500"
                     >
-                        {{ searchQuery.trim() ? "No submissions match your search." : "No submissions yet." }}
+                        {{ searchQuery.trim() ? "No submissions match your search." : "No submissions for this filter yet." }}
                     </div>
 
                     <div v-else class="space-y-4">
@@ -298,6 +481,12 @@ const applyCommentTemplate = () => {
                                                 class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
                                             >
                                                 Graded
+                                            </span>
+                                            <span
+                                                v-if="submission.is_late"
+                                                class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800"
+                                            >
+                                                Late by {{ submission.late_by }}
                                             </span>
                                         </div>
 

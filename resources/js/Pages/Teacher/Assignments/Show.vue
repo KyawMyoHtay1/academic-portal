@@ -83,13 +83,11 @@ const formatDue = (assignment) => {
     return assignment.due_time ? `${dateLabel}, ${assignment.due_time}` : dateLabel;
 };
 
-const submissionPercent = (assignment) => {
-    const total = Number(assignment?.submissions_count ?? 0);
-    const graded = Number(assignment?.graded_count ?? 0);
+const submissionPercent = (assignment) =>
+    Math.min(100, Math.max(0, Number(assignment?.submitted_percent ?? 0)));
 
-    if (total <= 0) return 0;
-    return Math.min(100, Math.max(0, Math.round((graded / total) * 100)));
-};
+const gradedPercent = (assignment) =>
+    Math.min(100, Math.max(0, Number(assignment?.graded_percent ?? 0)));
 </script>
 
 <template>
@@ -192,12 +190,24 @@ const submissionPercent = (assignment) => {
                                         >
                                             Overdue
                                         </span>
+                                        <span
+                                            v-if="assignment.missing_submissions_count > 0"
+                                            class="inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-800"
+                                        >
+                                            Missing {{ assignment.missing_submissions_count }}
+                                        </span>
+                                        <span
+                                            v-if="assignment.late_submissions_count > 0"
+                                            class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800"
+                                        >
+                                            Late {{ assignment.late_submissions_count }}
+                                        </span>
                                     </div>
                                     <p v-if="assignment.description" class="mt-1 text-sm text-slate-600 line-clamp-2">
                                         {{ assignment.description }}
                                     </p>
 
-                                    <div class="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                                    <div class="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-6">
                                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                                             <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                                 Due
@@ -218,10 +228,10 @@ const submissionPercent = (assignment) => {
 
                                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                                             <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                                Submissions
+                                                Submitted
                                             </p>
                                             <p class="mt-1 text-xs font-medium text-slate-800">
-                                                {{ assignment.submissions_count }} total, {{ assignment.graded_count }} graded
+                                                {{ assignment.submissions_count }}/{{ assignment.expected_students_count }} ({{ submissionPercent(assignment) }}%)
                                             </p>
                                             <div class="mt-1 h-1.5 rounded-full bg-slate-200">
                                                 <div
@@ -229,6 +239,39 @@ const submissionPercent = (assignment) => {
                                                     :style="{ width: `${submissionPercent(assignment)}%` }"
                                                 ></div>
                                             </div>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Graded
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-slate-800">
+                                                {{ assignment.graded_count }}/{{ assignment.expected_students_count }} ({{ gradedPercent(assignment) }}%)
+                                            </p>
+                                            <div class="mt-1 h-1.5 rounded-full bg-slate-200">
+                                                <div
+                                                    class="h-1.5 rounded-full bg-indigo-500"
+                                                    :style="{ width: `${gradedPercent(assignment)}%` }"
+                                                ></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Missing
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-rose-700">
+                                                {{ assignment.missing_submissions_count }} student(s)
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                Late
+                                            </p>
+                                            <p class="mt-1 text-xs font-medium text-amber-700">
+                                                {{ assignment.late_submissions_count }} submission(s)
+                                            </p>
                                         </div>
 
                                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">

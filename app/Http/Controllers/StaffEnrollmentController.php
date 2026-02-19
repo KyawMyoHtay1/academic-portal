@@ -195,9 +195,12 @@ class StaffEnrollmentController extends Controller
     /**
      * Reject a pending enrollment.
      */
-    public function reject($enrollment): RedirectResponse
+    public function reject(Request $request, $enrollment): RedirectResponse
     {
-        $result = $this->enrollmentService->rejectEnrollment($enrollment);
+        $result = $this->enrollmentService->rejectEnrollment(
+            $enrollment,
+            $this->normalizeDecisionReason($request->input('reason'))
+        );
 
         return redirect()
             ->route('admin.enrollments.index')
@@ -219,9 +222,12 @@ class StaffEnrollmentController extends Controller
     /**
      * Reject a withdrawal request (keeps the enrollment as approved).
      */
-    public function rejectWithdrawal($enrollment): RedirectResponse
+    public function rejectWithdrawal(Request $request, $enrollment): RedirectResponse
     {
-        $result = $this->enrollmentService->rejectWithdrawal($enrollment);
+        $result = $this->enrollmentService->rejectWithdrawal(
+            $enrollment,
+            $this->normalizeDecisionReason($request->input('reason'))
+        );
 
         return redirect()
             ->route('admin.enrollments.index')
@@ -271,6 +277,20 @@ class StaffEnrollmentController extends Controller
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
         ];
+    }
+
+    private function normalizeDecisionReason(mixed $rawReason): ?string
+    {
+        if (! is_scalar($rawReason)) {
+            return null;
+        }
+
+        $reason = trim((string) $rawReason);
+        if ($reason === '') {
+            return null;
+        }
+
+        return mb_substr($reason, 0, 1000);
     }
 
     /**

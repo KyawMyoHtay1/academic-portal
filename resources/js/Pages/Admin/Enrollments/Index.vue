@@ -213,6 +213,14 @@ const approveEnrollment = (enrollmentId) => {
 };
 
 const rejectEnrollment = (enrollmentId) => {
+    const reason = prompt(
+        "Optional rejection reason (shown in the audit trail). Leave blank to use default reason:",
+        ""
+    );
+    if (reason === null) {
+        return;
+    }
+
     if (
         !confirm(
             "Are you sure you want to reject this enrollment? The student can reapply later."
@@ -223,7 +231,9 @@ const rejectEnrollment = (enrollmentId) => {
 
     router.post(
         route("admin.enrollments.reject", enrollmentId),
-        {},
+        {
+            reason: reason.trim() || undefined,
+        },
         {
             preserveScroll: true,
         }
@@ -249,6 +259,14 @@ const approveWithdrawal = (enrollmentId) => {
 };
 
 const rejectWithdrawal = (enrollmentId) => {
+    const reason = prompt(
+        "Optional reason for rejecting withdrawal (shown in the audit trail). Leave blank to use default reason:",
+        ""
+    );
+    if (reason === null) {
+        return;
+    }
+
     if (
         !confirm(
             "Are you sure you want to reject this withdrawal? The student will remain enrolled in the course."
@@ -259,7 +277,9 @@ const rejectWithdrawal = (enrollmentId) => {
 
     router.post(
         route("admin.enrollments.reject-withdrawal", enrollmentId),
-        {},
+        {
+            reason: reason.trim() || undefined,
+        },
         {
             preserveScroll: true,
         }

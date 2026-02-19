@@ -61,6 +61,7 @@ class StaffGradesController extends Controller
         $this->authorize('viewAny', Grade::class);
 
         $studentRows = $this->buildSubjectRows($subject);
+        $analytics = $this->buildSubjectAnalytics($subject);
 
         return Inertia::render('Admin/Grades/Show', [
             'subject' => [
@@ -71,6 +72,7 @@ class StaffGradesController extends Controller
                 'course_title' => $subject->course->title,
             ],
             'rows' => $studentRows,
+            'analytics' => $analytics,
         ]);
     }
 
@@ -324,6 +326,130 @@ class StaffGradesController extends Controller
                 ] : null,
             ];
         });
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildSubjectAnalytics(Subject $subject): array
+    {
+        $enrolledStudentIds = $subject->course->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->pluck('students.id');
+
+        $grades = Grade::query()
+            ->where('subject_id', $subject->id)
+            ->whereIn('student_id', $enrolledStudentIds)
+            ->get([
+                'id',
+                'student_id',
+                'score',
+                'status',
+                'updated_at',
+            ]);
+
+        $totalStudents = $enrolledStudentIds->count();
+        $gradedStudentCount = $grades->pluck('student_id')->unique()->count();
+        $scoreValues = $grades
+            ->pluck('score')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value)
+            ->values();
+        $scoredCount = $scoreValues->count();
+
+        $letterDistribution = [
+            'A' => 0,
+            'B' => 0,
+            'C' => 0,
+            'D' => 0,
+            'E' => 0,
+            'F' => 0,
+        ];
+        foreach ($scoreValues as $score) {
+            if ($score >= 80) {
+                $letterDistribution['A']++;
+            } elseif ($score >= 70) {
+                $letterDistribution['B']++;
+            } elseif ($score >= 60) {
+                $letterDistribution['C']++;
+            } elseif ($score >= 50) {
+                $letterDistribution['D']++;
+            } elseif ($score >= 40) {
+                $letterDistribution['E']++;
+            } else {
+                $letterDistribution['F']++;
+            }
+        }
+
+        $monthKeys = collect(range(5, 0))
+            ->map(fn ($offset) => now()->copy()->startOfMonth()->subMonths($offset)->format('Y-m'))
+            ->push(now()->copy()->startOfMonth()->format('Y-m'))
+            ->values();
+
+        $trendMap = $monthKeys->mapWithKeys(function ($monthKey) {
+            return [$monthKey => [
+                'month_key' => $monthKey,
+                'label' => date('M Y', strtotime($monthKey.'-01')),
+                'count' => 0,
+                'score_sum' => 0.0,
+                'score_count' => 0,
+            ]];
+        });
+
+        foreach ($grades as $grade) {
+            $monthKey = $grade->updated_at?->format('Y-m');
+            if (! $monthKey || ! $trendMap->has($monthKey)) {
+                continue;
+            }
+
+            $current = $trendMap->get($monthKey);
+            $current['count']++;
+            if ($grade->score !== null) {
+                $current['score_sum'] += (float) $grade->score;
+                $current['score_count']++;
+            }
+            $trendMap->put($monthKey, $current);
+        }
+
+        $statusCounts = [
+            Grade::STATUS_DRAFT => (int) $grades->where('status', Grade::STATUS_DRAFT)->count(),
+            Grade::STATUS_PENDING => (int) $grades->where('status', Grade::STATUS_PENDING)->count(),
+            Grade::STATUS_APPROVED => (int) $grades->where('status', Grade::STATUS_APPROVED)->count(),
+            Grade::STATUS_REJECTED => (int) $grades->where('status', Grade::STATUS_REJECTED)->count(),
+        ];
+
+        $passCount = (int) $scoreValues->filter(fn ($score) => $score >= 40)->count();
+        $passRate = $scoredCount > 0
+            ? round(($passCount / $scoredCount) * 100, 1)
+            : 0.0;
+
+        return [
+            'status_counts' => $statusCounts,
+            'summary' => [
+                'total_students' => $totalStudents,
+                'graded_students' => $gradedStudentCount,
+                'ungraded_students' => max($totalStudents - $gradedStudentCount, 0),
+                'average_score' => $scoredCount > 0 ? round($scoreValues->avg(), 2) : null,
+                'highest_score' => $scoredCount > 0 ? round($scoreValues->max(), 2) : null,
+                'lowest_score' => $scoredCount > 0 ? round($scoreValues->min(), 2) : null,
+                'pass_rate' => $passRate,
+                'scored_count' => $scoredCount,
+            ],
+            'distribution' => $letterDistribution,
+            'trend' => $trendMap
+                ->values()
+                ->map(function (array $entry) {
+                    return [
+                        'month_key' => $entry['month_key'],
+                        'label' => $entry['label'],
+                        'count' => $entry['count'],
+                        'average_score' => $entry['score_count'] > 0
+                            ? round($entry['score_sum'] / $entry['score_count'], 2)
+                            : null,
+                    ];
+                })
+                ->all(),
+        ];
     }
 
     private function approvePendingGrade(Grade $grade): void

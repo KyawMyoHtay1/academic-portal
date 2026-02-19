@@ -19,6 +19,11 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public function __construct(
+        private readonly ?float $thresholdOverride = null,
+        private readonly ?int $cooldownDaysOverride = null
+    ) {}
+
     /**
      * Number of attempts before failing permanently.
      */
@@ -43,8 +48,10 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
 
     public function handle(): void
     {
-        $threshold = (float) config('attendance_alerts.low_threshold', 75);
-        $cooldownDays = (int) config('attendance_alerts.cooldown_days', 7);
+        $threshold = $this->thresholdOverride ?? (float) config('attendance_alerts.low_threshold', 75);
+        $cooldownDays = $this->cooldownDaysOverride ?? (int) config('attendance_alerts.cooldown_days', 7);
+        $threshold = max(1, min(100, (float) $threshold));
+        $cooldownDays = max(0, min(90, (int) $cooldownDays));
         $now = now();
 
         DB::table('attendances')

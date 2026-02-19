@@ -85,6 +85,11 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You are not assigned to this subject.');
         }
 
+        $expectedStudentsCount = $subject->course
+            ->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->count();
+
         $assignments = Assignment::where('subject_id', $subject->id)
             ->with('creator:id,name')
             ->withCount('submissions')
@@ -94,8 +99,23 @@ class TeacherAssignmentController extends Controller
                 },
             ])
             ->orderBy('due_date', 'desc')
-            ->get()
-            ->map(function ($assignment) {
+            ->get();
+
+        $assignmentIds = $assignments->pluck('id')->all();
+        $lateCounts = AssignmentSubmission::query()
+            ->join('assignments', 'assignment_submissions.assignment_id', '=', 'assignments.id')
+            ->whereIn('assignment_submissions.assignment_id', $assignmentIds)
+            ->whereRaw("assignment_submissions.updated_at > CONCAT(assignments.due_date, ' ', COALESCE(assignments.due_time, '23:59:59'))")
+            ->selectRaw('assignment_submissions.assignment_id, COUNT(*) as late_count')
+            ->groupBy('assignment_submissions.assignment_id')
+            ->pluck('late_count', 'assignment_submissions.assignment_id');
+
+        $assignments = $assignments
+            ->map(function ($assignment) use ($expectedStudentsCount, $lateCounts) {
+                $submissionsCount = (int) ($assignment->submissions_count ?? 0);
+                $gradedCount = (int) ($assignment->graded_submissions_count ?? 0);
+                $expectedCount = max($expectedStudentsCount, 0);
+
                 return [
                     'id' => $assignment->id,
                     'title' => $assignment->title,
@@ -104,8 +124,17 @@ class TeacherAssignmentController extends Controller
                     'due_time' => $assignment->due_time ? (is_string($assignment->due_time) ? substr($assignment->due_time, 0, 5) : $assignment->due_time->format('H:i')) : null,
                     'max_score' => $assignment->max_score,
                     'status' => $assignment->status,
-                    'submissions_count' => $assignment->submissions_count ?? 0,
-                    'graded_count' => $assignment->graded_submissions_count ?? 0,
+                    'submissions_count' => $submissionsCount,
+                    'graded_count' => $gradedCount,
+                    'expected_students_count' => $expectedCount,
+                    'missing_submissions_count' => max($expectedCount - $submissionsCount, 0),
+                    'late_submissions_count' => (int) ($lateCounts[$assignment->id] ?? 0),
+                    'submitted_percent' => $expectedCount > 0
+                        ? min(100, round(($submissionsCount / $expectedCount) * 100))
+                        : 0,
+                    'graded_percent' => $expectedCount > 0
+                        ? min(100, round(($gradedCount / $expectedCount) * 100))
+                        : 0,
                     'is_overdue' => $assignment->isOverdue(),
                     'creator_name' => $assignment->creator?->name ?? null,
                 ];
@@ -277,11 +306,37 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You can only view submissions for your own assignments.');
         }
 
-        $submissions = AssignmentSubmission::where('assignment_id', $assignment->id)
+        $dueAt = $this->assignmentDueAt($assignment);
+
+        $expectedStudents = $assignment->course
+            ->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->orderBy('students.full_name')
+            ->get(['students.id', 'students.student_no', 'students.full_name', 'students.photo'])
+            ->map(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'student_no' => $student->student_no,
+                    'full_name' => $student->full_name,
+                    'photo' => $student->photo,
+                ];
+            });
+
+        $submissionModels = AssignmentSubmission::where('assignment_id', $assignment->id)
             ->with(['student:id,student_no,full_name,photo', 'grader:id,name'])
             ->orderBy('updated_at', 'desc')
-            ->get()
-            ->map(function ($submission) {
+            ->get();
+
+        $submissions = $submissionModels
+            ->map(function ($submission) use ($dueAt) {
+                $submittedAt = $submission->updated_at ?? $submission->created_at;
+                $isLate = $dueAt !== null && $submittedAt !== null
+                    ? $submittedAt->gt($dueAt)
+                    : false;
+                $lateByMinutes = $isLate && $submittedAt !== null
+                    ? $dueAt->diffInMinutes($submittedAt)
+                    : 0;
+
                 return [
                     'id' => $submission->id,
                     'student' => [
@@ -301,8 +356,45 @@ class TeacherAssignmentController extends Controller
                     'submitted_at' => $submission->created_at->format('Y-m-d H:i'),
                     'last_submitted_at' => $submission->updated_at?->format('Y-m-d H:i'),
                     'percentage' => $submission->percentage,
+                    'is_late' => $isLate,
+                    'late_by' => $isLate ? $this->formatLateDuration($lateByMinutes) : null,
                 ];
             });
+
+        $submittedStudentIds = $submissionModels
+            ->pluck('student_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $missingStudents = $expectedStudents
+            ->filter(function ($student) use ($submittedStudentIds) {
+                return ! in_array((int) $student['id'], $submittedStudentIds, true);
+            })
+            ->values()
+            ->all();
+
+        $lateSubmissions = $submissions
+            ->filter(fn ($submission) => (bool) ($submission['is_late'] ?? false))
+            ->map(function ($submission) {
+                return [
+                    'id' => $submission['id'],
+                    'student_no' => $submission['student']['student_no'] ?? 'N/A',
+                    'student_name' => $submission['student']['full_name'] ?? 'Unknown',
+                    'submitted_at' => $submission['last_submitted_at'] ?? $submission['submitted_at'],
+                    'late_by' => $submission['late_by'],
+                ];
+            })
+            ->values()
+            ->all();
+
+        $totalExpected = $expectedStudents->count();
+        $totalSubmitted = $submissions->count();
+        $totalGraded = $submissions->filter(function ($submission) {
+            return $submission['status'] === AssignmentSubmission::STATUS_GRADED
+                || $submission['score'] !== null;
+        })->count();
+        $totalMissing = count($missingStudents);
+        $totalLate = count($lateSubmissions);
 
         return Inertia::render('Teacher/Assignments/Submissions', [
             'assignment' => [
@@ -316,8 +408,24 @@ class TeacherAssignmentController extends Controller
                     'subject_code' => $assignment->subject->subject_code,
                     'title' => $assignment->subject->title,
                 ],
+                'due_at' => $dueAt?->format('Y-m-d H:i'),
             ],
             'submissions' => $submissions,
+            'missingStudents' => $missingStudents,
+            'lateSubmissions' => $lateSubmissions,
+            'reporting' => [
+                'expected_students' => $totalExpected,
+                'submitted' => $totalSubmitted,
+                'graded' => $totalGraded,
+                'missing' => $totalMissing,
+                'late' => $totalLate,
+                'submitted_percent' => $totalExpected > 0
+                    ? min(100, round(($totalSubmitted / $totalExpected) * 100))
+                    : 0,
+                'graded_percent' => $totalExpected > 0
+                    ? min(100, round(($totalGraded / $totalExpected) * 100))
+                    : 0,
+            ],
             'gradingTemplates' => [
                 'comment_templates' => [
                     'Great structure and clarity. Keep this standard.',
@@ -468,6 +576,47 @@ class TeacherAssignmentController extends Controller
             $submission->file_path,
             $submission->original_filename
         );
+    }
+
+    private function assignmentDueAt(Assignment $assignment): ?\Illuminate\Support\Carbon
+    {
+        if (! $assignment->due_date) {
+            return null;
+        }
+
+        $dueAt = $assignment->due_date->copy()->endOfDay();
+
+        if ($assignment->due_time) {
+            $parts = array_map('intval', explode(':', (string) $assignment->due_time));
+            $dueAt->setTime($parts[0] ?? 23, $parts[1] ?? 59, $parts[2] ?? 0);
+        }
+
+        return $dueAt;
+    }
+
+    private function formatLateDuration(int $lateByMinutes): string
+    {
+        $minutes = max($lateByMinutes, 0);
+
+        if ($minutes < 60) {
+            return sprintf('%d min', $minutes);
+        }
+
+        if ($minutes < 1440) {
+            $hours = intdiv($minutes, 60);
+            $remainingMinutes = $minutes % 60;
+
+            return $remainingMinutes > 0
+                ? sprintf('%dh %dm', $hours, $remainingMinutes)
+                : sprintf('%dh', $hours);
+        }
+
+        $days = intdiv($minutes, 1440);
+        $remainingHours = intdiv($minutes % 1440, 60);
+
+        return $remainingHours > 0
+            ? sprintf('%dd %dh', $days, $remainingHours)
+            : sprintf('%dd', $days);
     }
 
     /**

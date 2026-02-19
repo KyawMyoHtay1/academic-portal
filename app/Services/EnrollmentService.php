@@ -365,9 +365,11 @@ class EnrollmentService
      * @param  int|string  $enrollmentId
      * @return array{level: string, message: string}
      */
-    public function rejectEnrollment(int|string $enrollmentId): array
+    public function rejectEnrollment(int|string $enrollmentId, ?string $reason = null): array
     {
-        return DB::transaction(function () use ($enrollmentId): array {
+        $reason = $this->normalizeReason($reason);
+
+        return DB::transaction(function () use ($enrollmentId, $reason): array {
             $performedBy = Auth::id();
             $enrollment = DB::table('course_student')
                 ->where('id', $enrollmentId)
@@ -402,7 +404,7 @@ class EnrollmentService
                 'from_status' => 'pending',
                 'to_status' => 'rejected',
                 'action' => 'rejected',
-                'reason' => 'Enrollment rejected by staff.',
+                'reason' => $reason ?? 'Enrollment rejected by staff.',
                 'performed_by' => $performedBy,
             ]);
 
@@ -470,9 +472,11 @@ class EnrollmentService
      * @param  int|string  $enrollmentId
      * @return array{level: string, message: string}
      */
-    public function rejectWithdrawal(int|string $enrollmentId): array
+    public function rejectWithdrawal(int|string $enrollmentId, ?string $reason = null): array
     {
-        return DB::transaction(function () use ($enrollmentId): array {
+        $reason = $this->normalizeReason($reason);
+
+        return DB::transaction(function () use ($enrollmentId, $reason): array {
             $performedBy = Auth::id();
             $enrollment = DB::table('course_student')
                 ->where('id', $enrollmentId)
@@ -507,7 +511,7 @@ class EnrollmentService
                 'from_status' => 'withdrawal_pending',
                 'to_status' => 'approved',
                 'action' => 'withdrawal_rejected',
-                'reason' => 'Withdrawal rejected by staff.',
+                'reason' => $reason ?? 'Withdrawal rejected by staff.',
                 'performed_by' => $performedBy,
             ]);
 
@@ -568,6 +572,17 @@ class EnrollmentService
         }
 
         return (bool) $exists;
+    }
+
+    private function normalizeReason(?string $reason): ?string
+    {
+        if ($reason === null) {
+            return null;
+        }
+
+        $cleaned = trim($reason);
+
+        return $cleaned !== '' ? mb_substr($cleaned, 0, 1000) : null;
     }
 
     /**

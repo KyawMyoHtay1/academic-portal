@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import DashboardChart from "@/Components/Dashboard/DashboardChart.vue";
+import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps({
@@ -30,6 +31,20 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    trend: {
+        type: Object,
+        default: () => ({
+            weekly: [],
+            monthly: [],
+        }),
+    },
+    defaults: {
+        type: Object,
+        default: () => ({
+            threshold: 75,
+            cooldown_days: 7,
+        }),
+    },
     options: {
         type: Object,
         default: () => ({
@@ -47,6 +62,36 @@ const searchRecent = ref("");
 const programmeFilter = ref(props.filters?.programme || "all");
 const intakeYearFilter = ref(props.filters?.intake_year || "all");
 const semesterFilter = ref(props.filters?.semester || "all");
+const dateFrom = ref(props.filters?.date_from || "");
+const dateTo = ref(props.filters?.date_to || "");
+const defaultThreshold = Number(props.defaults?.threshold ?? 75);
+const defaultCooldownDays = Number(props.defaults?.cooldown_days ?? 7);
+const thresholdFilter = ref(Number(props.filters?.threshold ?? defaultThreshold));
+const alertCooldownDays = ref(Number(props.filters?.cooldown_days ?? defaultCooldownDays));
+const trendMode = ref(props.filters?.trend_mode || "weekly");
+const sendingAlerts = ref(false);
+
+const normalizedThreshold = () => {
+    const value = Number(thresholdFilter.value);
+    return Number.isFinite(value) && value >= 1 && value <= 100 ? value : undefined;
+};
+
+const normalizedCooldownDays = () => {
+    const value = Number(alertCooldownDays.value);
+    return Number.isFinite(value) && value >= 0 && value <= 90 ? value : undefined;
+};
+
+const thresholdLabel = computed(() => {
+    const value = normalizedThreshold();
+    return (value ?? defaultThreshold).toFixed(1);
+});
+
+const cooldownLabel = computed(() => {
+    const value = normalizedCooldownDays();
+    return String(value ?? defaultCooldownDays);
+});
+
+const thresholdValue = computed(() => normalizedThreshold() ?? defaultThreshold);
 
 const applyFilters = () => {
     router.get(
@@ -64,11 +109,45 @@ const applyFilters = () => {
                 semesterFilter.value !== "all"
                     ? semesterFilter.value
                     : undefined,
+            date_from: dateFrom.value || undefined,
+            date_to: dateTo.value || undefined,
+            threshold: normalizedThreshold(),
+            cooldown_days: normalizedCooldownDays(),
+            trend_mode: trendMode.value !== "weekly" ? trendMode.value : undefined,
         },
         {
             preserveScroll: true,
             preserveState: true,
             replace: true,
+        }
+    );
+};
+
+const clearReportFilters = () => {
+    programmeFilter.value = "all";
+    intakeYearFilter.value = "all";
+    semesterFilter.value = "all";
+    dateFrom.value = "";
+    dateTo.value = "";
+    thresholdFilter.value = defaultThreshold;
+    alertCooldownDays.value = defaultCooldownDays;
+    trendMode.value = "weekly";
+    applyFilters();
+};
+
+const runLowAttendanceAlerts = () => {
+    sendingAlerts.value = true;
+    router.post(
+        route("admin.attendance.alerts.run"),
+        {
+            threshold: normalizedThreshold(),
+            cooldown_days: normalizedCooldownDays(),
+        },
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                sendingAlerts.value = false;
+            },
         }
     );
 };
@@ -84,11 +163,34 @@ const exportUrl = (format) =>
                 : undefined,
         semester:
             semesterFilter.value !== "all" ? semesterFilter.value : undefined,
+        date_from: dateFrom.value || undefined,
+        date_to: dateTo.value || undefined,
     });
 
 watch([programmeFilter, intakeYearFilter, semesterFilter], () => {
     applyFilters();
 });
+
+const trendRows = computed(() =>
+    trendMode.value === "monthly"
+        ? props.trend?.monthly ?? []
+        : props.trend?.weekly ?? []
+);
+
+const trendChartData = computed(() => ({
+    labels: trendRows.value.map((row) => row.label),
+    datasets: [
+        {
+            label: "Attendance rate",
+            data: trendRows.value.map((row) => Number(row.rate ?? 0)),
+            borderColor: "#0f766e",
+            backgroundColor: "rgba(15, 118, 110, 0.18)",
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3,
+        },
+    ],
+}));
 
 const filteredStudents = computed(() => {
     const q = searchStudents.value.trim().toLowerCase();
@@ -150,11 +252,11 @@ const filteredRecent = computed(() => {
                     >
                         Export PDF
                     </a>
-                    <Link
-                        :href="route('admin.attendance.alerts.run')"
-                        method="post"
-                        as="button"
+                    <button
+                        type="button"
                         class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                        :disabled="sendingAlerts"
+                        @click="runLowAttendanceAlerts"
                     >
                         <svg
                             class="h-5 w-5"
@@ -169,8 +271,8 @@ const filteredRecent = computed(() => {
                                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                             />
                         </svg>
-                        <span>Send Low Attendance Alerts</span>
-                    </Link>
+                        <span>{{ sendingAlerts ? "Queueing..." : "Send Low Attendance Alerts" }}</span>
+                    </button>
                 </div>
             </div>
         </template>
@@ -190,10 +292,10 @@ const filteredRecent = computed(() => {
                                 Report Filters
                             </p>
                             <p class="mt-1 text-sm text-slate-600">
-                                Narrow attendance analytics by programme, intake year, and semester.
+                                Narrow analytics by cohort, date range, risk threshold, and trend mode.
                             </p>
                         </div>
-                        <div class="grid w-full gap-2 sm:w-auto sm:grid-cols-3">
+                        <div class="grid w-full gap-2 sm:grid-cols-2 lg:grid-cols-4">
                             <select
                                 v-model="programmeFilter"
                                 class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
@@ -233,8 +335,81 @@ const filteredRecent = computed(() => {
                                     {{ semester }}
                                 </option>
                             </select>
+                            <input
+                                v-model="dateFrom"
+                                type="date"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                title="Date from"
+                            />
+                            <input
+                                v-model="dateTo"
+                                type="date"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                title="Date to"
+                            />
+                            <input
+                                v-model.number="thresholdFilter"
+                                type="number"
+                                min="1"
+                                max="100"
+                                step="0.1"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                placeholder="Low-attendance threshold %"
+                            />
+                            <input
+                                v-model.number="alertCooldownDays"
+                                type="number"
+                                min="0"
+                                max="90"
+                                step="1"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                placeholder="Alert cooldown days"
+                            />
+                            <select
+                                v-model="trendMode"
+                                class="w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option value="weekly">Weekly trend (12 weeks)</option>
+                                <option value="monthly">Monthly trend (6 months)</option>
+                            </select>
+                            <button
+                                type="button"
+                                class="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                                @click="applyFilters"
+                            >
+                                Apply
+                            </button>
                         </div>
                     </div>
+                    <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                        <p>
+                            Low-attendance threshold: <span class="font-semibold text-slate-700">{{ thresholdLabel }}%</span>
+                            | Alert cooldown: <span class="font-semibold text-slate-700">{{ cooldownLabel }} day(s)</span>
+                        </p>
+                        <button
+                            type="button"
+                            class="rounded-md border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-700 hover:bg-slate-50"
+                            @click="clearReportFilters"
+                        >
+                            Clear filters
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <DashboardChart
+                        type="line"
+                        variant="staff"
+                        :title="trendMode === 'monthly' ? 'Attendance Trend (Monthly)' : 'Attendance Trend (Weekly)'"
+                        :chart-data="trendChartData"
+                        :y-max="100"
+                        value-format="percent"
+                        :decimals="1"
+                        :height="280"
+                    />
+                    <p class="mt-2 text-xs text-slate-500">
+                        {{ trendMode === "monthly" ? "Last 6 months" : "Last 12 weeks" }} present rate after current filters.
+                    </p>
                 </div>
 
                 <!-- Overall Statistics -->
@@ -286,7 +461,7 @@ const filteredRecent = computed(() => {
                     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold text-slate-900">
-                                Students with Low Attendance (&lt; 75%)
+                                Students with Low Attendance (&lt; {{ thresholdLabel }}%)
                             </h3>
                             <p class="mt-1 text-sm text-slate-600">
                                 These students may require attention or intervention.
@@ -303,11 +478,11 @@ const filteredRecent = computed(() => {
                                 />
                             </div>
                             <div class="flex-shrink-0">
-                                <Link
-                                    :href="route('admin.attendance.alerts.run')"
-                                    method="post"
-                                    as="button"
+                                <button
+                                    type="button"
                                     class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                                    :disabled="sendingAlerts"
+                                    @click="runLowAttendanceAlerts"
                                 >
                                     <svg
                                         class="h-5 w-5"
@@ -322,8 +497,8 @@ const filteredRecent = computed(() => {
                                             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                                         />
                                     </svg>
-                                    <span>Send Alerts</span>
-                                </Link>
+                                    <span>{{ sendingAlerts ? "Queueing..." : "Send Alerts" }}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -361,6 +536,11 @@ const filteredRecent = computed(() => {
                                     >
                                         Rate
                                     </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Risk Reason
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -389,19 +569,22 @@ const filteredRecent = computed(() => {
                                             class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
                                             :class="{
                                                 'bg-red-100 text-red-800':
-                                                    student.rate < 50,
+                                                    student.rate < thresholdValue - 10,
                                                 'bg-amber-100 text-amber-800':
-                                                    student.rate >= 50 &&
-                                                    student.rate < 75,
+                                                    student.rate >= thresholdValue - 10 &&
+                                                    student.rate < thresholdValue,
                                             }"
                                         >
                                             {{ student.rate }}%
                                         </span>
                                     </td>
+                                    <td class="px-4 py-4 text-xs text-slate-600">
+                                        {{ student.reason || "Below threshold" }}
+                                    </td>
                                 </tr>
                                 <tr v-if="filteredStudents.length === 0 && lowAttendanceStudents.length > 0">
                                     <td
-                                        colspan="6"
+                                        colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No students match your search.
@@ -409,7 +592,7 @@ const filteredRecent = computed(() => {
                                 </tr>
                                 <tr v-if="lowAttendanceStudents.length === 0">
                                     <td
-                                        colspan="6"
+                                        colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         <div class="flex flex-col items-center gap-3">
@@ -431,7 +614,7 @@ const filteredRecent = computed(() => {
                                                     Great news!
                                                 </p>
                                                 <p class="mt-1">
-                                                    All students are meeting the attendance threshold (≥ 75%).
+                                                    All students are meeting the attendance threshold (>= {{ thresholdLabel }}%).
                                                 </p>
                                             </div>
                                         </div>
@@ -459,7 +642,7 @@ const filteredRecent = computed(() => {
                             <div>
                                 <p class="font-semibold">No action needed</p>
                                 <p class="mt-1 text-emerald-700">
-                                    All students are maintaining good attendance. The automated alert system will notify students if their attendance drops below 75%.
+                                    All students are maintaining good attendance. The automated alert system will notify students if their attendance drops below {{ thresholdLabel }}%.
                                 </p>
                             </div>
                         </div>

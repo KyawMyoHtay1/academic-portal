@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -68,7 +69,7 @@ class StaffAttendanceReportController extends Controller
                 ];
             });
 
-        // Students with low attendance (< 75%)
+        // Students with low attendance (below selected threshold)
         $studentsWithLowAttendance = Student::query()
             ->when(
                 $filters['programme'] !== '' && $filters['programme'] !== 'all',
@@ -117,10 +118,14 @@ class StaffAttendanceReportController extends Controller
                     'present' => $present,
                     'absent' => $total - $present,
                     'rate' => $rate,
+                    'deficit' => $rate !== null ? max(round($filters['threshold'] - $rate, 2), 0) : null,
+                    'reason' => $rate !== null && $rate < $filters['threshold']
+                        ? sprintf('%.2f%% below threshold', max(round($filters['threshold'] - $rate, 2), 0))
+                        : null,
                 ];
             })
-            ->filter(function ($student) {
-                return $student['rate'] !== null && $student['rate'] < 75;
+            ->filter(function ($student) use ($filters) {
+                return $student['rate'] !== null && $student['rate'] < $filters['threshold'];
             })
             ->sortBy('rate')
             ->values()
@@ -190,6 +195,9 @@ class StaffAttendanceReportController extends Controller
                 ];
             });
 
+        $trendWeekly = $this->buildWeeklyTrend($filters);
+        $trendMonthly = $this->buildMonthlyTrend($filters);
+
         return Inertia::render('Admin/Attendance/Report', [
             'overall' => [
                 'total' => $totalRecords,
@@ -202,6 +210,14 @@ class StaffAttendanceReportController extends Controller
             'lowAttendanceStudents' => $studentsWithLowAttendance,
             'recentRecords' => $recentRecords,
             'filters' => $filters,
+            'trend' => [
+                'weekly' => $trendWeekly,
+                'monthly' => $trendMonthly,
+            ],
+            'defaults' => [
+                'threshold' => (float) config('attendance_alerts.low_threshold', 75),
+                'cooldown_days' => (int) config('attendance_alerts.cooldown_days', 7),
+            ],
             'options' => [
                 'programmes' => $programmes,
                 'intakeYears' => $intakeYears,
@@ -316,7 +332,7 @@ class StaffAttendanceReportController extends Controller
     /**
      * Apply shared attendance filters to a query.
      *
-     * @param  array<string, string>  $filters
+     * @param  array<string, mixed>  $filters
      */
     private function applyAttendanceFilters(
         Builder $query,
@@ -342,19 +358,61 @@ class StaffAttendanceReportController extends Controller
                 $courseQuery->where('semester', $filters['semester']);
             });
         }
+
+        if (($filters['date_from'] ?? '') !== '') {
+            $query->whereDate('date', '>=', $filters['date_from']);
+        }
+
+        if (($filters['date_to'] ?? '') !== '') {
+            $query->whereDate('date', '<=', $filters['date_to']);
+        }
     }
 
     /**
      * Resolve and normalize report filters and options.
      *
-     * @return array{0: array<string, string>, 1: \Illuminate\Support\Collection<int, string>, 2: \Illuminate\Support\Collection<int, int>, 3: \Illuminate\Support\Collection<int, string>}
+     * @return array{0: array<string, mixed>, 1: \Illuminate\Support\Collection<int, string>, 2: \Illuminate\Support\Collection<int, int>, 3: \Illuminate\Support\Collection<int, string>}
      */
     private function resolveReportFilters(Request $request): array
     {
+        $defaultThreshold = (float) config('attendance_alerts.low_threshold', 75);
+        $defaultCooldown = (int) config('attendance_alerts.cooldown_days', 7);
+        $threshold = (float) $request->input('threshold', $defaultThreshold);
+        if ($threshold < 1 || $threshold > 100) {
+            $threshold = $defaultThreshold;
+        }
+
+        $cooldownDays = (int) $request->input('cooldown_days', $defaultCooldown);
+        if ($cooldownDays < 0 || $cooldownDays > 90) {
+            $cooldownDays = $defaultCooldown;
+        }
+
+        $dateFrom = trim((string) $request->input('date_from', ''));
+        $dateTo = trim((string) $request->input('date_to', ''));
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+            $dateFrom = '';
+        }
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+            $dateTo = '';
+        }
+        if ($dateFrom !== '' && $dateTo !== '' && $dateFrom > $dateTo) {
+            [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        }
+
+        $trendMode = trim((string) $request->input('trend_mode', 'weekly'));
+        if (! in_array($trendMode, ['weekly', 'monthly'], true)) {
+            $trendMode = 'weekly';
+        }
+
         $filters = [
             'programme' => trim((string) $request->input('programme', 'all')),
             'intake_year' => trim((string) $request->input('intake_year', 'all')),
             'semester' => trim((string) $request->input('semester', 'all')),
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'threshold' => round($threshold, 2),
+            'cooldown_days' => $cooldownDays,
+            'trend_mode' => $trendMode,
         ];
 
         $programmes = Student::query()
@@ -391,5 +449,87 @@ class StaffAttendanceReportController extends Controller
         }
 
         return [$filters, $programmes, $intakeYears, $semesters];
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<int, array<string, int|float|string>>
+     */
+    private function buildWeeklyTrend(array $filters): array
+    {
+        $firstWeek = CarbonImmutable::now()->startOfWeek()->subWeeks(11);
+
+        $rows = Attendance::query()
+            ->tap(function ($query) use ($filters) {
+                $this->applyAttendanceFilters($query, $filters);
+            })
+            ->whereDate('date', '>=', $firstWeek->toDateString())
+            ->get(['date', 'status'])
+            ->groupBy(function ($attendance) {
+                return CarbonImmutable::parse((string) $attendance->date)
+                    ->startOfWeek()
+                    ->toDateString();
+            });
+
+        return collect(range(0, 11))
+            ->map(function (int $offset) use ($firstWeek, $rows) {
+                $weekStart = $firstWeek->addWeeks($offset);
+                $key = $weekStart->toDateString();
+                $entries = $rows->get($key, collect());
+                $total = $entries->count();
+                $present = $entries->where('status', 'present')->count();
+
+                return [
+                    'period_start' => $key,
+                    'label' => $weekStart->format('M d'),
+                    'total' => $total,
+                    'present' => $present,
+                    'absent' => max($total - $present, 0),
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<int, array<string, int|float|string>>
+     */
+    private function buildMonthlyTrend(array $filters): array
+    {
+        $firstMonth = CarbonImmutable::now()->startOfMonth()->subMonths(5);
+
+        $rows = Attendance::query()
+            ->tap(function ($query) use ($filters) {
+                $this->applyAttendanceFilters($query, $filters);
+            })
+            ->whereDate('date', '>=', $firstMonth->toDateString())
+            ->get(['date', 'status'])
+            ->groupBy(function ($attendance) {
+                return CarbonImmutable::parse((string) $attendance->date)
+                    ->startOfMonth()
+                    ->toDateString();
+            });
+
+        return collect(range(0, 5))
+            ->map(function (int $offset) use ($firstMonth, $rows) {
+                $monthStart = $firstMonth->addMonths($offset);
+                $key = $monthStart->toDateString();
+                $entries = $rows->get($key, collect());
+                $total = $entries->count();
+                $present = $entries->where('status', 'present')->count();
+
+                return [
+                    'period_start' => $key,
+                    'label' => $monthStart->format('M Y'),
+                    'total' => $total,
+                    'present' => $present,
+                    'absent' => max($total - $present, 0),
+                    'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+                ];
+            })
+            ->values()
+            ->all();
     }
 }
