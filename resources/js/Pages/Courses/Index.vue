@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     courses: {
@@ -15,10 +16,25 @@ const props = defineProps({
     },
 });
 
-const searchTerm = ref("");
-const semesterFilter = ref("all");
-const availabilityFilter = ref("all");
-const sortBy = ref("code");
+const queryParam = (key) => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get(key);
+};
+
+const allowedAvailability = new Set(["all", "enrolled", "not-enrolled"]);
+const allowedSorts = new Set(["code", "title", "credits-desc", "credits-asc"]);
+
+const searchInput = ref(queryParam("search") ?? "");
+const searchTerm = ref(searchInput.value);
+const semesterFilter = ref(queryParam("semester") || "all");
+const availabilityFilter = ref(
+    allowedAvailability.has(queryParam("availability") || "")
+        ? queryParam("availability")
+        : "all"
+);
+const sortBy = ref(
+    allowedSorts.has(queryParam("sort") || "") ? queryParam("sort") : "code"
+);
 
 const isEnrolledStatus = (status) =>
     status === "approved" || status === "withdrawal_pending";
@@ -50,6 +66,36 @@ const hasActiveFilters = computed(
         semesterFilter.value !== "all" ||
         availabilityFilter.value !== "all"
 );
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+
+    if (searchTerm.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${searchTerm.value.trim()}`,
+        });
+    }
+
+    if (semesterFilter.value !== "all") {
+        chips.push({
+            key: "semester",
+            label: `Semester: ${semesterFilter.value}`,
+        });
+    }
+
+    if (availabilityFilter.value !== "all") {
+        chips.push({
+            key: "availability",
+            label:
+                availabilityFilter.value === "enrolled"
+                    ? "Enrollment: Enrolled"
+                    : "Enrollment: Not enrolled",
+        });
+    }
+
+    return chips;
+});
 
 const filteredCourses = computed(() => {
     const term = searchTerm.value.trim().toLowerCase();
@@ -96,11 +142,84 @@ const filteredCourses = computed(() => {
 });
 
 const clearFilters = () => {
+    searchInput.value = "";
     searchTerm.value = "";
     semesterFilter.value = "all";
     availabilityFilter.value = "all";
     sortBy.value = "code";
 };
+
+const removeFilterChip = (key) => {
+    if (key === "search") {
+        searchInput.value = "";
+        searchTerm.value = "";
+        return;
+    }
+
+    if (key === "semester") {
+        semesterFilter.value = "all";
+        return;
+    }
+
+    if (key === "availability") {
+        availabilityFilter.value = "all";
+    }
+};
+
+const applySearch = debounce(() => {
+    searchTerm.value = searchInput.value;
+}, 300);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (searchTerm.value.trim() !== "") {
+        params.set("search", searchTerm.value.trim());
+    } else {
+        params.delete("search");
+    }
+
+    if (semesterFilter.value !== "all") {
+        params.set("semester", semesterFilter.value);
+    } else {
+        params.delete("semester");
+    }
+
+    if (availabilityFilter.value !== "all") {
+        params.set("availability", availabilityFilter.value);
+    } else {
+        params.delete("availability");
+    }
+
+    if (sortBy.value !== "code") {
+        params.set("sort", sortBy.value);
+    } else {
+        params.delete("sort");
+    }
+
+    const query = params.toString();
+    window.history.replaceState(
+        {},
+        "",
+        query !== "" ? `${url.pathname}?${query}` : url.pathname
+    );
+}, 300);
+
+watch(searchInput, () => {
+    applySearch();
+});
+
+watch([searchTerm, semesterFilter, availabilityFilter, sortBy], () => {
+    persistFiltersToUrl();
+});
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
+});
 
 const enroll = (courseId) => {
     router.post(route("courses.enroll", courseId), {}, { preserveScroll: false });
@@ -195,7 +314,7 @@ const statusLabel = (status) => {
                             @click="clearFilters"
                             class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                         >
-                            Reset filters
+                            Clear all filters
                         </button>
                     </div>
 
@@ -204,7 +323,7 @@ const statusLabel = (status) => {
                             <label for="courses-search" class="block text-xs font-medium text-slate-600">Search</label>
                             <input
                                 id="courses-search"
-                                v-model="searchTerm"
+                                v-model="searchInput"
                                 type="search"
                                 class="mt-1 block w-full rounded-md border-slate-300 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 placeholder="Code, title, semester"
@@ -254,6 +373,26 @@ const statusLabel = (status) => {
                         Showing <span class="font-semibold text-slate-700">{{ filteredCourses.length }}</span>
                         of <span class="font-semibold text-slate-700">{{ courses.length }}</span> courses
                     </p>
+
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="mt-3 flex flex-wrap gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded-full bg-white px-1.5 text-slate-500 hover:text-slate-700"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="portal-card overflow-hidden p-0">

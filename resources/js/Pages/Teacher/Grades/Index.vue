@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     subjects: {
@@ -20,15 +21,76 @@ const stats = computed(() => ({
     ).size,
 }));
 
-const query = ref("");
-const courseFilter = ref("all");
-
 const courses = computed(() => {
     const set = new Set(
         (props.subjects ?? []).map((s) => s.course_code).filter(Boolean)
     );
+
     return Array.from(set).sort();
 });
+
+const params =
+    typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search)
+        : null;
+
+const initialSearch = params?.get("search") ?? "";
+const initialCourse = params?.get("course") ?? "all";
+
+const searchInput = ref(initialSearch);
+const query = ref(initialSearch);
+const courseFilter = ref(initialCourse);
+
+const applySearch = debounce(() => {
+    query.value = searchInput.value.trim();
+}, 250);
+
+const syncUrlQuery = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const nextParams = new URLSearchParams(window.location.search);
+
+    if (query.value) {
+        nextParams.set("search", query.value);
+    } else {
+        nextParams.delete("search");
+    }
+
+    if (courseFilter.value !== "all") {
+        nextParams.set("course", String(courseFilter.value));
+    } else {
+        nextParams.delete("course");
+    }
+
+    const nextQuery = nextParams.toString();
+    const nextUrl = nextQuery
+        ? `${window.location.pathname}?${nextQuery}`
+        : window.location.pathname;
+
+    window.history.replaceState({}, "", nextUrl);
+}, 200);
+
+watch(searchInput, () => {
+    applySearch();
+});
+
+watch(courses, (list) => {
+    if (courseFilter.value === "all") {
+        return;
+    }
+
+    if (!list.includes(courseFilter.value)) {
+        courseFilter.value = "all";
+    }
+}, { immediate: true });
+
+watch(
+    [query, courseFilter],
+    () => {
+        syncUrlQuery();
+    },
+    { immediate: true }
+);
 
 const filteredSubjects = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -45,6 +107,7 @@ const filteredSubjects = computed(() => {
             const course = `${s.course_code ?? ""} ${
                 s.course_title ?? ""
             }`.toLowerCase();
+
             return (
                 code.includes(q) || title.includes(q) || course.includes(q)
             );
@@ -52,6 +115,52 @@ const filteredSubjects = computed(() => {
     }
 
     return list;
+});
+
+const hasActiveFilters = computed(
+    () => query.value.trim() !== "" || courseFilter.value !== "all"
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+
+    if (courseFilter.value !== "all") {
+        chips.push({
+            key: "course",
+            label: `Course: ${courseFilter.value}`,
+        });
+    }
+
+    if (query.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${query.value.trim()}`,
+        });
+    }
+
+    return chips;
+});
+
+const clearAllFilters = () => {
+    courseFilter.value = "all";
+    searchInput.value = "";
+    query.value = "";
+};
+
+const removeFilterChip = (key) => {
+    if (key === "course") {
+        courseFilter.value = "all";
+    }
+
+    if (key === "search") {
+        searchInput.value = "";
+        query.value = "";
+    }
+};
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    syncUrlQuery.cancel();
 });
 </script>
 
@@ -73,7 +182,6 @@ const filteredSubjects = computed(() => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <!-- Summary stats -->
                 <div class="mb-6 grid gap-4 md:grid-cols-2">
                     <div class="portal-card p-5">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -139,7 +247,6 @@ const filteredSubjects = computed(() => {
                     </div>
 
                     <div v-else class="space-y-4">
-                        <!-- Filters -->
                         <div
                             class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
                         >
@@ -160,19 +267,19 @@ const filteredSubjects = computed(() => {
 
                                 <div class="relative w-full sm:w-72">
                                     <input
-                                        v-model="query"
+                                        v-model="searchInput"
                                         type="text"
-                                        placeholder="Search subject or course…"
+                                        placeholder="Search subject or course..."
                                         class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                                     />
                                     <button
-                                        v-if="query"
+                                        v-if="searchInput"
                                         type="button"
                                         class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                        @click="query = ''"
+                                        @click="searchInput = ''"
                                     >
                                         <span class="sr-only">Clear</span>
-                                        ✕
+                                        x
                                     </button>
                                 </div>
                             </div>
@@ -192,7 +299,32 @@ const filteredSubjects = computed(() => {
                             </p>
                         </div>
 
-                        <!-- Subjects grid -->
+                        <div
+                            v-if="hasActiveFilters"
+                            class="flex flex-wrap items-center gap-2"
+                        >
+                            <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Active filters:
+                            </span>
+                            <button
+                                v-for="chip in activeFilterChips"
+                                :key="chip.key"
+                                type="button"
+                                class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                {{ chip.label }}
+                                <span aria-hidden="true">x</span>
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="clearAllFilters"
+                            >
+                                Clear all filters
+                            </button>
+                        </div>
+
                         <div
                             v-if="filteredSubjects.length === 0"
                             class="rounded-lg bg-slate-50 p-8 text-center text-sm text-slate-500"
@@ -204,60 +336,60 @@ const filteredSubjects = computed(() => {
                             v-else
                             class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                         >
-                        <Link
-                            v-for="subject in filteredSubjects"
-                            :key="subject.id"
-                            :href="route('teacher.grades.show', subject.id)"
-                            class="group rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-portal-navy hover:shadow-md"
-                        >
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-start gap-3 flex-1">
-                                    <div
-                                        class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                            <Link
+                                v-for="subject in filteredSubjects"
+                                :key="subject.id"
+                                :href="route('teacher.grades.show', subject.id)"
+                                class="group rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-portal-navy hover:shadow-md"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex flex-1 items-start gap-3">
+                                        <div
+                                            class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100"
+                                        >
+                                            <img
+                                                v-if="subject.photo"
+                                                :src="`/storage/${subject.photo}`"
+                                                :alt="`Photo for ${subject.title}`"
+                                                class="h-full w-full object-cover"
+                                            />
+                                            <span
+                                                v-else
+                                                class="text-xs font-semibold text-slate-500"
+                                            >
+                                                {{ subject.title[0] }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="text-lg font-semibold text-slate-900 group-hover:text-portal-navy"
+                                            >
+                                                {{ subject.subject_code }}
+                                            </h3>
+                                            <p class="mt-1 text-sm text-slate-600">
+                                                {{ subject.title }}
+                                            </p>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                {{ subject.course_code }} -
+                                                {{ subject.course_title }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <svg
+                                        class="h-5 w-5 text-slate-400 group-hover:text-portal-navy"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
                                     >
-                                        <img
-                                            v-if="subject.photo"
-                                            :src="`/storage/${subject.photo}`"
-                                            :alt="`Photo for ${subject.title}`"
-                                            class="h-full w-full object-cover"
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 5l7 7-7 7"
                                         />
-                                        <span
-                                            v-else
-                                            class="text-xs font-semibold text-slate-500"
-                                        >
-                                            {{ subject.title[0] }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="text-lg font-semibold text-slate-900 group-hover:text-portal-navy"
-                                        >
-                                            {{ subject.subject_code }}
-                                        </h3>
-                                        <p class="mt-1 text-sm text-slate-600">
-                                            {{ subject.title }}
-                                        </p>
-                                        <p class="mt-1 text-xs text-slate-500">
-                                            {{ subject.course_code }} -
-                                            {{ subject.course_title }}
-                                        </p>
-                                    </div>
+                                    </svg>
                                 </div>
-                                <svg
-                                    class="h-5 w-5 text-slate-400 group-hover:text-portal-navy"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 5l7 7-7 7"
-                                    />
-                                </svg>
-                            </div>
-                        </Link>
+                            </Link>
                         </div>
                     </div>
                 </div>
