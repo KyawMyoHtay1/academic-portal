@@ -51,6 +51,7 @@ entity "courses" as Course {
   title : varchar
   credits : int
   semester : varchar
+  attendance_threshold : decimal(5,2)
   photo : varchar
   created_at : timestamp
   updated_at : timestamp
@@ -64,6 +65,7 @@ entity "subjects" as Subject {
   credits : int
   description : text
   photo : varchar
+  attendance_threshold : decimal(5,2)
   created_at : timestamp
   updated_at : timestamp
 }
@@ -301,6 +303,43 @@ entity "stripe_webhook_events" as StripeWebhookEvent {
   updated_at : timestamp
 }
 
+entity "system_settings" as SystemSetting {
+  *id : bigint <<PK>>
+  key : varchar <<UK>>
+  value : text
+  updated_by : bigint <<FK,nullable>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "enrollment_status_logs" as EnrollmentStatusLog {
+  *id : bigint <<PK>>
+  enrollment_id : bigint <<nullable>>
+  student_id : bigint <<FK>>
+  course_id : bigint <<FK>>
+  from_status : varchar
+  to_status : varchar
+  action : varchar
+  reason : text
+  performed_by : bigint <<FK,nullable>>
+  meta : json
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "fee_status_logs" as FeeStatusLog {
+  *id : bigint <<PK>>
+  fee_id : bigint <<FK>>
+  from_status : varchar
+  to_status : varchar
+  action : varchar
+  note : varchar
+  performed_by : bigint <<FK,nullable>>
+  meta : json
+  created_at : timestamp
+  updated_at : timestamp
+}
+
 '----------------------------------------------------
 ' Relationships
 '----------------------------------------------------
@@ -350,5 +389,15 @@ User ||--o{ Message : sender
 User ||--o{ Message : receiver
 
 User ||--o{ Notification : notifiable
+
+User ||--o{ SystemSetting : updated_by
+
+Enrollment ||--o{ EnrollmentStatusLog
+Student ||--o{ EnrollmentStatusLog
+Course ||--o{ EnrollmentStatusLog
+User ||--o{ EnrollmentStatusLog : performed_by
+
+Fee ||--o{ FeeStatusLog
+User ||--o{ FeeStatusLog : performed_by
 
 @enduml

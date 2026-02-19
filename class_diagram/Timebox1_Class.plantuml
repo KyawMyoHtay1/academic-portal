@@ -80,6 +80,7 @@ class Course {
   +title: varchar
   +credits: int
   +semester: varchar
+  +attendance_threshold: decimal(5,2)
   +photo: varchar
   +created_at: timestamp
   +updated_at: timestamp
@@ -104,6 +105,7 @@ class Subject {
   +credits: int
   +description: text
   +photo: varchar
+  +attendance_threshold: decimal(5,2)
   +created_at: timestamp
   +updated_at: timestamp
   --
