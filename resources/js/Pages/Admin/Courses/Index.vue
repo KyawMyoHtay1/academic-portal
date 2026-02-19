@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     courses: {
@@ -11,10 +12,26 @@ const props = defineProps({
     },
 });
 
-const query = ref("");
-const semesterFilter = ref("all");
-const enrollmentFilter = ref("all");
-const sortBy = ref("code");
+const queryParam = (key) => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get(key);
+};
+
+const allowedEnrollmentFilters = new Set(["all", "enrolled", "not-enrolled"]);
+const allowedSorts = new Set(["code", "title", "semester", "credits-desc", "credits-asc"]);
+
+const searchInput = ref(queryParam("search") ?? "");
+const query = ref(searchInput.value);
+const semesterFilter = ref(queryParam("semester") || "all");
+const enrollmentFilter = ref(
+    allowedEnrollmentFilters.has(queryParam("enrollment") || "")
+        ? queryParam("enrollment")
+        : "all"
+);
+const sortBy = ref(
+    allowedSorts.has(queryParam("sort") || "") ? queryParam("sort") : "code"
+);
+const selectedCourseId = ref(null);
 
 const semesters = computed(() => {
     const set = new Set((props.courses ?? []).map((c) => c.semester).filter(Boolean));
@@ -42,6 +59,28 @@ const hasActiveFilters = computed(
         enrollmentFilter.value !== "all" ||
         sortBy.value !== "code"
 );
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+
+    if (query.value.trim() !== "") {
+        chips.push({ key: "search", label: `Search: ${query.value.trim()}` });
+    }
+    if (semesterFilter.value !== "all") {
+        chips.push({ key: "semester", label: `Semester: ${semesterFilter.value}` });
+    }
+    if (enrollmentFilter.value !== "all") {
+        chips.push({
+            key: "enrollment",
+            label:
+                enrollmentFilter.value === "enrolled"
+                    ? "Enrollment: Enrolled"
+                    : "Enrollment: Not enrolled",
+        });
+    }
+
+    return chips;
+});
 
 const filtered = computed(() => {
     const q = query.value.trim().toLowerCase();
@@ -82,11 +121,96 @@ const filtered = computed(() => {
     return list;
 });
 
+const selectedCourse = computed(() =>
+    (props.courses ?? []).find((course) => String(course.id) === String(selectedCourseId.value)) || null
+);
+
 const clearFilters = () => {
+    searchInput.value = "";
     query.value = "";
     semesterFilter.value = "all";
     enrollmentFilter.value = "all";
     sortBy.value = "code";
+};
+
+const removeFilterChip = (key) => {
+    if (key === "search") {
+        searchInput.value = "";
+        query.value = "";
+        return;
+    }
+
+    if (key === "semester") {
+        semesterFilter.value = "all";
+        return;
+    }
+
+    if (key === "enrollment") {
+        enrollmentFilter.value = "all";
+    }
+};
+
+const applySearch = debounce(() => {
+    query.value = searchInput.value.trim();
+}, 250);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (query.value.trim() !== "") {
+        params.set("search", query.value.trim());
+    } else {
+        params.delete("search");
+    }
+
+    if (semesterFilter.value !== "all") {
+        params.set("semester", semesterFilter.value);
+    } else {
+        params.delete("semester");
+    }
+
+    if (enrollmentFilter.value !== "all") {
+        params.set("enrollment", enrollmentFilter.value);
+    } else {
+        params.delete("enrollment");
+    }
+
+    if (sortBy.value !== "code") {
+        params.set("sort", sortBy.value);
+    } else {
+        params.delete("sort");
+    }
+
+    const queryString = params.toString();
+    window.history.replaceState(
+        {},
+        "",
+        queryString ? `${url.pathname}?${queryString}` : url.pathname
+    );
+}, 200);
+
+watch(searchInput, () => {
+    applySearch();
+});
+
+watch([query, semesterFilter, enrollmentFilter, sortBy], () => {
+    persistFiltersToUrl();
+});
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
+});
+
+const openQuickView = (courseId) => {
+    selectedCourseId.value = courseId;
+};
+
+const closeQuickView = () => {
+    selectedCourseId.value = null;
 };
 
 const deleteCourse = (courseId) => {
@@ -153,7 +277,7 @@ const deleteCourse = (courseId) => {
                             @click="clearFilters"
                             class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                         >
-                            Reset filters
+                            Clear all filters
                         </button>
                     </div>
 
@@ -162,7 +286,7 @@ const deleteCourse = (courseId) => {
                             <label for="admin-courses-search" class="block text-xs font-medium text-slate-600">Search</label>
                             <input
                                 id="admin-courses-search"
-                                v-model="query"
+                                v-model="searchInput"
                                 type="search"
                                 placeholder="Course code, title, semester"
                                 class="mt-1 block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
@@ -211,6 +335,26 @@ const deleteCourse = (courseId) => {
                         Showing <span class="font-semibold text-slate-700">{{ filtered.length }}</span>
                         of <span class="font-semibold text-slate-700">{{ courses.length }}</span> courses
                     </p>
+
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="mt-3 flex flex-wrap gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="portal-card overflow-hidden p-0">
@@ -274,6 +418,13 @@ const deleteCourse = (courseId) => {
                                     </td>
                                     <td class="px-4 py-4 text-right text-sm">
                                         <div class="flex items-center justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                class="rounded-md bg-indigo-100 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
+                                                @click="openQuickView(course.id)"
+                                            >
+                                                Quick view
+                                            </button>
                                             <Link
                                                 :href="route('admin.courses.edit', course.id)"
                                                 class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
@@ -335,21 +486,121 @@ const deleteCourse = (courseId) => {
                             </p>
 
                             <div class="mt-3 grid grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    class="rounded-md bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
+                                    @click="openQuickView(course.id)"
+                                >
+                                    Quick view
+                                </button>
                                 <Link
                                     :href="route('admin.courses.edit', course.id)"
                                     class="rounded-md bg-slate-100 px-3 py-2 text-center text-xs font-semibold text-slate-700 hover:bg-slate-200"
                                 >
                                     Edit
                                 </Link>
+                            </div>
+
+                            <div class="mt-2">
                                 <button
                                     @click="deleteCourse(course.id)"
-                                    class="rounded-md bg-red-100 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-200"
+                                    class="w-full rounded-md bg-red-100 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-200"
                                 >
                                     Delete
                                 </button>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div
+                    v-if="selectedCourse"
+                    class="fixed inset-0 z-50 flex"
+                    aria-modal="true"
+                    role="dialog"
+                >
+                    <button
+                        type="button"
+                        class="h-full flex-1 bg-slate-900/40"
+                        aria-label="Close quick view"
+                        @click="closeQuickView"
+                    ></button>
+
+                    <aside
+                        class="h-full w-full max-w-md overflow-y-auto bg-white p-6 shadow-xl"
+                    >
+                        <div class="mb-4 flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Course quick view
+                                </p>
+                                <h3 class="mt-1 text-lg font-semibold text-slate-900">
+                                    {{ selectedCourse.title }}
+                                </h3>
+                                <p class="text-sm text-slate-500">
+                                    {{ selectedCourse.course_code }}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="closeQuickView"
+                            >
+                                Close
+                            </button>
+                        </div>
+
+                        <div class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-white"
+                                >
+                                    <img
+                                        v-if="selectedCourse.photo"
+                                        :src="`/storage/${selectedCourse.photo}`"
+                                        :alt="`Photo for ${selectedCourse.title}`"
+                                        class="h-full w-full object-cover"
+                                    />
+                                    <span
+                                        v-else
+                                        class="text-sm font-semibold text-slate-500"
+                                    >
+                                        {{ selectedCourse.title?.[0] }}
+                                    </span>
+                                </div>
+                                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                                    {{ selectedCourse.semester || 'N/A' }}
+                                </span>
+                            </div>
+                            <p>
+                                <span class="font-semibold text-slate-700">Credits:</span>
+                                {{ selectedCourse.credits }}
+                            </p>
+                            <p>
+                                <span class="font-semibold text-slate-700">Enrollment:</span>
+                                <span v-if="Number(selectedCourse.enrolled_students_count ?? 0) > 0" class="font-semibold text-emerald-700">
+                                    Enrolled ({{ selectedCourse.enrolled_students_count }})
+                                </span>
+                                <span v-else class="font-semibold text-slate-700">Not enrolled</span>
+                            </p>
+                        </div>
+
+                        <div class="mt-4 flex items-center gap-2">
+                            <Link
+                                :href="route('admin.courses.edit', selectedCourse.id)"
+                                class="rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white hover:bg-portal-navy-dark"
+                            >
+                                Edit course
+                            </Link>
+                            <button
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="closeQuickView"
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </aside>
                 </div>
             </div>
         </div>

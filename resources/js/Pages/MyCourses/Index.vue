@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     courses: {
@@ -15,8 +16,14 @@ const props = defineProps({
     },
 });
 
-const searchTerm = ref("");
-const semesterFilter = ref("all");
+const queryParam = (key) => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get(key);
+};
+
+const searchInput = ref(queryParam("search") ?? "");
+const searchTerm = ref(searchInput.value.trim());
+const semesterFilter = ref(queryParam("semester") ?? "all");
 
 const semesters = computed(() => {
     const set = new Set();
@@ -28,10 +35,66 @@ const semesters = computed(() => {
     return Array.from(set).sort();
 });
 
+watch(
+    semesters,
+    (list) => {
+        if (semesterFilter.value === "all") return;
+        if (!list.includes(semesterFilter.value)) {
+            semesterFilter.value = "all";
+        }
+    },
+    { immediate: true }
+);
+
+const applySearch = debounce(() => {
+    searchTerm.value = searchInput.value.trim();
+}, 250);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (searchTerm.value.trim() !== "") {
+        params.set("search", searchTerm.value.trim());
+    } else {
+        params.delete("search");
+    }
+
+    if (semesterFilter.value !== "all") {
+        params.set("semester", semesterFilter.value);
+    } else {
+        params.delete("semester");
+    }
+
+    const queryString = params.toString();
+    window.history.replaceState(
+        {},
+        "",
+        queryString ? `${url.pathname}?${queryString}` : url.pathname
+    );
+}, 200);
+
+watch(searchInput, () => {
+    applySearch();
+});
+
+watch([searchTerm, semesterFilter], () => {
+    persistFiltersToUrl();
+});
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
+});
+
 const stats = computed(() => {
     const list = props.courses ?? [];
     const enrolled = list.filter((c) => c.enrollment_status === "approved").length;
-    const withdrawalPending = list.filter((c) => c.enrollment_status === "withdrawal_pending").length;
+    const withdrawalPending = list.filter(
+        (c) => c.enrollment_status === "withdrawal_pending"
+    ).length;
     const totalCredits = list.reduce((sum, c) => sum + (Number(c.credits) || 0), 0);
 
     return {
@@ -46,26 +109,64 @@ const filteredCourses = computed(() => {
     const term = searchTerm.value.trim().toLowerCase();
 
     return (props.courses ?? []).filter((course) => {
-        if (semesterFilter.value !== "all" && course.semester !== semesterFilter.value) {
+        if (
+            semesterFilter.value !== "all" &&
+            course.semester !== semesterFilter.value
+        ) {
             return false;
         }
 
         if (!term) return true;
 
-        const haystack = `${course.course_code ?? ""} ${course.title ?? ""} ${course.semester ?? ""}`.toLowerCase();
+        const haystack = `${course.course_code ?? ""} ${course.title ?? ""} ${
+            course.semester ?? ""
+        }`.toLowerCase();
         return haystack.includes(term);
     });
 });
 
-const hasActiveFilters = computed(() => searchTerm.value.trim() !== "" || semesterFilter.value !== "all");
+const hasActiveFilters = computed(
+    () => searchTerm.value.trim() !== "" || semesterFilter.value !== "all"
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+    if (searchTerm.value.trim() !== "") {
+        chips.push({ key: "search", label: `Search: ${searchTerm.value.trim()}` });
+    }
+    if (semesterFilter.value !== "all") {
+        chips.push({
+            key: "semester",
+            label: `Semester: ${semesterFilter.value}`,
+        });
+    }
+    return chips;
+});
 
 const clearFilters = () => {
+    searchInput.value = "";
     searchTerm.value = "";
     semesterFilter.value = "all";
 };
 
+const removeFilterChip = (key) => {
+    if (key === "search") {
+        searchInput.value = "";
+        searchTerm.value = "";
+        return;
+    }
+
+    if (key === "semester") {
+        semesterFilter.value = "all";
+    }
+};
+
 const unenroll = (courseId) => {
-    if (!confirm("Are you sure you want to request withdrawal from this course? This request requires admin approval.")) {
+    if (
+        !confirm(
+            "Are you sure you want to request withdrawal from this course? This request requires admin approval."
+        )
+    ) {
         return;
     }
 
@@ -145,14 +246,14 @@ const formatDate = (value) => {
                                 @click="clearFilters"
                                 class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                             >
-                                Reset filters
+                                Clear all filters
                             </button>
                         </div>
 
                         <div class="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                             <div class="lg:col-span-2">
                                 <input
-                                    v-model="searchTerm"
+                                    v-model="searchInput"
                                     type="search"
                                     placeholder="Search by course code, title, semester"
                                     class="block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
@@ -175,6 +276,26 @@ const formatDate = (value) => {
                             Showing <span class="font-semibold text-slate-700">{{ filteredCourses.length }}</span>
                             of <span class="font-semibold text-slate-700">{{ courses.length }}</span> courses
                         </p>
+
+                        <div
+                            v-if="activeFilterChips.length > 0"
+                            class="mt-3 flex flex-wrap gap-2"
+                        >
+                            <span
+                                v-for="chip in activeFilterChips"
+                                :key="chip.key"
+                                class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                            >
+                                {{ chip.label }}
+                                <button
+                                    type="button"
+                                    class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                    @click="removeFilterChip(chip.key)"
+                                >
+                                    x
+                                </button>
+                            </span>
+                        </div>
                     </div>
 
                     <div v-if="courses.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">

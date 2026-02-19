@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     announcements: {
@@ -17,12 +18,38 @@ const tabs = [
     { key: "urgent", label: "Urgent" },
 ];
 
-const activeTab = ref("all");
-const query = ref("");
-const sortBy = ref("newest");
-const priorityFilter = ref("all");
-const audienceFilter = ref("all");
-const dateRangeFilter = ref("all");
+const queryParam = (key) => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get(key);
+};
+
+const allowedTabs = new Set(tabs.map((tab) => tab.key));
+const allowedSorts = new Set(["newest", "title", "engagement"]);
+const allowedPriorities = new Set(["all", "urgent", "important", "info"]);
+const allowedAudiences = new Set(["all", "student", "teacher", "staff"]);
+const allowedDateRanges = new Set(["all", "7", "30", "90"]);
+
+const activeTab = ref(
+    allowedTabs.has(queryParam("tab") || "") ? queryParam("tab") : "all"
+);
+const searchInput = ref(queryParam("search") ?? "");
+const query = ref(searchInput.value.trim());
+const sortBy = ref(
+    allowedSorts.has(queryParam("sort") || "") ? queryParam("sort") : "newest"
+);
+const priorityFilter = ref(
+    allowedPriorities.has(queryParam("priority") || "")
+        ? queryParam("priority")
+        : "all"
+);
+const audienceFilter = ref(
+    allowedAudiences.has(queryParam("audience") || "")
+        ? queryParam("audience")
+        : "all"
+);
+const dateRangeFilter = ref(
+    allowedDateRanges.has(queryParam("range") || "") ? queryParam("range") : "all"
+);
 
 const stats = computed(() => {
     const list = props.announcements ?? [];
@@ -61,7 +88,9 @@ const filtered = computed(() => {
     let list = [...(props.announcements ?? [])];
 
     if (activeTab.value === "pinned") list = list.filter((a) => !!a.pinned);
-    if (activeTab.value === "urgent") list = list.filter((a) => a.priority === "urgent");
+    if (activeTab.value === "urgent") {
+        list = list.filter((a) => a.priority === "urgent");
+    }
 
     if (priorityFilter.value !== "all") {
         list = list.filter((a) => a.priority === priorityFilter.value);
@@ -100,7 +129,9 @@ const filtered = computed(() => {
     }
 
     if (sortBy.value === "title") {
-        list.sort((a, b) => String(a.title ?? "").localeCompare(String(b.title ?? "")));
+        list.sort((a, b) =>
+            String(a.title ?? "").localeCompare(String(b.title ?? ""))
+        );
     } else if (sortBy.value === "engagement") {
         list.sort(
             (a, b) =>
@@ -121,8 +152,57 @@ const hasActiveFilters = computed(
         dateRangeFilter.value !== "all"
 );
 
+const activeFilterChips = computed(() => {
+    const chips = [];
+
+    if (activeTab.value !== "all") {
+        const tabLabel = tabs.find((tab) => tab.key === activeTab.value)?.label;
+        chips.push({
+            key: "tab",
+            label: `Tab: ${tabLabel ?? activeTab.value}`,
+        });
+    }
+
+    if (query.value.trim() !== "") {
+        chips.push({ key: "search", label: `Search: ${query.value.trim()}` });
+    }
+
+    if (priorityFilter.value !== "all") {
+        chips.push({
+            key: "priority",
+            label: `Priority: ${priorityFilter.value}`,
+        });
+    }
+
+    if (audienceFilter.value !== "all") {
+        chips.push({
+            key: "audience",
+            label: `Audience: ${audienceFilter.value}`,
+        });
+    }
+
+    if (dateRangeFilter.value !== "all") {
+        chips.push({
+            key: "range",
+            label: `Date: last ${dateRangeFilter.value} days`,
+        });
+    }
+
+    if (sortBy.value !== "newest") {
+        const sortLabel =
+            sortBy.value === "title" ? "Title (A-Z)" : "Highest read rate";
+        chips.push({
+            key: "sort",
+            label: `Sort: ${sortLabel}`,
+        });
+    }
+
+    return chips;
+});
+
 const clearFilters = () => {
     activeTab.value = "all";
+    searchInput.value = "";
     query.value = "";
     sortBy.value = "newest";
     priorityFilter.value = "all";
@@ -130,8 +210,114 @@ const clearFilters = () => {
     dateRangeFilter.value = "all";
 };
 
+const removeFilterChip = (key) => {
+    if (key === "tab") {
+        activeTab.value = "all";
+        return;
+    }
+
+    if (key === "search") {
+        searchInput.value = "";
+        query.value = "";
+        return;
+    }
+
+    if (key === "priority") {
+        priorityFilter.value = "all";
+        return;
+    }
+
+    if (key === "audience") {
+        audienceFilter.value = "all";
+        return;
+    }
+
+    if (key === "range") {
+        dateRangeFilter.value = "all";
+        return;
+    }
+
+    if (key === "sort") {
+        sortBy.value = "newest";
+    }
+};
+
+const applySearch = debounce(() => {
+    query.value = searchInput.value.trim();
+}, 250);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (activeTab.value !== "all") {
+        params.set("tab", activeTab.value);
+    } else {
+        params.delete("tab");
+    }
+
+    if (query.value.trim() !== "") {
+        params.set("search", query.value.trim());
+    } else {
+        params.delete("search");
+    }
+
+    if (priorityFilter.value !== "all") {
+        params.set("priority", priorityFilter.value);
+    } else {
+        params.delete("priority");
+    }
+
+    if (audienceFilter.value !== "all") {
+        params.set("audience", audienceFilter.value);
+    } else {
+        params.delete("audience");
+    }
+
+    if (dateRangeFilter.value !== "all") {
+        params.set("range", dateRangeFilter.value);
+    } else {
+        params.delete("range");
+    }
+
+    if (sortBy.value !== "newest") {
+        params.set("sort", sortBy.value);
+    } else {
+        params.delete("sort");
+    }
+
+    const queryString = params.toString();
+    window.history.replaceState(
+        {},
+        "",
+        queryString ? `${url.pathname}?${queryString}` : url.pathname
+    );
+}, 200);
+
+watch(searchInput, () => {
+    applySearch();
+});
+
+watch(
+    [query, activeTab, sortBy, priorityFilter, audienceFilter, dateRangeFilter],
+    () => {
+        persistFiltersToUrl();
+    }
+);
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
+});
+
 const deleteAnnouncement = (id) => {
-    if (!confirm("Are you sure you want to delete this announcement? This action cannot be undone.")) {
+    if (
+        !confirm(
+            "Are you sure you want to delete this announcement? This action cannot be undone."
+        )
+    ) {
         return;
     }
 
@@ -157,7 +343,11 @@ const sendReminder = (announcement) => {
     }
 
     const checkLabel = announcement?.require_ack ? "acknowledgement" : "read";
-    if (!confirm(`Send reminder to ${pending} recipient(s) who have not completed ${checkLabel}?`)) {
+    if (
+        !confirm(
+            `Send reminder to ${pending} recipient(s) who have not completed ${checkLabel}?`
+        )
+    ) {
         return;
     }
 
@@ -236,7 +426,7 @@ const priorityLabel = (p) => {
                             @click="clearFilters"
                             class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                         >
-                            Reset filters
+                            Clear all filters
                         </button>
                     </div>
 
@@ -260,7 +450,7 @@ const priorityLabel = (p) => {
 
                         <div>
                             <input
-                                v-model="query"
+                                v-model="searchInput"
                                 type="text"
                                 placeholder="Search title, body, author, roles"
                                 class="block w-full rounded-md border-slate-300 py-2 text-sm focus:border-portal-navy focus:ring-portal-navy"
@@ -319,6 +509,26 @@ const priorityLabel = (p) => {
                         Showing <span class="font-semibold text-slate-700">{{ filtered.length }}</span>
                         of <span class="font-semibold text-slate-700">{{ announcements.length }}</span> announcements
                     </p>
+
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="mt-3 flex flex-wrap gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="space-y-4">

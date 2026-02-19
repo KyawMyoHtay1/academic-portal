@@ -2,7 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     notifications: {
@@ -21,8 +22,18 @@ const tabs = [
     { key: "timetable", label: "Timetable" },
 ];
 
-const activeTab = ref("all");
-const query = ref("");
+const queryParam = (key) => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get(key);
+};
+
+const allowedTabs = new Set(tabs.map((tab) => tab.key));
+
+const activeTab = ref(
+    allowedTabs.has(queryParam("tab") || "") ? queryParam("tab") : "all"
+);
+const searchInput = ref(queryParam("search") ?? "");
+const query = ref(searchInput.value.trim());
 
 const isUnread = (n) => !n.read_at;
 
@@ -44,13 +55,11 @@ const filtered = computed(() => {
     let list = [...(props.notifications ?? [])];
 
     if (activeTab.value === "unread") list = list.filter(isUnread);
-    if ([
-        "grade",
-        "grade_review",
-        "fee",
-        "attendance",
-        "timetable",
-    ].includes(activeTab.value)) {
+    if (
+        ["grade", "grade_review", "fee", "attendance", "timetable"].includes(
+            activeTab.value
+        )
+    ) {
         list = list.filter((n) => n.type === activeTab.value);
     }
 
@@ -66,7 +75,79 @@ const filtered = computed(() => {
     return list;
 });
 
-const hasUnread = computed(() => (props.notifications ?? []).some((n) => !n.read_at));
+const hasUnread = computed(() =>
+    (props.notifications ?? []).some((n) => !n.read_at)
+);
+
+const hasActiveFilters = computed(
+    () => activeTab.value !== "all" || query.value.trim() !== ""
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+
+    if (activeTab.value !== "all") {
+        chips.push({
+            key: "tab",
+            label: `Tab: ${
+                tabs.find((tab) => tab.key === activeTab.value)?.label ??
+                activeTab.value
+            }`,
+        });
+    }
+
+    if (query.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${query.value.trim()}`,
+        });
+    }
+
+    return chips;
+});
+
+const applySearch = debounce(() => {
+    query.value = searchInput.value.trim();
+}, 250);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (activeTab.value !== "all") {
+        params.set("tab", activeTab.value);
+    } else {
+        params.delete("tab");
+    }
+
+    if (query.value.trim() !== "") {
+        params.set("search", query.value.trim());
+    } else {
+        params.delete("search");
+    }
+
+    const queryString = params.toString();
+    window.history.replaceState(
+        {},
+        "",
+        queryString ? `${url.pathname}?${queryString}` : url.pathname
+    );
+}, 200);
+
+watch(searchInput, () => {
+    applySearch();
+});
+
+watch([query, activeTab], () => {
+    persistFiltersToUrl();
+});
+
+onBeforeUnmount(() => {
+    applySearch.cancel();
+    persistFiltersToUrl.cancel();
+});
 
 const markAsRead = (id) => {
     router.post(route("notifications.read", id), {}, { preserveScroll: true });
@@ -77,7 +158,24 @@ const markAllAsRead = () => {
 };
 
 const clearSearch = () => {
+    searchInput.value = "";
     query.value = "";
+};
+
+const clearAllFilters = () => {
+    activeTab.value = "all";
+    clearSearch();
+};
+
+const removeFilterChip = (key) => {
+    if (key === "tab") {
+        activeTab.value = "all";
+        return;
+    }
+
+    if (key === "search") {
+        clearSearch();
+    }
 };
 
 const typeBadgeClass = (type) => {
@@ -189,23 +287,53 @@ const iconClass = (type) => {
                             </button>
                         </div>
 
-                        <div class="relative w-full md:w-80">
-                            <input
-                                v-model="query"
-                                type="text"
-                                placeholder="Search notifications"
-                                class="block w-full rounded-md border-slate-300 pr-9 text-sm focus:border-portal-navy focus:ring-portal-navy"
-                            />
+                        <div class="flex w-full items-center gap-2 md:w-auto">
+                            <div class="relative w-full md:w-80">
+                                <input
+                                    v-model="searchInput"
+                                    type="text"
+                                    placeholder="Search notifications"
+                                    class="block w-full rounded-md border-slate-300 pr-9 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                                />
+                                <button
+                                    v-if="searchInput"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                    @click="clearSearch"
+                                >
+                                    <span class="sr-only">Clear</span>
+                                    X
+                                </button>
+                            </div>
                             <button
-                                v-if="query"
+                                v-if="hasActiveFilters"
                                 type="button"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
-                                @click="clearSearch"
+                                class="whitespace-nowrap rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                @click="clearAllFilters"
                             >
-                                <span class="sr-only">Clear</span>
-                                X
+                                Clear all filters
                             </button>
                         </div>
+                    </div>
+
+                    <div
+                        v-if="activeFilterChips.length > 0"
+                        class="mt-3 flex flex-wrap gap-2"
+                    >
+                        <span
+                            v-for="chip in activeFilterChips"
+                            :key="chip.key"
+                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                            {{ chip.label }}
+                            <button
+                                type="button"
+                                class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                @click="removeFilterChip(chip.key)"
+                            >
+                                x
+                            </button>
+                        </span>
                     </div>
                 </div>
 

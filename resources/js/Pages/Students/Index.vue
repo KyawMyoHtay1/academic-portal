@@ -31,8 +31,12 @@ const statusFilter = ref(props.filters.status || "all");
 const sortBy = ref(props.filters.sort_by || "student_no");
 const sortDir = ref(props.filters.sort_dir || "asc");
 const selectedIds = ref([]);
+const selectedStudentId = ref(null);
 
 const rows = computed(() => props.students?.data ?? []);
+const selectedStudent = computed(() =>
+    rows.value.find((student) => String(student.id) === String(selectedStudentId.value)) || null
+);
 
 const programmes = computed(() => props.filterOptions?.programmes ?? []);
 const intakeYears = computed(() => props.filterOptions?.intakeYears ?? []);
@@ -126,6 +130,12 @@ watch(
     () => props.students?.data,
     () => {
         selectedIds.value = [];
+        if (
+            selectedStudentId.value !== null &&
+            !rows.value.some((student) => String(student.id) === String(selectedStudentId.value))
+        ) {
+            selectedStudentId.value = null;
+        }
     }
 );
 
@@ -223,6 +233,14 @@ const bulkDeleteStudents = () => {
             selectedIds.value = [];
         },
     });
+};
+
+const openQuickView = (studentId) => {
+    selectedStudentId.value = studentId;
+};
+
+const closeQuickView = () => {
+    selectedStudentId.value = null;
 };
 </script>
 
@@ -583,6 +601,13 @@ export default {
                                 <div
                                     class="flex items-center justify-end gap-2"
                                 >
+                                    <button
+                                        type="button"
+                                        class="rounded-md bg-indigo-100 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        @click="openQuickView(student.id)"
+                                    >
+                                        Quick view
+                                    </button>
                                     <Link
                                         :href="
                                             route('students.edit', student.id)
@@ -617,6 +642,96 @@ export default {
 
         <div class="mt-6">
             <Pagination :links="students.links" />
+        </div>
+
+        <div
+            v-if="selectedStudent"
+            class="fixed inset-0 z-50 flex"
+            aria-modal="true"
+            role="dialog"
+        >
+            <button
+                type="button"
+                class="h-full flex-1 bg-slate-900/40"
+                aria-label="Close quick view"
+                @click="closeQuickView"
+            ></button>
+
+            <aside
+                class="h-full w-full max-w-md overflow-y-auto bg-white p-6 shadow-xl"
+            >
+                <div class="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Student quick view
+                        </p>
+                        <h3 class="mt-1 text-lg font-semibold text-slate-900">
+                            {{ selectedStudent.full_name }}
+                        </h3>
+                        <p class="text-sm text-slate-500">
+                            {{ selectedStudent.student_no }}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        class="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        @click="closeQuickView"
+                    >
+                        Close
+                    </button>
+                </div>
+
+                <div class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-white"
+                        >
+                            <img
+                                v-if="selectedStudent.photo"
+                                :src="`/storage/${selectedStudent.photo}`"
+                                :alt="`Photo for ${selectedStudent.full_name}`"
+                                class="h-full w-full object-cover"
+                            />
+                            <span
+                                v-else
+                                class="text-sm font-semibold text-slate-500"
+                            >
+                                {{ selectedStudent.full_name?.[0] }}
+                            </span>
+                        </div>
+                        <span
+                            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                            :class="{
+                                'bg-emerald-100 text-emerald-800': selectedStudent.status === 'active',
+                                'bg-amber-100 text-amber-800': selectedStudent.status === 'suspended',
+                                'bg-indigo-100 text-indigo-800': selectedStudent.status === 'graduated',
+                                'bg-slate-100 text-slate-700': !selectedStudent.status,
+                            }"
+                        >
+                            {{ selectedStudent.status || 'N/A' }}
+                        </span>
+                    </div>
+                    <p><span class="font-semibold text-slate-700">Email:</span> {{ selectedStudent.email }}</p>
+                    <p><span class="font-semibold text-slate-700">Programme:</span> {{ selectedStudent.programme }}</p>
+                    <p><span class="font-semibold text-slate-700">Intake year:</span> {{ selectedStudent.intake_year }}</p>
+                </div>
+
+                <div class="mt-4 flex items-center gap-2">
+                    <Link
+                        :href="route('students.edit', selectedStudent.id)"
+                        class="rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white hover:bg-portal-navy-dark"
+                    >
+                        Edit student
+                    </Link>
+                    <button
+                        type="button"
+                        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        @click="closeQuickView"
+                    >
+                        Done
+                    </button>
+                </div>
+            </aside>
         </div>
     </AuthenticatedLayout>
 </template>
