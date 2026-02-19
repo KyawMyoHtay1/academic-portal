@@ -84,14 +84,33 @@ class ImageService
      */
     public static function delete(?string $path): bool
     {
-        if (! $path) {
+        $normalizedPath = trim((string) $path);
+        if ($normalizedPath === '') {
             return false;
         }
 
-        if (Storage::disk('public')->exists($path)) {
-            return Storage::disk('public')->delete($path);
+        $normalizedPath = ltrim(str_replace('\\', '/', $normalizedPath), '/');
+        $disk = Storage::disk('public');
+
+        if (! $disk->exists($normalizedPath)) {
+            return false;
         }
 
-        return false;
+        $deleted = (bool) $disk->delete($normalizedPath);
+        if (! $disk->exists($normalizedPath)) {
+            return true;
+        }
+
+        // Fallback for local/public disk cases where adapter delete can be flaky.
+        try {
+            $absolutePath = $disk->path($normalizedPath);
+            if (is_file($absolutePath) && @unlink($absolutePath)) {
+                $deleted = true;
+            }
+        } catch (\Throwable) {
+            // Ignore and report based on current disk state below.
+        }
+
+        return $deleted && ! $disk->exists($normalizedPath);
     }
 }

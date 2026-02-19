@@ -52,9 +52,9 @@ class StaffAttendanceReportController extends Controller
                     $query->where('status', 'present');
                 },
             ])
-            ->having('total_attendances', '>', 0)
             ->orderBy('course_code')
             ->get()
+            ->filter(fn ($course) => (int) ($course->total_attendances ?? 0) > 0)
             ->map(function ($course) {
                 $rate = $course->total_attendances > 0
                     ? round(($course->present_attendances / $course->total_attendances) * 100, 2)
@@ -94,7 +94,7 @@ class StaffAttendanceReportController extends Controller
                 }
             )
             ->get()
-            ->map(function ($student) use ($filters) {
+            ->map(function ($student) use ($filters, $effectiveThreshold, $thresholdContext) {
                 $studentAttendance = Attendance::query()
                     ->where('student_id', $student->id);
                 $this->applyAttendanceFilters(
@@ -157,9 +157,9 @@ class StaffAttendanceReportController extends Controller
                     $query->where('status', 'present');
                 },
             ])
-            ->having('total_attendances', '>', 0)
             ->orderBy('subject_code')
             ->get()
+            ->filter(fn ($subject) => (int) ($subject->total_attendances ?? 0) > 0)
             ->map(function ($subject) {
                 $rate = $subject->total_attendances > 0
                     ? round(($subject->present_attendances / $subject->total_attendances) * 100, 2)
