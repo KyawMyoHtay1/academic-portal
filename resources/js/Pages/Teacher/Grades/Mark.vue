@@ -262,6 +262,19 @@ const stats = computed(() => {
     };
 });
 
+const lockSummary = computed(() => {
+    const list = props.students ?? [];
+
+    return {
+        pending: list.filter((student) => student?.status === "pending").length,
+        approved: list.filter((student) => student?.status === "approved").length,
+        ownedByOther: list.filter(
+            (student) =>
+                student?.edit_lock_reason === "owned_by_other_teacher"
+        ).length,
+    };
+});
+
 const reviewBadge = (status) => {
     if (status === "draft")
         return { label: "Draft", class: "bg-slate-100 text-slate-700" };
@@ -275,6 +288,47 @@ const reviewBadge = (status) => {
             class: "bg-amber-100 text-amber-800",
         };
     return null;
+};
+
+const lockBadge = (student) => {
+    if (!student || student?.can_edit_score !== false) {
+        return null;
+    }
+
+    if (student?.edit_lock_reason === "owned_by_other_teacher") {
+        return {
+            label: `Locked by ${student?.graded_by ?? "another teacher"}`,
+            class: "bg-slate-200 text-slate-800",
+        };
+    }
+
+    if (student?.status === "approved") {
+        return {
+            label: "Locked: approved",
+            class: "bg-emerald-100 text-emerald-800",
+        };
+    }
+
+    return {
+        label: "Locked: pending review",
+        class: "bg-amber-100 text-amber-800",
+    };
+};
+
+const rowHighlightClass = (student) => {
+    if (!student || student?.can_edit_score !== false) {
+        return "bg-white hover:bg-slate-50";
+    }
+
+    if (student?.edit_lock_reason === "owned_by_other_teacher") {
+        return "bg-slate-100/80 hover:bg-slate-100";
+    }
+
+    if (student?.status === "approved") {
+        return "bg-emerald-50/70 hover:bg-emerald-50";
+    }
+
+    return "bg-amber-50/70 hover:bg-amber-50";
 };
 
 const getGradeClass = (score) => {
@@ -529,6 +583,33 @@ const submit = () => {
                         </div>
                     </div>
 
+                    <div class="mb-6 grid gap-3 sm:grid-cols-3">
+                        <div class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+                                Pending Review Lock
+                            </p>
+                            <p class="mt-1 text-sm font-semibold text-amber-900">
+                                {{ lockSummary.pending }}
+                            </p>
+                        </div>
+                        <div class="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+                                Approved Lock
+                            </p>
+                            <p class="mt-1 text-sm font-semibold text-emerald-900">
+                                {{ lockSummary.approved }}
+                            </p>
+                        </div>
+                        <div class="rounded-md border border-slate-300 bg-slate-100 px-3 py-2">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-700">
+                                Locked by Other Teacher
+                            </p>
+                            <p class="mt-1 text-sm font-semibold text-slate-900">
+                                {{ lockSummary.ownedByOther }}
+                            </p>
+                        </div>
+                    </div>
+
                     <form @submit.prevent="submit">
                         <div class="space-y-6">
                             <!-- Students Grades Table -->
@@ -601,7 +682,8 @@ const submit = () => {
                                                 :key="entry.record.student_id"
                                             >
                                                 <tr
-                                                    class="bg-white hover:bg-slate-50 transition-colors"
+                                                    class="transition-colors"
+                                                    :class="rowHighlightClass(entry.student)"
                                                 >
                                                     <td
                                                         class="px-4 py-4 text-sm text-slate-700"
@@ -663,6 +745,13 @@ const submit = () => {
                                                                         "-"
                                                                     }}
                                                                 </span>
+                                                                <span
+                                                                    v-if="lockBadge(entry.student)"
+                                                                    class="mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                                                                    :class="lockBadge(entry.student).class"
+                                                                >
+                                                                    {{ lockBadge(entry.student).label }}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -686,11 +775,35 @@ const submit = () => {
                                                                         .student
                                                                         ?.can_edit_score
                                                                 "
-                                                                class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy disabled:cursor-not-allowed disabled:opacity-60"
-                                                                :class="{
-                                                                    'border-emerald-300 bg-emerald-50':
-                                                                        hasNumericScore(
-                                                                            entry
+                                                                 class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy disabled:cursor-not-allowed disabled:opacity-60"
+                                                                 :class="{
+                                                                     'ring-1 ring-amber-200 bg-amber-100/70':
+                                                                         !entry
+                                                                             .student
+                                                                             ?.can_edit_score &&
+                                                                         entry
+                                                                             .student
+                                                                             ?.status ===
+                                                                             'pending',
+                                                                     'ring-1 ring-emerald-200 bg-emerald-100/70':
+                                                                         !entry
+                                                                             .student
+                                                                             ?.can_edit_score &&
+                                                                         entry
+                                                                             .student
+                                                                             ?.status ===
+                                                                             'approved',
+                                                                     'ring-1 ring-slate-300 bg-slate-100':
+                                                                         !entry
+                                                                             .student
+                                                                             ?.can_edit_score &&
+                                                                         entry
+                                                                             .student
+                                                                             ?.edit_lock_reason ===
+                                                                             'owned_by_other_teacher',
+                                                                     'border-emerald-300 bg-emerald-50':
+                                                                         hasNumericScore(
+                                                                             entry
                                                                                 .record
                                                                                 .score,
                                                                         ) &&

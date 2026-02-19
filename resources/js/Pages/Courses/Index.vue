@@ -35,6 +35,7 @@ const availabilityFilter = ref(
 const sortBy = ref(
     allowedSorts.has(queryParam("sort") || "") ? queryParam("sort") : "code"
 );
+const selectedCourseId = ref(null);
 
 const isEnrolledStatus = (status) =>
     status === "approved" || status === "withdrawal_pending";
@@ -139,6 +140,19 @@ const filteredCourses = computed(() => {
     }
 
     return list;
+});
+
+const selectedCourse = computed(() => {
+    if (selectedCourseId.value === null) {
+        return null;
+    }
+
+    return (
+        (props.courses ?? []).find(
+            (course) =>
+                String(course.id) === String(selectedCourseId.value)
+        ) || null
+    );
 });
 
 const clearFilters = () => {
@@ -251,6 +265,14 @@ const statusLabel = (status) => {
     if (status === "withdrawal_pending") return "Withdrawal Pending";
     if (status === "rejected") return "Rejected";
     return "Open";
+};
+
+const openCourseQuickView = (courseId) => {
+    selectedCourseId.value = courseId;
+};
+
+const closeCourseQuickView = () => {
+    selectedCourseId.value = null;
 };
 </script>
 
@@ -404,12 +426,12 @@ const statusLabel = (status) => {
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Credits</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Semester</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Status</th>
-                                    <th v-if="hasStudentRecord" class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Action</th>
+                                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="filteredCourses.length === 0">
-                                    <td :colspan="hasStudentRecord ? 5 : 4" class="px-4 py-8 text-center text-sm text-slate-500">
+                                    <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
                                         No courses match your current search or filters.
                                     </td>
                                 </tr>
@@ -440,14 +462,23 @@ const statusLabel = (status) => {
                                             {{ statusLabel(course.enrollment_status) }}
                                         </span>
                                     </td>
-                                    <td v-if="hasStudentRecord" class="px-4 py-4 text-right text-sm">
-                                        <button
-                                            v-if="isOpenToEnroll(course.enrollment_status)"
-                                            @click="enroll(course.id)"
-                                            class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
-                                        >
-                                            {{ course.enrollment_status === "rejected" ? "Reapply" : "Enroll" }}
-                                        </button>
+                                    <td class="px-4 py-4 text-right text-sm">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                @click="openCourseQuickView(course.id)"
+                                                class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                            >
+                                                Quick view
+                                            </button>
+                                            <button
+                                                v-if="hasStudentRecord && isOpenToEnroll(course.enrollment_status)"
+                                                @click="enroll(course.id)"
+                                                class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
+                                            >
+                                                {{ course.enrollment_status === "rejected" ? "Reapply" : "Enroll" }}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -478,9 +509,16 @@ const statusLabel = (status) => {
                                 <p>Semester: <span class="font-semibold text-slate-700">{{ course.semester }}</span></p>
                             </div>
 
-                            <div v-if="hasStudentRecord" class="mt-3">
+                            <div class="mt-3 flex gap-2">
                                 <button
-                                    v-if="isOpenToEnroll(course.enrollment_status)"
+                                    type="button"
+                                    @click="openCourseQuickView(course.id)"
+                                    class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                >
+                                    Quick view
+                                </button>
+                                <button
+                                    v-if="hasStudentRecord && isOpenToEnroll(course.enrollment_status)"
                                     @click="enroll(course.id)"
                                     class="w-full rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white hover:bg-portal-navy-dark"
                                 >
@@ -491,6 +529,98 @@ const statusLabel = (status) => {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div
+            v-if="selectedCourse"
+            class="fixed inset-0 z-50 flex"
+            aria-modal="true"
+            role="dialog"
+        >
+            <button
+                type="button"
+                class="h-full flex-1 bg-slate-900/40"
+                aria-label="Close quick view"
+                @click="closeCourseQuickView"
+            ></button>
+
+            <aside
+                class="h-full w-full max-w-md overflow-y-auto bg-white p-6 shadow-xl"
+            >
+                <div class="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Course quick view
+                        </p>
+                        <h3 class="mt-1 text-lg font-semibold text-slate-900">
+                            {{ selectedCourse.title }}
+                        </h3>
+                        <p class="text-sm text-slate-500">
+                            {{ selectedCourse.course_code }}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        class="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        @click="closeCourseQuickView"
+                    >
+                        Close
+                    </button>
+                </div>
+
+                <div class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-white"
+                        >
+                            <img
+                                v-if="selectedCourse.photo"
+                                :src="`/storage/${selectedCourse.photo}`"
+                                :alt="`Photo for ${selectedCourse.title}`"
+                                class="h-full w-full object-cover"
+                            />
+                            <span
+                                v-else
+                                class="text-sm font-semibold text-slate-500"
+                            >
+                                {{ selectedCourse.title?.[0] }}
+                            </span>
+                        </div>
+                        <span
+                            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                            :class="statusClass(selectedCourse.enrollment_status)"
+                        >
+                            {{ statusLabel(selectedCourse.enrollment_status) }}
+                        </span>
+                    </div>
+                    <p>
+                        <span class="font-semibold text-slate-700">Semester:</span>
+                        {{ selectedCourse.semester || "N/A" }}
+                    </p>
+                    <p>
+                        <span class="font-semibold text-slate-700">Credits:</span>
+                        {{ selectedCourse.credits ?? "N/A" }}
+                    </p>
+                </div>
+
+                <div class="mt-4 flex items-center gap-2">
+                    <button
+                        v-if="hasStudentRecord && isOpenToEnroll(selectedCourse.enrollment_status)"
+                        type="button"
+                        class="rounded-md bg-portal-navy px-3 py-2 text-xs font-semibold text-white hover:bg-portal-navy-dark"
+                        @click="enroll(selectedCourse.id)"
+                    >
+                        {{ selectedCourse.enrollment_status === "rejected" ? "Reapply to course" : "Enroll to course" }}
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        @click="closeCourseQuickView"
+                    >
+                        Done
+                    </button>
+                </div>
+            </aside>
         </div>
     </AuthenticatedLayout>
 </template>
