@@ -276,6 +276,18 @@ const formatDate = (dateString) => {
     });
 };
 
+const formatAuditDate = (value) => {
+    if (!value) return "-";
+
+    return new Date(value).toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
+
 const getStatusBadgeClass = (status) => {
     switch (status) {
         case "pending":
@@ -883,6 +895,42 @@ const closeQuickView = () => {
                                 </span>
                                 <p class="mt-2 text-xs text-slate-500">
                                     Requested on: {{ formatDate(quickViewEnrollment.requested_at) }}
+                                </p>
+                            </div>
+
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Audit Trail
+                                </p>
+                                <div
+                                    v-if="(quickViewEnrollment.audit_trail ?? []).length > 0"
+                                    class="mt-2 space-y-2"
+                                >
+                                    <div
+                                        v-for="(entry, index) in quickViewEnrollment.audit_trail"
+                                        :key="`${entry.action}-${entry.created_at}-${index}`"
+                                        class="rounded-md border border-slate-200 bg-white p-2"
+                                    >
+                                        <p class="text-xs font-semibold text-slate-800">
+                                            {{ entry.label || entry.action }}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ formatAuditDate(entry.created_at) }}
+                                            <span v-if="entry.performed_by"> - {{ entry.performed_by }}</span>
+                                        </p>
+                                        <p
+                                            v-if="entry.reason"
+                                            class="mt-1 text-xs text-slate-500"
+                                        >
+                                            Reason: {{ entry.reason }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <p
+                                    v-else
+                                    class="mt-2 text-xs text-slate-500"
+                                >
+                                    No audit events recorded for this enrollment yet.
                                 </p>
                             </div>
                         </div>

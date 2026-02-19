@@ -500,6 +500,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::post('/admin/fees/{fee}/reject-payment', [StaffFeeController::class, 'rejectPayment'])->name('admin.fees.reject-payment');
         Route::post('/admin/fees/{fee}/send-reminder', [StaffFeeController::class, 'sendReminder'])->name('admin.fees.send-reminder');
         Route::get('/admin/fees/{fee}/receipt', [StaffFeeController::class, 'receipt'])->name('admin.fees.receipt');
+        Route::get('/admin/fees/export/{format}', [StaffFeeController::class, 'export'])->name('admin.fees.export');
 
         // Grades Review & Approval (staff only)
         Route::get('/admin/grades', [StaffGradesController::class, 'index'])->name('admin.grades.index');
@@ -529,6 +530,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'admin.announcements.update',
             'destroy' => 'admin.announcements.destroy',
         ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::post('/admin/announcements/{announcement}/remind', [StaffAnnouncementController::class, 'sendReminder'])->name('admin.announcements.remind');
 
         // Attendance Reports (staff only)
         Route::get('/admin/attendance/report', [StaffAttendanceReportController::class, 'index'])->name('admin.attendance.report');
@@ -587,6 +589,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
             'update' => 'teacher.announcements.update',
             'destroy' => 'teacher.announcements.destroy',
         ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::post('/teacher/announcements/{announcement}/remind', [TeacherAnnouncementController::class, 'sendReminder'])->name('teacher.announcements.remind');
     });
 });
 

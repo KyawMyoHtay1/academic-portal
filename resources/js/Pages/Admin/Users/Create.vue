@@ -2,11 +2,16 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { computed } from "vue";
 
 const props = defineProps({
     availableRoles: {
         type: Array,
         required: true,
+    },
+    duplicateHintUsers: {
+        type: Array,
+        default: () => [],
     },
 });
 
@@ -22,6 +27,77 @@ const submit = () => {
         forceFormData: true,
     });
 };
+
+const normalize = (value) => String(value || "").trim().toLowerCase();
+
+const emailPrefix = (value) => {
+    const normalized = normalize(value);
+    if (!normalized.includes("@")) return "";
+
+    return normalized.split("@")[0] || "";
+};
+
+const duplicateWarnings = computed(() => {
+    const name = normalize(form.name);
+    const email = normalize(form.email);
+
+    if (name === "" && email === "") {
+        return [];
+    }
+
+    return (props.duplicateHintUsers || [])
+        .map((user) => {
+            const existingName = normalize(user?.name);
+            const existingEmail = normalize(user?.email);
+            const reasons = [];
+            let score = 0;
+
+            if (email !== "" && existingEmail === email) {
+                reasons.push("same email");
+                score += 100;
+            }
+
+            const newPrefix = emailPrefix(email);
+            const existingPrefix = emailPrefix(existingEmail);
+            if (
+                email !== "" &&
+                existingEmail !== "" &&
+                newPrefix !== "" &&
+                existingPrefix === newPrefix
+            ) {
+                reasons.push("same email prefix");
+                score += 40;
+            }
+
+            if (name !== "" && existingName === name) {
+                reasons.push("same name");
+                score += 70;
+            } else if (
+                name !== "" &&
+                existingName !== "" &&
+                (existingName.includes(name) || name.includes(existingName)) &&
+                Math.min(name.length, existingName.length) >= 4
+            ) {
+                reasons.push("similar name");
+                score += 35;
+            }
+
+            if (score === 0) {
+                return null;
+            }
+
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                reasons,
+                score,
+            };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+});
 </script>
 
 <template>
@@ -105,6 +181,26 @@ const submit = () => {
                                 >
                                     {{ form.errors.email }}
                                 </p>
+                            </div>
+
+                            <div
+                                v-if="duplicateWarnings.length > 0"
+                                class="rounded-lg border border-amber-300 bg-amber-50 p-3"
+                            >
+                                <p class="text-xs font-semibold uppercase tracking-wide text-amber-800">
+                                    Duplicate warning
+                                </p>
+                                <p class="mt-1 text-xs text-amber-700">
+                                    Similar user records were found. Review before creating a new account.
+                                </p>
+                                <ul class="mt-2 space-y-1 text-xs text-amber-700">
+                                    <li
+                                        v-for="warning in duplicateWarnings"
+                                        :key="warning.id"
+                                    >
+                                        {{ warning.name }} ({{ warning.email }}) - {{ warning.reasons.join(", ") }}
+                                    </li>
+                                </ul>
                             </div>
 
                             <!-- Role -->

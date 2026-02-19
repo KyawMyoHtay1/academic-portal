@@ -129,6 +129,10 @@ class NotificationController extends Controller
             }
         }
 
+        if ($type === 'announcement') {
+            return route('announcements.index');
+        }
+
         return null;
     }
 }

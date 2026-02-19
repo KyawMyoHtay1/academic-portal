@@ -118,6 +118,11 @@ class StudentController extends Controller
         return Inertia::render('Students/Create', [
             'users' => $users,
             'programmes' => $this->getProgrammes(),
+            'duplicateHintStudents' => Student::query()
+                ->select('id', 'student_no', 'full_name', 'email')
+                ->orderByDesc('id')
+                ->limit(500)
+                ->get(),
         ]);
     }
 

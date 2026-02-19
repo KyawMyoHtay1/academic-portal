@@ -94,6 +94,11 @@ class StaffUserController extends Controller
                 'teacher',
                 'staff',
             ],
+            'duplicateHintUsers' => User::query()
+                ->select('id', 'name', 'email')
+                ->orderByDesc('id')
+                ->limit(500)
+                ->get(),
         ]);
     }
 

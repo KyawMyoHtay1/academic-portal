@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Models\Course;
+use App\Models\EnrollmentStatusLog;
 use App\Models\Student;
 use App\Models\Timetable;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class EnrollmentService
 {
@@ -20,6 +23,9 @@ class EnrollmentService
     {
         return DB::transaction(function () use ($student, $course): array {
             $reapplyAfterRejection = false;
+            $existingEnrollmentId = null;
+            $existingStatus = null;
+            $performedBy = (int) ($student->user_id ?? 0) ?: null;
 
             $existingEnrollment = DB::table('course_student')
                 ->where('student_id', $student->id)
@@ -29,6 +35,8 @@ class EnrollmentService
 
             if ($existingEnrollment) {
                 $status = $existingEnrollment->status;
+                $existingEnrollmentId = (int) ($existingEnrollment->id ?? 0) ?: null;
+                $existingStatus = is_string($status) ? $status : null;
                 if ($status === 'approved') {
                     Log::info('enrollment.request_blocked', [
                         'student_id' => $student->id,
@@ -77,6 +85,7 @@ class EnrollmentService
 
             $conflict = $this->findScheduleConflict($course, $approvedCourseIds);
             if ($conflict !== null) {
+                $reason = $this->scheduleConflictMessage($conflict);
                 Log::info('enrollment.request_blocked', [
                     'student_id' => $student->id,
                     'course_id' => $course->id,
@@ -84,22 +93,48 @@ class EnrollmentService
                     'conflict_course_id' => $conflict['conflict_course_id'],
                 ]);
 
+                $this->logEnrollmentStatus([
+                    'enrollment_id' => $existingEnrollmentId,
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'from_status' => $existingStatus,
+                    'to_status' => $existingStatus,
+                    'action' => 'request_blocked_conflict',
+                    'reason' => $reason,
+                    'performed_by' => $performedBy,
+                    'meta' => [
+                        'conflict_course_id' => $conflict['conflict_course_id'] ?? null,
+                    ],
+                ]);
+
                 return $this->result(
                     'error',
-                    $this->scheduleConflictMessage($conflict)
+                    $reason
                 );
             }
 
             if ($reapplyAfterRejection) {
+                $now = now();
                 DB::table('course_student')
                     ->where('student_id', $student->id)
                     ->where('course_id', $course->id)
-                    ->update(['status' => 'pending', 'updated_at' => now()]);
+                    ->update(['status' => 'pending', 'updated_at' => $now]);
 
                 Log::info('enrollment.request_submitted', [
                     'student_id' => $student->id,
                     'course_id' => $course->id,
                     'mode' => 'resubmission_after_rejection',
+                ]);
+
+                $this->logEnrollmentStatus([
+                    'enrollment_id' => $existingEnrollmentId,
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'from_status' => 'rejected',
+                    'to_status' => 'pending',
+                    'action' => 'request_resubmitted',
+                    'reason' => 'Student resubmitted previously rejected enrollment.',
+                    'performed_by' => $performedBy,
                 ]);
 
                 return $this->result(
@@ -109,12 +144,23 @@ class EnrollmentService
             }
 
             try {
-                DB::table('course_student')->insert([
+                $enrollmentId = DB::table('course_student')->insertGetId([
                     'student_id' => $student->id,
                     'course_id' => $course->id,
                     'status' => 'pending',
                     'created_at' => now(),
                     'updated_at' => now(),
+                ]);
+
+                $this->logEnrollmentStatus([
+                    'enrollment_id' => (int) $enrollmentId,
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'from_status' => null,
+                    'to_status' => 'pending',
+                    'action' => 'request_submitted',
+                    'reason' => 'Student submitted enrollment request.',
+                    'performed_by' => $performedBy,
                 ]);
             } catch (QueryException $e) {
                 if ((string) $e->getCode() === '23000') {
@@ -167,6 +213,11 @@ class EnrollmentService
      */
     public function requestWithdrawal(Student $student, Course $course): array
     {
+        $enrollmentRow = DB::table('course_student')
+            ->where('student_id', $student->id)
+            ->where('course_id', $course->id)
+            ->first(['id', 'status']);
+
         $enrollment = $student->courses()
             ->where('course_id', $course->id)
             ->first();
@@ -185,6 +236,17 @@ class EnrollmentService
         }
 
         $student->courses()->updateExistingPivot($course->id, ['status' => 'withdrawal_pending']);
+
+        $this->logEnrollmentStatus([
+            'enrollment_id' => (int) ($enrollmentRow?->id ?? 0) ?: null,
+            'student_id' => $student->id,
+            'course_id' => $course->id,
+            'from_status' => 'approved',
+            'to_status' => 'withdrawal_pending',
+            'action' => 'withdrawal_requested',
+            'reason' => 'Student requested withdrawal.',
+            'performed_by' => (int) ($student->user_id ?? 0) ?: null,
+        ]);
 
         Log::info('enrollment.withdrawal_requested', [
             'student_id' => $student->id,
@@ -206,6 +268,7 @@ class EnrollmentService
     public function approveEnrollment(int|string $enrollmentId): array
     {
         return DB::transaction(function () use ($enrollmentId): array {
+            $performedBy = Auth::id();
             $enrollment = DB::table('course_student')
                 ->where('id', $enrollmentId)
                 ->lockForUpdate()
@@ -234,6 +297,7 @@ class EnrollmentService
             if ($course !== null) {
                 $conflict = $this->findScheduleConflict($course, $approvedCourseIds);
                 if ($conflict !== null) {
+                    $reason = $this->scheduleConflictMessage($conflict);
                     Log::info('enrollment.review_blocked', [
                         'enrollment_id' => $enrollmentId,
                         'student_id' => $enrollment->student_id,
@@ -242,9 +306,23 @@ class EnrollmentService
                         'conflict_course_id' => $conflict['conflict_course_id'],
                     ]);
 
+                    $this->logEnrollmentStatus([
+                        'enrollment_id' => (int) $enrollmentId,
+                        'student_id' => (int) $enrollment->student_id,
+                        'course_id' => (int) $enrollment->course_id,
+                        'from_status' => 'pending',
+                        'to_status' => 'pending',
+                        'action' => 'review_blocked_conflict',
+                        'reason' => $reason,
+                        'performed_by' => $performedBy,
+                        'meta' => [
+                            'conflict_course_id' => $conflict['conflict_course_id'] ?? null,
+                        ],
+                    ]);
+
                     return $this->result(
                         'error',
-                        "Cannot approve enrollment for {$this->studentLabel($student)} in {$this->courseLabel($course)}. ".$this->scheduleConflictMessage($conflict)
+                        "Cannot approve enrollment for {$this->studentLabel($student)} in {$this->courseLabel($course)}. ".$reason
                     );
                 }
             }
@@ -263,6 +341,17 @@ class EnrollmentService
                 'decision' => 'approved',
             ]);
 
+            $this->logEnrollmentStatus([
+                'enrollment_id' => (int) $enrollmentId,
+                'student_id' => (int) $enrollment->student_id,
+                'course_id' => (int) $enrollment->course_id,
+                'from_status' => 'pending',
+                'to_status' => 'approved',
+                'action' => 'approved',
+                'reason' => 'Enrollment approved by staff.',
+                'performed_by' => $performedBy,
+            ]);
+
             return $this->result(
                 'success',
                 "Enrollment approved for {$this->studentLabel($student)} in {$this->courseLabel($course)}."
@@ -279,6 +368,7 @@ class EnrollmentService
     public function rejectEnrollment(int|string $enrollmentId): array
     {
         return DB::transaction(function () use ($enrollmentId): array {
+            $performedBy = Auth::id();
             $enrollment = DB::table('course_student')
                 ->where('id', $enrollmentId)
                 ->lockForUpdate()
@@ -305,6 +395,17 @@ class EnrollmentService
                 'decision' => 'rejected',
             ]);
 
+            $this->logEnrollmentStatus([
+                'enrollment_id' => (int) $enrollmentId,
+                'student_id' => (int) $enrollment->student_id,
+                'course_id' => (int) $enrollment->course_id,
+                'from_status' => 'pending',
+                'to_status' => 'rejected',
+                'action' => 'rejected',
+                'reason' => 'Enrollment rejected by staff.',
+                'performed_by' => $performedBy,
+            ]);
+
             return $this->result(
                 'success',
                 "Enrollment rejected for {$this->studentLabel($student)} in {$this->courseLabel($course)}."
@@ -321,6 +422,7 @@ class EnrollmentService
     public function approveWithdrawal(int|string $enrollmentId): array
     {
         return DB::transaction(function () use ($enrollmentId): array {
+            $performedBy = Auth::id();
             $enrollment = DB::table('course_student')
                 ->where('id', $enrollmentId)
                 ->lockForUpdate()
@@ -344,6 +446,17 @@ class EnrollmentService
                 'decision' => 'approved',
             ]);
 
+            $this->logEnrollmentStatus([
+                'enrollment_id' => (int) $enrollmentId,
+                'student_id' => (int) $enrollment->student_id,
+                'course_id' => (int) $enrollment->course_id,
+                'from_status' => 'withdrawal_pending',
+                'to_status' => 'withdrawn',
+                'action' => 'withdrawal_approved',
+                'reason' => 'Withdrawal approved by staff.',
+                'performed_by' => $performedBy,
+            ]);
+
             return $this->result(
                 'success',
                 "Withdrawal approved for {$this->studentLabel($student)} from {$this->courseLabel($course)}."
@@ -360,6 +473,7 @@ class EnrollmentService
     public function rejectWithdrawal(int|string $enrollmentId): array
     {
         return DB::transaction(function () use ($enrollmentId): array {
+            $performedBy = Auth::id();
             $enrollment = DB::table('course_student')
                 ->where('id', $enrollmentId)
                 ->lockForUpdate()
@@ -386,11 +500,74 @@ class EnrollmentService
                 'decision' => 'rejected',
             ]);
 
+            $this->logEnrollmentStatus([
+                'enrollment_id' => (int) $enrollmentId,
+                'student_id' => (int) $enrollment->student_id,
+                'course_id' => (int) $enrollment->course_id,
+                'from_status' => 'withdrawal_pending',
+                'to_status' => 'approved',
+                'action' => 'withdrawal_rejected',
+                'reason' => 'Withdrawal rejected by staff.',
+                'performed_by' => $performedBy,
+            ]);
+
             return $this->result(
                 'success',
                 "Withdrawal rejected for {$this->studentLabel($student)} from {$this->courseLabel($course)}. Student remains enrolled."
             );
         });
+    }
+
+    /**
+     * @param  array{
+     *     enrollment_id?: int|null,
+     *     student_id: int,
+     *     course_id: int,
+     *     from_status?: string|null,
+     *     to_status?: string|null,
+     *     action: string,
+     *     reason?: string|null,
+     *     performed_by?: int|null,
+     *     meta?: array<string, mixed>|null
+     * }  $payload
+     */
+    private function logEnrollmentStatus(array $payload): void
+    {
+        if (! $this->hasEnrollmentStatusLogTable()) {
+            return;
+        }
+
+        try {
+            EnrollmentStatusLog::create([
+                'enrollment_id' => $payload['enrollment_id'] ?? null,
+                'student_id' => $payload['student_id'],
+                'course_id' => $payload['course_id'],
+                'from_status' => $payload['from_status'] ?? null,
+                'to_status' => $payload['to_status'] ?? null,
+                'action' => $payload['action'],
+                'reason' => $payload['reason'] ?? null,
+                'performed_by' => $payload['performed_by'] ?? null,
+                'meta' => $payload['meta'] ?? null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('enrollment.status_log_failed', [
+                'student_id' => $payload['student_id'] ?? null,
+                'course_id' => $payload['course_id'] ?? null,
+                'action' => $payload['action'] ?? null,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function hasEnrollmentStatusLogTable(): bool
+    {
+        static $exists = null;
+
+        if ($exists === null) {
+            $exists = Schema::hasTable('enrollment_status_logs');
+        }
+
+        return (bool) $exists;
     }
 
     /**

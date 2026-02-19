@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StaffFeeController extends Controller
 {
@@ -386,6 +387,88 @@ class StaffFeeController extends Controller
     }
 
     /**
+     * Export filtered fee ledger (including receipt references) as CSV/PDF.
+     */
+    public function export(Request $request, string $format): StreamedResponse|\Illuminate\Http\Response
+    {
+        $this->authorize('viewAny', Fee::class);
+
+        $format = strtolower($format);
+        if (! in_array($format, ['csv', 'pdf'], true)) {
+            abort(404);
+        }
+
+        $filters = $this->resolveFilters($request);
+        $todayDate = now()->toDateString();
+
+        $query = Fee::with(['student', 'processor:id,name']);
+        $this->applyIndexFilters($query, $filters, $todayDate);
+
+        $rows = $query
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn (Fee $fee) => $this->mapFeeExportRow($fee));
+
+        $timestamp = now()->format('Ymd_His');
+
+        if ($format === 'csv') {
+            $filename = "fee_ledger_{$timestamp}.csv";
+
+            return response()->streamDownload(function () use ($rows): void {
+                $handle = fopen('php://output', 'w');
+                if ($handle === false) {
+                    return;
+                }
+
+                fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($handle, [
+                    'Fee ID',
+                    'Receipt No',
+                    'Student No',
+                    'Student Name',
+                    'Amount',
+                    'Status',
+                    'Due Date',
+                    'Paid Date',
+                    'Description',
+                    'Processed By',
+                    'Processed At',
+                    'Created At',
+                ]);
+
+                foreach ($rows as $row) {
+                    fputcsv($handle, [
+                        $row['fee_id'],
+                        $row['receipt_no'],
+                        $row['student_no'],
+                        $row['student_name'],
+                        $row['amount'],
+                        $row['status'],
+                        $row['due_date'],
+                        $row['paid_date'],
+                        $row['description'],
+                        $row['processed_by'],
+                        $row['processed_at'],
+                        $row['created_at'],
+                    ]);
+                }
+
+                fclose($handle);
+            }, $filename, [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        $pdf = Pdf::loadView('fees.report', [
+            'rows' => $rows,
+            'filters' => $filters,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download("fee_ledger_{$timestamp}.pdf");
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function resolveFilters(Request $request): array
@@ -407,6 +490,29 @@ class StaffFeeController extends Controller
             'search' => trim((string) $request->input('search', '')),
             'overdue_only' => $request->boolean('overdue_only'),
             'due_bucket' => $dueBucket,
+        ];
+    }
+
+    /**
+     * @return array<string, string|int|float|null>
+     */
+    private function mapFeeExportRow(Fee $fee): array
+    {
+        return [
+            'fee_id' => $fee->id,
+            'receipt_no' => $fee->status === Fee::STATUS_PAID
+                ? 'REC-'.str_pad((string) $fee->id, 6, '0', STR_PAD_LEFT)
+                : null,
+            'student_no' => $fee->student->student_no,
+            'student_name' => $fee->student->full_name,
+            'amount' => (float) $fee->amount,
+            'status' => $fee->status,
+            'due_date' => $fee->due_date?->format('Y-m-d'),
+            'paid_date' => $fee->paid_date?->format('Y-m-d'),
+            'description' => $fee->description,
+            'processed_by' => $fee->processor?->name,
+            'processed_at' => $fee->payment_processed_at?->format('Y-m-d H:i:s'),
+            'created_at' => $fee->created_at?->format('Y-m-d H:i:s'),
         ];
     }
 

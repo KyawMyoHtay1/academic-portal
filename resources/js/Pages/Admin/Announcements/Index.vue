@@ -140,6 +140,32 @@ const deleteAnnouncement = (id) => {
     });
 };
 
+const pendingAudienceCount = (announcement) => {
+    const recipientCount = Number(announcement?.analytics?.recipient_count ?? 0);
+    const completedCount = announcement?.require_ack
+        ? Number(announcement?.analytics?.ack_count ?? 0)
+        : Number(announcement?.analytics?.read_count ?? 0);
+
+    return Math.max(recipientCount - completedCount, 0);
+};
+
+const sendReminder = (announcement) => {
+    const pending = pendingAudienceCount(announcement);
+    if (pending <= 0) {
+        alert("All recipients have already completed this announcement.");
+        return;
+    }
+
+    const checkLabel = announcement?.require_ack ? "acknowledgement" : "read";
+    if (!confirm(`Send reminder to ${pending} recipient(s) who have not completed ${checkLabel}?`)) {
+        return;
+    }
+
+    router.post(route("admin.announcements.remind", announcement.id), {}, {
+        preserveScroll: true,
+    });
+};
+
 const priorityLabel = (p) => {
     if (p === "urgent") return "Urgent";
     if (p === "important") return "Important";
@@ -379,11 +405,7 @@ const priorityLabel = (p) => {
                                         </div>
                                         <div class="rounded-md bg-slate-50 px-2 py-1">
                                             Pending: <span class="font-semibold text-slate-800">{{
-                                                Math.max(
-                                                    (announcement.analytics?.recipient_count ?? 0) -
-                                                        (announcement.analytics?.read_count ?? 0),
-                                                    0
-                                                )
+                                                pendingAudienceCount(announcement)
                                             }}</span>
                                         </div>
                                     </div>
@@ -391,6 +413,14 @@ const priorityLabel = (p) => {
                             </div>
 
                             <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    class="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                    :disabled="pendingAudienceCount(announcement) === 0"
+                                    @click="sendReminder(announcement)"
+                                >
+                                    Remind
+                                </button>
                                 <Link
                                     :href="route('admin.announcements.edit', announcement.id)"
                                     class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"

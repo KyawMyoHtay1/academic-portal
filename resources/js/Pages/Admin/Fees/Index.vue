@@ -87,6 +87,15 @@ const applyFilters = () => {
     );
 };
 
+const exportUrl = (format) =>
+    route("admin.fees.export", {
+        format,
+        status: status.value,
+        search: search.value || undefined,
+        overdue_only: overdueOnly.value ? 1 : undefined,
+        due_bucket: dueBucket.value !== "all" ? dueBucket.value : undefined,
+    });
+
 watch([status, overdueOnly, dueBucket], () => {
     if (suppressAutoApply.value) {
         return;
@@ -312,14 +321,28 @@ const timelineEventClass = (action) => {
                                 Refine by status, overdue range, and search.
                             </p>
                         </div>
-                        <button
-                            v-if="hasActiveFilters"
-                            type="button"
-                            class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-                            @click="clearFilters"
-                        >
-                            Clear all filters
-                        </button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <a
+                                :href="exportUrl('csv')"
+                                class="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                            >
+                                Export CSV
+                            </a>
+                            <a
+                                :href="exportUrl('pdf')"
+                                class="rounded-md border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                            >
+                                Export PDF
+                            </a>
+                            <button
+                                v-if="hasActiveFilters"
+                                type="button"
+                                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                @click="clearFilters"
+                            >
+                                Clear all filters
+                            </button>
+                        </div>
                     </div>
 
                     <div class="grid gap-3 lg:grid-cols-5">

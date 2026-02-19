@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Announcements\UpsertAnnouncementRequest;
 use App\Models\Announcement;
+use App\Models\AnnouncementRead;
 use App\Models\User;
+use App\Notifications\AnnouncementReminder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -142,5 +146,64 @@ class StaffAnnouncementController extends Controller
         return redirect()
             ->route('admin.announcements.index')
             ->with('success', 'Announcement deleted successfully.');
+    }
+
+    public function sendReminder(Announcement $announcement): RedirectResponse
+    {
+        $targetUserIds = $this->resolveTargetUserIds($announcement);
+        if ($targetUserIds->isEmpty()) {
+            return back()->with('info', 'No matching audience users found for this announcement.');
+        }
+
+        $completedQuery = AnnouncementRead::query()
+            ->where('announcement_id', $announcement->id);
+
+        if ($announcement->require_ack) {
+            $completedQuery->whereNotNull('acknowledged_at');
+        } else {
+            $completedQuery->whereNotNull('read_at');
+        }
+
+        $completedUserIds = $completedQuery
+            ->pluck('user_id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $pendingUserIds = $targetUserIds->diff($completedUserIds)->values();
+        if ($pendingUserIds->isEmpty()) {
+            return back()->with('info', 'No pending recipients need a reminder for this announcement.');
+        }
+
+        $recipients = User::query()
+            ->whereIn('id', $pendingUserIds->all())
+            ->get();
+
+        Notification::send($recipients, new AnnouncementReminder($announcement));
+
+        return back()->with(
+            'success',
+            sprintf('Reminder sent to %d recipient(s).', $recipients->count())
+        );
+    }
+
+    private function resolveTargetUserIds(Announcement $announcement): Collection
+    {
+        $roles = $announcement->audience['roles'] ?? ['all'];
+        $query = User::query();
+
+        if (! in_array('all', $roles, true)) {
+            $query->whereIn('role', $roles);
+        }
+
+        if ($announcement->user_id) {
+            $query->where('id', '!=', $announcement->user_id);
+        }
+
+        return $query
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
     }
 }

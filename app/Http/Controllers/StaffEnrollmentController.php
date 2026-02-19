@@ -7,6 +7,7 @@ use App\Services\EnrollmentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -34,8 +35,17 @@ class StaffEnrollmentController extends Controller
         $perPage = 15;
         $enrollments = $query
             ->paginate($perPage)
-            ->withQueryString()
-            ->through(fn ($row) => $this->mapEnrollmentRow($row));
+            ->withQueryString();
+
+        $logsByEnrollment = $this->fetchEnrollmentLogsForPage($enrollments->items());
+        $enrollments = $enrollments->through(function ($row) use ($logsByEnrollment) {
+            $enrollmentId = (int) ($row->enrollment_id ?? 0);
+
+            return $this->mapEnrollmentRow(
+                $row,
+                $logsByEnrollment[$enrollmentId] ?? []
+            );
+        });
 
         // Status counts for tabs
         $statusCountsRaw = DB::table('course_student')
@@ -111,7 +121,7 @@ class StaffEnrollmentController extends Controller
             ->orderByDesc('course_student.updated_at')
             ->orderByDesc('course_student.created_at')
             ->get()
-            ->map(fn ($row) => $this->mapEnrollmentRow($row));
+            ->map(fn ($row) => $this->mapEnrollmentRow($row, []));
 
         $timestamp = now()->format('Ymd_His');
 
@@ -335,9 +345,10 @@ class StaffEnrollmentController extends Controller
 
     /**
      * @param  object  $row
+     * @param  array<int, array<string, mixed>>  $auditTrail
      * @return array<string, mixed>
      */
-    private function mapEnrollmentRow(object $row): array
+    private function mapEnrollmentRow(object $row, array $auditTrail): array
     {
         return [
             'enrollment_id' => $row->enrollment_id,
@@ -355,6 +366,105 @@ class StaffEnrollmentController extends Controller
             'student_email' => $row->student_email,
             'programme' => $row->programme,
             'student_photo' => $row->student_photo,
+            'audit_trail' => $auditTrail,
         ];
+    }
+
+    /**
+     * @param  array<int, object>  $rows
+     * @return array<int, array<int, array<string, mixed>>>
+     */
+    private function fetchEnrollmentLogsForPage(array $rows): array
+    {
+        if (! $this->hasEnrollmentStatusLogTable()) {
+            return [];
+        }
+
+        $enrollmentIds = collect($rows)
+            ->pluck('enrollment_id')
+            ->filter(fn ($id) => $id !== null)
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($enrollmentIds === []) {
+            return [];
+        }
+
+        $logs = DB::table('enrollment_status_logs')
+            ->leftJoin('users', 'enrollment_status_logs.performed_by', '=', 'users.id')
+            ->select(
+                'enrollment_status_logs.enrollment_id',
+                'enrollment_status_logs.action',
+                'enrollment_status_logs.from_status',
+                'enrollment_status_logs.to_status',
+                'enrollment_status_logs.reason',
+                'enrollment_status_logs.created_at',
+                'users.name as performer_name'
+            )
+            ->whereIn('enrollment_status_logs.enrollment_id', $enrollmentIds)
+            ->orderByDesc('enrollment_status_logs.created_at')
+            ->orderByDesc('enrollment_status_logs.id')
+            ->get();
+
+        return $logs
+            ->groupBy(fn ($log) => (int) ($log->enrollment_id ?? 0))
+            ->map(function ($group) {
+                return $group->map(function ($log) {
+                    $fromStatus = is_string($log->from_status) ? $log->from_status : null;
+                    $toStatus = is_string($log->to_status) ? $log->to_status : null;
+
+                    return [
+                        'action' => (string) $log->action,
+                        'label' => $this->enrollmentActionLabel((string) $log->action, $fromStatus, $toStatus),
+                        'from_status' => $fromStatus,
+                        'to_status' => $toStatus,
+                        'reason' => $log->reason,
+                        'performed_by' => $log->performer_name,
+                        'created_at' => $log->created_at,
+                    ];
+                })->values()->all();
+            })
+            ->toArray();
+    }
+
+    private function hasEnrollmentStatusLogTable(): bool
+    {
+        static $exists = null;
+
+        if ($exists === null) {
+            $exists = Schema::hasTable('enrollment_status_logs');
+        }
+
+        return (bool) $exists;
+    }
+
+    private function enrollmentActionLabel(string $action, ?string $fromStatus, ?string $toStatus): string
+    {
+        return match ($action) {
+            'request_submitted' => 'Enrollment request submitted',
+            'request_resubmitted' => 'Enrollment request resubmitted',
+            'approved' => 'Enrollment approved',
+            'rejected' => 'Enrollment rejected',
+            'withdrawal_requested' => 'Withdrawal requested',
+            'withdrawal_approved' => 'Withdrawal approved',
+            'withdrawal_rejected' => 'Withdrawal rejected',
+            'request_blocked_conflict' => 'Request blocked by timetable conflict',
+            'review_blocked_conflict' => 'Approval blocked by timetable conflict',
+            default => $this->fallbackActionLabel($action, $fromStatus, $toStatus),
+        };
+    }
+
+    private function fallbackActionLabel(string $action, ?string $fromStatus, ?string $toStatus): string
+    {
+        if ($fromStatus !== null && $toStatus !== null && $fromStatus !== $toStatus) {
+            return sprintf('Status changed: %s -> %s', $fromStatus, $toStatus);
+        }
+        if ($toStatus !== null) {
+            return sprintf('Status: %s', $toStatus);
+        }
+
+        return ucfirst(str_replace('_', ' ', $action));
     }
 }

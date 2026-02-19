@@ -2,6 +2,37 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
+
+const announcementTemplates = [
+    {
+        key: "exam_notice",
+        label: "Exam Notice",
+        title: "Exam Preparation Notice",
+        body: "Please review exam topics and timetable details for this subject. Reach out during office hours if you need clarification before the exam.",
+        priority: "important",
+        require_ack: true,
+        audience_roles: ["student"],
+    },
+    {
+        key: "timetable_change",
+        label: "Timetable Change",
+        title: "Class Timetable Update",
+        body: "There is a class timetable update for this subject. Please review the latest schedule to avoid missing sessions.",
+        priority: "urgent",
+        require_ack: true,
+        audience_roles: ["student"],
+    },
+    {
+        key: "fee_deadline",
+        label: "Fee Reminder",
+        title: "Fee Deadline Reminder",
+        body: "Please complete fee payment before the stated deadline. Pending fees may affect attendance and grade processing workflows.",
+        priority: "important",
+        require_ack: false,
+        audience_roles: ["student"],
+    },
+];
 
 const form = useForm({
     title: "",
@@ -15,9 +46,27 @@ const form = useForm({
     publish_at: "",
     expires_at: "",
 });
+const selectedTemplate = ref("");
 
 const submit = () => {
     form.post(route("teacher.announcements.store"));
+};
+
+const applyTemplate = () => {
+    const template = announcementTemplates.find(
+        (item) => item.key === selectedTemplate.value
+    );
+    if (!template) {
+        return;
+    }
+
+    form.title = template.title;
+    form.body = template.body;
+    form.priority = template.priority;
+    form.require_ack = template.require_ack;
+    form.audience = {
+        roles: [...template.audience_roles],
+    };
 };
 </script>
 
@@ -50,6 +99,35 @@ const submit = () => {
                 <div class="portal-card p-6">
                     <form @submit.prevent="submit">
                         <div class="space-y-6">
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Role-scoped template
+                                </p>
+                                <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                                    <select
+                                        v-model="selectedTemplate"
+                                        class="block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:w-64"
+                                    >
+                                        <option value="">Select template (optional)</option>
+                                        <option
+                                            v-for="template in announcementTemplates"
+                                            :key="template.key"
+                                            :value="template.key"
+                                        >
+                                            {{ template.label }}
+                                        </option>
+                                    </select>
+                                    <button
+                                        type="button"
+                                        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                        :disabled="!selectedTemplate"
+                                        @click="applyTemplate"
+                                    >
+                                        Apply template
+                                    </button>
+                                </div>
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-medium text-slate-700">
                                     Title <span class="text-red-500">*</span>
@@ -202,4 +280,3 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
