@@ -27,6 +27,7 @@ const props = defineProps({
 const rejectReason = ref({});
 const searchQuery = ref("");
 const statusFilter = ref("pending");
+const quickFilter = ref("all");
 
 const selectedGradeIds = ref([]);
 const bulkAction = ref("approve");
@@ -56,6 +57,12 @@ const statusTabs = [
     { key: "approved", label: "Approved" },
     { key: "rejected", label: "Rejected" },
     { key: "all", label: "All Reviewed" },
+];
+const quickFilters = [
+    { key: "all", label: "All" },
+    { key: "needs_action", label: "Needs action" },
+    { key: "rejected", label: "Rejected only" },
+    { key: "missing_computed", label: "Missing computed/score" },
 ];
 
 const approveForm = useForm({});
@@ -106,6 +113,21 @@ const filteredRows = computed(() => {
         );
     } else {
         list = list.filter((row) => row.grade);
+    }
+
+    if (quickFilter.value === "needs_action") {
+        list = list.filter(
+            (row) =>
+                row.grade?.status === "pending" || row.grade?.status === "rejected"
+        );
+    } else if (quickFilter.value === "rejected") {
+        list = list.filter((row) => row.grade?.status === "rejected");
+    } else if (quickFilter.value === "missing_computed") {
+        list = list.filter(
+            (row) =>
+                row.grade &&
+                (row.grade.score === null || row.grade.score === undefined)
+        );
     }
 
     if (!q) {
@@ -202,7 +224,7 @@ const submitBulkReview = () => {
     });
 };
 
-watch([statusFilter, searchQuery], () => {
+watch([statusFilter, quickFilter, searchQuery], () => {
     const visibleSet = new Set(visiblePendingGradeIds.value);
     selectedGradeIds.value = selectedGradeIds.value.filter((id) => visibleSet.has(id));
 });
@@ -412,7 +434,25 @@ const exportUrl = (format) =>
                                 </button>
                             </div>
                         </div>
-                        <div class="w-full sm:w-80">
+                        <div class="w-full sm:w-[28rem]">
+                            <label
+                                class="block text-xs font-medium text-slate-600"
+                                >Quick Filter</label
+                            >
+                            <select
+                                v-model="quickFilter"
+                                class="mt-1 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                            >
+                                <option
+                                    v-for="option in quickFilters"
+                                    :key="option.key"
+                                    :value="option.key"
+                                >
+                                    {{ option.label }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-[28rem]">
                             <label
                                 class="block text-xs font-medium text-slate-600"
                                 >Search Students</label
