@@ -3,7 +3,8 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import debounce from "lodash/debounce";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
     messages: {
@@ -27,11 +28,22 @@ const tabs = [
     { key: "unread", label: "Unread" },
 ];
 
-const activeTab = ref("all");
+const queryParam = (key) => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get(key);
+};
+
+const allowedTabs = new Set(tabs.map((tab) => tab.key));
+
+const activeTab = ref(
+    allowedTabs.has(queryParam("tab") || "") ? queryParam("tab") : "all"
+);
 const expandedMessages = ref(new Set());
-const query = ref("");
-const conversationQuery = ref("");
-const unreadOnly = ref(false);
+const queryInput = ref(queryParam("search") ?? "");
+const query = ref(queryInput.value.trim());
+const conversationQueryInput = ref(queryParam("thread_search") ?? "");
+const conversationQuery = ref(conversationQueryInput.value.trim());
+const unreadOnly = ref(queryParam("unread_only") === "1");
 
 const messagesData = computed(() => props.messages?.data ?? []);
 const messageLinks = computed(() => props.messages?.links ?? []);
@@ -107,6 +119,51 @@ const filteredMessages = computed(() => {
     }
 
     return list;
+});
+
+const hasActiveFilters = computed(
+    () =>
+        activeTab.value !== "all" ||
+        query.value.trim() !== "" ||
+        conversationQuery.value.trim() !== "" ||
+        unreadOnly.value
+);
+
+const activeFilterChips = computed(() => {
+    const chips = [];
+
+    if (activeTab.value !== "all") {
+        const tabLabel =
+            tabs.find((tab) => tab.key === activeTab.value)?.label ??
+            activeTab.value;
+        chips.push({
+            key: "tab",
+            label: `Tab: ${tabLabel}`,
+        });
+    }
+
+    if (query.value.trim() !== "") {
+        chips.push({
+            key: "search",
+            label: `Search: ${query.value.trim()}`,
+        });
+    }
+
+    if (conversationQuery.value.trim() !== "") {
+        chips.push({
+            key: "thread_search",
+            label: `Thread search: ${conversationQuery.value.trim()}`,
+        });
+    }
+
+    if (unreadOnly.value) {
+        chips.push({
+            key: "unread_only",
+            label: "Unread only",
+        });
+    }
+
+    return chips;
 });
 
 const parseTimestamp = (value) => {
@@ -219,8 +276,103 @@ const truncateMessage = (text, maxLength = 150) => {
 };
 
 const clearSearch = () => {
+    queryInput.value = "";
     query.value = "";
 };
+
+const clearConversationSearch = () => {
+    conversationQueryInput.value = "";
+    conversationQuery.value = "";
+};
+
+const clearAllFilters = () => {
+    activeTab.value = "all";
+    clearSearch();
+    clearConversationSearch();
+    unreadOnly.value = false;
+};
+
+const removeFilterChip = (key) => {
+    if (key === "tab") {
+        activeTab.value = "all";
+        return;
+    }
+    if (key === "search") {
+        clearSearch();
+        return;
+    }
+    if (key === "thread_search") {
+        clearConversationSearch();
+        return;
+    }
+    if (key === "unread_only") {
+        unreadOnly.value = false;
+    }
+};
+
+const applyMessageSearch = debounce(() => {
+    query.value = queryInput.value.trim();
+}, 250);
+
+const applyConversationSearch = debounce(() => {
+    conversationQuery.value = conversationQueryInput.value.trim();
+}, 250);
+
+const persistFiltersToUrl = debounce(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (activeTab.value !== "all") {
+        params.set("tab", activeTab.value);
+    } else {
+        params.delete("tab");
+    }
+
+    if (query.value.trim() !== "") {
+        params.set("search", query.value.trim());
+    } else {
+        params.delete("search");
+    }
+
+    if (conversationQuery.value.trim() !== "") {
+        params.set("thread_search", conversationQuery.value.trim());
+    } else {
+        params.delete("thread_search");
+    }
+
+    if (unreadOnly.value) {
+        params.set("unread_only", "1");
+    } else {
+        params.delete("unread_only");
+    }
+
+    const queryString = params.toString();
+    window.history.replaceState(
+        {},
+        "",
+        queryString ? `${url.pathname}?${queryString}` : url.pathname
+    );
+}, 200);
+
+watch(queryInput, () => {
+    applyMessageSearch();
+});
+
+watch(conversationQueryInput, () => {
+    applyConversationSearch();
+});
+
+watch([query, conversationQuery, activeTab, unreadOnly], () => {
+    persistFiltersToUrl();
+});
+
+onBeforeUnmount(() => {
+    applyMessageSearch.cancel();
+    applyConversationSearch.cancel();
+    persistFiltersToUrl.cancel();
+});
 
 const openReply = () => {
     if (!activeConversationData.value) return;
@@ -287,13 +439,22 @@ const openReply = () => {
                             </button>
                         </div>
 
-                        <div class="mt-3">
+                        <div class="mt-3 relative">
                             <input
-                                v-model="conversationQuery"
+                                v-model="conversationQueryInput"
                                 type="text"
                                 placeholder="Search conversations"
-                                class="block w-full rounded-md border-slate-300 text-sm focus:border-portal-navy focus:ring-portal-navy"
+                                class="block w-full rounded-md border-slate-300 pr-9 text-sm focus:border-portal-navy focus:ring-portal-navy"
                             />
+                            <button
+                                v-if="conversationQueryInput"
+                                type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
+                                @click="clearConversationSearch"
+                            >
+                                <span class="sr-only">Clear</span>
+                                X
+                            </button>
                         </div>
 
                         <div class="mt-4 space-y-2">
@@ -363,13 +524,13 @@ const openReply = () => {
 
                                 <div class="relative">
                                     <input
-                                        v-model="query"
+                                        v-model="queryInput"
                                         type="text"
                                         placeholder="Search messages by name, role, or content"
                                         class="block w-full rounded-md border-slate-300 pr-9 text-sm focus:border-portal-navy focus:ring-portal-navy"
                                     />
                                     <button
-                                        v-if="query"
+                                        v-if="queryInput"
                                         type="button"
                                         class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:bg-slate-100"
                                         @click="clearSearch"
@@ -387,6 +548,34 @@ const openReply = () => {
                                     />
                                     Unread only
                                 </label>
+                            </div>
+
+                            <div
+                                v-if="activeFilterChips.length > 0"
+                                class="mt-3 flex flex-wrap items-center gap-2"
+                            >
+                                <span
+                                    v-for="chip in activeFilterChips"
+                                    :key="chip.key"
+                                    class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+                                >
+                                    {{ chip.label }}
+                                    <button
+                                        type="button"
+                                        class="rounded px-1 text-slate-500 hover:bg-slate-200"
+                                        @click="removeFilterChip(chip.key)"
+                                    >
+                                        x
+                                    </button>
+                                </span>
+                                <button
+                                    v-if="hasActiveFilters"
+                                    type="button"
+                                    class="rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                    @click="clearAllFilters"
+                                >
+                                    Clear all filters
+                                </button>
                             </div>
                         </div>
 
