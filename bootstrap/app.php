@@ -38,8 +38,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (PostTooLargeException $exception, Request $request) {
             $limit = (string) (ini_get('post_max_size') ?: 'server limit');
             $message = "Upload failed: submitted form data exceeds server limit ({$limit}). Please use a smaller file and try again.";
+            $isInertia = (bool) $request->headers->get('X-Inertia');
 
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() && ! $isInertia) {
                 return response()->json([
                     'message' => $message,
                     'errors' => [
@@ -50,6 +51,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
             $target = (string) ($request->headers->get('referer') ?: url('/'));
 
-            return redirect()->to($target, 303)->with('error', $message);
+            return redirect()
+                ->to($target, 303)
+                ->withErrors([
+                    'photo' => $message,
+                    'file' => $message,
+                    'id_card' => $message,
+                    'transcript' => $message,
+                ])
+                ->with('error', $message);
         });
     })->create();
