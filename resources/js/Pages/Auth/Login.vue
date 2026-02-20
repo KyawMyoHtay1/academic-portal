@@ -7,6 +7,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { useRecaptcha } from "@/composables/useRecaptcha";
+import { ref } from "vue";
 
 defineProps({
     canResetPassword: {
@@ -23,6 +24,8 @@ const form = useForm({
     remember: false,
     recaptcha_token: "",
 });
+
+const showPassword = ref(false);
 
 const { execute: executeRecaptcha, isAvailable: recaptchaAvailable } = useRecaptcha();
 
@@ -72,14 +75,25 @@ const submit = async () => {
             <div>
                 <InputLabel for="password" value="Password" />
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                />
+                <div class="relative mt-1">
+                    <TextInput
+                        id="password"
+                        :type="showPassword ? 'text' : 'password'"
+                        class="block w-full pr-20"
+                        v-model="form.password"
+                        required
+                        autocomplete="current-password"
+                    />
+                    <button
+                        type="button"
+                        class="absolute inset-y-0 right-3 text-sm font-medium text-slate-600 hover:text-slate-900 focus:outline-none focus:text-slate-900"
+                        @click="showPassword = !showPassword"
+                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                        :aria-pressed="showPassword"
+                    >
+                        {{ showPassword ? "Hide" : "Show" }}
+                    </button>
+                </div>
 
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>

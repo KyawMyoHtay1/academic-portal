@@ -7,6 +7,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { useRecaptcha } from '@/composables/useRecaptcha';
+import { ref } from 'vue';
 
 const form = useForm({
     name: '',
@@ -16,6 +17,9 @@ const form = useForm({
     terms: false,
     recaptcha_token: '',
 });
+
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 
 const { execute: executeRecaptcha, isAvailable: recaptchaAvailable } = useRecaptcha();
 
@@ -76,14 +80,25 @@ const submit = async () => {
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
+                <div class="relative mt-1">
+                    <TextInput
+                        id="password"
+                        :type="showPassword ? 'text' : 'password'"
+                        class="block w-full pr-20"
+                        v-model="form.password"
+                        required
+                        autocomplete="new-password"
+                    />
+                    <button
+                        type="button"
+                        class="absolute inset-y-0 right-3 text-sm font-medium text-slate-600 hover:text-slate-900 focus:outline-none focus:text-slate-900"
+                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                        :aria-pressed="showPassword"
+                        @click="showPassword = !showPassword"
+                    >
+                        {{ showPassword ? 'Hide' : 'Show' }}
+                    </button>
+                </div>
 
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
@@ -94,14 +109,25 @@ const submit = async () => {
                     value="Confirm Password"
                 />
 
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
+                <div class="relative mt-1">
+                    <TextInput
+                        id="password_confirmation"
+                        :type="showPasswordConfirmation ? 'text' : 'password'"
+                        class="block w-full pr-20"
+                        v-model="form.password_confirmation"
+                        required
+                        autocomplete="new-password"
+                    />
+                    <button
+                        type="button"
+                        class="absolute inset-y-0 right-3 text-sm font-medium text-slate-600 hover:text-slate-900 focus:outline-none focus:text-slate-900"
+                        :aria-label="showPasswordConfirmation ? 'Hide confirm password' : 'Show confirm password'"
+                        :aria-pressed="showPasswordConfirmation"
+                        @click="showPasswordConfirmation = !showPasswordConfirmation"
+                    >
+                        {{ showPasswordConfirmation ? 'Hide' : 'Show' }}
+                    </button>
+                </div>
 
                 <InputError
                     class="mt-2"
