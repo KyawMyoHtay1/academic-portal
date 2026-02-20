@@ -8,6 +8,41 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 
 // Default application name shown in browser titles
 const appName = import.meta.env.VITE_APP_NAME || "University Academic Portal";
+const disableNativeValidation =
+    import.meta.env.DEV ||
+    String(import.meta.env.VITE_DISABLE_HTML5_VALIDATION || "").toLowerCase() ===
+        "true";
+
+const applyNoValidateToForms = (root) => {
+    if (!root) return;
+
+    if (root instanceof HTMLFormElement) {
+        root.setAttribute("novalidate", "novalidate");
+        return;
+    }
+
+    if (typeof root.querySelectorAll === "function") {
+        root.querySelectorAll("form").forEach((form) => {
+            form.setAttribute("novalidate", "novalidate");
+        });
+    }
+};
+
+const enableBackendValidationTestingMode = () => {
+    applyNoValidateToForms(document);
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node instanceof Element) {
+                    applyNoValidateToForms(node);
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+};
 
 const inertiaRoot = document.getElementById("app");
 const hasInertiaPage = inertiaRoot?.dataset?.page;
@@ -30,4 +65,16 @@ if (inertiaRoot && hasInertiaPage) {
             color: "#0f172a", // dark academic navy
         },
     });
+}
+
+if (disableNativeValidation) {
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            enableBackendValidationTestingMode,
+            { once: true }
+        );
+    } else {
+        enableBackendValidationTestingMode();
+    }
 }
