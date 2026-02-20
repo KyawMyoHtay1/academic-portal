@@ -1,8 +1,12 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+
+const page = usePage();
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 
 const props = defineProps({
     users: {
@@ -41,8 +45,86 @@ const form = useForm({
     id_card: null,
     transcript: null,
 });
+const clientPhotoError = ref("");
+const clientIdCardError = ref("");
+const clientTranscriptError = ref("");
+
+const toMb = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+
+const validatePhoto = (file) => {
+    if (!file) return "";
+
+    if (Number(file.size || 0) > MAX_PHOTO_BYTES) {
+        return `Photo must be 2MB or less. Selected file is ${toMb(file.size)}MB.`;
+    }
+
+    return "";
+};
+
+const validateDocument = (file, label) => {
+    if (!file) return "";
+
+    if (Number(file.size || 0) > MAX_DOCUMENT_BYTES) {
+        return `${label} must be 5MB or less. Selected file is ${toMb(file.size)}MB.`;
+    }
+
+    return "";
+};
+
+const onPhotoChange = (event) => {
+    const file = event?.target?.files?.[0] ?? null;
+    const error = validatePhoto(file);
+    clientPhotoError.value = error;
+
+    if (error) {
+        form.photo = null;
+        if (event?.target) event.target.value = "";
+        return;
+    }
+
+    form.photo = file;
+};
+
+const onIdCardChange = (event) => {
+    const file = event?.target?.files?.[0] ?? null;
+    const error = validateDocument(file, "ID card");
+    clientIdCardError.value = error;
+
+    if (error) {
+        form.id_card = null;
+        if (event?.target) event.target.value = "";
+        return;
+    }
+
+    form.id_card = file;
+};
+
+const onTranscriptChange = (event) => {
+    const file = event?.target?.files?.[0] ?? null;
+    const error = validateDocument(file, "Transcript");
+    clientTranscriptError.value = error;
+
+    if (error) {
+        form.transcript = null;
+        if (event?.target) event.target.value = "";
+        return;
+    }
+
+    form.transcript = file;
+};
 
 const submit = () => {
+    const photoErrorValue = validatePhoto(form.photo);
+    const idCardErrorValue = validateDocument(form.id_card, "ID card");
+    const transcriptErrorValue = validateDocument(form.transcript, "Transcript");
+    clientPhotoError.value = photoErrorValue;
+    clientIdCardError.value = idCardErrorValue;
+    clientTranscriptError.value = transcriptErrorValue;
+
+    if (photoErrorValue || idCardErrorValue || transcriptErrorValue) {
+        return;
+    }
+
     form.post(route("students.store"), {
         forceFormData: true,
     });
@@ -118,6 +200,56 @@ const duplicateWarnings = computed(() => {
         .filter(Boolean)
         .sort((a, b) => b.score - a.score)
         .slice(0, 5);
+});
+
+const getErrorMessage = (value) => (Array.isArray(value) ? value[0] : value || "");
+
+const sharedUploadFallbackError = computed(() => {
+    const fileError = getErrorMessage(page.props.errors?.file);
+    if (fileError) return fileError;
+
+    const queryError =
+        typeof window !== "undefined"
+            ? new URLSearchParams(window.location.search).get("_upload_error")
+            : null;
+    if (queryError) return queryError;
+
+    const flashError = page.props.flash?.error;
+    if (typeof flashError === "string" && flashError.length > 0) {
+        return flashError;
+    }
+
+    return "";
+});
+
+const photoError = computed(() => {
+    return (
+        clientPhotoError.value ||
+        getErrorMessage(form.errors.photo) ||
+        getErrorMessage(page.props.errors?.photo) ||
+        sharedUploadFallbackError.value ||
+        ""
+    );
+});
+
+const idCardError = computed(() => {
+    return (
+        clientIdCardError.value ||
+        getErrorMessage(form.errors.id_card) ||
+        getErrorMessage(page.props.errors?.id_card) ||
+        sharedUploadFallbackError.value ||
+        ""
+    );
+});
+
+const transcriptError = computed(() => {
+    return (
+        clientTranscriptError.value ||
+        getErrorMessage(form.errors.transcript) ||
+        getErrorMessage(page.props.errors?.transcript) ||
+        sharedUploadFallbackError.value ||
+        ""
+    );
 });
 </script>
 
@@ -577,13 +709,13 @@ const duplicateWarnings = computed(() => {
                             type="file"
                             accept="image/jpeg,image/jpg,image/png"
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
-                            @change="(e) => (form.photo = e.target.files[0])"
+                            @change="onPhotoChange"
                         />
                         <p
-                            v-if="form.errors.photo"
+                            v-if="photoError"
                             class="mt-1 text-xs text-red-600"
                         >
-                            {{ form.errors.photo }}
+                            {{ photoError }}
                         </p>
                     </div>
                 </div>
@@ -608,15 +740,13 @@ const duplicateWarnings = computed(() => {
                                 type="file"
                                 accept=".pdf,image/jpeg,image/jpg,image/png"
                                 class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
-                                @change="
-                                    (e) => (form.id_card = e.target.files[0])
-                                "
+                                @change="onIdCardChange"
                             />
                             <p
-                                v-if="form.errors.id_card"
+                                v-if="idCardError"
                                 class="mt-1 text-xs text-red-600"
                             >
-                                {{ form.errors.id_card }}
+                                {{ idCardError }}
                             </p>
                         </div>
 
@@ -633,15 +763,13 @@ const duplicateWarnings = computed(() => {
                                 type="file"
                                 accept=".pdf,image/jpeg,image/jpg,image/png"
                                 class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy/90 focus:border-portal-navy focus:ring-portal-navy"
-                                @change="
-                                    (e) => (form.transcript = e.target.files[0])
-                                "
+                                @change="onTranscriptChange"
                             />
                             <p
-                                v-if="form.errors.transcript"
+                                v-if="transcriptError"
                                 class="mt-1 text-xs text-red-600"
                             >
-                                {{ form.errors.transcript }}
+                                {{ transcriptError }}
                             </p>
                         </div>
                     </div>

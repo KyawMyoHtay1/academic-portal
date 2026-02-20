@@ -203,7 +203,7 @@ class StudentController extends Controller
                 'id' => $student->id,
                 'student_no' => $student->student_no,
                 'full_name' => $student->full_name,
-                'dob' => $student->dob,
+                'dob' => $student->dob?->toDateString(),
                 'gender' => $student->gender,
                 'nationality' => $student->nationality,
                 'email' => $student->email,
@@ -217,7 +217,7 @@ class StudentController extends Controller
                 'previous_qualification' => $student->previous_qualification,
                 'status' => $student->status ?? 'active',
                 'notes' => $student->notes,
-                'enrollment_date' => $student->enrollment_date,
+                'enrollment_date' => $student->enrollment_date?->toDateString(),
                 'photo_url' => $student->photo
                     ? asset('storage/'.$student->photo)
                     : null,

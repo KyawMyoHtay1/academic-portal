@@ -113,6 +113,7 @@ class StaffUserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'dob' => $user->student?->dob?->toDateString(),
                 'photo_url' => $user->photo
                     ? asset('storage/'.$user->photo)
                     : null,
