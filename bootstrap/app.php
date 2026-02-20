@@ -4,6 +4,8 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -33,5 +35,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (PostTooLargeException $exception, Request $request) {
+            $limit = (string) (ini_get('post_max_size') ?: 'server limit');
+            $message = "Upload failed: submitted form data exceeds server limit ({$limit}). Please use a smaller file and try again.";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => [
+                        'file' => [$message],
+                    ],
+                ], 413);
+            }
+
+            $target = (string) ($request->headers->get('referer') ?: url('/'));
+
+            return redirect()->to($target, 303)->with('error', $message);
+        });
     })->create();
