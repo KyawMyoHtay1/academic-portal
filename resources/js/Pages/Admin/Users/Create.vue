@@ -1,8 +1,10 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
+
+const page = usePage();
 
 const props = defineProps({
     availableRoles: {
@@ -97,6 +99,14 @@ const duplicateWarnings = computed(() => {
         .filter(Boolean)
         .sort((a, b) => b.score - a.score)
         .slice(0, 5);
+});
+
+// Include session errors (e.g. PostTooLarge redirect) for file fields - useForm does not receive them on redirect
+const photoError = computed(() => {
+    const fe = form.errors.photo;
+    if (fe) return fe;
+    const pe = page.props.errors?.photo;
+    return Array.isArray(pe) ? pe[0] : pe;
 });
 </script>
 
@@ -258,10 +268,10 @@ const duplicateWarnings = computed(() => {
                                     "
                                 />
                                 <p
-                                    v-if="form.errors.photo"
+                                    v-if="photoError"
                                     class="mt-1 text-sm text-red-600"
                                 >
-                                    {{ form.errors.photo }}
+                                    {{ photoError }}
                                 </p>
                             </div>
 
