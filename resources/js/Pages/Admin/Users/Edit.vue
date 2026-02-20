@@ -1,7 +1,11 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Head, useForm, router } from "@inertiajs/vue3";
+import { Head, useForm, router, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+
+const page = usePage();
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 
 const props = defineProps({
     user: {
@@ -20,8 +24,69 @@ const form = useForm({
     role: props.user.role,
     photo: null,
 });
+const clientPhotoError = ref("");
+
+const toMb = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+
+const validatePhoto = (file) => {
+    if (!file) return "";
+
+    if (Number(file.size || 0) > MAX_PHOTO_BYTES) {
+        return `Profile photo must be 2MB or less. Selected file is ${toMb(file.size)}MB.`;
+    }
+
+    return "";
+};
+
+const onPhotoChange = (event) => {
+    const file = event?.target?.files?.[0] ?? null;
+    const error = validatePhoto(file);
+    clientPhotoError.value = error;
+
+    if (error) {
+        form.photo = null;
+        if (event?.target) event.target.value = "";
+        return;
+    }
+
+    form.photo = file;
+};
+
+const photoError = computed(() => {
+    if (clientPhotoError.value) return clientPhotoError.value;
+
+    const fe = form.errors.photo;
+    if (fe) return fe;
+
+    const pe = page.props.errors?.photo;
+    const se = Array.isArray(pe) ? pe[0] : pe;
+    if (se) return se;
+
+    const fe2 = page.props.errors?.file;
+    const se2 = Array.isArray(fe2) ? fe2[0] : fe2;
+    if (se2) return se2;
+
+    const queryError =
+        typeof window !== "undefined"
+            ? new URLSearchParams(window.location.search).get("_upload_error")
+            : null;
+    if (queryError) return queryError;
+
+    const flashError = page.props.flash?.error;
+    if (typeof flashError === "string" && flashError.length > 0) {
+        return flashError;
+    }
+
+    return "";
+});
 
 const submit = () => {
+    const error = validatePhoto(form.photo);
+    clientPhotoError.value = error;
+    if (error) {
+        return;
+    }
+
     form.transform((data) => ({
         ...data,
         _method: "put",
@@ -203,15 +268,13 @@ const removePhoto = () => {
                                     type="file"
                                     accept="image/jpeg,image/jpg,image/png"
                                     class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
-                                    @change="
-                                        (e) => (form.photo = e.target.files[0])
-                                    "
+                                    @change="onPhotoChange"
                                 />
                                 <p
-                                    v-if="form.errors.photo"
+                                    v-if="photoError"
                                     class="mt-1 text-sm text-red-600"
                                 >
-                                    {{ form.errors.photo }}
+                                    {{ photoError }}
                                 </p>
                             </div>
 

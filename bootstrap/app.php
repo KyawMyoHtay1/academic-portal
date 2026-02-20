@@ -50,9 +50,11 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $target = (string) ($request->headers->get('referer') ?: url('/'));
+            $separator = str_contains($target, '?') ? '&' : '?';
+            $targetWithError = $target.$separator.'_upload_error='.rawurlencode($message);
 
             return redirect()
-                ->to($target, 303)
+                ->to($targetWithError, 303)
                 ->withErrors([
                     'photo' => $message,
                     'file' => $message,
