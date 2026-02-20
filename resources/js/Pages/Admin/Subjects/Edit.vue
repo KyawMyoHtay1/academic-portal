@@ -2,8 +2,13 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
-import { Head, Link, useForm, router } from "@inertiajs/vue3";
-import { computed, watch } from "vue";
+import { Head, Link, useForm, router, usePage } from "@inertiajs/vue3";
+import { computed, ref, watch } from "vue";
+
+const page = usePage();
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const ALLOWED_PHOTO_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+const ALLOWED_PHOTO_EXTENSIONS = ["jpg", "jpeg", "png"];
 
 const props = defineProps({
     subject: {
@@ -29,6 +34,7 @@ const form = useForm({
     attendance_threshold: props.subject.attendance_threshold ?? null,
     photo: null,
 });
+const clientPhotoError = ref("");
 
 const selectedCourse = computed(
     () => props.courses.find((c) => c.id === form.course_id) || null
@@ -67,6 +73,12 @@ watch(
 );
 
 const submit = () => {
+    const error = validatePhoto(form.photo);
+    clientPhotoError.value = error;
+    if (error) {
+        return;
+    }
+
     form.transform((data) => ({
         ...data,
         _method: "put",
@@ -75,6 +87,74 @@ const submit = () => {
         onFinish: () => form.reset("photo"),
     });
 };
+
+const toMb = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+
+const validatePhoto = (file) => {
+    if (!file) return "";
+
+    const mimeType = String(file.type || "").toLowerCase();
+    const extension = String(file.name || "")
+        .split(".")
+        .pop()
+        ?.toLowerCase();
+    const hasValidMime = mimeType !== "" && ALLOWED_PHOTO_MIME_TYPES.includes(mimeType);
+    const hasValidExtension =
+        typeof extension === "string" &&
+        ALLOWED_PHOTO_EXTENSIONS.includes(extension);
+
+    if (!hasValidMime && !hasValidExtension) {
+        return "Subject photo must be a JPG or PNG image.";
+    }
+
+    if (Number(file.size || 0) > MAX_PHOTO_BYTES) {
+        return `Subject photo must be 2MB or less. Selected file is ${toMb(file.size)}MB.`;
+    }
+
+    return "";
+};
+
+const onPhotoChange = (event) => {
+    const file = event?.target?.files?.[0] ?? null;
+    const error = validatePhoto(file);
+    clientPhotoError.value = error;
+
+    if (error) {
+        form.photo = null;
+        if (event?.target) event.target.value = "";
+        return;
+    }
+
+    form.photo = file;
+};
+
+const getErrorMessage = (value) => (Array.isArray(value) ? value[0] : value || "");
+
+const photoError = computed(() => {
+    if (clientPhotoError.value) return clientPhotoError.value;
+
+    const fe = getErrorMessage(form.errors.photo);
+    if (fe) return fe;
+
+    const pe = getErrorMessage(page.props.errors?.photo);
+    if (pe) return pe;
+
+    const fe2 = getErrorMessage(page.props.errors?.file);
+    if (fe2) return fe2;
+
+    const queryError =
+        typeof window !== "undefined"
+            ? new URLSearchParams(window.location.search).get("_upload_error")
+            : null;
+    if (queryError) return queryError;
+
+    const flashError = page.props.flash?.error;
+    if (typeof flashError === "string" && flashError.length > 0) {
+        return flashError;
+    }
+
+    return "";
+});
 
 const removePhoto = () => {
     if (confirm("Are you sure you want to remove this subject photo?")) {
@@ -343,15 +423,13 @@ const removePhoto = () => {
                                     type="file"
                                     accept="image/jpeg,image/jpg,image/png"
                                     class="mt-1 block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-portal-navy file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-portal-navy-dark"
-                                    @change="
-                                        (e) => (form.photo = e.target.files[0])
-                                    "
+                                    @change="onPhotoChange"
                                 />
                                 <p
-                                    v-if="form.errors.photo"
+                                    v-if="photoError"
                                     class="mt-1 text-sm text-red-600"
                                 >
-                                    {{ form.errors.photo }}
+                                    {{ photoError }}
                                 </p>
                             </div>
 
