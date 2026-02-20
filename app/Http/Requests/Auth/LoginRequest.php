@@ -41,6 +41,18 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'recaptcha_token.required' => 'reCAPTCHA verification is required. Please try again.',
+        ];
+    }
+
+    /**
      * Configure the validator instance.
      */
     public function withValidator($validator): void

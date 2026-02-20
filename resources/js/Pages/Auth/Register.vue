@@ -152,6 +152,8 @@ const submit = async () => {
                 <InputError class="mt-2" :message="form.errors.terms" />
             </div>
 
+            <InputError class="mt-2" :message="form.errors.recaptcha_token" />
+
             <div class="mt-4 flex items-center justify-end">
                 <Link
                     :href="route('login')"

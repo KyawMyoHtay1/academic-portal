@@ -105,6 +105,8 @@ const submit = async () => {
                 </label>
             </div>
 
+            <InputError class="mt-2" :message="form.errors.recaptcha_token" />
+
             <div
                 class="flex flex-col gap-3 border-t border-slate-200 pt-4 text-sm sm:flex-row sm:items-center sm:justify-between"
             >

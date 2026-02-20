@@ -44,7 +44,9 @@ class RegisteredUserController extends Controller
             $rules['recaptcha_token'] = 'required|string';
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'recaptcha_token.required' => 'reCAPTCHA verification is required. Please try again.',
+        ]);
 
         // Verify reCAPTCHA if configured
         if (config('recaptcha.site_key') && isset($validated['recaptcha_token'])) {
