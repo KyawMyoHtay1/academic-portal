@@ -36,6 +36,9 @@ class HandleInertiaRequests extends Middleware
             'unreadCount' => 0,
             'latest' => [],
         ];
+        $notificationsPreview = [
+            'items' => [],
+        ];
 
         if ($user) {
             // unread = visible announcements that don't have a read_at record for this user
@@ -72,6 +75,25 @@ class HandleInertiaRequests extends Middleware
                 'unreadCount' => $unreadCount,
                 'latest' => $latest,
             ];
+
+            $notificationsPreview = [
+                'items' => $user->notifications()
+                    ->orderByDesc('created_at')
+                    ->limit(6)
+                    ->get()
+                    ->map(function ($notification) {
+                        return [
+                            'id' => $notification->id,
+                            'title' => (string) ($notification->data['title'] ?? 'Notification'),
+                            'message' => (string) ($notification->data['message'] ?? ''),
+                            'read_at' => $notification->read_at?->toIso8601String(),
+                            'created_at' => $notification->created_at?->toIso8601String(),
+                            'created_label' => $notification->created_at?->diffForHumans(),
+                            'url' => (string) ($notification->data['url'] ?? ''),
+                        ];
+                    })
+                    ->all(),
+            ];
         }
 
         return [
@@ -104,6 +126,7 @@ class HandleInertiaRequests extends Middleware
                 'announcements' => $announcementsWidget['unreadCount'] ?? 0,
             ],
             'announcementsWidget' => $announcementsWidget,
+            'notificationsPreview' => $notificationsPreview,
             'recaptchaSiteKey' => config('recaptcha.site_key'),
         ];
     }

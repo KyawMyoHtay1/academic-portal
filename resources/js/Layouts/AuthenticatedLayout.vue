@@ -439,6 +439,20 @@ const userRoleMeta = computed(() => {
             "bg-slate-100 text-slate-600 border border-slate-200",
     };
 });
+
+const unreadNotificationCount = computed(() =>
+    Number(page.props.unread?.notifications ?? 0)
+);
+
+const notificationsPreview = computed(
+    () => page.props.notificationsPreview?.items ?? []
+);
+
+const truncateNotificationText = (value, max = 96) => {
+    const text = String(value ?? "").trim();
+    if (!text) return "No details available.";
+    return text.length > max ? `${text.slice(0, max)}...` : text;
+};
 </script>
 
 <template>
@@ -904,37 +918,136 @@ const userRoleMeta = computed(() => {
                         <!-- Google Translate -->
                         <GoogleTranslate />
 
-                        <!-- Notification bell -->
-                        <Link
-                            :href="route('notifications.index')"
-                            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+                        <!-- Notification dropdown -->
+                        <Dropdown
+                            align="right"
+                            width="80"
+                            content-classes="overflow-hidden rounded-xl bg-white py-0"
                         >
-                            <span class="sr-only">Open notifications</span>
-                            <svg
-                                class="h-5 w-5"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1"
-                                />
-                            </svg>
-                            <span
-                                v-if="$page.props.unread?.notifications > 0"
-                                class="absolute -right-0.5 -top-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-portal-gold px-1 text-[10px] font-semibold text-slate-900 ring-2 ring-white"
-                            >
-                                {{
-                                    $page.props.unread.notifications > 9
-                                        ? "9+"
-                                        : $page.props.unread.notifications
-                                }}
-                            </span>
-                        </Link>
+                            <template #trigger>
+                                <button
+                                    type="button"
+                                    class="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+                                >
+                                    <span class="sr-only">
+                                        Open notifications
+                                    </span>
+                                    <svg
+                                        class="h-5 w-5"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.8"
+                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1"
+                                        />
+                                    </svg>
+                                    <span
+                                        v-if="unreadNotificationCount > 0"
+                                        class="absolute -right-0.5 -top-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-portal-gold px-1 text-[10px] font-semibold text-slate-900 ring-2 ring-white"
+                                    >
+                                        {{
+                                            unreadNotificationCount > 9
+                                                ? "9+"
+                                                : unreadNotificationCount
+                                        }}
+                                    </span>
+                                </button>
+                            </template>
+
+                            <template #content>
+                                <div class="max-h-[30rem]">
+                                    <div
+                                        class="flex items-center justify-between border-b border-slate-200 px-4 py-3"
+                                    >
+                                        <p
+                                            class="text-sm font-semibold text-slate-900"
+                                        >
+                                            Notifications
+                                        </p>
+                                        <Link
+                                            v-if="unreadNotificationCount > 0"
+                                            :href="route('notifications.read-all')"
+                                            method="post"
+                                            as="button"
+                                            class="text-xs font-semibold text-portal-navy hover:text-portal-navy-dark"
+                                        >
+                                            Mark all read
+                                        </Link>
+                                    </div>
+
+                                    <div
+                                        v-if="notificationsPreview.length > 0"
+                                        class="max-h-80 overflow-y-auto"
+                                    >
+                                        <Link
+                                            v-for="notification in notificationsPreview"
+                                            :key="notification.id"
+                                            :href="notification.url || route('notifications.index')"
+                                            class="block border-b border-slate-100 px-4 py-3 transition hover:bg-slate-50"
+                                            :class="
+                                                notification.read_at
+                                                    ? 'bg-white'
+                                                    : 'bg-emerald-50/40'
+                                            "
+                                        >
+                                            <div
+                                                class="flex items-start justify-between gap-3"
+                                            >
+                                                <p
+                                                    class="text-sm font-semibold text-slate-900"
+                                                >
+                                                    {{ notification.title }}
+                                                </p>
+                                                <span
+                                                    v-if="!notification.read_at"
+                                                    class="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500"
+                                                />
+                                            </div>
+                                            <p
+                                                class="mt-1 text-xs text-slate-600"
+                                            >
+                                                {{
+                                                    truncateNotificationText(
+                                                        notification.message
+                                                    )
+                                                }}
+                                            </p>
+                                            <p
+                                                class="mt-1 text-[11px] text-slate-500"
+                                            >
+                                                {{
+                                                    notification.created_label ||
+                                                    notification.created_at
+                                                }}
+                                            </p>
+                                        </Link>
+                                    </div>
+
+                                    <div
+                                        v-else
+                                        class="px-4 py-8 text-center text-sm text-slate-500"
+                                    >
+                                        No notifications yet.
+                                    </div>
+
+                                    <div
+                                        class="border-t border-slate-200 px-4 py-2"
+                                    >
+                                        <Link
+                                            :href="route('notifications.index')"
+                                            class="text-xs font-semibold text-portal-navy hover:text-portal-navy-dark"
+                                        >
+                                            Open notification center
+                                        </Link>
+                                    </div>
+                                </div>
+                            </template>
+                        </Dropdown>
 
                         <!-- User dropdown -->
                         <div class="relative">
