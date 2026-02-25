@@ -24,7 +24,17 @@ class StaffSubjectController extends Controller
      */
     public function index(): Response
     {
-        $subjects = Subject::with(['course', 'teachers'])
+        $subjects = Subject::query()
+            ->with([
+                'course:id,course_code,title',
+                'teachers:id,name',
+            ])
+            ->withCount([
+                'assignments',
+                'assignments as published_assignments_count' => function ($query): void {
+                    $query->where('status', 'published');
+                },
+            ])
             ->orderBy('subject_code')
             ->get([
                 'id',
@@ -34,6 +44,7 @@ class StaffSubjectController extends Controller
                 'credits',
                 'description',
                 'photo',
+                'attendance_threshold',
                 'created_at',
                 'updated_at',
             ])
@@ -41,13 +52,17 @@ class StaffSubjectController extends Controller
                 return [
                     'id' => $subject->id,
                     'course_id' => $subject->course_id,
-                    'course_code' => $subject->course->course_code,
-                    'course_title' => $subject->course->title,
+                    'course_code' => $subject->course?->course_code,
+                    'course_title' => $subject->course?->title,
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
                     'credits' => $subject->credits,
                     'description' => $subject->description,
                     'photo' => $subject->photo,
+                    'teacher_count' => $subject->teachers->count(),
+                    'assignments_count' => (int) ($subject->assignments_count ?? 0),
+                    'published_assignments_count' => (int) ($subject->published_assignments_count ?? 0),
+                    'attendance_threshold' => $subject->attendance_threshold,
                     'teachers' => $subject->teachers->map(function ($teacher) {
                         return [
                             'id' => $teacher->id,

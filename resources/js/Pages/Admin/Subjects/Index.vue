@@ -223,6 +223,21 @@ const deleteSubject = (subjectId) => {
         preserveScroll: true,
     });
 };
+
+const formatUpdatedAt = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(date);
+};
+
+const formatThreshold = (value) =>
+    value === null || value === undefined ? "Global default" : `${value}%`;
 </script>
 
 <template>
@@ -473,6 +488,12 @@ const deleteSubject = (subjectId) => {
                                     </th>
                                     <th
                                         scope="col"
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Details
+                                    </th>
+                                    <th
+                                        scope="col"
                                         class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
                                         Actions
@@ -481,7 +502,7 @@ const deleteSubject = (subjectId) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="filtered.length === 0" class="bg-white">
-                                    <td colspan="8" class="px-4 py-8 text-center text-sm text-slate-500">
+                                    <td colspan="9" class="px-4 py-8 text-center text-sm text-slate-500">
                                         {{
                                             subjects.length === 0
                                                 ? "No subjects found. Create your first subject to get started."
@@ -541,6 +562,35 @@ const deleteSubject = (subjectId) => {
                                         <span v-else class="text-slate-400">
                                             Not Assigned
                                         </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-xs text-slate-600">
+                                        <div class="space-y-1">
+                                            <p>
+                                                Teachers:
+                                                <span class="font-semibold text-slate-700">
+                                                    {{ Number(subject.teacher_count ?? 0) }}
+                                                </span>
+                                            </p>
+                                            <p>
+                                                Assignments:
+                                                <span class="font-semibold text-slate-700">
+                                                    {{ Number(subject.published_assignments_count ?? 0) }}/{{ Number(subject.assignments_count ?? 0) }}
+                                                </span>
+                                                <span class="text-slate-500">published</span>
+                                            </p>
+                                            <p>
+                                                Attendance threshold:
+                                                <span class="font-semibold text-slate-700">
+                                                    {{ formatThreshold(subject.attendance_threshold) }}
+                                                </span>
+                                            </p>
+                                            <p>
+                                                Updated:
+                                                <span class="font-semibold text-slate-700">
+                                                    {{ formatUpdatedAt(subject.updated_at) }}
+                                                </span>
+                                            </p>
+                                        </div>
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-4 text-right text-sm">
                                         <div class="flex items-center justify-end gap-2">
