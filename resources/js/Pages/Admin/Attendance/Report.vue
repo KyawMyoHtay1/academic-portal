@@ -231,6 +231,11 @@ const cooldownLabel = computed(() => {
 });
 
 const thresholdValue = computed(() => Number(effectiveThreshold.value.value));
+const thresholdGap = (rate) => {
+    const numericRate = Number(rate ?? 0);
+    return Math.max(Number((thresholdValue.value - numericRate).toFixed(2)), 0);
+};
+const isBelowThreshold = (rate) => Number(rate ?? 0) < thresholdValue.value;
 
 const applyFilters = () => {
     router.get(
@@ -795,7 +800,7 @@ const selectSessionDate = (date) => {
                                     <th
                                         class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
-                                        Risk Reason
+                                        Details
                                     </th>
                                 </tr>
                             </thead>
@@ -835,7 +840,12 @@ const selectSessionDate = (date) => {
                                         </span>
                                     </td>
                                     <td class="px-4 py-4 text-xs text-slate-600">
-                                        {{ student.reason || "Below threshold" }}
+                                        <p class="font-semibold text-slate-700">
+                                            {{ student.reason || "Below threshold" }}
+                                        </p>
+                                        <p class="mt-1 text-slate-500">
+                                            Present {{ student.present }} of {{ student.total }} records.
+                                        </p>
                                     </td>
                                 </tr>
                                 <tr v-if="filteredStudents.length === 0 && lowAttendanceStudents.length > 0">
@@ -955,6 +965,11 @@ const selectSessionDate = (date) => {
                                     >
                                         Rate
                                     </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Details
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -994,10 +1009,29 @@ const selectSessionDate = (date) => {
                                             {{ course.rate }}%
                                         </span>
                                     </td>
+                                    <td class="px-4 py-4 text-xs text-slate-600">
+                                        <p
+                                            class="font-semibold"
+                                            :class="
+                                                isBelowThreshold(course.rate)
+                                                    ? 'text-red-700'
+                                                    : 'text-emerald-700'
+                                            "
+                                        >
+                                            {{
+                                                isBelowThreshold(course.rate)
+                                                    ? `${thresholdGap(course.rate).toFixed(2)}% below threshold`
+                                                    : "Meets threshold"
+                                            }}
+                                        </p>
+                                        <p class="mt-1 text-slate-500">
+                                            Threshold: {{ thresholdLabel }}% ({{ thresholdScopeLabel }})
+                                        </p>
+                                    </td>
                                 </tr>
                                 <tr v-if="filteredCourses.length === 0">
                                     <td
-                                        colspan="6"
+                                        colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         {{ searchCourses.trim() ? "No courses match your search." : "No attendance records found for any courses." }}
@@ -1063,6 +1097,11 @@ const selectSessionDate = (date) => {
                                     >
                                         Rate
                                     </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Details
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -1105,10 +1144,29 @@ const selectSessionDate = (date) => {
                                             {{ subject.rate }}%
                                         </span>
                                     </td>
+                                    <td class="px-4 py-4 text-xs text-slate-600">
+                                        <p
+                                            class="font-semibold"
+                                            :class="
+                                                isBelowThreshold(subject.rate)
+                                                    ? 'text-red-700'
+                                                    : 'text-emerald-700'
+                                            "
+                                        >
+                                            {{
+                                                isBelowThreshold(subject.rate)
+                                                    ? `${thresholdGap(subject.rate).toFixed(2)}% below threshold`
+                                                    : "Meets threshold"
+                                            }}
+                                        </p>
+                                        <p class="mt-1 text-slate-500">
+                                            Threshold: {{ thresholdLabel }}% ({{ thresholdScopeLabel }})
+                                        </p>
+                                    </td>
                                 </tr>
                                 <tr v-if="filteredSubjects.length === 0">
                                     <td
-                                        colspan="7"
+                                        colspan="8"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         {{ searchSubjects.trim() ? "No subjects match your search." : "No attendance records found for any subjects." }}
