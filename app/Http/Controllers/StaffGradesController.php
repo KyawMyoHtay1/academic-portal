@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\GradePublished;
 use App\Notifications\GradeReviewOutcome;
+use App\Services\SubjectGradeCalculator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -289,10 +290,14 @@ class StaffGradesController extends Controller
                 'students.full_name',
                 'students.photo',
             ]);
+        $studentIds = $students->pluck('id')->all();
+
+        $calculator = new SubjectGradeCalculator();
+        $assignmentDataByStudent = $calculator->calculateForSubjectStudents($subject->id, $studentIds);
 
         $grades = Grade::query()
             ->where('subject_id', $subject->id)
-            ->whereIn('student_id', $students->pluck('id'))
+            ->whereIn('student_id', $studentIds)
             ->whereIn('status', [
                 Grade::STATUS_PENDING,
                 Grade::STATUS_APPROVED,
@@ -302,9 +307,17 @@ class StaffGradesController extends Controller
             ->get()
             ->keyBy('student_id');
 
-        return $students->map(function ($student) use ($grades) {
+        return $students->map(function ($student) use ($grades, $assignmentDataByStudent) {
             $grade = $grades->get($student->id);
             $letterGrade = $grade?->letter_grade;
+            $assignmentData = $assignmentDataByStudent[$student->id] ?? [
+                'computed_grade' => null,
+                'breakdown' => [],
+                'total_assignments' => 0,
+                'graded_assignments' => 0,
+                'ungraded_assignments' => 0,
+                'has_assignments' => false,
+            ];
 
             return [
                 'student' => [
@@ -324,6 +337,14 @@ class StaffGradesController extends Controller
                     'reviewed_at' => $grade->reviewed_at?->toDateTimeString(),
                     'rejection_reason' => $grade->rejection_reason,
                 ] : null,
+                'assignment' => [
+                    'computed_grade' => $assignmentData['computed_grade'],
+                    'breakdown' => $assignmentData['breakdown'],
+                    'total_assignments' => $assignmentData['total_assignments'],
+                    'graded_assignments' => $assignmentData['graded_assignments'],
+                    'ungraded_assignments' => $assignmentData['ungraded_assignments'],
+                    'has_assignments' => $assignmentData['has_assignments'],
+                ],
             ];
         });
     }

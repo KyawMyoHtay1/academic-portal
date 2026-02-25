@@ -30,6 +30,7 @@ const statusFilter = ref("pending");
 const quickFilter = ref("all");
 
 const selectedGradeIds = ref([]);
+const expandedAssignmentRows = ref([]);
 const bulkAction = ref("approve");
 const bulkReason = ref("");
 const bulkReasonTemplate = ref("");
@@ -126,7 +127,12 @@ const filteredRows = computed(() => {
         list = list.filter(
             (row) =>
                 row.grade &&
-                (row.grade.score === null || row.grade.score === undefined)
+                (
+                    row.grade.score === null ||
+                    row.grade.score === undefined ||
+                    row.assignment?.computed_grade === null ||
+                    row.assignment?.computed_grade === undefined
+                )
         );
     }
 
@@ -160,8 +166,13 @@ const allVisiblePendingSelected = computed(
         hasPendingInView.value &&
         selectedVisiblePendingCount.value === visiblePendingGradeIds.value.length
 );
+const visibleStudentIds = computed(() =>
+    filteredRows.value.map((row) => row.student?.id).filter((id) => Number.isFinite(id))
+);
 
 const isGradeSelected = (gradeId) => selectedGradeIds.value.includes(gradeId);
+const isAssignmentExpanded = (studentId) =>
+    expandedAssignmentRows.value.includes(studentId);
 
 const toggleSelectGrade = (gradeId) => {
     if (isGradeSelected(gradeId)) {
@@ -187,6 +198,18 @@ const toggleSelectAllVisiblePending = () => {
 
 const clearSelection = () => {
     selectedGradeIds.value = [];
+};
+
+const toggleAssignmentDetails = (studentId) => {
+    if (isAssignmentExpanded(studentId)) {
+        expandedAssignmentRows.value = expandedAssignmentRows.value.filter(
+            (id) => id !== studentId
+        );
+
+        return;
+    }
+
+    expandedAssignmentRows.value = [...expandedAssignmentRows.value, studentId];
 };
 
 const approve = (gradeId) => {
@@ -227,6 +250,11 @@ const submitBulkReview = () => {
 watch([statusFilter, quickFilter, searchQuery], () => {
     const visibleSet = new Set(visiblePendingGradeIds.value);
     selectedGradeIds.value = selectedGradeIds.value.filter((id) => visibleSet.has(id));
+
+    const visibleStudentSet = new Set(visibleStudentIds.value);
+    expandedAssignmentRows.value = expandedAssignmentRows.value.filter((id) =>
+        visibleStudentSet.has(id)
+    );
 });
 
 watch(bulkAction, (nextAction) => {
@@ -248,6 +276,24 @@ const badgeClass = (status) => {
 
     return "bg-amber-100 text-amber-800";
 };
+
+const assignmentProgressClass = (assignment) => {
+    if (assignment?.graded) return "bg-emerald-100 text-emerald-800";
+    if (assignment?.submitted) return "bg-blue-100 text-blue-800";
+
+    return "bg-slate-100 text-slate-700";
+};
+
+const assignmentProgressLabel = (assignment) => {
+    if (assignment?.graded) return "Graded";
+    if (assignment?.submitted) return "Submitted";
+
+    return "Not submitted";
+};
+
+const hasAssignmentBreakdown = (row) =>
+    Array.isArray(row.assignment?.breakdown) &&
+    row.assignment.breakdown.length > 0;
 
 const exportUrl = (format) =>
     route("admin.grades.export", {
@@ -583,7 +629,7 @@ const exportUrl = (format) =>
                         </p>
                     </div>
 
-                    <div class="overflow-hidden rounded-md border border-slate-200">
+                    <div class="overflow-x-auto rounded-md border border-slate-200">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
@@ -608,112 +654,230 @@ const exportUrl = (format) =>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
                                         Submitted by
                                     </th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                        Assignments
+                                    </th>
                                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr
-                                    v-for="row in filteredRows"
-                                    :key="row.student.id"
-                                    class="hover:bg-slate-50"
-                                >
-                                    <td class="px-4 py-3 text-center">
-                                        <input
-                                            v-if="row.grade?.status === 'pending'"
-                                            type="checkbox"
-                                            :checked="isGradeSelected(row.grade.id)"
-                                            class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
-                                            @change="toggleSelectGrade(row.grade.id)"
-                                        />
-                                        <span v-else class="text-xs text-slate-300">-</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-sm text-slate-900">
-                                        <div class="font-medium">{{ row.student.full_name }}</div>
-                                        <div class="text-xs text-slate-500">{{ row.student.student_no }}</div>
-                                    </td>
-                                    <td class="px-4 py-3 text-center text-sm text-slate-900">
-                                        <span v-if="row.grade?.score !== null && row.grade?.score !== undefined">
-                                            {{ Number(row.grade.score).toFixed(2) }}
-                                        </span>
-                                        <span v-else class="text-slate-400">-</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <span
-                                            v-if="row.grade?.status"
-                                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                                            :class="badgeClass(row.grade.status)"
-                                        >
-                                            {{ row.grade.status }}
-                                        </span>
-                                        <span v-else class="text-xs text-slate-400">-</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-sm text-slate-700">
-                                        <div>{{ row.grade?.graded_by ?? "-" }}</div>
-                                        <div class="text-xs text-slate-500">
-                                            {{ row.grade?.submitted_at ?? "" }}
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3 text-right">
-                                        <div
-                                            v-if="row.grade && row.grade.status === 'pending'"
-                                            class="flex flex-col items-end gap-2"
-                                        >
-                                            <div class="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    class="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
-                                                    :disabled="approveForm.processing || rejectForm.processing"
-                                                    @click="approve(row.grade.id)"
-                                                >
-                                                    Approve
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    class="rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
-                                                    :disabled="approveForm.processing || rejectForm.processing || !(rejectReason[row.grade.id] ?? '').trim()"
-                                                    @click="reject(row.grade.id)"
-                                                >
-                                                    Reject
-                                                </button>
-                                            </div>
+                                <template v-for="row in filteredRows" :key="row.student.id">
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-4 py-3 text-center">
                                             <input
-                                                v-model="rejectReason[row.grade.id]"
-                                                type="text"
-                                                placeholder="Rejection reason (required)"
-                                                required
-                                                class="w-72 rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                v-if="row.grade?.status === 'pending'"
+                                                type="checkbox"
+                                                :checked="isGradeSelected(row.grade.id)"
+                                                class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                                @change="toggleSelectGrade(row.grade.id)"
                                             />
-                                            <p class="text-[11px] text-slate-500">
-                                                Reason is required to reject.
-                                            </p>
-                                            <p
-                                                v-if="rejectForm.errors.reason"
-                                                class="text-[11px] text-red-600"
+                                            <span v-else class="text-xs text-slate-300">-</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-slate-900">
+                                            <div class="font-medium">{{ row.student.full_name }}</div>
+                                            <div class="text-xs text-slate-500">{{ row.student.student_no }}</div>
+                                        </td>
+                                        <td class="px-4 py-3 text-center text-sm text-slate-900">
+                                            <span v-if="row.grade?.score !== null && row.grade?.score !== undefined">
+                                                {{ Number(row.grade.score).toFixed(2) }}
+                                            </span>
+                                            <span v-else class="text-slate-400">-</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            <span
+                                                v-if="row.grade?.status"
+                                                class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                                                :class="badgeClass(row.grade.status)"
                                             >
-                                                {{ rejectForm.errors.reason }}
-                                            </p>
-                                        </div>
-                                        <div v-else class="text-xs text-slate-500">
-                                            <div v-if="row.grade?.reviewed_by">
-                                                Reviewed by {{ row.grade.reviewed_by }}
+                                                {{ row.grade.status }}
+                                            </span>
+                                            <span v-else class="text-xs text-slate-400">-</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-slate-700">
+                                            <div>{{ row.grade?.graded_by ?? "-" }}</div>
+                                            <div class="text-xs text-slate-500">
+                                                {{ row.grade?.submitted_at ?? "" }}
                                             </div>
-                                            <div v-if="row.grade?.reviewed_at">
-                                                {{ row.grade.reviewed_at }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-slate-700">
+                                            <div class="space-y-1">
+                                                <p class="text-xs text-slate-500">
+                                                    Graded {{ row.assignment?.graded_assignments ?? 0 }}/{{ row.assignment?.total_assignments ?? 0 }}
+                                                </p>
+                                                <p class="text-xs text-slate-500">
+                                                    Computed: {{ formatScore(row.assignment?.computed_grade) }}
+                                                </p>
+                                                <button
+                                                    type="button"
+                                                    class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    :disabled="!hasAssignmentBreakdown(row)"
+                                                    @click="toggleAssignmentDetails(row.student.id)"
+                                                >
+                                                    {{
+                                                        isAssignmentExpanded(row.student.id)
+                                                            ? "Hide details"
+                                                            : "View details"
+                                                    }}
+                                                </button>
                                             </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-right">
                                             <div
-                                                v-if="row.grade?.rejection_reason"
-                                                class="text-red-700"
+                                                v-if="row.grade && row.grade.status === 'pending'"
+                                                class="flex flex-col items-end gap-2"
                                             >
-                                                Reason: {{ row.grade.rejection_reason }}
+                                                <div class="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        class="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
+                                                        :disabled="approveForm.processing || rejectForm.processing"
+                                                        @click="approve(row.grade.id)"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        class="rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
+                                                        :disabled="approveForm.processing || rejectForm.processing || !(rejectReason[row.grade.id] ?? '').trim()"
+                                                        @click="reject(row.grade.id)"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                                <input
+                                                    v-model="rejectReason[row.grade.id]"
+                                                    type="text"
+                                                    placeholder="Rejection reason (required)"
+                                                    required
+                                                    class="w-72 rounded-md border-slate-300 text-xs shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                                />
+                                                <p class="text-[11px] text-slate-500">
+                                                    Reason is required to reject.
+                                                </p>
+                                                <p
+                                                    v-if="rejectForm.errors.reason"
+                                                    class="text-[11px] text-red-600"
+                                                >
+                                                    {{ rejectForm.errors.reason }}
+                                                </p>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            <div v-else class="text-xs text-slate-500">
+                                                <div v-if="row.grade?.reviewed_by">
+                                                    Reviewed by {{ row.grade.reviewed_by }}
+                                                </div>
+                                                <div v-if="row.grade?.reviewed_at">
+                                                    {{ row.grade.reviewed_at }}
+                                                </div>
+                                                <div
+                                                    v-if="row.grade?.rejection_reason"
+                                                    class="text-red-700"
+                                                >
+                                                    Reason: {{ row.grade.rejection_reason }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr v-if="isAssignmentExpanded(row.student.id)" class="bg-slate-50">
+                                        <td colspan="7" class="px-4 py-4">
+                                            <div class="rounded-lg border border-slate-200 bg-white p-4">
+                                                <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                                                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                        Assignment breakdown
+                                                    </p>
+                                                    <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                                                        <span class="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">
+                                                            Total: {{ row.assignment?.total_assignments ?? 0 }}
+                                                        </span>
+                                                        <span class="rounded-full bg-emerald-100 px-2.5 py-1 font-semibold text-emerald-800">
+                                                            Graded: {{ row.assignment?.graded_assignments ?? 0 }}
+                                                        </span>
+                                                        <span class="rounded-full bg-blue-100 px-2.5 py-1 font-semibold text-blue-800">
+                                                            Pending: {{ row.assignment?.ungraded_assignments ?? 0 }}
+                                                        </span>
+                                                        <span class="rounded-full bg-indigo-100 px-2.5 py-1 font-semibold text-indigo-800">
+                                                            Computed: {{ formatScore(row.assignment?.computed_grade) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="hasAssignmentBreakdown(row)" class="overflow-x-auto">
+                                                    <table class="min-w-full divide-y divide-slate-200">
+                                                        <thead class="bg-slate-50">
+                                                            <tr>
+                                                                <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Assignment
+                                                                </th>
+                                                                <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Due
+                                                                </th>
+                                                                <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Progress
+                                                                </th>
+                                                                <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Graded by
+                                                                </th>
+                                                                <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Score
+                                                                </th>
+                                                                <th class="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                                    Percent
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y divide-slate-200 bg-white">
+                                                            <tr
+                                                                v-for="assignment in row.assignment.breakdown"
+                                                                :key="assignment.assignment_id"
+                                                            >
+                                                                <td class="px-3 py-2 text-sm text-slate-900">
+                                                                    {{ assignment.title }}
+                                                                </td>
+                                                                <td class="px-3 py-2 text-center text-xs text-slate-600">
+                                                                    {{ assignment.due_date ?? "-" }}
+                                                                </td>
+                                                                <td class="px-3 py-2 text-center">
+                                                                    <span
+                                                                        class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                                                                        :class="assignmentProgressClass(assignment)"
+                                                                    >
+                                                                        {{ assignmentProgressLabel(assignment) }}
+                                                                    </span>
+                                                                </td>
+                                                                <td class="px-3 py-2 text-center text-sm text-slate-700">
+                                                                    {{ assignment.graded_by ?? "-" }}
+                                                                </td>
+                                                                <td class="px-3 py-2 text-center text-sm text-slate-900">
+                                                                    <span v-if="assignment.score !== null && assignment.score !== undefined">
+                                                                        {{ Number(assignment.score).toFixed(2) }}/{{ Number(assignment.max_score).toFixed(2) }}
+                                                                    </span>
+                                                                    <span v-else class="text-slate-400">-</span>
+                                                                </td>
+                                                                <td class="px-3 py-2 text-center text-sm text-slate-900">
+                                                                    <span v-if="assignment.percentage !== null && assignment.percentage !== undefined">
+                                                                        {{ Number(assignment.percentage).toFixed(2) }}%
+                                                                    </span>
+                                                                    <span v-else class="text-slate-400">-</span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div
+                                                    v-else
+                                                    class="rounded-md border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-center text-xs text-slate-500"
+                                                >
+                                                    No assignment records found for this student in this subject.
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
                                 <tr v-if="filteredRows.length === 0">
                                     <td
-                                        colspan="6"
+                                        colspan="7"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         {{
