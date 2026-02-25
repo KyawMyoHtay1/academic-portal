@@ -18,8 +18,10 @@ const tabs = [
     { key: "message", label: "Messages" },
     { key: "assignment", label: "Assignments" },
     { key: "announcement", label: "Announcements" },
+    { key: "enrollment", label: "Enrollments" },
     { key: "contact", label: "Contact" },
     { key: "feedback", label: "Feedback" },
+    { key: "management", label: "Management" },
     { key: "grade", label: "Grades" },
     { key: "grade_review", label: "Grade Review" },
     { key: "fee", label: "Fees" },
@@ -50,6 +52,8 @@ const stats = computed(() => {
         message: list.filter((n) => n.type === "message").length,
         grade: list.filter((n) => n.type === "grade").length,
         gradeReview: list.filter((n) => n.type === "grade_review").length,
+        enrollment: list.filter((n) => n.type === "enrollment").length,
+        management: list.filter((n) => n.type === "management").length,
         fee: list.filter((n) => n.type === "fee").length,
         attendance: list.filter((n) => n.type === "attendance").length,
         timetable: list.filter((n) => n.type === "timetable").length,
@@ -66,8 +70,10 @@ const filtered = computed(() => {
             "message",
             "assignment",
             "announcement",
+            "enrollment",
             "contact",
             "feedback",
+            "management",
             "grade",
             "grade_review",
             "fee",
@@ -199,8 +205,10 @@ const typeBadgeClass = (type) => {
     if (type === "message") return "bg-cyan-100 text-cyan-800";
     if (type === "assignment") return "bg-teal-100 text-teal-800";
     if (type === "announcement") return "bg-fuchsia-100 text-fuchsia-800";
+    if (type === "enrollment") return "bg-lime-100 text-lime-800";
     if (type === "contact") return "bg-orange-100 text-orange-800";
     if (type === "feedback") return "bg-rose-100 text-rose-800";
+    if (type === "management") return "bg-slate-200 text-slate-800";
     if (type === "grade") return "bg-emerald-100 text-emerald-800";
     if (type === "grade_review") return "bg-violet-100 text-violet-800";
     if (type === "fee") return "bg-blue-100 text-blue-800";
@@ -213,8 +221,10 @@ const iconWrapperClass = (type) => {
     if (type === "message") return "bg-cyan-100";
     if (type === "assignment") return "bg-teal-100";
     if (type === "announcement") return "bg-fuchsia-100";
+    if (type === "enrollment") return "bg-lime-100";
     if (type === "contact") return "bg-orange-100";
     if (type === "feedback") return "bg-rose-100";
+    if (type === "management") return "bg-slate-200";
     if (type === "grade") return "bg-emerald-100";
     if (type === "grade_review") return "bg-violet-100";
     if (type === "fee") return "bg-blue-100";
@@ -227,8 +237,10 @@ const iconClass = (type) => {
     if (type === "message") return "text-cyan-600";
     if (type === "assignment") return "text-teal-600";
     if (type === "announcement") return "text-fuchsia-600";
+    if (type === "enrollment") return "text-lime-600";
     if (type === "contact") return "text-orange-600";
     if (type === "feedback") return "text-rose-600";
+    if (type === "management") return "text-slate-700";
     if (type === "grade") return "text-emerald-600";
     if (type === "grade_review") return "text-violet-600";
     if (type === "fee") return "text-blue-600";

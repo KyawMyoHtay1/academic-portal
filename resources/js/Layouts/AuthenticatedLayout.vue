@@ -7,7 +7,7 @@ import DropdownLink from "@/Components/DropdownLink.vue";
 import GoogleTranslate from "@/Components/GoogleTranslate.vue";
 import PageLoadingIndicator from "@/Components/PageLoadingIndicator.vue";
 import GlobalToastStack from "@/Components/GlobalToastStack.vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { Link, router, usePage } from "@inertiajs/vue3";
 
 const showingMobileSidebar = ref(false);
 const page = usePage();
@@ -447,6 +447,63 @@ const unreadNotificationCount = computed(() =>
 const notificationsPreview = computed(
     () => page.props.notificationsPreview?.items ?? []
 );
+
+const isMarkingNotificationsRead = ref(false);
+
+const markAllNotificationsRead = () => {
+    if (isMarkingNotificationsRead.value) {
+        return;
+    }
+
+    if (unreadNotificationCount.value <= 0) {
+        return;
+    }
+
+    isMarkingNotificationsRead.value = true;
+
+    router.post(
+        route("notifications.read-all"),
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+            onFinish: () => {
+                isMarkingNotificationsRead.value = false;
+            },
+        }
+    );
+};
+
+const openNotificationFromPreview = (notification) => {
+    const targetUrl = notification?.url || route("notifications.index");
+    const notificationId = notification?.id;
+
+    if (!notificationId || notification?.read_at) {
+        router.visit(targetUrl);
+        return;
+    }
+
+    router.post(
+        route("notifications.read", notificationId),
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+            onSuccess: () => {
+                router.visit(targetUrl);
+            },
+            onError: () => {
+                router.visit(targetUrl);
+            },
+        }
+    );
+};
+
+const openNotificationCenter = () => {
+    router.visit(route("notifications.index"));
+};
 
 const truncateNotificationText = (value, max = 96) => {
     const text = String(value ?? "").trim();
@@ -969,26 +1026,35 @@ const truncateNotificationText = (value, max = 96) => {
                                         >
                                             Notifications
                                         </p>
-                                        <Link
+                                        <button
+                                            type="button"
                                             v-if="unreadNotificationCount > 0"
-                                            :href="route('notifications.read-all')"
-                                            method="post"
-                                            as="button"
+                                            @click="markAllNotificationsRead"
+                                            :disabled="isMarkingNotificationsRead"
                                             class="text-xs font-semibold text-portal-navy hover:text-portal-navy-dark"
                                         >
-                                            Mark all read
-                                        </Link>
+                                            {{
+                                                isMarkingNotificationsRead
+                                                    ? "Marking..."
+                                                    : "Mark all read"
+                                            }}
+                                        </button>
                                     </div>
 
                                     <div
                                         v-if="notificationsPreview.length > 0"
                                         class="max-h-80 overflow-y-auto"
                                     >
-                                        <Link
+                                        <button
+                                            type="button"
                                             v-for="notification in notificationsPreview"
                                             :key="notification.id"
-                                            :href="notification.url || route('notifications.index')"
-                                            class="block border-b border-slate-100 px-4 py-3 transition hover:bg-slate-50"
+                                            @click="
+                                                openNotificationFromPreview(
+                                                    notification
+                                                )
+                                            "
+                                            class="block w-full border-b border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50"
                                             :class="
                                                 notification.read_at
                                                     ? 'bg-white'
@@ -1025,7 +1091,7 @@ const truncateNotificationText = (value, max = 96) => {
                                                     notification.created_at
                                                 }}
                                             </p>
-                                        </Link>
+                                        </button>
                                     </div>
 
                                     <div
@@ -1038,12 +1104,13 @@ const truncateNotificationText = (value, max = 96) => {
                                     <div
                                         class="border-t border-slate-200 px-4 py-2"
                                     >
-                                        <Link
-                                            :href="route('notifications.index')"
+                                        <button
+                                            type="button"
+                                            @click="openNotificationCenter"
                                             class="text-xs font-semibold text-portal-navy hover:text-portal-navy-dark"
                                         >
                                             Open notification center
-                                        </Link>
+                                        </button>
                                     </div>
                                 </div>
                             </template>

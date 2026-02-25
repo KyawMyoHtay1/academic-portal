@@ -28,6 +28,8 @@ class UpdateSettingsRequest extends FormRequest
             'notify_messages' => ['sometimes', 'boolean'],
             'notify_assignments' => ['sometimes', 'boolean'],
             'notify_announcements' => ['sometimes', 'boolean'],
+            'notify_enrollment_requests' => ['sometimes', 'boolean'],
+            'notify_management' => ['sometimes', 'boolean'],
         ];
 
         $role = (string) ($this->user()?->role ?? '');

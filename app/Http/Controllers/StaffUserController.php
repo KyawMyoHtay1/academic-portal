@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Staff\Users\StoreUserRequest;
 use App\Http\Requests\Staff\Users\UpdateUserRequest;
 use App\Models\User;
+use App\Notifications\ManagementActivityNotification;
 use App\Services\ImageService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -169,6 +172,28 @@ class StaffUserController extends Controller
             $message = 'User created successfully. Could not send password setup link automatically.';
         }
 
+        $this->notifyUserTargetedChange(
+            $user,
+            'Account created',
+            "Your portal account was created with role {$user->role}."
+        );
+
+        $this->notifyUserManagement(
+            'User created',
+            sprintf(
+                '%s created %s (%s) with role %s.',
+                $this->actorName(),
+                $user->name,
+                $user->email,
+                $user->role
+            ),
+            route('admin.users.edit', $user),
+            [
+                'user_id' => $user->id,
+                'action' => 'created',
+            ]
+        );
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', $message);
@@ -180,6 +205,7 @@ class StaffUserController extends Controller
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         $data = $request->validated();
+        $previousRole = (string) $user->role;
 
         if ($request->hasFile('photo')) {
             // Delete old photo if it exists
@@ -189,6 +215,40 @@ class StaffUserController extends Controller
         }
 
         $user->update($data);
+        $user->refresh();
+
+        $roleChanged = $previousRole !== (string) $user->role;
+        $targetMessage = $roleChanged
+            ? "Your account details were updated. Role changed from {$previousRole} to {$user->role}."
+            : 'Your account details were updated by administration.';
+
+        $this->notifyUserTargetedChange($user, 'Account updated', $targetMessage);
+
+        $this->notifyUserManagement(
+            'User updated',
+            $roleChanged
+                ? sprintf(
+                    '%s updated %s (%s) and changed role from %s to %s.',
+                    $this->actorName(),
+                    $user->name,
+                    $user->email,
+                    $previousRole,
+                    $user->role
+                )
+                : sprintf(
+                    '%s updated %s (%s).',
+                    $this->actorName(),
+                    $user->name,
+                    $user->email
+                ),
+            route('admin.users.edit', $user),
+            [
+                'user_id' => $user->id,
+                'action' => $roleChanged ? 'role_changed' : 'updated',
+                'from_role' => $roleChanged ? $previousRole : null,
+                'to_role' => $roleChanged ? $user->role : null,
+            ]
+        );
 
         return redirect()
             ->route('admin.users.index')
@@ -223,10 +283,29 @@ class StaffUserController extends Controller
                 ->with('error', 'You cannot delete your own account while logged in as this user.');
         }
 
+        $deletedUserId = $user->id;
+        $deletedUserName = $user->name;
+        $deletedUserEmail = $user->email;
+
         // Delete stored profile photo, if any
         ImageService::delete($user->photo);
 
         $user->delete();
+
+        $this->notifyUserManagement(
+            'User deleted',
+            sprintf(
+                '%s deleted %s (%s).',
+                $this->actorName(),
+                $deletedUserName,
+                $deletedUserEmail
+            ),
+            route('admin.users.index'),
+            [
+                'user_id' => $deletedUserId,
+                'action' => 'deleted',
+            ]
+        );
 
         return redirect()
             ->route('admin.users.index')
@@ -259,7 +338,7 @@ class StaffUserController extends Controller
 
         $users = User::query()
             ->whereIn('id', $ids->all())
-            ->get(['id', 'photo']);
+            ->get(['id', 'name', 'email', 'photo']);
 
         foreach ($users as $user) {
             ImageService::delete($user->photo);
@@ -267,8 +346,91 @@ class StaffUserController extends Controller
 
         User::query()->whereIn('id', $ids->all())->delete();
 
+        $deletedCount = $users->count();
+        $sampleLabels = $users
+            ->take(3)
+            ->map(fn (User $user) => "{$user->name} ({$user->email})")
+            ->implode(', ');
+        $sampleSuffix = $sampleLabels !== '' ? " Example: {$sampleLabels}." : '';
+
+        $this->notifyUserManagement(
+            'Users deleted',
+            sprintf(
+                '%s deleted %d user account(s).%s',
+                $this->actorName(),
+                $deletedCount,
+                $sampleSuffix
+            ),
+            route('admin.users.index'),
+            [
+                'action' => 'bulk_deleted',
+                'count' => $deletedCount,
+            ]
+        );
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', "{$users->count()} user(s) deleted successfully.");
+    }
+
+    /**
+     * @param  array<string, mixed>  $meta
+     */
+    private function notifyUserManagement(
+        string $title,
+        string $message,
+        ?string $url = null,
+        array $meta = []
+    ): void {
+        $recipients = User::query()
+            ->whereIn('role', ['staff', 'admin'])
+            ->get(['id', 'role', 'preferences']);
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        try {
+            Notification::send(
+                $recipients,
+                new ManagementActivityNotification('users', $title, $message, $url, $meta)
+            );
+        } catch (\Throwable $e) {
+            Log::warning('staff_user_management_notification_failed', [
+                'title' => $title,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function notifyUserTargetedChange(User $recipient, string $title, string $message): void
+    {
+        if (in_array((string) $recipient->role, ['staff', 'admin'], true)) {
+            return;
+        }
+
+        try {
+            $recipient->notify(new ManagementActivityNotification(
+                'users',
+                $title,
+                $message,
+                route('settings.index'),
+                [
+                    'user_id' => $recipient->id,
+                    'action' => 'targeted_update',
+                ]
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('staff_user_target_notification_failed', [
+                'user_id' => $recipient->id,
+                'title' => $title,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function actorName(): string
+    {
+        return Auth::user()?->name ?? 'System';
     }
 }

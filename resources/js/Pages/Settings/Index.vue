@@ -47,6 +47,9 @@ const form = useForm({
     notify_messages: props.preferences.notify_messages ?? true,
     notify_assignments: props.preferences.notify_assignments ?? true,
     notify_announcements: props.preferences.notify_announcements ?? true,
+    notify_enrollment_requests:
+        props.preferences.notify_enrollment_requests ?? true,
+    notify_management: props.preferences.notify_management ?? true,
     ...(canManageAttendanceAlertDefaults
         ? {
               attendance_low_threshold:
@@ -247,6 +250,8 @@ const submit = () => {
                         <InputError class="mt-2" :message="form.errors.notify_messages" />
                         <InputError class="mt-2" :message="form.errors.notify_assignments" />
                         <InputError class="mt-2" :message="form.errors.notify_announcements" />
+                        <InputError class="mt-2" :message="form.errors.notify_enrollment_requests" />
+                        <InputError class="mt-2" :message="form.errors.notify_management" />
                         <InputError class="mt-2" :message="form.errors.attendance_low_threshold" />
                         <InputError class="mt-2" :message="form.errors.attendance_cooldown_days" />
 
@@ -363,6 +368,42 @@ const submit = () => {
                                     <Checkbox
                                         id="notify_announcements"
                                         v-model:checked="form.notify_announcements"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_enrollment_requests"
+                                            value="Enrollment request alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            New enrollment and withdrawal requests sent to admin/staff reviewers.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_enrollment_requests"
+                                        v-model:checked="form.notify_enrollment_requests"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_management"
+                                            value="Management activity alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            User, course, subject, and teacher-assignment management updates.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_management"
+                                        v-model:checked="form.notify_management"
                                         class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
                                     />
                                 </div>

@@ -77,7 +77,7 @@ class HandleInertiaRequests extends Middleware
             ];
 
             $notificationsPreview = [
-                'items' => $user->notifications()
+                'items' => $user->unreadNotifications()
                     ->orderByDesc('created_at')
                     ->limit(6)
                     ->get()

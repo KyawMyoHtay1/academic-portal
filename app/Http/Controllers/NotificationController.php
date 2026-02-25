@@ -43,10 +43,10 @@ class NotificationController extends Controller
     /**
      * Mark a single notification as read.
      */
-    public function markAsRead(string $notificationId): RedirectResponse
+    public function markAsRead(string $id): RedirectResponse
     {
         $user = Auth::user();
-        $notification = $user->notifications()->where('id', $notificationId)->firstOrFail();
+        $notification = $user->notifications()->where('id', $id)->firstOrFail();
         $notification->markAsRead();
 
         return back();
@@ -186,6 +186,22 @@ class NotificationController extends Controller
             }
 
             return route('messages.index');
+        }
+
+        if ($type === 'management' && in_array($role, ['staff', 'admin'], true)) {
+            $module = (string) ($data['module'] ?? '');
+
+            if ($module === 'users') {
+                return route('admin.users.index');
+            }
+
+            if ($module === 'courses') {
+                return route('admin.courses.index');
+            }
+
+            if ($module === 'subjects') {
+                return route('admin.subjects.index');
+            }
         }
 
         return null;

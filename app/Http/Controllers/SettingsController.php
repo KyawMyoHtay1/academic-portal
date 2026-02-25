@@ -27,6 +27,8 @@ class SettingsController extends Controller
         'notify_messages' => true,
         'notify_assignments' => true,
         'notify_announcements' => true,
+        'notify_enrollment_requests' => true,
+        'notify_management' => true,
     ];
 
     /**

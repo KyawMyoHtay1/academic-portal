@@ -6,11 +6,14 @@ use App\Models\Course;
 use App\Models\EnrollmentStatusLog;
 use App\Models\Student;
 use App\Models\Timetable;
+use App\Models\User;
+use App\Notifications\EnrollmentRequestReceived;
 use App\Notifications\EnrollmentStatusUpdated;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 
 class EnrollmentService
@@ -140,6 +143,8 @@ class EnrollmentService
                     'performed_by' => $performedBy,
                 ]);
 
+                $this->notifyStaffEnrollmentRequest($student, $course, 'enrollment');
+
                 return $this->result(
                     'success',
                     "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval."
@@ -202,6 +207,8 @@ class EnrollmentService
                 'mode' => 'new_request',
             ]);
 
+            $this->notifyStaffEnrollmentRequest($student, $course, 'enrollment');
+
             return $this->result(
                 'success',
                 "Enrollment request submitted for {$course->course_code} - {$course->title}. Waiting for admin approval."
@@ -255,6 +262,8 @@ class EnrollmentService
             'student_id' => $student->id,
             'course_id' => $course->id,
         ]);
+
+        $this->notifyStaffEnrollmentRequest($student, $course, 'withdrawal');
 
         return $this->result(
             'success',
@@ -780,6 +789,28 @@ class EnrollmentService
                 'student_id' => $student?->id,
                 'course_id' => $course?->id,
                 'decision' => $decision,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function notifyStaffEnrollmentRequest(Student $student, Course $course, string $requestType): void
+    {
+        $recipients = User::query()
+            ->whereIn('role', ['staff', 'admin'])
+            ->get(['id', 'role', 'preferences']);
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        try {
+            Notification::send($recipients, new EnrollmentRequestReceived($student, $course, $requestType));
+        } catch (\Throwable $e) {
+            Log::warning('enrollment.request_notification_failed', [
+                'student_id' => $student->id,
+                'course_id' => $course->id,
+                'request_type' => $requestType,
                 'error' => $e->getMessage(),
             ]);
         }

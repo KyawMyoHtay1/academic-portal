@@ -7,9 +7,13 @@ use App\Http\Requests\Staff\Subjects\UpdateSubjectRequest;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\User;
+use App\Notifications\ManagementActivityNotification;
 use App\Services\ImageService;
 use App\Support\AttendanceAlertSettings;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -94,7 +98,22 @@ class StaffSubjectController extends Controller
             $data['photo'] = ImageService::store($request->file('photo'), 'subjects');
         }
 
-        Subject::create($data);
+        $subject = Subject::create($data);
+
+        $this->notifySubjectManagement(
+            'Subject created',
+            sprintf(
+                '%s created subject %s - %s.',
+                $this->actorName(),
+                $subject->subject_code,
+                $subject->title
+            ),
+            route('admin.subjects.edit', $subject),
+            [
+                'subject_id' => $subject->id,
+                'action' => 'created',
+            ]
+        );
 
         return redirect()
             ->route('admin.subjects.index')
@@ -143,6 +162,21 @@ class StaffSubjectController extends Controller
 
         $subject->update($data);
 
+        $this->notifySubjectManagement(
+            'Subject updated',
+            sprintf(
+                '%s updated subject %s - %s.',
+                $this->actorName(),
+                $subject->subject_code,
+                $subject->title
+            ),
+            route('admin.subjects.edit', $subject),
+            [
+                'subject_id' => $subject->id,
+                'action' => 'updated',
+            ]
+        );
+
         return redirect()
             ->route('admin.subjects.index')
             ->with('success', 'Subject updated successfully.');
@@ -169,13 +203,67 @@ class StaffSubjectController extends Controller
      */
     public function destroy(Subject $subject): RedirectResponse
     {
+        $subjectId = $subject->id;
+        $subjectCode = $subject->subject_code;
+        $subjectTitle = $subject->title;
+
         // Delete photo file first to avoid orphaned storage files.
         ImageService::delete($subject->photo);
 
         $subject->delete();
 
+        $this->notifySubjectManagement(
+            'Subject deleted',
+            sprintf(
+                '%s deleted subject %s - %s.',
+                $this->actorName(),
+                $subjectCode,
+                $subjectTitle
+            ),
+            route('admin.subjects.index'),
+            [
+                'subject_id' => $subjectId,
+                'action' => 'deleted',
+            ]
+        );
+
         return redirect()
             ->route('admin.subjects.index')
             ->with('success', 'Subject deleted successfully.');
+    }
+
+    /**
+     * @param  array<string, mixed>  $meta
+     */
+    private function notifySubjectManagement(
+        string $title,
+        string $message,
+        ?string $url = null,
+        array $meta = []
+    ): void {
+        $recipients = User::query()
+            ->whereIn('role', ['staff', 'admin'])
+            ->get(['id', 'role', 'preferences']);
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        try {
+            Notification::send(
+                $recipients,
+                new ManagementActivityNotification('subjects', $title, $message, $url, $meta)
+            );
+        } catch (\Throwable $e) {
+            Log::warning('staff_subject_management_notification_failed', [
+                'title' => $title,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function actorName(): string
+    {
+        return Auth::user()?->name ?? 'System';
     }
 }

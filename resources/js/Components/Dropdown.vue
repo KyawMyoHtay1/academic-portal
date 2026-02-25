@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps({
     align: {
@@ -15,6 +15,8 @@ const props = defineProps({
         default: 'py-1 bg-white',
     },
 });
+
+const emit = defineEmits(['open-change']);
 
 const closeOnEscape = (e) => {
     if (open.value && e.key === 'Escape') {
@@ -47,11 +49,15 @@ const alignmentClasses = computed(() => {
 });
 
 const open = ref(false);
+
+watch(open, (value) => {
+    emit('open-change', value);
+});
 </script>
 
 <template>
     <div class="relative">
-        <div @click="open = !open">
+        <div @click.stop="open = !open">
             <slot name="trigger" />
         </div>
 
@@ -75,7 +81,7 @@ const open = ref(false);
                 class="absolute z-50 mt-2 rounded-md shadow-lg"
                 :class="[widthClass, alignmentClasses]"
                 style="display: none"
-                @click="open = false"
+                @click.stop
             >
                 <div
                     class="rounded-md ring-1 ring-black ring-opacity-5"
