@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     subjects: {
@@ -19,6 +19,7 @@ const query = ref("");
 const courseFilter = ref("all");
 const teacherFilter = ref("all");
 const selectedSubjectIds = ref([]);
+const expandedSubjectIds = ref([]);
 const bulkTeacherIds = ref([]);
 const bulkAssignProcessing = ref(false);
 
@@ -149,6 +150,17 @@ const toggleSubjectSelection = (subjectId) => {
     selectedSubjectIds.value = [...selectedSubjectIds.value, subjectId];
 };
 
+const isSubjectExpanded = (subjectId) => expandedSubjectIds.value.includes(subjectId);
+
+const toggleSubjectDetails = (subjectId) => {
+    if (isSubjectExpanded(subjectId)) {
+        expandedSubjectIds.value = expandedSubjectIds.value.filter((id) => id !== subjectId);
+        return;
+    }
+
+    expandedSubjectIds.value = [...expandedSubjectIds.value, subjectId];
+};
+
 const clearFilters = () => {
     query.value = "";
     courseFilter.value = "all";
@@ -174,6 +186,13 @@ const removeFilterChip = (key) => {
 const clearSelection = () => {
     selectedSubjectIds.value = [];
 };
+
+watch(visibleSubjectIds, (ids) => {
+    const visibleSet = new Set(ids);
+    expandedSubjectIds.value = expandedSubjectIds.value.filter((id) =>
+        visibleSet.has(id)
+    );
+});
 
 const assignTeachersInBulk = () => {
     if (selectedSubjectIds.value.length === 0) {
@@ -510,112 +529,123 @@ const formatThreshold = (value) =>
                                         }}
                                     </td>
                                 </tr>
-                                <tr
-                                    v-for="subject in filtered"
-                                    :key="subject.id"
-                                    class="bg-white transition-colors hover:bg-slate-50"
-                                >
-                                    <td class="whitespace-nowrap px-4 py-4">
-                                        <input
-                                            type="checkbox"
-                                            class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
-                                            :checked="selectedSubjectIds.includes(subject.id)"
-                                            @change="toggleSubjectSelection(subject.id)"
-                                        />
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100"
-                                            >
-                                                <img
-                                                    v-if="subject.photo"
-                                                    :src="`/storage/${subject.photo}`"
-                                                    :alt="`Photo for ${subject.title}`"
-                                                    class="h-full w-full object-cover"
-                                                />
-                                                <span v-else class="text-xs font-semibold text-slate-500">
-                                                    {{ subject.title?.[0] ?? "S" }}
-                                                </span>
+                                <template v-for="subject in filtered" :key="subject.id">
+                                    <tr class="bg-white transition-colors hover:bg-slate-50">
+                                        <td class="whitespace-nowrap px-4 py-4">
+                                            <input
+                                                type="checkbox"
+                                                class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                                :checked="selectedSubjectIds.includes(subject.id)"
+                                                @change="toggleSubjectSelection(subject.id)"
+                                            />
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100"
+                                                >
+                                                    <img
+                                                        v-if="subject.photo"
+                                                        :src="`/storage/${subject.photo}`"
+                                                        :alt="`Photo for ${subject.title}`"
+                                                        class="h-full w-full object-cover"
+                                                    />
+                                                    <span v-else class="text-xs font-semibold text-slate-500">
+                                                        {{ subject.title?.[0] ?? "S" }}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
-                                        {{ subject.subject_code }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-slate-700">
-                                        {{ subject.title }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-slate-600">
-                                        <div class="flex flex-col">
-                                            <span class="font-medium">{{ subject.course_code }}</span>
-                                            <span class="text-xs text-slate-500">{{ subject.course_title }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
-                                        {{ subject.credits || "-" }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-slate-600">
-                                        <span v-if="subject.teachers && subject.teachers.length > 0">
-                                            {{ subject.teachers.map((teacher) => teacher.name).join(", ") }}
-                                        </span>
-                                        <span v-else class="text-slate-400">
-                                            Not Assigned
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-xs text-slate-600">
-                                        <div class="space-y-1">
-                                            <p>
-                                                Teachers:
-                                                <span class="font-semibold text-slate-700">
-                                                    {{ Number(subject.teacher_count ?? 0) }}
-                                                </span>
-                                            </p>
-                                            <p>
-                                                Assignments:
-                                                <span class="font-semibold text-slate-700">
-                                                    {{ Number(subject.published_assignments_count ?? 0) }}/{{ Number(subject.assignments_count ?? 0) }}
-                                                </span>
-                                                <span class="text-slate-500">published</span>
-                                            </p>
-                                            <p>
-                                                Attendance threshold:
-                                                <span class="font-semibold text-slate-700">
-                                                    {{ formatThreshold(subject.attendance_threshold) }}
-                                                </span>
-                                            </p>
-                                            <p>
-                                                Updated:
-                                                <span class="font-semibold text-slate-700">
-                                                    {{ formatUpdatedAt(subject.updated_at) }}
-                                                </span>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-right text-sm">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <Link
-                                                :href="route('admin.subjects.assign-teachers', subject.id)"
-                                                class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
-                                            >
-                                                Assign Teachers
-                                            </Link>
-                                            <Link
-                                                :href="route('admin.subjects.edit', subject.id)"
-                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                            >
-                                                Edit
-                                            </Link>
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
+                                            {{ subject.subject_code }}
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-700">
+                                            {{ subject.title }}
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-600">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium">{{ subject.course_code }}</span>
+                                                <span class="text-xs text-slate-500">{{ subject.course_title }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
+                                            {{ subject.credits || "-" }}
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-600">
+                                            <span v-if="subject.teachers && subject.teachers.length > 0">
+                                                {{ subject.teachers.map((teacher) => teacher.name).join(", ") }}
+                                            </span>
+                                            <span v-else class="text-slate-400">
+                                                Not Assigned
+                                            </span>
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-xs text-slate-600">
                                             <button
                                                 type="button"
-                                                class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                                @click="deleteSubject(subject.id)"
+                                                class="rounded-md border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-700 hover:bg-slate-100"
+                                                @click="toggleSubjectDetails(subject.id)"
                                             >
-                                                Delete
+                                                {{ isSubjectExpanded(subject.id) ? "Hide details" : "Details" }}
                                             </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-right text-sm">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <Link
+                                                    :href="route('admin.subjects.assign-teachers', subject.id)"
+                                                    class="rounded-md bg-portal-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-portal-gold-dark focus:outline-none focus:ring-2 focus:ring-portal-gold focus:ring-offset-2"
+                                                >
+                                                    Assign Teachers
+                                                </Link>
+                                                <Link
+                                                    :href="route('admin.subjects.edit', subject.id)"
+                                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                    @click="deleteSubject(subject.id)"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="isSubjectExpanded(subject.id)" class="bg-slate-50">
+                                        <td colspan="9" class="px-4 py-4">
+                                            <div class="rounded-lg border border-slate-200 bg-white p-4 text-xs text-slate-600">
+                                                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                                    <p>
+                                                        Teachers:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ Number(subject.teacher_count ?? 0) }}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        Assignments:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ Number(subject.published_assignments_count ?? 0) }}/{{ Number(subject.assignments_count ?? 0) }}
+                                                        </span>
+                                                        <span class="text-slate-500">published</span>
+                                                    </p>
+                                                    <p>
+                                                        Attendance threshold:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ formatThreshold(subject.attendance_threshold) }}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        Updated:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ formatUpdatedAt(subject.updated_at) }}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                     </div>
