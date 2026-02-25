@@ -56,7 +56,7 @@ const statusTabs = [
     { key: "pending", label: "Pending" },
     { key: "approved", label: "Approved" },
     { key: "rejected", label: "Rejected" },
-    { key: "all", label: "All Reviewed" },
+    { key: "all", label: "All" },
 ];
 const quickFilters = [
     { key: "all", label: "All" },
