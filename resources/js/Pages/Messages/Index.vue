@@ -742,7 +742,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="grid gap-6 lg:grid-cols-[320px,1fr] lg:h-[calc(100vh-18rem)] lg:min-h-[34rem] lg:items-start">
+                <div class="grid gap-6 lg:grid-cols-[320px,1fr] lg:h-[calc(100vh-14rem)] lg:min-h-[42rem] lg:items-start">
                     <div class="portal-card p-4 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
                         <div class="flex items-center justify-between gap-2">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Threads</p>
