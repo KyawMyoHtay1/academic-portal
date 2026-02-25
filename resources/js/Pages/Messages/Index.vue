@@ -4,7 +4,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
 import { Head, router, useForm } from "@inertiajs/vue3";
 import debounce from "lodash/debounce";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
     messages: {
@@ -49,6 +49,11 @@ const replyForm = useForm({
     receiver_id: "",
     body: "",
 });
+const POLL_INTERVAL_MS = 15000;
+const USER_ACTIVE_GRACE_MS = 2500;
+const isPolling = ref(false);
+const lastInteractionAt = ref(Date.now());
+let pollingTimer = null;
 
 const messagesData = computed(() => props.messages?.data ?? []);
 const messageLinks = computed(() => props.messages?.links ?? []);
@@ -354,6 +359,10 @@ const clearAllFilters = () => {
     unreadOnly.value = false;
 };
 
+const trackInteraction = () => {
+    lastInteractionAt.value = Date.now();
+};
+
 const removeFilterChip = (key) => {
     if (key === "tab") {
         activeTab.value = "all";
@@ -441,6 +450,11 @@ watch(activeConversationData, (conversation) => {
 });
 
 onBeforeUnmount(() => {
+    stopPolling();
+    if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }
+
     applyMessageSearch.cancel();
     applyConversationSearch.cancel();
     persistFiltersToUrl.cancel();
@@ -454,6 +468,7 @@ const focusInlineReply = () => {
 const sendInlineReply = () => {
     if (!activeConversationData.value) return;
 
+    trackInteraction();
     replyForm.receiver_id = String(activeConversationData.value.user_id);
     replyForm.post(route("messages.store"), {
         preserveScroll: true,
@@ -465,6 +480,51 @@ const sendInlineReply = () => {
         },
     });
 };
+
+const shouldPollNow = () => {
+    if (isPolling.value) return false;
+    if (replyForm.processing) return false;
+    if (typeof document !== "undefined" && document.hidden) return false;
+    return Date.now() - lastInteractionAt.value >= USER_ACTIVE_GRACE_MS;
+};
+
+const refreshMessages = () => {
+    if (!shouldPollNow()) return;
+
+    isPolling.value = true;
+    router.reload({
+        only: ["messages", "conversations", "activeConversation", "unread"],
+        preserveState: true,
+        preserveScroll: true,
+        onFinish: () => {
+            isPolling.value = false;
+        },
+    });
+};
+
+const startPolling = () => {
+    if (pollingTimer !== null || typeof window === "undefined") return;
+    pollingTimer = window.setInterval(refreshMessages, POLL_INTERVAL_MS);
+};
+
+const stopPolling = () => {
+    if (pollingTimer === null || typeof window === "undefined") return;
+    window.clearInterval(pollingTimer);
+    pollingTimer = null;
+};
+
+const handleVisibilityChange = () => {
+    if (typeof document !== "undefined" && !document.hidden) {
+        refreshMessages();
+    }
+};
+
+onMounted(() => {
+    startPolling();
+    if (typeof document !== "undefined") {
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+    }
+});
 </script>
 
 <template>
@@ -489,7 +549,12 @@ const sendInlineReply = () => {
             </div>
         </template>
 
-        <div class="py-10">
+        <div
+            class="py-10"
+            @input.capture="trackInteraction"
+            @keydown.capture="trackInteraction"
+            @click.capture="trackInteraction"
+        >
             <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
