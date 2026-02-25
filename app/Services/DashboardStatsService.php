@@ -101,7 +101,7 @@ class DashboardStatsService
         $pendingGrades = Cache::remember('dashboard:staff:pending_grades', $cacheTtl, fn () => Grade::where('status', 'pending')->count());
         $pendingPayments = Cache::remember('dashboard:staff:pending_payments', $cacheTtl, fn () => Fee::where('status', 'payment_pending')->count());
         $paidFees = Cache::remember('dashboard:staff:paid_fees_total', $cacheTtl, fn () => Fee::where('status', 'paid')->sum('amount'));
-        $pendingFees = Cache::remember('dashboard:staff:pending_fees_total', $cacheTtl, fn () => Fee::where('status', 'pending')->sum('amount'));
+        $pendingFees = Cache::remember('dashboard:staff:pending_fees_total', $cacheTtl, fn () => Fee::whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_FAILED])->sum('amount'));
 
         $now = Carbon::now();
         $currentMonthStart = $now->copy()->startOfMonth()->toDateString();
@@ -172,14 +172,15 @@ class DashboardStatsService
                 ->toArray();
         });
         $chartsFeeStatus = [
-            'labels' => ['Pending', 'Payment Pending', 'Paid'],
+            'labels' => ['Pending', 'Payment Pending', 'Failed', 'Paid'],
             'datasets' => [[
                 'data' => [
                     $feeStatusCounts['pending'] ?? 0,
                     $feeStatusCounts['payment_pending'] ?? 0,
+                    $feeStatusCounts['failed'] ?? 0,
                     $feeStatusCounts['paid'] ?? 0,
                 ],
-                'backgroundColor' => ['#f59e0b', '#10b981', '#3b82f6'],
+                'backgroundColor' => ['#f59e0b', '#3b82f6', '#ef4444', '#10b981'],
                 'borderWidth' => 0,
             ]],
         ];
@@ -632,10 +633,10 @@ class DashboardStatsService
             ? Cache::remember("{$studentCacheKeyPrefix}:my_courses", $cacheTtl, fn () => $student->courses()->count())
             : 0;
         $outstandingFees = $student
-            ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_fees", $cacheTtl, fn () => $student->fees()->where('status', 'pending')->sum('amount'))
+            ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_fees", $cacheTtl, fn () => $student->fees()->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])->sum('amount'))
             : 0;
         $outstandingBalance = $student
-            ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_balance", $cacheTtl, fn () => $student->fees()->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])->sum('amount'))
+            ? Cache::remember("{$studentCacheKeyPrefix}:outstanding_balance", $cacheTtl, fn () => $student->fees()->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])->sum('amount'))
             : 0;
         $paidFees = $student
             ? Cache::remember("{$studentCacheKeyPrefix}:paid_fees", $cacheTtl, fn () => $student->fees()->where('status', Fee::STATUS_PAID)->sum('amount'))
@@ -674,7 +675,7 @@ class DashboardStatsService
             })
             : 0;
 
-        $chartsFeeStatus = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#f59e0b', '#10b981'], 'borderWidth' => 0]]];
+        $chartsFeeStatus = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#f59e0b', '#3b82f6', '#ef4444', '#10b981'], 'borderWidth' => 0]]];
         $chartsGradesBySubject = ['labels' => [], 'datasets' => [['label' => 'Score', 'data' => [], 'backgroundColor' => 'rgba(139, 92, 246, 0.7)', 'borderColor' => '#8b5cf6', 'borderWidth' => 1]]];
         $chartsAttendanceLine = ['labels' => [], 'datasets' => [['label' => 'Attendance %', 'data' => [], 'borderColor' => '#06b6d4', 'backgroundColor' => 'rgba(6, 182, 212, 0.1)', 'fill' => true, 'tension' => 0.3]]];
         $chartsCourseEnrollment = ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => ['#3b82f6', '#f59e0b'], 'borderWidth' => 0]]];
@@ -698,13 +699,15 @@ class DashboardStatsService
         ];
 
         if ($student) {
-            $feePendingCount = Cache::remember("{$studentCacheKeyPrefix}:fee_pending_count", $cacheTtl, fn () => $student->fees()->where('status', 'pending')->count());
+            $feePendingCount = Cache::remember("{$studentCacheKeyPrefix}:fee_pending_count", $cacheTtl, fn () => $student->fees()->where('status', Fee::STATUS_PENDING)->count());
+            $feePaymentPendingCount = Cache::remember("{$studentCacheKeyPrefix}:fee_payment_pending_count", $cacheTtl, fn () => $student->fees()->where('status', Fee::STATUS_PAYMENT_PENDING)->count());
+            $feeFailedCount = Cache::remember("{$studentCacheKeyPrefix}:fee_failed_count", $cacheTtl, fn () => $student->fees()->where('status', Fee::STATUS_FAILED)->count());
             $feePaidCount = Cache::remember("{$studentCacheKeyPrefix}:fee_paid_count", $cacheTtl, fn () => $student->fees()->where('status', 'paid')->count());
             $chartsFeeStatus = [
-                'labels' => ['Pending', 'Paid'],
+                'labels' => ['Pending', 'Payment Pending', 'Failed', 'Paid'],
                 'datasets' => [[
-                    'data' => [$feePendingCount, $feePaidCount],
-                    'backgroundColor' => ['#f59e0b', '#10b981'],
+                    'data' => [$feePendingCount, $feePaymentPendingCount, $feeFailedCount, $feePaidCount],
+                    'backgroundColor' => ['#f59e0b', '#3b82f6', '#ef4444', '#10b981'],
                     'borderWidth' => 0,
                 ]],
             ];

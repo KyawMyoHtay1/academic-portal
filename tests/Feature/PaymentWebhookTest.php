@@ -109,7 +109,7 @@ class PaymentWebhookTest extends TestCase
         $this->assertDatabaseCount('stripe_webhook_events', 1);
     }
 
-    public function test_reset_pending_payment_reverts_to_pending_even_without_payment_intent_id(): void
+    public function test_reset_pending_payment_marks_failed_even_without_payment_intent_id(): void
     {
         [, $student] = $this->createStudentUser();
 
@@ -127,8 +127,45 @@ class PaymentWebhookTest extends TestCase
         $this->assertTrue($updated);
         $this->assertDatabaseHas('fees', [
             'id' => $fee->id,
-            'status' => 'pending',
+            'status' => 'failed',
             'payment_intent_id' => null,
+        ]);
+    }
+
+    public function test_payment_failed_webhook_marks_fee_as_failed(): void
+    {
+        [, $student] = $this->createStudentUser();
+
+        $fee = Fee::create([
+            'student_id' => $student->id,
+            'amount' => 900,
+            'description' => 'Exam fee',
+            'status' => 'payment_pending',
+            'due_date' => now()->toDateString(),
+            'payment_intent_id' => 'pi_failed_001',
+        ]);
+
+        $event = [
+            'id' => 'evt_payment_failed_accepted_001',
+            'type' => 'payment_intent.payment_failed',
+            'data' => [
+                'object' => [
+                    'id' => 'pi_failed_001',
+                    'status' => 'requires_payment_method',
+                    'metadata' => [
+                        'fee_id' => (string) $fee->id,
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->postStripeWebhookEvent($event);
+        $response->assertOk();
+
+        $this->assertDatabaseHas('fees', [
+            'id' => $fee->id,
+            'status' => 'failed',
+            'payment_intent_id' => 'pi_failed_001',
         ]);
     }
 

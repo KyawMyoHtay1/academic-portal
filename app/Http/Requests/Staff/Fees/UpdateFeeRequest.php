@@ -21,7 +21,7 @@ class UpdateFeeRequest extends FormRequest
             'amount' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'description' => ['nullable', 'string', 'max:255'],
             'due_date' => ['required', 'date'],
-            'status' => ['required', 'in:pending,payment_pending,paid'],
+            'status' => ['required', 'in:pending,payment_pending,failed,paid'],
             'paid_date' => ['nullable', 'date', 'required_if:status,paid'],
         ];
     }

@@ -33,7 +33,7 @@ class StaffFeeController extends Controller
         $todayDate = $today->toDateString();
 
         $latePayments = Fee::with('student')
-            ->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+            ->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])
             ->whereDate('due_date', '<', $todayDate)
             ->orderBy('due_date', 'asc')
             ->get()
@@ -83,7 +83,7 @@ class StaffFeeController extends Controller
         }
 
         $fees = $fees->through(function (Fee $fee) use ($today) {
-            $isLate = in_array($fee->status, [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING], true)
+            $isLate = in_array($fee->status, [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED], true)
                 && $fee->due_date < $today;
 
             return [
@@ -199,8 +199,10 @@ class StaffFeeController extends Controller
             $data['paid_date'] = now()->format('Y-m-d');
         }
 
-        if ($data['status'] === Fee::STATUS_PENDING) {
+        if (in_array($data['status'], [Fee::STATUS_PENDING, Fee::STATUS_FAILED], true)) {
             $data['paid_date'] = null;
+            $data['payment_method'] = null;
+            $data['payment_intent_id'] = null;
             $data['payment_processed_at'] = null;
             $data['processed_by'] = null;
         }
@@ -358,7 +360,7 @@ class StaffFeeController extends Controller
         $query = Fee::query()->with('student.user');
         $this->applyIndexFilters($query, $filters, $todayDate);
 
-        $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+        $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])
             ->whereDate('due_date', '<', $todayDate);
 
         $feeIds = $request->input('fee_ids');
@@ -535,7 +537,7 @@ class StaffFeeController extends Controller
     private function resolveFilters(Request $request): array
     {
         $status = (string) $request->input('status', 'all');
-        $allowedStatuses = ['all', Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_PAID];
+        $allowedStatuses = ['all', Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED, Fee::STATUS_PAID];
         if (! in_array($status, $allowedStatuses, true)) {
             $status = 'all';
         }
@@ -600,12 +602,12 @@ class StaffFeeController extends Controller
         }
 
         if ($filters['overdue_only']) {
-            $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+            $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])
                 ->whereDate('due_date', '<', $todayDate);
         }
 
         if ($filters['due_bucket'] !== 'all') {
-            $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+            $query->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])
                 ->whereDate('due_date', '<', $todayDate);
 
             if ($filters['due_bucket'] === '0_7') {
@@ -629,11 +631,11 @@ class StaffFeeController extends Controller
             ->where('status', Fee::STATUS_PAID)
             ->sum('amount');
         $totalOutstanding = (float) Fee::query()
-            ->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+            ->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])
             ->sum('amount');
 
         $overdueBase = Fee::query()
-            ->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING])
+            ->whereIn('status', [Fee::STATUS_PENDING, Fee::STATUS_PAYMENT_PENDING, Fee::STATUS_FAILED])
             ->whereDate('due_date', '<', $todayDate);
 
         $bucket0to7Query = (clone $overdueBase)
@@ -738,6 +740,12 @@ class StaffFeeController extends Controller
         }
         if ($action === 'payment_rejected') {
             return 'Payment rejected by staff';
+        }
+        if ($action === 'payment_failed') {
+            return 'Payment failed';
+        }
+        if ($action === 'checkout_cancelled') {
+            return 'Checkout cancelled';
         }
         if ($action === 'reminder_sent') {
             return 'Overdue reminder sent';

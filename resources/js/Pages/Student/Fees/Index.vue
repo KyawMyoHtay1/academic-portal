@@ -17,7 +17,7 @@ const props = defineProps({
 
 const viewMode = ref("cards"); // cards | table
 const query = ref("");
-const statusFilter = ref("all"); // all | pending | payment_pending | paid
+const statusFilter = ref("all"); // all | pending | payment_pending | failed | paid
 
 const isOverdue = (dueDate) => {
     if (!dueDate) return false;
@@ -33,8 +33,8 @@ const stats = computed(() => {
     const paid = list
         .filter((f) => f.status === "paid")
         .reduce((sum, f) => sum + parseFloat(f.amount || 0), 0);
-    const pending = list
-        .filter((f) => f.status === "pending")
+    const outstanding = list
+        .filter((f) => f.status !== "paid")
         .reduce((sum, f) => sum + parseFloat(f.amount || 0), 0);
     const overdue = list.filter(
         (f) => f.status !== "paid" && isOverdue(f.due_date)
@@ -43,11 +43,11 @@ const stats = computed(() => {
     return {
         total: total.toFixed(2),
         paid: paid.toFixed(2),
-        pending: pending.toFixed(2),
+        outstanding: outstanding.toFixed(2),
         overdue,
         totalCount: list.length,
         paidCount: list.filter((f) => f.status === "paid").length,
-        pendingCount: list.filter((f) => f.status === "pending").length,
+        outstandingCount: list.filter((f) => f.status !== "paid").length,
     };
 });
 
@@ -75,6 +75,8 @@ const getStatusBadgeClass = (status) => {
         return "bg-emerald-100 text-emerald-800";
     } else if (status === "payment_pending") {
         return "bg-blue-100 text-blue-800";
+    } else if (status === "failed") {
+        return "bg-red-100 text-red-800";
     } else {
         return "bg-amber-100 text-amber-800";
     }
@@ -190,13 +192,13 @@ const payNow = (feeId) => {
                         </div>
                         <div class="portal-card p-5 bg-amber-50">
                             <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
-                                Pending
+                                Outstanding
                             </p>
                             <p class="mt-2 text-2xl font-bold text-amber-900">
-                                £{{ stats.pending }}
+                                £{{ stats.outstanding }}
                             </p>
                             <p class="mt-1 text-xs text-amber-700">
-                                {{ stats.pendingCount }} pending
+                                {{ stats.outstandingCount }} unpaid
                             </p>
                         </div>
                         <div class="portal-card p-5 bg-red-50">
@@ -234,6 +236,7 @@ const payNow = (feeId) => {
                                     <option value="all">All statuses</option>
                                     <option value="pending">Pending</option>
                                     <option value="payment_pending">Payment Pending</option>
+                                    <option value="failed">Failed</option>
                                     <option value="paid">Paid</option>
                                 </select>
 
@@ -286,7 +289,7 @@ const payNow = (feeId) => {
                                 'border-emerald-200 bg-emerald-50/50': fee.status === 'paid',
                                 'border-blue-200 bg-blue-50/50': fee.status === 'payment_pending',
                                 'border-amber-200 bg-amber-50/50': fee.status === 'pending' && !isOverdue(fee.due_date),
-                                'border-red-300 bg-red-50/50 ring-2 ring-red-200': fee.status === 'pending' && isOverdue(fee.due_date),
+                                'border-red-300 bg-red-50/50 ring-2 ring-red-200': fee.status === 'failed' || (fee.status === 'pending' && isOverdue(fee.due_date)),
                             }"
                         >
                             <div class="flex items-start justify-between gap-3">
@@ -296,7 +299,7 @@ const payNow = (feeId) => {
                                             :class="getStatusBadgeClass(fee.status)"
                                             class="inline-flex rounded-full px-2 py-1 text-xs font-semibold capitalize"
                                         >
-                                            {{ fee.status.replace("_", " ") }}
+                                            {{ fee.status.replace(/_/g, " ") }}
                                         </span>
                                         <span
                                             v-if="fee.status !== 'paid' && isOverdue(fee.due_date)"
@@ -319,7 +322,7 @@ const payNow = (feeId) => {
                                             'bg-emerald-100': fee.status === 'paid',
                                             'bg-blue-100': fee.status === 'payment_pending',
                                             'bg-amber-100': fee.status === 'pending' && !isOverdue(fee.due_date),
-                                            'bg-red-100': fee.status === 'pending' && isOverdue(fee.due_date),
+                                            'bg-red-100': fee.status === 'failed' || (fee.status === 'pending' && isOverdue(fee.due_date)),
                                         }"
                                     >
                                         <svg
@@ -348,6 +351,20 @@ const payNow = (feeId) => {
                                                 stroke-linejoin="round"
                                                 stroke-width="2"
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
+                                        </svg>
+                                        <svg
+                                            v-else-if="fee.status === 'failed'"
+                                            class="h-6 w-6 text-red-600"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                             />
                                         </svg>
                                         <svg
@@ -398,7 +415,7 @@ const payNow = (feeId) => {
                                 >
                                     Payment Pending Approval
                                 </span>
-                                <template v-else-if="fee.status === 'pending'">
+                                <template v-else-if="fee.status === 'pending' || fee.status === 'failed'">
                                     <button
                                         @click="payNow(fee.id)"
                                         class="flex-1 rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -491,7 +508,7 @@ const payNow = (feeId) => {
                                             :class="getStatusBadgeClass(fee.status)"
                                             class="inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize"
                                         >
-                                            {{ fee.status }}
+                                            {{ fee.status.replace(/_/g, " ") }}
                                         </span>
                                     </td>
                                     <td
@@ -514,7 +531,7 @@ const payNow = (feeId) => {
                                             >
                                                 Payment Pending
                                             </span>
-                                            <template v-else-if="fee.status === 'pending'">
+                                            <template v-else-if="fee.status === 'pending' || fee.status === 'failed'">
                                                 <button
                                                     @click="payNow(fee.id)"
                                                     class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -568,4 +585,3 @@ const payNow = (feeId) => {
         </div>
     </AuthenticatedLayout>
 </template>
-

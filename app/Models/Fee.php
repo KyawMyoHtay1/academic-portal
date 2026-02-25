@@ -15,6 +15,8 @@ class Fee extends Model
 
     public const STATUS_PAYMENT_PENDING = 'payment_pending';
 
+    public const STATUS_FAILED = 'failed';
+
     public const STATUS_PAID = 'paid';
 
     protected $fillable = [
@@ -75,6 +77,11 @@ class Fee extends Model
         return $query->where('status', self::STATUS_PAID);
     }
 
+    public function scopeFailed(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_FAILED);
+    }
+
     public function scopeOverdue(Builder $query): Builder
     {
         return $query
@@ -100,7 +107,7 @@ class Fee extends Model
 
         $this->update([
             'status' => self::STATUS_PAYMENT_PENDING,
-            'payment_intent_id' => $normalizedPaymentIntentId ?? $this->payment_intent_id,
+            'payment_intent_id' => $normalizedPaymentIntentId,
         ]);
 
         $this->logStatusChange(
@@ -166,6 +173,41 @@ class Fee extends Model
             self::STATUS_PAID,
             $action,
             $processedBy,
+            $note,
+            $meta
+        );
+    }
+
+    public function markAsFailed(
+        ?int $performedBy = null,
+        string $action = 'failed',
+        ?string $note = null,
+        array $meta = [],
+        ?string $paymentIntentId = null
+    ): void
+    {
+        $fromStatus = $this->status;
+        $normalizedPaymentIntentId = is_string($paymentIntentId)
+            ? trim($paymentIntentId)
+            : null;
+        if ($normalizedPaymentIntentId === '') {
+            $normalizedPaymentIntentId = null;
+        }
+
+        $this->update([
+            'status' => self::STATUS_FAILED,
+            'paid_date' => null,
+            'payment_method' => null,
+            'payment_processed_at' => null,
+            'processed_by' => null,
+            'payment_intent_id' => $normalizedPaymentIntentId ?? $this->payment_intent_id,
+        ]);
+
+        $this->logStatusChange(
+            $fromStatus,
+            self::STATUS_FAILED,
+            $action,
+            $performedBy,
             $note,
             $meta
         );

@@ -64,6 +64,7 @@ const pageStats = computed(() => {
         count: list.length,
         paidCount: list.filter((f) => f.status === "paid").length,
         paymentPendingCount: list.filter((f) => f.status === "payment_pending").length,
+        failedCount: list.filter((f) => f.status === "failed").length,
         overdueCount: list.filter((f) => f.is_late).length,
     };
 });
@@ -191,6 +192,9 @@ const getStatusBadgeClass = (value) => {
     }
     if (value === "payment_pending") {
         return "bg-blue-100 text-blue-800";
+    }
+    if (value === "failed") {
+        return "bg-red-100 text-red-800";
     }
 
     return "bg-amber-100 text-amber-800";
@@ -397,6 +401,7 @@ watch(entries, (list) => {
                             <option value="all">All statuses</option>
                             <option value="pending">Pending</option>
                             <option value="payment_pending">Payment Pending</option>
+                            <option value="failed">Failed</option>
                             <option value="paid">Paid</option>
                         </select>
 
@@ -440,6 +445,7 @@ watch(entries, (list) => {
                     <p class="mt-3 text-xs text-slate-500">
                         Current page: {{ pageStats.count }} fee(s),
                         {{ pageStats.paymentPendingCount }} payment pending,
+                        {{ pageStats.failedCount }} failed,
                         {{ pageStats.overdueCount }} overdue
                     </p>
                 </div>
@@ -473,7 +479,13 @@ watch(entries, (list) => {
                                 </tr>
 
                                 <template v-for="fee in entries" :key="fee.id">
-                                    <tr class="transition-colors hover:bg-slate-50" :class="{ 'bg-blue-50/40': fee.status === 'payment_pending' }">
+                                    <tr
+                                        class="transition-colors hover:bg-slate-50"
+                                        :class="{
+                                            'bg-blue-50/40': fee.status === 'payment_pending',
+                                            'bg-red-50/40': fee.status === 'failed',
+                                        }"
+                                    >
                                         <td class="px-4 py-4 text-sm text-slate-700">
                                             <div class="flex items-start gap-3">
                                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100">

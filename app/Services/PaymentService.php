@@ -91,7 +91,7 @@ class PaymentService
         }
 
         if ($session->payment_status !== 'paid' && $fee->status === Fee::STATUS_PAYMENT_PENDING) {
-            $fee->markAsPending(
+            $fee->markAsFailed(
                 null,
                 'checkout_session_unpaid',
                 'Checkout session completed without successful payment.'
@@ -107,7 +107,7 @@ class PaymentService
             return false;
         }
 
-        $fee->markAsPending(
+        $fee->markAsFailed(
             null,
             'checkout_cancelled',
             'Student cancelled Stripe checkout before payment.'
@@ -288,10 +288,12 @@ class PaymentService
                 return false;
             }
 
-            $fee->markAsPending(
+            $fee->markAsFailed(
                 null,
                 'payment_failed',
-                'Payment failed in Stripe webhook event.'
+                'Payment failed in Stripe webhook event.',
+                [],
+                (string) $paymentIntent->id
             );
 
             return true;

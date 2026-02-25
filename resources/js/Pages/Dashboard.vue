@@ -64,7 +64,7 @@ const hasChartData = (chart) => {
     );
 };
 
-const feeStatusByChartIndex = ["pending", "payment_pending", "paid"];
+const feeStatusByChartIndex = ["pending", "payment_pending", "failed", "paid"];
 const enrollmentStatusByChartIndex = [
     "pending",
     "approved",
@@ -206,7 +206,7 @@ const cards = computed(() => {
             {
                 title: "Outstanding Fees",
                 value: formatCurrency(s.outstandingFees),
-                helper: "Pending fees for your account",
+                helper: "Unpaid fees for your account",
             },
             {
                 title: "Grades",

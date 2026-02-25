@@ -127,7 +127,7 @@ class PaymentController extends Controller
 
         return redirect()
             ->route('student.fees.index')
-            ->with('info', 'Payment was cancelled. You can try again anytime.');
+            ->with('info', 'Payment was cancelled and marked as failed. You can retry anytime.');
     }
 
     /**

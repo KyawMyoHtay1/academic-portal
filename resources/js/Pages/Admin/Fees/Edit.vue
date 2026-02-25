@@ -168,6 +168,8 @@ const submit = () => {
                                     }"
                                 >
                                     <option value="pending">Pending</option>
+                                    <option value="payment_pending">Payment Pending</option>
+                                    <option value="failed">Failed</option>
                                     <option value="paid">Paid</option>
                                 </select>
                                 <p

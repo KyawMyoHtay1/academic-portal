@@ -31,7 +31,7 @@ class FeeStatusUpdated extends Notification
                 'Your fee "%s" (%s) is now marked as %s.',
                 $this->fee->description ?? 'Tuition fee',
                 $this->fee->due_date->format('Y-m-d'),
-                ucfirst($this->fee->status)
+                ucwords(str_replace('_', ' ', (string) $this->fee->status))
             ),
             'fee_id' => $this->fee->id,
             'url' => $this->resolveUrl($notifiable),
