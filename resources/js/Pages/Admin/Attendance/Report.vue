@@ -1377,6 +1377,11 @@ const selectSessionDate = (date) => {
                                     >
                                         Status
                                     </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Details
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -1410,10 +1415,29 @@ const selectSessionDate = (date) => {
                                             {{ record.status }}
                                         </span>
                                     </td>
+                                    <td class="px-4 py-4 text-xs text-slate-600">
+                                        <p
+                                            class="font-semibold"
+                                            :class="
+                                                record.status === 'present'
+                                                    ? 'text-emerald-700'
+                                                    : 'text-red-700'
+                                            "
+                                        >
+                                            {{
+                                                record.status === 'present'
+                                                    ? 'Supports attendance target'
+                                                    : 'Missed session affects rate'
+                                            }}
+                                        </p>
+                                        <p class="mt-1 text-slate-500">
+                                            Reference threshold: {{ thresholdLabel }}% ({{ thresholdScopeLabel }})
+                                        </p>
+                                    </td>
                                 </tr>
                                 <tr v-if="filteredRecent.length === 0">
                                     <td
-                                        colspan="5"
+                                        colspan="6"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         {{ searchRecent.trim() ? "No records match your search." : "No recent attendance records found." }}
