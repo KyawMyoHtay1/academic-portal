@@ -203,6 +203,24 @@ const timelineEventClass = (action) => {
 
     return "text-slate-700";
 };
+
+const expandedFeeIds = ref([]);
+
+const isFeeExpanded = (feeId) => expandedFeeIds.value.includes(feeId);
+
+const toggleFeeDetails = (feeId) => {
+    if (isFeeExpanded(feeId)) {
+        expandedFeeIds.value = expandedFeeIds.value.filter((id) => id !== feeId);
+        return;
+    }
+
+    expandedFeeIds.value = [...expandedFeeIds.value, feeId];
+};
+
+watch(entries, (list) => {
+    const visibleIds = new Set(list.map((fee) => fee.id));
+    expandedFeeIds.value = expandedFeeIds.value.filter((id) => visibleIds.has(id));
+});
 </script>
 
 <template>
@@ -437,163 +455,179 @@ const timelineEventClass = (action) => {
                     </div>
 
                     <div class="overflow-x-auto pb-2">
-                        <table class="min-w-full divide-y divide-slate-200">
+                        <table class="w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Student No</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Student Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Student</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Amount</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Description</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Status</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Due Date</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Paid Date</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Processed By</th>
-                                    <th class="min-w-[14rem] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Audit Timeline</th>
-                                    <th class="min-w-[16rem] px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
+                                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="entries.length === 0">
-                                    <td colspan="10" class="px-4 py-8 text-center text-sm text-slate-500">
+                                    <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
                                         No fees match your current filters.
                                     </td>
                                 </tr>
 
-                                <tr
-                                    v-for="fee in entries"
-                                    :key="fee.id"
-                                    class="transition-colors hover:bg-slate-50"
-                                    :class="{ 'bg-blue-50/40': fee.status === 'payment_pending' }"
-                                >
-                                    <td class="px-4 py-4 text-sm font-medium text-slate-900">
-                                        {{ fee.student_no }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-slate-700">
-                                        <div class="flex items-center gap-3">
-                                            <div class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100">
-                                                <img
-                                                    v-if="fee.student_photo"
-                                                    :src="`/storage/${fee.student_photo}`"
-                                                    :alt="`Photo for ${fee.student_name}`"
-                                                    class="h-full w-full object-cover"
-                                                />
-                                                <span v-else class="text-xs font-semibold text-slate-500">
-                                                    {{ fee.student_name.charAt(0).toUpperCase() }}
+                                <template v-for="fee in entries" :key="fee.id">
+                                    <tr class="transition-colors hover:bg-slate-50" :class="{ 'bg-blue-50/40': fee.status === 'payment_pending' }">
+                                        <td class="px-4 py-4 text-sm text-slate-700">
+                                            <div class="flex items-start gap-3">
+                                                <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+                                                    <img
+                                                        v-if="fee.student_photo"
+                                                        :src="`/storage/${fee.student_photo}`"
+                                                        :alt="`Photo for ${fee.student_name}`"
+                                                        class="h-full w-full object-cover"
+                                                    />
+                                                    <span v-else class="text-xs font-semibold text-slate-500">
+                                                        {{ fee.student_name.charAt(0).toUpperCase() }}
+                                                    </span>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="font-medium text-slate-900">{{ fee.student_name }}</p>
+                                                    <p class="text-xs text-slate-500">{{ fee.student_no }}</p>
+                                                    <p class="mt-0.5 max-w-sm truncate text-xs text-slate-500">{{ fee.description || "No description" }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-700">
+                                            {{ formatCurrency(fee.amount) }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-sm">
+                                            <div class="flex flex-col gap-1">
+                                                <span
+                                                    :class="getStatusBadgeClass(fee.status)"
+                                                    class="inline-flex w-fit rounded-full px-2 py-1 text-xs font-medium capitalize"
+                                                >
+                                                    {{ fee.status.replace(/_/g, " ") }}
+                                                </span>
+                                                <span
+                                                    v-if="fee.is_late && fee.days_overdue !== null"
+                                                    class="inline-flex w-fit rounded bg-red-100 px-1.5 py-0.5 text-[11px] font-semibold text-red-700"
+                                                >
+                                                    {{ Number(fee.days_overdue).toFixed(0) }}d late
                                                 </span>
                                             </div>
-                                            <span>{{ fee.student_name }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-700">
-                                        {{ formatCurrency(fee.amount) }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-slate-600">
-                                        {{ fee.description || "-" }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-sm">
-                                        <span
-                                            :class="getStatusBadgeClass(fee.status)"
-                                            class="inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize"
+                                        </td>
+                                        <td
+                                            class="whitespace-nowrap px-4 py-4 text-sm"
+                                            :class="{
+                                                'font-semibold text-red-600': fee.is_late,
+                                                'text-slate-600': !fee.is_late,
+                                            }"
                                         >
-                                            {{ fee.status.replace("_", " ") }}
-                                        </span>
-                                    </td>
-                                    <td
-                                        class="whitespace-nowrap px-4 py-4 text-sm"
-                                        :class="{
-                                            'font-semibold text-red-600': fee.is_late,
-                                            'text-slate-600': !fee.is_late,
-                                        }"
-                                    >
-                                        {{ fee.due_date }}
-                                        <span
-                                            v-if="fee.is_late && fee.days_overdue !== null"
-                                            class="ml-1 rounded bg-red-100 px-1.5 py-0.5 text-[11px] font-semibold text-red-700"
-                                        >
-                                            {{ Number(fee.days_overdue).toFixed(0) }}d late
-                                        </span>
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
-                                        {{ fee.paid_date || "-" }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-slate-600">
-                                        <template v-if="fee.status === 'paid' && (fee.processed_by || fee.payment_processed_at)">
-                                            <div>{{ fee.processed_by || "-" }}</div>
-                                            <div v-if="fee.payment_processed_at" class="text-xs text-slate-500">
-                                                {{ fee.payment_processed_at }}
-                                            </div>
-                                        </template>
-                                        <span v-else>-</span>
-                                    </td>
-                                    <td class="px-4 py-4 text-xs text-slate-600">
-                                        <div class="max-w-xs space-y-1">
-                                            <div
-                                                v-for="event in (fee.timeline || []).slice(-4)"
-                                                :key="`${fee.id}-${event.id ?? event.created_at}-${event.action}`"
-                                                class="rounded bg-slate-50 px-2 py-1"
-                                            >
-                                                <p class="font-semibold" :class="timelineEventClass(event.action)">
-                                                    {{ event.label }}
-                                                </p>
-                                                <p class="text-[11px] text-slate-500">
-                                                    {{ event.created_at || '-' }}
-                                                    <span v-if="event.performed_by"> - {{ event.performed_by }}</span>
-                                                </p>
-                                                <p v-if="event.note" class="text-[11px] text-slate-500">
-                                                    {{ event.note }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="min-w-[16rem] px-4 py-4 text-right text-sm align-top">
-                                        <div class="ml-auto flex w-fit flex-wrap items-center justify-end gap-2">
-                                            <template v-if="fee.status === 'payment_pending'">
+                                            {{ fee.due_date }}
+                                        </td>
+                                        <td class="px-4 py-4 text-right text-sm">
+                                            <div class="ml-auto flex w-fit flex-wrap items-center justify-end gap-2">
                                                 <button
-                                                    @click="approvePayment(fee.id)"
-                                                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                                    type="button"
+                                                    @click="toggleFeeDetails(fee.id)"
+                                                    class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                                    :aria-expanded="isFeeExpanded(fee.id)"
                                                 >
-                                                    Approve Payment
+                                                    {{ isFeeExpanded(fee.id) ? "Hide Details" : "Details" }}
                                                 </button>
-                                                <button
-                                                    @click="rejectPayment(fee.id)"
-                                                    class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
-                                                >
-                                                    Reject
-                                                </button>
-                                            </template>
+                                                <template v-if="fee.status === 'payment_pending'">
+                                                    <button
+                                                        @click="approvePayment(fee.id)"
+                                                        class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                                    >
+                                                        Approve Payment
+                                                    </button>
+                                                    <button
+                                                        @click="rejectPayment(fee.id)"
+                                                        class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </template>
+                                                <template v-else>
+                                                    <button
+                                                        v-if="fee.is_late && fee.status !== 'paid'"
+                                                        @click="sendReminder(fee.id)"
+                                                        class="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-200"
+                                                    >
+                                                        Send Reminder
+                                                    </button>
+                                                    <a
+                                                        v-if="fee.status === 'paid'"
+                                                        :href="route('admin.fees.receipt', fee.id)"
+                                                        target="_blank"
+                                                        class="rounded-md bg-indigo-100 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200"
+                                                    >
+                                                        Receipt
+                                                    </a>
+                                                    <Link
+                                                        :href="route('admin.fees.edit', fee.id)"
+                                                        class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                                                    >
+                                                        Edit
+                                                    </Link>
+                                                    <button
+                                                        @click="deleteFee(fee.id)"
+                                                        class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                            <template v-else>
-                                                <button
-                                                    v-if="fee.is_late && fee.status !== 'paid'"
-                                                    @click="sendReminder(fee.id)"
-                                                    class="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-200"
-                                                >
-                                                    Send Reminder
-                                                </button>
-                                                <a
-                                                    v-if="fee.status === 'paid'"
-                                                    :href="route('admin.fees.receipt', fee.id)"
-                                                    target="_blank"
-                                                    class="rounded-md bg-indigo-100 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200"
-                                                >
-                                                    Receipt
-                                                </a>
-                                                <Link
-                                                    :href="route('admin.fees.edit', fee.id)"
-                                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
-                                                >
-                                                    Edit
-                                                </Link>
-                                                <button
-                                                    @click="deleteFee(fee.id)"
-                                                    class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </template>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    <tr v-if="isFeeExpanded(fee.id)" class="bg-slate-50/70">
+                                        <td colspan="5" class="px-4 pb-4 pt-0">
+                                            <div class="grid gap-4 rounded-lg border border-slate-200 bg-white p-4 lg:grid-cols-3">
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Description</p>
+                                                        <p class="mt-1 text-sm text-slate-700">{{ fee.description || "-" }}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Paid Date</p>
+                                                        <p class="mt-1 text-sm text-slate-700">{{ fee.paid_date || "-" }}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Processed By</p>
+                                                        <template v-if="fee.status === 'paid' && (fee.processed_by || fee.payment_processed_at)">
+                                                            <p class="mt-1 text-sm text-slate-700">{{ fee.processed_by || "-" }}</p>
+                                                            <p v-if="fee.payment_processed_at" class="text-xs text-slate-500">
+                                                                {{ fee.payment_processed_at }}
+                                                            </p>
+                                                        </template>
+                                                        <p v-else class="mt-1 text-sm text-slate-700">-</p>
+                                                    </div>
+                                                </div>
+                                                <div class="lg:col-span-2">
+                                                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Audit Timeline</p>
+                                                    <div v-if="(fee.timeline || []).length > 0" class="mt-2 space-y-2">
+                                                        <div
+                                                            v-for="event in (fee.timeline || []).slice(-4)"
+                                                            :key="`${fee.id}-${event.id ?? event.created_at}-${event.action}`"
+                                                            class="rounded border border-slate-200 bg-slate-50 px-3 py-2"
+                                                        >
+                                                            <p class="text-sm font-semibold" :class="timelineEventClass(event.action)">
+                                                                {{ event.label }}
+                                                            </p>
+                                                            <p class="text-xs text-slate-500">
+                                                                {{ event.created_at || "-" }}
+                                                                <span v-if="event.performed_by"> - {{ event.performed_by }}</span>
+                                                            </p>
+                                                            <p v-if="event.note" class="text-xs text-slate-500">
+                                                                {{ event.note }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <p v-else class="mt-2 text-sm text-slate-500">No audit events yet.</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                     </div>
