@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentFeeResource;
 use App\Models\Fee;
+use App\Models\User;
+use App\Notifications\FeePaymentPendingReview;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -92,6 +95,15 @@ class StudentFeeController extends Controller
             'student_submitted_payment',
             'Student submitted payment confirmation.'
         );
+
+        $reviewers = User::query()
+            ->whereIn('role', ['staff', 'admin'])
+            ->get(['id', 'role', 'preferences']);
+
+        if ($reviewers->isNotEmpty()) {
+            $fee->loadMissing('student:id,student_no,full_name');
+            Notification::send($reviewers, new FeePaymentPendingReview($fee, 'student_submission'));
+        }
 
         return redirect()
             ->route('student.fees.index')

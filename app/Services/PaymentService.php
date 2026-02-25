@@ -5,10 +5,13 @@ namespace App\Services;
 use App\Models\Fee;
 use App\Models\StripeWebhookEvent;
 use App\Models\Student;
+use App\Models\User;
+use App\Notifications\FeePaymentPendingReview;
 use App\Notifications\FeeStatusUpdated;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
@@ -50,6 +53,8 @@ class PaymentService
 
     public function markCheckoutStarted(Fee $fee, string $paymentIntentId, int $performedByUserId): void
     {
+        $alreadyPaymentPending = $fee->status === Fee::STATUS_PAYMENT_PENDING;
+
         $fee->markAsPaymentPending(
             $paymentIntentId,
             $performedByUserId,
@@ -63,6 +68,10 @@ class PaymentService
             'performed_by' => $performedByUserId,
             'payment_intent_id' => $paymentIntentId,
         ]);
+
+        if (! $alreadyPaymentPending) {
+            $this->notifyStaffPaymentPending($fee, 'checkout_started');
+        }
     }
 
     /**
@@ -323,5 +332,19 @@ class PaymentService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function notifyStaffPaymentPending(Fee $fee, string $source): void
+    {
+        $reviewers = User::query()
+            ->whereIn('role', ['staff', 'admin'])
+            ->get(['id', 'role', 'preferences']);
+
+        if ($reviewers->isEmpty()) {
+            return;
+        }
+
+        $fee->loadMissing('student:id,student_no,full_name');
+        Notification::send($reviewers, new FeePaymentPendingReview($fee, $source));
     }
 }
