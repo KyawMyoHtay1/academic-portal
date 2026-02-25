@@ -145,6 +145,24 @@ class NotificationController extends Controller
             return route('announcements.index');
         }
 
+        if ($type === 'assignment') {
+            if ($role === 'student') {
+                if (! empty($data['assignment_id'])) {
+                    return route('student.assignments.show', $data['assignment_id']);
+                }
+
+                return route('student.assignments.index');
+            }
+
+            if ($role === 'teacher') {
+                if (! empty($data['subject_id'])) {
+                    return route('teacher.assignments.show', $data['subject_id']);
+                }
+
+                return route('teacher.assignments.index');
+            }
+        }
+
         if ($type === 'enrollment') {
             if ($role === 'student') {
                 return route('my-courses.index');
@@ -152,6 +170,14 @@ class NotificationController extends Controller
             if (in_array($role, ['staff', 'admin'], true)) {
                 return route('admin.enrollments.index');
             }
+        }
+
+        if ($type === 'contact' && in_array($role, ['staff', 'admin'], true)) {
+            return route('admin.contact-messages.index', ['status' => 'unread']);
+        }
+
+        if ($type === 'feedback' && in_array($role, ['staff', 'admin'], true)) {
+            return route('admin.feedback-messages.index', ['status' => 'unread']);
         }
 
         if ($type === 'message') {

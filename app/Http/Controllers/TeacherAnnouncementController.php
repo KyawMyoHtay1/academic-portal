@@ -6,6 +6,7 @@ use App\Http\Requests\Announcements\UpsertAnnouncementRequest;
 use App\Models\Announcement;
 use App\Models\AnnouncementRead;
 use App\Models\User;
+use App\Notifications\AnnouncementPublished;
 use App\Notifications\AnnouncementReminder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
@@ -95,13 +96,15 @@ class TeacherAnnouncementController extends Controller
     {
         $data = $request->validated();
 
-        Announcement::create([
+        $announcement = Announcement::create([
             ...$data,
             'pinned' => (bool) ($data['pinned'] ?? false),
             'require_ack' => (bool) ($data['require_ack'] ?? false),
             'audience' => $data['audience'] ?? ['roles' => ['student']],
             'user_id' => Auth::id(),
         ]);
+
+        $this->notifyAudienceAnnouncement($announcement, 'published');
 
         return redirect()
             ->route('teacher.announcements.index')
@@ -143,6 +146,8 @@ class TeacherAnnouncementController extends Controller
             'require_ack' => (bool) ($data['require_ack'] ?? false),
             'audience' => $data['audience'] ?? ['roles' => ['student']],
         ]);
+
+        $this->notifyAudienceAnnouncement($announcement, 'updated');
 
         return redirect()
             ->route('teacher.announcements.index')
@@ -203,6 +208,24 @@ class TeacherAnnouncementController extends Controller
             'success',
             sprintf('Reminder sent to %d recipient(s).', $recipients->count())
         );
+    }
+
+    private function notifyAudienceAnnouncement(Announcement $announcement, string $action): void
+    {
+        $targetUserIds = $this->resolveTargetUserIds($announcement);
+        if ($targetUserIds->isEmpty()) {
+            return;
+        }
+
+        $recipients = User::query()
+            ->whereIn('id', $targetUserIds->all())
+            ->get();
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        Notification::send($recipients, new AnnouncementPublished($announcement, $action));
     }
 
     private function resolveTargetUserIds(Announcement $announcement): Collection

@@ -25,6 +25,8 @@ class SettingsController extends Controller
         'notify_grade_review' => true,
         'notify_fees' => true,
         'notify_messages' => true,
+        'notify_assignments' => true,
+        'notify_announcements' => true,
     ];
 
     /**

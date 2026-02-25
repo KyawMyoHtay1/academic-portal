@@ -16,9 +16,12 @@ class AnnouncementReminder extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        $channels = ['database'];
-
         $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
+        if (($preferences['notify_announcements'] ?? true) === false) {
+            return [];
+        }
+
+        $channels = ['database'];
         if (($preferences['email_notifications'] ?? true) === true) {
             $channels[] = 'mail';
         }
@@ -51,4 +54,3 @@ class AnnouncementReminder extends Notification implements ShouldQueue
         ];
     }
 }
-

@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Public\StoreFeedbackMessageRequest;
 use App\Models\FeedbackMessage;
+use App\Models\User;
+use App\Notifications\FeedbackMessageReceived;
 use App\Services\RecaptchaService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Notification;
 
 class FeedbackController extends Controller
 {
@@ -26,12 +29,20 @@ class FeedbackController extends Controller
             }
         }
 
-        FeedbackMessage::create([
+        $feedbackMessage = FeedbackMessage::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'type' => $validated['type'],
             'message' => $validated['message'],
         ]);
+
+        $staffRecipients = User::query()
+            ->whereIn('role', ['staff', 'admin'])
+            ->get();
+
+        if ($staffRecipients->isNotEmpty()) {
+            Notification::send($staffRecipients, new FeedbackMessageReceived($feedbackMessage));
+        }
 
         return back()->with('success', 'Thank you for your feedback. We appreciate your input.');
     }

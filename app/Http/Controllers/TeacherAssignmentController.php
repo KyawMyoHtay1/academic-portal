@@ -8,6 +8,7 @@ use App\Http\Requests\Teacher\Assignments\UpdateAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Subject;
+use App\Notifications\AssignmentUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -187,12 +188,16 @@ class TeacherAssignmentController extends Controller
 
         $data = $request->validated();
 
-        Assignment::create([
+        $assignment = Assignment::create([
             ...$data,
             'subject_id' => $subject->id,
             'course_id' => $subject->course_id,
             'created_by' => $user->id,
         ]);
+
+        if ($assignment->status === Assignment::STATUS_PUBLISHED) {
+            $this->notifyEnrolledStudents($assignment, 'created');
+        }
 
         return redirect()
             ->route('teacher.assignments.show', $subject->id)
@@ -246,6 +251,10 @@ class TeacherAssignmentController extends Controller
 
         $assignment->update($data);
 
+        if ($assignment->status === Assignment::STATUS_PUBLISHED) {
+            $this->notifyEnrolledStudents($assignment, 'updated');
+        }
+
         return redirect()
             ->route('teacher.assignments.show', $assignment->subject_id)
             ->with('success', 'Assignment updated successfully.');
@@ -262,9 +271,15 @@ class TeacherAssignmentController extends Controller
             abort(403, 'You can only publish your own assignments.');
         }
 
+        if ($assignment->status === Assignment::STATUS_PUBLISHED) {
+            return back()->with('info', 'Assignment is already published.');
+        }
+
         $assignment->update([
             'status' => Assignment::STATUS_PUBLISHED,
         ]);
+
+        $this->notifyEnrolledStudents($assignment, 'published');
 
         return back()->with('success', 'Assignment published successfully.');
     }
@@ -576,6 +591,25 @@ class TeacherAssignmentController extends Controller
             $submission->file_path,
             $submission->original_filename
         );
+    }
+
+    private function notifyEnrolledStudents(Assignment $assignment, string $action): void
+    {
+        $students = $assignment->course
+            ?->students()
+            ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
+            ->with('user')
+            ->get();
+
+        if (! $students) {
+            return;
+        }
+
+        $students->pluck('user')
+            ->filter()
+            ->each(function ($recipient) use ($assignment, $action): void {
+                $recipient->notify(new AssignmentUpdated($assignment, $action));
+            });
     }
 
     private function assignmentDueAt(Assignment $assignment): ?\Illuminate\Support\Carbon

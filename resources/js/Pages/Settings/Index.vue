@@ -45,6 +45,8 @@ const form = useForm({
     notify_grade_review: props.preferences.notify_grade_review ?? true,
     notify_fees: props.preferences.notify_fees ?? true,
     notify_messages: props.preferences.notify_messages ?? true,
+    notify_assignments: props.preferences.notify_assignments ?? true,
+    notify_announcements: props.preferences.notify_announcements ?? true,
     ...(canManageAttendanceAlertDefaults
         ? {
               attendance_low_threshold:
@@ -243,6 +245,8 @@ const submit = () => {
                         <InputError class="mt-2" :message="form.errors.notify_grade_review" />
                         <InputError class="mt-2" :message="form.errors.notify_fees" />
                         <InputError class="mt-2" :message="form.errors.notify_messages" />
+                        <InputError class="mt-2" :message="form.errors.notify_assignments" />
+                        <InputError class="mt-2" :message="form.errors.notify_announcements" />
                         <InputError class="mt-2" :message="form.errors.attendance_low_threshold" />
                         <InputError class="mt-2" :message="form.errors.attendance_cooldown_days" />
 
@@ -323,6 +327,42 @@ const submit = () => {
                                     <Checkbox
                                         id="notify_grade_review"
                                         v-model:checked="form.notify_grade_review"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_assignments"
+                                            value="Assignment alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            Assignment publish and update announcements for your courses.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_assignments"
+                                        v-model:checked="form.notify_assignments"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_announcements"
+                                            value="Announcement alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            New announcements and announcement updates targeted to you.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_announcements"
+                                        v-model:checked="form.notify_announcements"
                                         class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
                                     />
                                 </div>
