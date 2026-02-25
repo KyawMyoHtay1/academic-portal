@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Head, router, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import debounce from "lodash/debounce";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
@@ -49,11 +49,15 @@ const replyForm = useForm({
     receiver_id: "",
     body: "",
 });
+const page = usePage();
+const authUserId = computed(() => Number(page.props.auth?.user?.id ?? 0));
 const POLL_INTERVAL_MS = 15000;
 const USER_ACTIVE_GRACE_MS = 2500;
 const isPolling = ref(false);
 const lastInteractionAt = ref(Date.now());
 let pollingTimer = null;
+let echoConnection = null;
+let echoConnectionStateHandler = null;
 
 const messagesData = computed(() => props.messages?.data ?? []);
 const messageLinks = computed(() => props.messages?.links ?? []);
@@ -450,6 +454,8 @@ watch(activeConversationData, (conversation) => {
 });
 
 onBeforeUnmount(() => {
+    stopRealtime();
+    stopRealtimeConnectionFallback();
     stopPolling();
     if (typeof document !== "undefined") {
         document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -488,8 +494,11 @@ const shouldPollNow = () => {
     return Date.now() - lastInteractionAt.value >= USER_ACTIVE_GRACE_MS;
 };
 
-const refreshMessages = () => {
-    if (!shouldPollNow()) return;
+const refreshMessages = (force = false) => {
+    if (isPolling.value) return;
+    if (!force && !shouldPollNow()) return;
+    if (replyForm.processing) return;
+    if (typeof document !== "undefined" && document.hidden) return;
 
     isPolling.value = true;
     router.reload({
@@ -515,12 +524,76 @@ const stopPolling = () => {
 
 const handleVisibilityChange = () => {
     if (typeof document !== "undefined" && !document.hidden) {
-        refreshMessages();
+        refreshMessages(true);
     }
 };
 
+const startRealtime = () => {
+    if (typeof window === "undefined" || !window.Echo || !authUserId.value) return false;
+
+    window.Echo.private(`messages.${authUserId.value}`).listen(".message.sent", () => {
+        refreshMessages(true);
+    });
+
+    return true;
+};
+
+const stopRealtime = () => {
+    if (typeof window === "undefined" || !window.Echo || !authUserId.value) return;
+    window.Echo.leave(`messages.${authUserId.value}`);
+};
+
+const startRealtimeConnectionFallback = () => {
+    const connection = window.Echo?.connector?.pusher?.connection;
+
+    if (!connection) {
+        startPolling();
+        return;
+    }
+
+    echoConnection = connection;
+
+    if (echoConnectionStateHandler) {
+        echoConnection.unbind("state_change", echoConnectionStateHandler);
+    }
+
+    echoConnectionStateHandler = (state) => {
+        const current = state?.current;
+        if (current === "connected") {
+            stopPolling();
+            return;
+        }
+
+        if (current === "disconnected" || current === "failed" || current === "unavailable") {
+            startPolling();
+        }
+    };
+
+    echoConnection.bind("state_change", echoConnectionStateHandler);
+
+    if (connection.state === "connected") {
+        stopPolling();
+    } else {
+        startPolling();
+    }
+};
+
+const stopRealtimeConnectionFallback = () => {
+    if (echoConnection && echoConnectionStateHandler) {
+        echoConnection.unbind("state_change", echoConnectionStateHandler);
+    }
+
+    echoConnection = null;
+    echoConnectionStateHandler = null;
+};
+
 onMounted(() => {
-    startPolling();
+    if (startRealtime()) {
+        startRealtimeConnectionFallback();
+    } else {
+        startPolling();
+    }
+
     if (typeof document !== "undefined") {
         document.addEventListener("visibilitychange", handleVisibilityChange);
     }

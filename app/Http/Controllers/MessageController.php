@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Http\Requests\Messages\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
@@ -123,7 +124,7 @@ class MessageController extends Controller
 
         $receiver = User::find($data['receiver_id']);
 
-        Message::create([
+        $message = Message::create([
             'sender_id' => $user->id,
             'sender_role' => $user->role,
             'receiver_id' => $data['receiver_id'],
@@ -131,6 +132,11 @@ class MessageController extends Controller
             'body' => $data['body'],
             'read' => false,
         ]);
+
+        broadcast(new MessageSent($message, [
+            (int) $user->id,
+            (int) $data['receiver_id'],
+        ]));
 
         Log::info('message.sent', [
             'sender_id' => $user->id,
