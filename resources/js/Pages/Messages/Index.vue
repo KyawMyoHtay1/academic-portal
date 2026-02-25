@@ -648,8 +648,8 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="grid gap-6 lg:grid-cols-[320px,1fr]">
-                    <div class="portal-card p-4">
+                <div class="grid gap-6 lg:grid-cols-[320px,1fr] lg:h-[calc(100vh-18rem)] lg:min-h-[34rem] lg:items-start">
+                    <div class="portal-card p-4 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
                         <div class="flex items-center justify-between gap-2">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Threads</p>
                             <button
@@ -680,7 +680,7 @@ onMounted(() => {
                             </button>
                         </div>
 
-                        <div class="mt-4 space-y-2">
+                        <div class="mt-4 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
                             <button
                                 v-for="conversation in filteredConversations"
                                 :key="conversation.user_id"
@@ -711,6 +711,13 @@ onMounted(() => {
                                     {{ truncate(conversation.last_message) }}
                                 </p>
                                 <p class="mt-1 text-[11px] text-slate-500">
+                                    <span
+                                        v-if="conversation.last_is_sent"
+                                        class="font-semibold text-indigo-700"
+                                    >
+                                        {{ conversation.last_read ? "Seen by recipient" : "Sent" }}
+                                    </span>
+                                    <span v-if="conversation.last_is_sent"> · </span>
                                     {{ formatDate(conversation.last_at) }}
                                 </p>
                             </button>
@@ -724,7 +731,7 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="space-y-4 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
                         <div class="portal-card p-4">
                             <div class="grid gap-3 lg:grid-cols-[auto,1fr,auto] lg:items-center">
                                 <div class="flex flex-wrap gap-2">
@@ -808,7 +815,7 @@ onMounted(() => {
 
                         <div
                             v-if="activeConversationData"
-                            class="portal-card p-4"
+                            class="portal-card p-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
                         >
                             <div class="mb-4 flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
                                 <div>
@@ -828,7 +835,7 @@ onMounted(() => {
                                 </button>
                             </div>
 
-                            <div class="space-y-3">
+                            <div class="space-y-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
                                 <div
                                     v-if="threadMessages.length === 0"
                                     class="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500"
@@ -872,6 +879,9 @@ onMounted(() => {
                                                 :class="item.message.is_sent ? 'text-blue-100' : 'text-slate-500'"
                                             >
                                                 {{ formatDate(item.message.created_at) }}
+                                                <span v-if="item.message.is_sent">
+                                                    · {{ item.message.read ? "Seen by recipient" : "Sent" }}
+                                                </span>
                                             </p>
                                             <button
                                                 v-if="!item.message.read && !item.message.is_sent"
@@ -921,7 +931,7 @@ onMounted(() => {
                             </form>
                         </div>
 
-                        <div v-else class="space-y-4">
+                        <div v-else class="space-y-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
                             <div v-if="filteredMessages.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
                                 <h3 class="text-sm font-semibold text-slate-900">No messages found</h3>
                                 <p class="mt-1 text-sm text-slate-500">Try changing your tab or search query.</p>
@@ -991,7 +1001,17 @@ onMounted(() => {
                                     >
                                         Mark as read
                                     </button>
-                                    <span v-else-if="message.is_sent" class="rounded-md bg-indigo-100 px-3 py-1.5 text-xs font-semibold text-indigo-700">Sent</span>
+                                    <span
+                                        v-else-if="message.is_sent"
+                                        class="rounded-md px-3 py-1.5 text-xs font-semibold"
+                                        :class="
+                                            message.read
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : 'bg-indigo-100 text-indigo-700'
+                                        "
+                                    >
+                                        {{ message.read ? "Seen by recipient" : "Sent" }}
+                                    </span>
                                     <span v-else class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">Read</span>
                                 </div>
                             </div>

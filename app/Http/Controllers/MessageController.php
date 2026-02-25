@@ -226,6 +226,8 @@ class MessageController extends Controller
                     'photo' => $otherUser->photo,
                     'last_message' => $message->body,
                     'last_sender_id' => $message->sender_id,
+                    'last_is_sent' => $message->sender_id === $userId,
+                    'last_read' => (bool) $message->read,
                     'last_at' => $message->created_at?->timestamp ? $message->created_at->timestamp * 1000 : null,
                     'unread_count' => 0,
                 ];
