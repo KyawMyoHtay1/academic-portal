@@ -15,6 +15,7 @@ const props = defineProps({
 const tabs = [
     { key: "all", label: "All" },
     { key: "unread", label: "Unread" },
+    { key: "message", label: "Messages" },
     { key: "grade", label: "Grades" },
     { key: "grade_review", label: "Grade Review" },
     { key: "fee", label: "Fees" },
@@ -42,6 +43,7 @@ const stats = computed(() => {
     return {
         total: list.length,
         unread: list.filter(isUnread).length,
+        message: list.filter((n) => n.type === "message").length,
         grade: list.filter((n) => n.type === "grade").length,
         gradeReview: list.filter((n) => n.type === "grade_review").length,
         fee: list.filter((n) => n.type === "fee").length,
@@ -56,7 +58,14 @@ const filtered = computed(() => {
 
     if (activeTab.value === "unread") list = list.filter(isUnread);
     if (
-        ["grade", "grade_review", "fee", "attendance", "timetable"].includes(
+        [
+            "message",
+            "grade",
+            "grade_review",
+            "fee",
+            "attendance",
+            "timetable",
+        ].includes(
             activeTab.value
         )
     ) {
@@ -179,6 +188,7 @@ const removeFilterChip = (key) => {
 };
 
 const typeBadgeClass = (type) => {
+    if (type === "message") return "bg-cyan-100 text-cyan-800";
     if (type === "grade") return "bg-emerald-100 text-emerald-800";
     if (type === "grade_review") return "bg-violet-100 text-violet-800";
     if (type === "fee") return "bg-blue-100 text-blue-800";
@@ -188,6 +198,7 @@ const typeBadgeClass = (type) => {
 };
 
 const iconWrapperClass = (type) => {
+    if (type === "message") return "bg-cyan-100";
     if (type === "grade") return "bg-emerald-100";
     if (type === "grade_review") return "bg-violet-100";
     if (type === "fee") return "bg-blue-100";
@@ -197,6 +208,7 @@ const iconWrapperClass = (type) => {
 };
 
 const iconClass = (type) => {
+    if (type === "message") return "text-cyan-600";
     if (type === "grade") return "text-emerald-600";
     if (type === "grade_review") return "text-violet-600";
     if (type === "fee") return "text-blue-600";
@@ -237,7 +249,7 @@ const iconClass = (type) => {
                     <p class="mt-2 text-sm text-indigo-900/80">Review unread alerts and quickly clear items after checking grades, fees, and attendance notices.</p>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-7">
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-8">
                     <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Total</p>
                         <p class="mt-2 text-2xl font-bold text-blue-900">{{ stats.total }}</p>
@@ -245,6 +257,10 @@ const iconClass = (type) => {
                     <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Unread</p>
                         <p class="mt-2 text-2xl font-bold text-emerald-900">{{ stats.unread }}</p>
+                    </div>
+                    <div class="rounded-xl border border-cyan-200 bg-cyan-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-cyan-700">Messages</p>
+                        <p class="mt-2 text-2xl font-bold text-cyan-900">{{ stats.message }}</p>
                     </div>
                     <div class="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Grades</p>

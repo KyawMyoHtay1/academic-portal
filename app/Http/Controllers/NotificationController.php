@@ -154,6 +154,14 @@ class NotificationController extends Controller
             }
         }
 
+        if ($type === 'message') {
+            if (! empty($data['sender_id'])) {
+                return route('messages.index', ['with_user' => (int) $data['sender_id']]);
+            }
+
+            return route('messages.index');
+        }
+
         return null;
     }
 }

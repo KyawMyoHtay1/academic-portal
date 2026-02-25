@@ -25,6 +25,7 @@ class UpdateSettingsRequest extends FormRequest
             'notify_grades' => ['sometimes', 'boolean'],
             'notify_grade_review' => ['sometimes', 'boolean'],
             'notify_fees' => ['sometimes', 'boolean'],
+            'notify_messages' => ['sometimes', 'boolean'],
         ];
 
         $role = (string) ($this->user()?->role ?? '');

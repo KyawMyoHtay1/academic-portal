@@ -4,10 +4,9 @@ namespace App\Notifications;
 
 use App\Models\Fee;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class FeePaymentReminder extends Notification implements ShouldQueue
+class FeePaymentReminder extends Notification
 {
     use Queueable;
 

@@ -44,6 +44,7 @@ const form = useForm({
     notify_grades: props.preferences.notify_grades ?? true,
     notify_grade_review: props.preferences.notify_grade_review ?? true,
     notify_fees: props.preferences.notify_fees ?? true,
+    notify_messages: props.preferences.notify_messages ?? true,
     ...(canManageAttendanceAlertDefaults
         ? {
               attendance_low_threshold:
@@ -241,6 +242,7 @@ const submit = () => {
                         <InputError class="mt-2" :message="form.errors.notify_grades" />
                         <InputError class="mt-2" :message="form.errors.notify_grade_review" />
                         <InputError class="mt-2" :message="form.errors.notify_fees" />
+                        <InputError class="mt-2" :message="form.errors.notify_messages" />
                         <InputError class="mt-2" :message="form.errors.attendance_low_threshold" />
                         <InputError class="mt-2" :message="form.errors.attendance_cooldown_days" />
 
@@ -321,6 +323,24 @@ const submit = () => {
                                     <Checkbox
                                         id="notify_grade_review"
                                         v-model:checked="form.notify_grade_review"
+                                        class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                    />
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4">
+                                    <div class="flex-1">
+                                        <InputLabel
+                                            for="notify_messages"
+                                            value="Message alerts"
+                                            class="font-medium text-slate-900"
+                                        />
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            New direct messages sent to your inbox.
+                                        </p>
+                                    </div>
+                                    <Checkbox
+                                        id="notify_messages"
+                                        v-model:checked="form.notify_messages"
                                         class="h-5 w-5 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
                                     />
                                 </div>

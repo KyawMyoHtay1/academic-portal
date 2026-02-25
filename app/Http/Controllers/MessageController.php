@@ -6,6 +6,7 @@ use App\Events\MessageSent;
 use App\Http\Requests\Messages\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\NewMessageReceived;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -132,6 +133,15 @@ class MessageController extends Controller
             'body' => $data['body'],
             'read' => false,
         ]);
+
+        if ($receiver) {
+            $receiver->notify(new NewMessageReceived(
+                messageId: (int) $message->id,
+                senderId: (int) $user->id,
+                senderName: (string) $user->name,
+                body: (string) $data['body'],
+            ));
+        }
 
         broadcast(new MessageSent($message, [
             (int) $user->id,

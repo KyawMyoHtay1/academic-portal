@@ -6,10 +6,9 @@ use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class GradeReviewRequested extends Notification implements ShouldQueue
+class GradeReviewRequested extends Notification
 {
     use Queueable;
 
