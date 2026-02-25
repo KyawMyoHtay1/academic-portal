@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Student\Assignments\SubmitAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Notifications\AssignmentSubmissionReceived;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -229,6 +230,7 @@ class StudentAssignmentController extends Controller
             ]);
 
             $successMessage = 'Assignment resubmitted successfully.';
+            $isResubmission = true;
         } else {
             AssignmentSubmission::create([
                 'assignment_id' => $assignment->id,
@@ -240,6 +242,16 @@ class StudentAssignmentController extends Controller
             ]);
 
             $successMessage = 'Assignment submitted successfully.';
+            $isResubmission = false;
+        }
+
+        $teacherRecipient = $assignment->creator;
+        if ($teacherRecipient && $teacherRecipient->id !== $user->id) {
+            $teacherRecipient->notify(new AssignmentSubmissionReceived(
+                assignment: $assignment,
+                student: $student,
+                isResubmission: $isResubmission
+            ));
         }
 
         return redirect()

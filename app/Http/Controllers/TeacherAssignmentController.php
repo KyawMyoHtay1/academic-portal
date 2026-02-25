@@ -8,6 +8,7 @@ use App\Http\Requests\Teacher\Assignments\UpdateAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Subject;
+use App\Notifications\AssignmentSubmissionGraded;
 use App\Notifications\AssignmentUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -568,6 +569,11 @@ class TeacherAssignmentController extends Controller
             'graded_at' => now(),
             'status' => AssignmentSubmission::STATUS_GRADED,
         ]);
+
+        $studentRecipient = $submission->student?->user;
+        if ($studentRecipient) {
+            $studentRecipient->notify(new AssignmentSubmissionGraded($submission));
+        }
 
         return back()->with('success', 'Submission graded successfully.');
     }
