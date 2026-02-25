@@ -31,6 +31,7 @@ class StaffCourseController extends Controller
                 'credits',
                 'semester',
                 'photo',
+                'attendance_threshold',
                 'created_at',
                 'updated_at',
             ])
@@ -38,6 +39,8 @@ class StaffCourseController extends Controller
                 'students as enrolled_students_count' => function ($query): void {
                     $query->whereIn('course_student.status', ['approved', 'withdrawal_pending']);
                 },
+                'subjects',
+                'teachers',
             ])
             ->orderBy('course_code')
             ->get();

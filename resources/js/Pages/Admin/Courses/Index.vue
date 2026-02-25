@@ -125,6 +125,21 @@ const selectedCourse = computed(() =>
     (props.courses ?? []).find((course) => String(course.id) === String(selectedCourseId.value)) || null
 );
 
+const formatUpdatedAt = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(date);
+};
+
+const formatThreshold = (value) =>
+    value === null || value === undefined ? "Global default" : `${value}%`;
+
 const clearFilters = () => {
     searchInput.value = "";
     query.value = "";
@@ -366,12 +381,13 @@ const deleteCourse = (courseId) => {
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Credits</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Semester</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Enrollment</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Details</th>
                                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="filtered.length === 0">
-                                    <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
+                                    <td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">
                                         {{
                                             courses.length === 0
                                                 ? "No courses found. Create your first course to get started."
@@ -415,6 +431,26 @@ const deleteCourse = (courseId) => {
                                         >
                                             Not enrolled
                                         </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-xs text-slate-600">
+                                        <div class="space-y-1">
+                                            <p>
+                                                Subjects:
+                                                <span class="font-semibold text-slate-700">{{ Number(course.subjects_count ?? 0) }}</span>
+                                            </p>
+                                            <p>
+                                                Teachers:
+                                                <span class="font-semibold text-slate-700">{{ Number(course.teachers_count ?? 0) }}</span>
+                                            </p>
+                                            <p>
+                                                Attendance threshold:
+                                                <span class="font-semibold text-slate-700">{{ formatThreshold(course.attendance_threshold) }}</span>
+                                            </p>
+                                            <p>
+                                                Updated:
+                                                <span class="font-semibold text-slate-700">{{ formatUpdatedAt(course.updated_at) }}</span>
+                                            </p>
+                                        </div>
                                     </td>
                                     <td class="px-4 py-4 text-right text-sm">
                                         <div class="flex items-center justify-end gap-2">
@@ -483,6 +519,16 @@ const deleteCourse = (courseId) => {
                                     Enrolled ({{ course.enrolled_students_count }})
                                 </span>
                                 <span v-else class="font-semibold text-slate-700">Not enrolled</span>
+                            </p>
+                            <p class="mt-1 text-xs text-slate-600">
+                                Subjects: <span class="font-semibold text-slate-700">{{ Number(course.subjects_count ?? 0) }}</span>
+                                • Teachers: <span class="font-semibold text-slate-700">{{ Number(course.teachers_count ?? 0) }}</span>
+                            </p>
+                            <p class="mt-1 text-xs text-slate-600">
+                                Threshold:
+                                <span class="font-semibold text-slate-700">{{ formatThreshold(course.attendance_threshold) }}</span>
+                                • Updated:
+                                <span class="font-semibold text-slate-700">{{ formatUpdatedAt(course.updated_at) }}</span>
                             </p>
 
                             <div class="mt-3 grid grid-cols-2 gap-2">
@@ -582,6 +628,22 @@ const deleteCourse = (courseId) => {
                                     Enrolled ({{ selectedCourse.enrolled_students_count }})
                                 </span>
                                 <span v-else class="font-semibold text-slate-700">Not enrolled</span>
+                            </p>
+                            <p>
+                                <span class="font-semibold text-slate-700">Subjects:</span>
+                                {{ Number(selectedCourse.subjects_count ?? 0) }}
+                            </p>
+                            <p>
+                                <span class="font-semibold text-slate-700">Assigned teachers:</span>
+                                {{ Number(selectedCourse.teachers_count ?? 0) }}
+                            </p>
+                            <p>
+                                <span class="font-semibold text-slate-700">Attendance threshold:</span>
+                                {{ formatThreshold(selectedCourse.attendance_threshold) }}
+                            </p>
+                            <p>
+                                <span class="font-semibold text-slate-700">Last updated:</span>
+                                {{ formatUpdatedAt(selectedCourse.updated_at) }}
                             </p>
                         </div>
 
