@@ -126,7 +126,7 @@ const filteredCourses = computed(() => {
                 </div>
 
                 <!-- Summary + search -->
-                <div class="mb-6 grid gap-4 md:grid-cols-3">
+                <div class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                     <div class="portal-card p-5">
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -153,6 +153,32 @@ const filteredCourses = computed(() => {
                             Total assigned subjects
                         </p>
                     </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            Enrollments
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ stats.enrollments }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Active student enrollments
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-amber-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-amber-700"
+                        >
+                            Pending Reviews
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-amber-900">
+                            {{ stats.pendingGrades }}
+                        </p>
+                        <p class="mt-1 text-xs text-amber-700">
+                            Grade submissions awaiting review
+                        </p>
+                    </div>
                     <div class="portal-card p-5">
                         <p
                             class="text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -163,7 +189,7 @@ const filteredCourses = computed(() => {
                             <input
                                 v-model="query"
                                 type="text"
-                                placeholder="Search courses or subjects…"
+                                placeholder="Search courses or subjects..."
                                 class="block w-full rounded-md border-slate-300 pr-9 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                             />
                             <button
@@ -173,11 +199,14 @@ const filteredCourses = computed(() => {
                                 @click="query = ''"
                             >
                                 <span class="sr-only">Clear</span>
-                                ✕
+                                x
                             </button>
                         </div>
                         <p class="mt-2 text-xs text-slate-600">
                             Code or title
+                        </p>
+                        <p class="mt-1 text-xs text-slate-500">
+                            Avg attendance: {{ stats.averageAttendance ? `${stats.averageAttendance}%` : "N/A" }}
                         </p>
                     </div>
                 </div>
@@ -232,18 +261,35 @@ const filteredCourses = computed(() => {
                                                 {{ course.course_code }} -
                                                 {{ course.course_title }}
                                             </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                Semester: {{ course.semester || "N/A" }} |
+                                                Avg attendance:
+                                                {{ formatRate(course.avg_attendance_rate) }}
+                                            </p>
                                         </div>
                                     </div>
-                                    <span
-                                        class="inline-flex items-center rounded-full bg-portal-navy/10 px-2.5 py-0.5 text-xs font-medium text-portal-navy"
-                                    >
-                                        {{ course.subjects.length }}
-                                        {{
-                                            course.subjects.length === 1
-                                                ? "subject"
-                                                : "subjects"
-                                        }}
-                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="inline-flex items-center rounded-full bg-portal-navy/10 px-2.5 py-0.5 text-xs font-medium text-portal-navy"
+                                        >
+                                            {{ course.subjects.length }}
+                                            {{
+                                                course.subjects.length === 1
+                                                    ? "subject"
+                                                    : "subjects"
+                                            }}
+                                        </span>
+                                        <span
+                                            class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700"
+                                        >
+                                            {{ course.students_count }} students
+                                        </span>
+                                        <span
+                                            class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700"
+                                        >
+                                            {{ course.pending_grades_total }} pending grades
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -295,6 +341,38 @@ const filteredCourses = computed(() => {
                                                         ? "credit"
                                                         : "credits"
                                                 }}
+                                            </div>
+                                            <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                                                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
+                                                    Students: {{ subject.student_count }}
+                                                </span>
+                                                <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-indigo-700">
+                                                    Attendance: {{ formatRate(subject.attendance_rate) }}
+                                                </span>
+                                                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700">
+                                                    Present: {{ subject.attendance_records_present }}/{{ subject.attendance_records_total }}
+                                                </span>
+                                                <span class="rounded-full bg-amber-100 px-2 py-0.5 text-amber-700">
+                                                    Pending grades: {{ subject.pending_grades }}
+                                                </span>
+                                                <span class="rounded-full bg-sky-100 px-2 py-0.5 text-sky-700">
+                                                    Draft grades: {{ subject.draft_grades }}
+                                                </span>
+                                                <span
+                                                    v-if="subject.attendance_threshold !== null && subject.attendance_rate !== null"
+                                                    class="rounded-full px-2 py-0.5"
+                                                    :class="
+                                                        Number(subject.attendance_rate) < Number(subject.attendance_threshold)
+                                                            ? 'bg-red-100 text-red-700'
+                                                            : 'bg-emerald-100 text-emerald-700'
+                                                    "
+                                                >
+                                                    {{
+                                                        Number(subject.attendance_rate) < Number(subject.attendance_threshold)
+                                                            ? `Below threshold (${subject.attendance_threshold}%)`
+                                                            : `Meets threshold (${subject.attendance_threshold}%)`
+                                                    }}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -367,3 +445,4 @@ const filteredCourses = computed(() => {
         </div>
     </AuthenticatedLayout>
 </template>
+
