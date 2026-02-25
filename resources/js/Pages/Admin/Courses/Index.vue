@@ -18,7 +18,19 @@ const queryParam = (key) => {
 };
 
 const allowedEnrollmentFilters = new Set(["all", "enrolled", "not-enrolled"]);
-const allowedSorts = new Set(["code", "title", "semester", "credits-desc", "credits-asc"]);
+const allowedSorts = new Set([
+    "code",
+    "title",
+    "semester",
+    "credits-desc",
+    "credits-asc",
+    "subjects-desc",
+    "subjects-asc",
+    "teachers-desc",
+    "teachers-asc",
+    "updated-desc",
+    "updated-asc",
+]);
 
 const searchInput = ref(queryParam("search") ?? "");
 const query = ref(searchInput.value);
@@ -106,6 +118,12 @@ const filtered = computed(() => {
     }
 
     const cmp = (a, b) => String(a ?? "").localeCompare(String(b ?? ""));
+    const ts = (value) => {
+        const time = new Date(value ?? "").getTime();
+
+        return Number.isNaN(time) ? 0 : time;
+    };
+
     if (sortBy.value === "title") {
         list.sort((a, b) => cmp(a.title, b.title));
     } else if (sortBy.value === "semester") {
@@ -114,6 +132,34 @@ const filtered = computed(() => {
         list.sort((a, b) => Number(b.credits ?? 0) - Number(a.credits ?? 0));
     } else if (sortBy.value === "credits-asc") {
         list.sort((a, b) => Number(a.credits ?? 0) - Number(b.credits ?? 0));
+    } else if (sortBy.value === "subjects-desc") {
+        list.sort(
+            (a, b) =>
+                Number(b.subjects_count ?? 0) - Number(a.subjects_count ?? 0) ||
+                cmp(a.course_code, b.course_code)
+        );
+    } else if (sortBy.value === "subjects-asc") {
+        list.sort(
+            (a, b) =>
+                Number(a.subjects_count ?? 0) - Number(b.subjects_count ?? 0) ||
+                cmp(a.course_code, b.course_code)
+        );
+    } else if (sortBy.value === "teachers-desc") {
+        list.sort(
+            (a, b) =>
+                Number(b.teachers_count ?? 0) - Number(a.teachers_count ?? 0) ||
+                cmp(a.course_code, b.course_code)
+        );
+    } else if (sortBy.value === "teachers-asc") {
+        list.sort(
+            (a, b) =>
+                Number(a.teachers_count ?? 0) - Number(b.teachers_count ?? 0) ||
+                cmp(a.course_code, b.course_code)
+        );
+    } else if (sortBy.value === "updated-desc") {
+        list.sort((a, b) => ts(b.updated_at) - ts(a.updated_at) || cmp(a.course_code, b.course_code));
+    } else if (sortBy.value === "updated-asc") {
+        list.sort((a, b) => ts(a.updated_at) - ts(b.updated_at) || cmp(a.course_code, b.course_code));
     } else {
         list.sort((a, b) => cmp(a.course_code, b.course_code));
     }
@@ -342,6 +388,12 @@ const deleteCourse = (courseId) => {
                                 <option value="semester">Semester</option>
                                 <option value="credits-desc">Credits (high to low)</option>
                                 <option value="credits-asc">Credits (low to high)</option>
+                                <option value="subjects-desc">Subjects (high to low)</option>
+                                <option value="subjects-asc">Subjects (low to high)</option>
+                                <option value="teachers-desc">Teachers (high to low)</option>
+                                <option value="teachers-asc">Teachers (low to high)</option>
+                                <option value="updated-desc">Last updated (newest)</option>
+                                <option value="updated-asc">Last updated (oldest)</option>
                             </select>
                         </div>
                     </div>
@@ -522,12 +574,12 @@ const deleteCourse = (courseId) => {
                             </p>
                             <p class="mt-1 text-xs text-slate-600">
                                 Subjects: <span class="font-semibold text-slate-700">{{ Number(course.subjects_count ?? 0) }}</span>
-                                • Teachers: <span class="font-semibold text-slate-700">{{ Number(course.teachers_count ?? 0) }}</span>
+                                | Teachers: <span class="font-semibold text-slate-700">{{ Number(course.teachers_count ?? 0) }}</span>
                             </p>
                             <p class="mt-1 text-xs text-slate-600">
                                 Threshold:
                                 <span class="font-semibold text-slate-700">{{ formatThreshold(course.attendance_threshold) }}</span>
-                                • Updated:
+                                | Updated:
                                 <span class="font-semibold text-slate-700">{{ formatUpdatedAt(course.updated_at) }}</span>
                             </p>
 
