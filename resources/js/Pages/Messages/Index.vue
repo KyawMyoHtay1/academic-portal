@@ -487,14 +487,20 @@ watch(activeConversationData, (conversation, previousConversation) => {
         unreadOnly.value = false;
     }
 
-    replyForm.reset("body");
-    replyForm.clearErrors();
-    replyForm.receiver_id = conversation ? String(conversation.user_id) : "";
-
     const previousUserId = previousConversation
         ? String(previousConversation.user_id)
         : "";
     const currentUserId = conversation ? String(conversation.user_id) : "";
+    replyForm.receiver_id = currentUserId;
+
+    // Inertia reloads replace objects, so avoid clearing draft text unless user switched threads.
+    if (currentUserId === previousUserId) {
+        return;
+    }
+
+    replyForm.reset("body");
+    replyForm.clearErrors();
+
     if (currentUserId && currentUserId !== previousUserId) {
         pendingThreadAutoScroll.value = true;
         scrollThreadToBottom("auto");
