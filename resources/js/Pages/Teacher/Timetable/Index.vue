@@ -167,6 +167,12 @@ const formatTime = (value) => {
 };
 
 const formatRange = (entry) => `${formatTime(entry?.start_time)} - ${formatTime(entry?.end_time)}`;
+const formatDuration = (entry) => {
+    const minutes = sessionDurationMinutes(entry);
+    const hoursPart = Math.floor(minutes / 60);
+    const minutesPart = minutes % 60;
+    return `${hoursPart}h ${String(minutesPart).padStart(2, "0")}m`;
+};
 
 const timetableStats = computed(() => {
     const rows = filteredEntries.value;
@@ -177,6 +183,9 @@ const timetableStats = computed(() => {
     );
     const totalHours = (totalMinutes / 60).toFixed(1);
     const courseCount = new Set(rows.map((entry) => entry.course_id)).size;
+    const subjectCount = new Set(
+        rows.map((entry) => `${entry.subject_code ?? ""}-${entry.course_id ?? ""}`)
+    ).size;
 
     const dayLoad = dayOrder.map((day) => {
         const sessions = rows.filter((entry) => entry.day_of_week === day);
@@ -200,6 +209,7 @@ const timetableStats = computed(() => {
         totalSessions,
         totalHours,
         courseCount,
+        subjectCount,
         busiestDay:
             busiestDay && busiestDay.sessions > 0
                 ? `${busiestDay.day} (${busiestDay.sessions})`
@@ -449,13 +459,21 @@ const exportCsvUrl = computed(() =>
                         </p>
                     </div>
 
-                    <div class="mb-5 grid gap-4 md:grid-cols-4">
+                    <div class="mb-5 grid gap-4 md:grid-cols-5">
                         <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
                                 Sessions
                             </p>
                             <p class="mt-2 text-2xl font-bold text-blue-900">
                                 {{ timetableStats.totalSessions }}
+                            </p>
+                        </div>
+                        <div class="rounded-xl border border-cyan-200 bg-cyan-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-cyan-700">
+                                Subjects
+                            </p>
+                            <p class="mt-2 text-2xl font-bold text-cyan-900">
+                                {{ timetableStats.subjectCount }}
                             </p>
                         </div>
                         <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
@@ -771,6 +789,9 @@ const exportCsvUrl = computed(() =>
                                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
                                             Location
                                         </th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                                            Details
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 bg-white">
@@ -792,6 +813,14 @@ const exportCsvUrl = computed(() =>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-slate-700">
                                             {{ e.location || "-" }}
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-slate-600">
+                                            <p class="font-semibold text-slate-700">
+                                                Duration: {{ formatDuration(e) }}
+                                            </p>
+                                            <p class="mt-1 text-slate-500">
+                                                Semester: {{ e.semester || "N/A" }}
+                                            </p>
                                         </td>
                                     </tr>
                                 </tbody>
