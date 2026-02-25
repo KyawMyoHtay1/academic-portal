@@ -145,6 +145,15 @@ class NotificationController extends Controller
             return route('announcements.index');
         }
 
+        if ($type === 'enrollment') {
+            if ($role === 'student') {
+                return route('my-courses.index');
+            }
+            if (in_array($role, ['staff', 'admin'], true)) {
+                return route('admin.enrollments.index');
+            }
+        }
+
         return null;
     }
 }

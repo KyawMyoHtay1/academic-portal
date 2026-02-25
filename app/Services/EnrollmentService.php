@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\EnrollmentStatusLog;
 use App\Models\Student;
 use App\Models\Timetable;
+use App\Notifications\EnrollmentStatusUpdated;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -356,6 +357,8 @@ class EnrollmentService
                 'performed_by' => $performedBy,
             ]);
 
+            $this->notifyStudentEnrollmentDecision($student, $course, 'approved');
+
             return $this->result(
                 'success',
                 "Enrollment approved for {$this->studentLabel($student)} in {$this->courseLabel($course)}."
@@ -412,6 +415,8 @@ class EnrollmentService
                 'performed_by' => $performedBy,
             ]);
 
+            $this->notifyStudentEnrollmentDecision($student, $course, 'rejected', $reason);
+
             return $this->result(
                 'success',
                 "Enrollment rejected for {$this->studentLabel($student)} in {$this->courseLabel($course)}."
@@ -462,6 +467,8 @@ class EnrollmentService
                 'reason' => 'Withdrawal approved by staff.',
                 'performed_by' => $performedBy,
             ]);
+
+            $this->notifyStudentEnrollmentDecision($student, $course, 'withdrawal_approved');
 
             return $this->result(
                 'success',
@@ -518,6 +525,8 @@ class EnrollmentService
                 'reason' => $reason ?? 'Withdrawal rejected by staff.',
                 'performed_by' => $performedBy,
             ]);
+
+            $this->notifyStudentEnrollmentDecision($student, $course, 'withdrawal_rejected', $reason);
 
             return $this->result(
                 'success',
@@ -751,5 +760,28 @@ class EnrollmentService
         }
 
         return $raw;
+    }
+
+    private function notifyStudentEnrollmentDecision(
+        ?Student $student,
+        ?Course $course,
+        string $decision,
+        ?string $reason = null
+    ): void {
+        $recipient = $student?->user;
+        if (! $recipient) {
+            return;
+        }
+
+        try {
+            $recipient->notify(new EnrollmentStatusUpdated($course, $decision, $reason));
+        } catch (\Throwable $e) {
+            Log::warning('enrollment.notification_failed', [
+                'student_id' => $student?->id,
+                'course_id' => $course?->id,
+                'decision' => $decision,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
