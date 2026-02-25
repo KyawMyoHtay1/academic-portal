@@ -19,11 +19,40 @@ const query = ref("");
 const stats = computed(() => {
     const courses = props.courses ?? [];
     const subjects = courses.flatMap((c) => c.subjects ?? []);
+    const attendanceRates = subjects
+        .map((s) => s.attendance_rate)
+        .filter((rate) => rate !== null && rate !== undefined);
+
     return {
         courses: courses.length,
         subjects: subjects.length,
+        enrollments: courses.reduce(
+            (sum, course) => sum + Number(course.students_count ?? 0),
+            0
+        ),
+        pendingGrades: subjects.reduce(
+            (sum, subject) => sum + Number(subject.pending_grades ?? 0),
+            0
+        ),
+        averageAttendance:
+            attendanceRates.length > 0
+                ? Number(
+                      attendanceRates.reduce(
+                          (sum, rate) => sum + Number(rate),
+                          0
+                      ) / attendanceRates.length
+                  ).toFixed(1)
+                : null,
     };
 });
+
+const formatRate = (value) => {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+        return "N/A";
+    }
+
+    return `${Number(value).toFixed(1)}%`;
+};
 
 const filteredCourses = computed(() => {
     const q = query.value.trim().toLowerCase();
