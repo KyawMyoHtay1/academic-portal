@@ -438,6 +438,9 @@ class StaffTimetableController extends Controller
     {
         $subject = $entry->subject;
         $course = $subject?->course;
+        $startAt = $entry->start_time ? Carbon::parse($entry->start_time) : null;
+        $endAt = $entry->end_time ? Carbon::parse($entry->end_time) : null;
+        $durationMinutes = ($startAt && $endAt) ? max($startAt->diffInMinutes($endAt, false), 0) : null;
 
         return [
             'id' => $entry->id,
@@ -455,6 +458,9 @@ class StaffTimetableController extends Controller
             'location' => $entry->location,
             'created_by' => $entry->created_by,
             'creator_name' => $entry->creator?->name ?? null,
+            'duration_minutes' => $durationMinutes,
+            'created_at' => $entry->created_at?->toDateTimeString(),
+            'updated_at' => $entry->updated_at?->toDateTimeString(),
         ];
     }
 

@@ -34,6 +34,7 @@ const selectedDay = ref(props.filters?.day ?? "all");
 const selectedSemester = ref(props.filters?.semester ?? "all");
 const selectedCourse = ref(props.filters?.course_id ?? "all");
 const selectedTeacher = ref(props.filters?.teacher_id ?? "all");
+const expandedEntryIds = ref([]);
 const weekRange = ref("weekdays");
 const timeFormat = ref("12h");
 let searchTimer = null;
@@ -97,6 +98,41 @@ const formatTime = (value) => {
 };
 
 const formatRange = (entry) => `${formatTime(entry?.start_time)} - ${formatTime(entry?.end_time)}`;
+
+const formatDuration = (minutes) => {
+    const total = Number(minutes ?? 0);
+    if (!Number.isFinite(total) || total <= 0) return "-";
+    if (total < 60) return `${total} min`;
+    const hours = Math.floor(total / 60);
+    const rem = total % 60;
+
+    return rem === 0 ? `${hours}h` : `${hours}h ${rem}m`;
+};
+
+const formatDateTime = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
+};
+
+const isEntryExpanded = (id) => expandedEntryIds.value.includes(id);
+
+const toggleEntryDetails = (id) => {
+    if (isEntryExpanded(id)) {
+        expandedEntryIds.value = expandedEntryIds.value.filter((rowId) => rowId !== id);
+        return;
+    }
+
+    expandedEntryIds.value = [...expandedEntryIds.value, id];
+};
 
 const applyFilters = () => {
     router.get(
@@ -170,6 +206,11 @@ watch(
     },
     { flush: "post" }
 );
+
+watch(entries, (rows) => {
+    const visibleIds = new Set(rows.map((row) => row.id));
+    expandedEntryIds.value = expandedEntryIds.value.filter((id) => visibleIds.has(id));
+});
 
 const deleteEntry = (id) => {
     if (
@@ -415,6 +456,11 @@ export default {
                                         Created by
                                     </th>
                                     <th
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700"
+                                    >
+                                        Details
+                                    </th>
+                                    <th
                                         class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700"
                                     >
                                         Actions
@@ -424,135 +470,145 @@ export default {
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 <tr v-if="filteredEntries.length === 0">
                                     <td
-                                        colspan="7"
+                                        colspan="8"
                                         class="px-4 py-8 text-center text-sm text-slate-500"
                                     >
                                         No timetable entries match your filters.
                                     </td>
                                 </tr>
-                                <tr
-                                    v-for="entry in filteredEntries"
-                                    :key="entry.id"
-                                    class="bg-white hover:bg-slate-50 transition-colors"
-                                >
-                                    <td
-                                        class="px-4 py-4 text-sm font-medium text-slate-900"
-                                    >
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
-                                            >
-                                                <img
-                                                    v-if="entry.subject_photo"
-                                                    :src="`/storage/${entry.subject_photo}`"
-                                                    :alt="`Photo for ${
-                                                        entry.subject_title ||
-                                                        'N/A'
-                                                    }`"
-                                                    class="h-full w-full object-cover"
-                                                />
-                                                <span
-                                                    v-else
-                                                    class="text-xs font-semibold text-slate-500"
+                                <template v-for="entry in filteredEntries" :key="entry.id">
+                                    <tr class="bg-white hover:bg-slate-50 transition-colors">
+                                        <td class="px-4 py-4 text-sm font-medium text-slate-900">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                                 >
-                                                    {{
-                                                        (entry.subject_title ||
-                                                            entry.subject_code ||
-                                                            "N")[0].toUpperCase()
-                                                    }}
-                                                </span>
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span>{{
-                                                    entry.subject_code || "N/A"
-                                                }}</span>
-                                                <span
-                                                    class="text-xs text-slate-500"
-                                                    >{{
-                                                        entry.subject_title ||
-                                                        ""
-                                                    }}</span
-                                                >
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-slate-700"
-                                    >
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
-                                            >
-                                                <img
-                                                    v-if="entry.course_photo"
-                                                    :src="`/storage/${entry.course_photo}`"
-                                                    :alt="`Photo for ${entry.course_title}`"
-                                                    class="h-full w-full object-cover"
-                                                />
-                                                <span
-                                                    v-else
-                                                    class="text-xs font-semibold text-slate-500"
-                                                >
-                                                    {{
-                                                        entry.course_title
-                                                            .charAt(0)
-                                                            .toUpperCase()
-                                                    }}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                {{ entry.course_code }} -
-                                                {{ entry.course_title }}
-                                                <div class="text-xs text-slate-500">
-                                                    Semester: {{ entry.semester || "-" }}
+                                                    <img
+                                                        v-if="entry.subject_photo"
+                                                        :src="`/storage/${entry.subject_photo}`"
+                                                        :alt="`Photo for ${entry.subject_title || 'N/A'}`"
+                                                        class="h-full w-full object-cover"
+                                                    />
+                                                    <span
+                                                        v-else
+                                                        class="text-xs font-semibold text-slate-500"
+                                                    >
+                                                        {{
+                                                            (entry.subject_title ||
+                                                                entry.subject_code ||
+                                                                "N")[0].toUpperCase()
+                                                        }}
+                                                    </span>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span>{{ entry.subject_code || "N/A" }}</span>
+                                                    <span class="text-xs text-slate-500">
+                                                        {{ entry.subject_title || "" }}
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-slate-700"
-                                    >
-                                        {{ entry.day_of_week }}
-                                    </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-slate-700"
-                                    >
-                                        {{ formatRange(entry) }}
-                                    </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-slate-700"
-                                    >
-                                        {{ entry.location || "-" }}
-                                    </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-slate-600"
-                                    >
-                                        {{ entry.creator_name || "-" }}
-                                    </td>
-                                    <td class="px-4 py-4 text-right text-sm">
-                                        <div
-                                            class="flex items-center justify-end gap-2"
-                                        >
-                                            <Link
-                                                :href="
-                                                    route(
-                                                        'admin.timetables.edit',
-                                                        entry.id
-                                                    )
-                                                "
-                                                class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
-                                            >
-                                                Edit
-                                            </Link>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-700">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
+                                                >
+                                                    <img
+                                                        v-if="entry.course_photo"
+                                                        :src="`/storage/${entry.course_photo}`"
+                                                        :alt="`Photo for ${entry.course_title || 'N/A'}`"
+                                                        class="h-full w-full object-cover"
+                                                    />
+                                                    <span
+                                                        v-else
+                                                        class="text-xs font-semibold text-slate-500"
+                                                    >
+                                                        {{
+                                                            (entry.course_title ||
+                                                                entry.course_code ||
+                                                                "N")[0].toUpperCase()
+                                                        }}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    {{ entry.course_code }} -
+                                                    {{ entry.course_title }}
+                                                    <div class="text-xs text-slate-500">
+                                                        Semester: {{ entry.semester || "-" }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-700">
+                                            {{ entry.day_of_week }}
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-700">
+                                            {{ formatRange(entry) }}
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-700">
+                                            {{ entry.location || "-" }}
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-slate-600">
+                                            {{ entry.creator_name || "-" }}
+                                        </td>
+                                        <td class="px-4 py-4 text-xs">
                                             <button
-                                                @click="deleteEntry(entry.id)"
-                                                class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                type="button"
+                                                class="rounded-md border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-700 hover:bg-slate-100"
+                                                @click="toggleEntryDetails(entry.id)"
                                             >
-                                                Delete
+                                                {{ isEntryExpanded(entry.id) ? "Hide details" : "Details" }}
                                             </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="px-4 py-4 text-right text-sm">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <Link
+                                                    :href="
+                                                        route(
+                                                            'admin.timetables.edit',
+                                                            entry.id
+                                                        )
+                                                    "
+                                                    class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    @click="deleteEntry(entry.id)"
+                                                    class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="isEntryExpanded(entry.id)" class="bg-slate-50">
+                                        <td colspan="8" class="px-4 py-4">
+                                            <div class="rounded-lg border border-slate-200 bg-white p-4 text-xs text-slate-600">
+                                                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                                    <p>
+                                                        Duration:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ formatDuration(entry.duration_minutes) }}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        Created at:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ formatDateTime(entry.created_at) }}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        Updated at:
+                                                        <span class="font-semibold text-slate-700">
+                                                            {{ formatDateTime(entry.updated_at) }}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                     </div>
