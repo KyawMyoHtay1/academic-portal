@@ -426,7 +426,7 @@ const timelineEventClass = (action) => {
                     </p>
                 </div>
 
-                <div class="portal-card overflow-hidden p-6">
+                <div class="portal-card p-6">
                     <div class="mb-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                             Fee Records
@@ -436,7 +436,7 @@ const timelineEventClass = (action) => {
                         </p>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto pb-2">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
@@ -448,8 +448,8 @@ const timelineEventClass = (action) => {
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Due Date</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Paid Date</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Processed By</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Audit Timeline</th>
-                                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
+                                    <th class="min-w-[14rem] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">Audit Timeline</th>
+                                    <th class="sticky right-0 z-20 border-l border-slate-200 bg-slate-50 px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-700">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 bg-white">
@@ -462,7 +462,7 @@ const timelineEventClass = (action) => {
                                 <tr
                                     v-for="fee in entries"
                                     :key="fee.id"
-                                    class="transition-colors hover:bg-slate-50"
+                                    class="group transition-colors hover:bg-slate-50"
                                     :class="{ 'bg-blue-50/40': fee.status === 'payment_pending' }"
                                 >
                                     <td class="px-4 py-4 text-sm font-medium text-slate-900">
@@ -545,8 +545,15 @@ const timelineEventClass = (action) => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap px-4 py-4 text-right text-sm">
-                                        <div class="flex items-center justify-end gap-2">
+                                    <td
+                                        class="sticky right-0 z-10 min-w-[14rem] border-l border-slate-200 px-4 py-4 text-right text-sm"
+                                        :class="
+                                            fee.status === 'payment_pending'
+                                                ? 'bg-blue-50/40 group-hover:bg-blue-50/60'
+                                                : 'bg-white group-hover:bg-slate-50'
+                                        "
+                                    >
+                                        <div class="flex flex-wrap items-center justify-end gap-2">
                                             <template v-if="fee.status === 'payment_pending'">
                                                 <button
                                                     @click="approvePayment(fee.id)"
