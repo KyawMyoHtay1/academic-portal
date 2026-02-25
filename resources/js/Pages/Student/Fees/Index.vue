@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
     fees: {
@@ -18,6 +18,8 @@ const props = defineProps({
 const viewMode = ref("cards"); // cards | table
 const query = ref("");
 const statusFilter = ref("all"); // all | pending | payment_pending | failed | paid
+const pendingCheckoutStorageKey = "student_fee_pending_checkout";
+const pendingCheckoutMaxAgeMs = 2 * 60 * 60 * 1000;
 
 const isOverdue = (dueDate) => {
     if (!dueDate) return false;
@@ -82,6 +84,126 @@ const getStatusBadgeClass = (status) => {
     }
 };
 
+const setPendingCheckout = (feeId) => {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    window.sessionStorage.setItem(
+        pendingCheckoutStorageKey,
+        JSON.stringify({
+            feeId: Number(feeId),
+            startedAt: Date.now(),
+        })
+    );
+};
+
+const getPendingCheckout = () => {
+    if (typeof window === "undefined") {
+        return null;
+    }
+
+    const raw = window.sessionStorage.getItem(pendingCheckoutStorageKey);
+    if (!raw) {
+        return null;
+    }
+
+    try {
+        const parsed = JSON.parse(raw);
+        const feeId = Number(parsed?.feeId);
+        const startedAt = Number(parsed?.startedAt);
+
+        if (!Number.isFinite(feeId) || feeId <= 0) {
+            return null;
+        }
+
+        return {
+            feeId,
+            startedAt: Number.isFinite(startedAt) ? startedAt : 0,
+        };
+    } catch {
+        return null;
+    }
+};
+
+const clearPendingCheckout = () => {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    window.sessionStorage.removeItem(pendingCheckoutStorageKey);
+};
+
+const shouldAutoCancelPendingCheckout = () => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+        return false;
+    }
+
+    const fromStripeReferrer = document.referrer.includes("checkout.stripe.com");
+
+    let navType = "";
+    const navigationEntries = window.performance?.getEntriesByType?.("navigation");
+    if (Array.isArray(navigationEntries) && navigationEntries.length > 0) {
+        navType = navigationEntries[0]?.type ?? "";
+    }
+
+    return fromStripeReferrer || navType === "back_forward";
+};
+
+const autoCancelAbandonedCheckout = () => {
+    const pendingCheckout = getPendingCheckout();
+    if (!pendingCheckout) {
+        return;
+    }
+
+    const age = Date.now() - (pendingCheckout.startedAt || 0);
+    if (age > pendingCheckoutMaxAgeMs) {
+        clearPendingCheckout();
+        return;
+    }
+
+    const targetFee = (props.fees ?? []).find(
+        (fee) => Number(fee.id) === pendingCheckout.feeId
+    );
+    if (!targetFee || targetFee.status !== "payment_pending") {
+        clearPendingCheckout();
+        return;
+    }
+
+    if (!shouldAutoCancelPendingCheckout()) {
+        return;
+    }
+
+    clearPendingCheckout();
+    router.get(
+        route("payment.cancel", targetFee.id),
+        {},
+        {
+            replace: true,
+            preserveState: false,
+            preserveScroll: true,
+        }
+    );
+};
+
+const handlePageShow = () => {
+    autoCancelAbandonedCheckout();
+};
+
+onMounted(() => {
+    autoCancelAbandonedCheckout();
+
+    if (typeof window !== "undefined") {
+        window.addEventListener("pageshow", handlePageShow);
+    }
+});
+
+onBeforeUnmount(() => {
+    if (typeof window !== "undefined") {
+        window.removeEventListener("pageshow", handlePageShow);
+    }
+});
+
 const submitPayment = (feeId) => {
     if (
         !confirm(
@@ -104,6 +226,8 @@ const payNow = (feeId) => {
     ) {
         return;
     }
+
+    setPendingCheckout(feeId);
 
     router.post(route("payment.checkout", feeId), {}, {
         preserveScroll: true,
