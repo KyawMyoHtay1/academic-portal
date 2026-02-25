@@ -931,7 +931,7 @@ onMounted(() => {
 
                             <div
                                 ref="threadScrollContainer"
-                                class="space-y-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
+                                class="space-y-3 overflow-x-hidden lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
                                 @scroll.passive="handleThreadScroll"
                             >
                                 <div
@@ -971,7 +971,7 @@ onMounted(() => {
                                                     : 'bg-slate-100 text-slate-800'
                                             "
                                         >
-                                            <p class="whitespace-pre-line">{{ item.message.body }}</p>
+                                            <p class="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{{ item.message.body }}</p>
                                             <p
                                                 class="mt-2 text-[11px]"
                                                 :class="item.message.is_sent ? 'text-blue-100' : 'text-slate-500'"
@@ -1075,7 +1075,7 @@ onMounted(() => {
 
                                             <p class="mt-1 text-xs text-slate-500">{{ formatDate(message.created_at) }}</p>
 
-                                            <p class="mt-3 whitespace-pre-line text-sm text-slate-700">
+                                            <p class="mt-3 whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-sm text-slate-700">
                                                 <span v-if="!expandedMessages.has(message.id) && (message.body ?? '').length > 150">
                                                     {{ truncateMessage(message.body) }}
                                                 </span>
