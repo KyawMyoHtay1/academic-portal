@@ -40,7 +40,10 @@ class PaymentController extends Controller
 
         try {
             $checkoutSession = $this->paymentService->createCheckoutSession($fee, $student);
-            $this->paymentService->markCheckoutStarted($fee, (string) $checkoutSession->payment_intent, $user->id);
+            $paymentIntentId = is_string($checkoutSession->payment_intent)
+                ? $checkoutSession->payment_intent
+                : null;
+            $this->paymentService->markCheckoutStarted($fee, $paymentIntentId, $user->id);
 
             return Inertia::location($checkoutSession->url);
 

@@ -51,7 +51,7 @@ class PaymentService
         ]);
     }
 
-    public function markCheckoutStarted(Fee $fee, string $paymentIntentId, int $performedByUserId): void
+    public function markCheckoutStarted(Fee $fee, ?string $paymentIntentId, int $performedByUserId): void
     {
         $alreadyPaymentPending = $fee->status === Fee::STATUS_PAYMENT_PENDING;
 
@@ -103,7 +103,7 @@ class PaymentService
 
     public function resetPendingPayment(Fee $fee): bool
     {
-        if ($fee->status !== Fee::STATUS_PAYMENT_PENDING || ! $fee->payment_intent_id) {
+        if ($fee->status !== Fee::STATUS_PAYMENT_PENDING) {
             return false;
         }
 

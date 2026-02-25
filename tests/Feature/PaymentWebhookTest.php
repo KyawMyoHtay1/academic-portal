@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Fee;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -106,6 +107,29 @@ class PaymentWebhookTest extends TestCase
             'payment_intent_id' => 'pi_paid_001',
         ]);
         $this->assertDatabaseCount('stripe_webhook_events', 1);
+    }
+
+    public function test_reset_pending_payment_reverts_to_pending_even_without_payment_intent_id(): void
+    {
+        [, $student] = $this->createStudentUser();
+
+        $fee = Fee::create([
+            'student_id' => $student->id,
+            'amount' => 550,
+            'description' => 'Library fee',
+            'status' => 'payment_pending',
+            'due_date' => now()->toDateString(),
+            'payment_intent_id' => null,
+        ]);
+
+        $updated = app(PaymentService::class)->resetPendingPayment($fee);
+
+        $this->assertTrue($updated);
+        $this->assertDatabaseHas('fees', [
+            'id' => $fee->id,
+            'status' => 'pending',
+            'payment_intent_id' => null,
+        ]);
     }
 
     public function test_invalid_webhook_signature_is_rejected(): void

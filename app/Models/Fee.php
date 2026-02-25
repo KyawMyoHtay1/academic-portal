@@ -91,10 +91,16 @@ class Fee extends Model
     ): void
     {
         $fromStatus = $this->status;
+        $normalizedPaymentIntentId = is_string($paymentIntentId)
+            ? trim($paymentIntentId)
+            : null;
+        if ($normalizedPaymentIntentId === '') {
+            $normalizedPaymentIntentId = null;
+        }
 
         $this->update([
             'status' => self::STATUS_PAYMENT_PENDING,
-            'payment_intent_id' => $paymentIntentId ?? $this->payment_intent_id,
+            'payment_intent_id' => $normalizedPaymentIntentId ?? $this->payment_intent_id,
         ]);
 
         $this->logStatusChange(
