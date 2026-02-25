@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import debounce from "lodash/debounce";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
@@ -44,6 +44,11 @@ const query = ref(queryInput.value.trim());
 const conversationQueryInput = ref(queryParam("thread_search") ?? "");
 const conversationQuery = ref(conversationQueryInput.value.trim());
 const unreadOnly = ref(queryParam("unread_only") === "1");
+const replyBodyInput = ref(null);
+const replyForm = useForm({
+    receiver_id: "",
+    body: "",
+});
 
 const messagesData = computed(() => props.messages?.data ?? []);
 const messageLinks = computed(() => props.messages?.links ?? []);
@@ -96,7 +101,7 @@ const filteredMessages = computed(() => {
         if (activeTab.value === "unread") list = list.filter((message) => !message.is_sent && !message.read);
     }
 
-    if (unreadOnly.value) {
+    if (unreadOnly.value && !activeConversationData.value) {
         list = list.filter((message) => !message.is_sent && !message.read);
     }
 
@@ -185,6 +190,63 @@ const threadMessages = computed(() =>
         (a, b) => parseTimestamp(a.created_at) - parseTimestamp(b.created_at)
     )
 );
+
+const formatThreadDateLabel = (value) => {
+    const date = new Date(parseTimestamp(value));
+    if (Number.isNaN(date.getTime())) return "Unknown date";
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfInput = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const dayDiff = Math.round((startOfInput.getTime() - startOfToday.getTime()) / 86400000);
+
+    if (dayDiff === 0) return "Today";
+    if (dayDiff === -1) return "Yesterday";
+
+    return date.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: date.getFullYear() === now.getFullYear() ? undefined : "numeric",
+    });
+};
+
+const threadFeedItems = computed(() => {
+    const items = [];
+    let lastDayKey = null;
+    let unreadDividerInserted = false;
+
+    threadMessages.value.forEach((message) => {
+        const timestamp = parseTimestamp(message.created_at);
+        const date = new Date(timestamp);
+        const dayKey = Number.isNaN(date.getTime()) ? "unknown" : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
+        if (dayKey !== lastDayKey) {
+            lastDayKey = dayKey;
+            items.push({
+                type: "date",
+                key: `date-${dayKey}-${message.id}`,
+                label: formatThreadDateLabel(message.created_at),
+            });
+        }
+
+        if (!unreadDividerInserted && !message.is_sent && !message.read) {
+            unreadDividerInserted = true;
+            items.push({
+                type: "unread",
+                key: `unread-${message.id}`,
+            });
+        }
+
+        items.push({
+            type: "message",
+            key: `message-${message.id}`,
+            message,
+        });
+    });
+
+    return items;
+});
 
 const markAsRead = (id) => {
     router.post(route("messages.read", id), {}, { preserveScroll: true });
@@ -368,16 +430,39 @@ watch([query, conversationQuery, activeTab, unreadOnly], () => {
     persistFiltersToUrl();
 });
 
+watch(activeConversationData, (conversation) => {
+    if (conversation && unreadOnly.value) {
+        unreadOnly.value = false;
+    }
+
+    replyForm.reset("body");
+    replyForm.clearErrors();
+    replyForm.receiver_id = conversation ? String(conversation.user_id) : "";
+});
+
 onBeforeUnmount(() => {
     applyMessageSearch.cancel();
     applyConversationSearch.cancel();
     persistFiltersToUrl.cancel();
 });
 
-const openReply = () => {
+const focusInlineReply = () => {
     if (!activeConversationData.value) return;
-    router.get(route("messages.create"), {
-        to: activeConversationData.value.user_id,
+    replyBodyInput.value?.focus?.();
+};
+
+const sendInlineReply = () => {
+    if (!activeConversationData.value) return;
+
+    replyForm.receiver_id = String(activeConversationData.value.user_id);
+    replyForm.post(route("messages.store"), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            replyForm.reset("body");
+            replyForm.clearErrors();
+            replyBodyInput.value?.focus?.();
+        },
     });
 };
 </script>
@@ -540,11 +625,15 @@ const openReply = () => {
                                     </button>
                                 </div>
 
-                                <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                                <label
+                                    class="inline-flex items-center gap-2 text-sm"
+                                    :class="activeConversationData ? 'text-slate-400' : 'text-slate-700'"
+                                >
                                     <input
                                         v-model="unreadOnly"
                                         type="checkbox"
                                         class="rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                        :disabled="!!activeConversationData"
                                     />
                                     Unread only
                                 </label>
@@ -595,7 +684,7 @@ const openReply = () => {
                                 <button
                                     type="button"
                                     class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark"
-                                    @click="openReply"
+                                    @click="focusInlineReply"
                                 >
                                     Reply
                                 </button>
@@ -609,38 +698,89 @@ const openReply = () => {
                                     No messages found in this thread for current filters.
                                 </div>
 
-                                <div
-                                    v-for="message in threadMessages"
-                                    :key="message.id"
-                                    class="flex"
-                                    :class="message.is_sent ? 'justify-end' : 'justify-start'"
-                                >
-                                    <div
-                                        class="max-w-[85%] rounded-xl px-4 py-3 text-sm shadow-sm"
-                                        :class="
-                                            message.is_sent
-                                                ? 'bg-portal-navy text-white'
-                                                : 'bg-slate-100 text-slate-800'
-                                        "
-                                    >
-                                        <p class="whitespace-pre-line">{{ message.body }}</p>
-                                        <p
-                                            class="mt-2 text-[11px]"
-                                            :class="message.is_sent ? 'text-blue-100' : 'text-slate-500'"
-                                        >
-                                            {{ formatDate(message.created_at) }}
-                                        </p>
-                                        <button
-                                            v-if="!message.read && !message.is_sent"
-                                            type="button"
-                                            class="mt-2 rounded-md bg-white/20 px-2 py-1 text-[11px] font-semibold text-current hover:bg-white/30"
-                                            @click="markAsRead(message.id)"
-                                        >
-                                            Mark as read
-                                        </button>
+                                <template v-for="item in threadFeedItems" :key="item.key">
+                                    <div v-if="item.type === 'date'" class="flex items-center gap-3 py-1">
+                                        <span class="h-px flex-1 bg-slate-200"></span>
+                                        <span class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                            {{ item.label }}
+                                        </span>
+                                        <span class="h-px flex-1 bg-slate-200"></span>
                                     </div>
-                                </div>
+
+                                    <div v-else-if="item.type === 'unread'" class="flex items-center gap-3 py-1">
+                                        <span class="h-px flex-1 bg-emerald-200"></span>
+                                        <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-800">
+                                            Unread
+                                        </span>
+                                        <span class="h-px flex-1 bg-emerald-200"></span>
+                                    </div>
+
+                                    <div
+                                        v-else
+                                        class="flex"
+                                        :class="item.message.is_sent ? 'justify-end' : 'justify-start'"
+                                    >
+                                        <div
+                                            class="max-w-[85%] rounded-xl px-4 py-3 text-sm shadow-sm"
+                                            :class="
+                                                item.message.is_sent
+                                                    ? 'bg-portal-navy text-white'
+                                                    : 'bg-slate-100 text-slate-800'
+                                            "
+                                        >
+                                            <p class="whitespace-pre-line">{{ item.message.body }}</p>
+                                            <p
+                                                class="mt-2 text-[11px]"
+                                                :class="item.message.is_sent ? 'text-blue-100' : 'text-slate-500'"
+                                            >
+                                                {{ formatDate(item.message.created_at) }}
+                                            </p>
+                                            <button
+                                                v-if="!item.message.read && !item.message.is_sent"
+                                                type="button"
+                                                class="mt-2 rounded-md bg-white/20 px-2 py-1 text-[11px] font-semibold text-current hover:bg-white/30"
+                                                @click="markAsRead(item.message.id)"
+                                            >
+                                                Mark as read
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
+
+                            <form class="mt-4 border-t border-slate-200 pt-4" @submit.prevent="sendInlineReply">
+                                <label for="thread-reply" class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Reply to {{ activeConversationData.name }}
+                                </label>
+                                <textarea
+                                    id="thread-reply"
+                                    ref="replyBodyInput"
+                                    v-model="replyForm.body"
+                                    rows="3"
+                                    maxlength="2000"
+                                    placeholder="Write a reply..."
+                                    class="mt-2 block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
+                                    :class="{
+                                        'border-red-300 focus:border-red-500 focus:ring-red-500': replyForm.errors.body,
+                                    }"
+                                ></textarea>
+                                <p v-if="replyForm.errors.body" class="mt-1 text-xs text-red-600">
+                                    {{ replyForm.errors.body }}
+                                </p>
+                                <div class="mt-3 flex items-center justify-between gap-3">
+                                    <p class="text-xs text-slate-500">
+                                        {{ (replyForm.body ?? '').length }}/2000
+                                    </p>
+                                    <button
+                                        type="submit"
+                                        :disabled="replyForm.processing || !replyForm.body.trim()"
+                                        class="rounded-md bg-portal-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-portal-navy-dark disabled:opacity-50"
+                                    >
+                                        <span v-if="replyForm.processing">Sending...</span>
+                                        <span v-else>Send Reply</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
 
                         <div v-else class="space-y-4">

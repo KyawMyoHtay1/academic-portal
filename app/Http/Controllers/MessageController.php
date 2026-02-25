@@ -23,6 +23,15 @@ class MessageController extends Controller
         $activeConversation = $this->resolveActiveConversation($request);
         $conversationUserId = $activeConversation ? (int) $activeConversation->id : null;
 
+        // Opening a conversation marks unread incoming messages in that thread as read.
+        if ($conversationUserId !== null) {
+            Message::query()
+                ->where('sender_id', $conversationUserId)
+                ->where('receiver_id', $user->id)
+                ->where('read', false)
+                ->update(['read' => true]);
+        }
+
         // Get both received and sent messages (paginated to avoid loading large inboxes).
         $messageQuery = Message::with(['sender', 'receiver'])
             ->where(function ($query) use ($user) {
@@ -130,7 +139,7 @@ class MessageController extends Controller
         ]);
 
         return redirect()
-            ->route('messages.index')
+            ->route('messages.index', ['with_user' => (int) $data['receiver_id']])
             ->with('success', 'Message sent successfully.');
     }
 
