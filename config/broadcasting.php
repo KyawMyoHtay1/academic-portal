@@ -2,7 +2,22 @@
 
 $requestedConnection = env('BROADCAST_CONNECTION', 'log');
 $requiresPusherClient = in_array($requestedConnection, ['reverb', 'pusher'], true);
-$defaultConnection = $requiresPusherClient && ! class_exists(\Pusher\Pusher::class)
+$hasValue = static fn ($value): bool => is_string($value)
+    ? trim($value) !== ''
+    : $value !== null && $value !== '';
+$hasPusherLibrary = class_exists(\Pusher\Pusher::class);
+$hasReverbCredentials = $hasValue(env('REVERB_APP_KEY'))
+    && $hasValue(env('REVERB_APP_SECRET'))
+    && $hasValue(env('REVERB_APP_ID'));
+$hasPusherCredentials = $hasValue(env('PUSHER_APP_KEY'))
+    && $hasValue(env('PUSHER_APP_SECRET'))
+    && $hasValue(env('PUSHER_APP_ID'));
+$connectionConfigured = match ($requestedConnection) {
+    'reverb' => $hasReverbCredentials,
+    'pusher' => $hasPusherCredentials,
+    default => true,
+};
+$defaultConnection = $requiresPusherClient && (! $hasPusherLibrary || ! $connectionConfigured)
     ? 'log'
     : $requestedConnection;
 
