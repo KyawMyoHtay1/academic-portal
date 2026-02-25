@@ -4,7 +4,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
 import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import debounce from "lodash/debounce";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
     messages: {
@@ -53,8 +53,12 @@ const page = usePage();
 const authUserId = computed(() => Number(page.props.auth?.user?.id ?? 0));
 const POLL_INTERVAL_MS = 15000;
 const USER_ACTIVE_GRACE_MS = 2500;
+const AUTO_SCROLL_BOTTOM_THRESHOLD_PX = 120;
 const isPolling = ref(false);
 const lastInteractionAt = ref(Date.now());
+const threadScrollContainer = ref(null);
+const threadIsNearBottom = ref(true);
+const pendingThreadAutoScroll = ref(false);
 let pollingTimer = null;
 let echoConnection = null;
 let echoConnectionStateHandler = null;
@@ -262,6 +266,7 @@ const markAsRead = (id) => {
 };
 
 const selectConversation = (userId) => {
+    pendingThreadAutoScroll.value = true;
     router.get(
         route("messages.index"),
         { with_user: userId },
@@ -274,6 +279,7 @@ const selectConversation = (userId) => {
 };
 
 const clearConversation = () => {
+    pendingThreadAutoScroll.value = false;
     router.get(
         route("messages.index"),
         {},
@@ -363,6 +369,39 @@ const clearAllFilters = () => {
     unreadOnly.value = false;
 };
 
+const getThreadDistanceFromBottom = () => {
+    const container = threadScrollContainer.value;
+    if (!container) return 0;
+
+    return Math.max(
+        0,
+        container.scrollHeight - container.scrollTop - container.clientHeight
+    );
+};
+
+const handleThreadScroll = () => {
+    threadIsNearBottom.value =
+        getThreadDistanceFromBottom() <= AUTO_SCROLL_BOTTOM_THRESHOLD_PX;
+};
+
+const scrollThreadToBottom = (behavior = "smooth") => {
+    nextTick(() => {
+        const container = threadScrollContainer.value;
+        if (!container) return;
+
+        if (typeof container.scrollTo === "function") {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior,
+            });
+        } else {
+            container.scrollTop = container.scrollHeight;
+        }
+
+        threadIsNearBottom.value = true;
+    });
+};
+
 const trackInteraction = () => {
     lastInteractionAt.value = Date.now();
 };
@@ -443,7 +482,7 @@ watch([query, conversationQuery, activeTab, unreadOnly], () => {
     persistFiltersToUrl();
 });
 
-watch(activeConversationData, (conversation) => {
+watch(activeConversationData, (conversation, previousConversation) => {
     if (conversation && unreadOnly.value) {
         unreadOnly.value = false;
     }
@@ -451,6 +490,49 @@ watch(activeConversationData, (conversation) => {
     replyForm.reset("body");
     replyForm.clearErrors();
     replyForm.receiver_id = conversation ? String(conversation.user_id) : "";
+
+    const previousUserId = previousConversation
+        ? String(previousConversation.user_id)
+        : "";
+    const currentUserId = conversation ? String(conversation.user_id) : "";
+    if (currentUserId && currentUserId !== previousUserId) {
+        pendingThreadAutoScroll.value = true;
+        scrollThreadToBottom("auto");
+    }
+});
+
+watch(
+    () => threadMessages.value.at(-1)?.id ?? null,
+    (latestMessageId, previousMessageId) => {
+        if (!activeConversationData.value) return;
+        if (!latestMessageId || latestMessageId === previousMessageId) return;
+
+        const shouldAutoScroll =
+            pendingThreadAutoScroll.value || threadIsNearBottom.value;
+
+        if (shouldAutoScroll) {
+            scrollThreadToBottom(
+                pendingThreadAutoScroll.value ? "smooth" : "auto"
+            );
+        }
+
+        pendingThreadAutoScroll.value = false;
+    }
+);
+
+watch(
+    () => props.activeConversation,
+    (activeConversation) => {
+        if (activeConversation) {
+            pendingThreadAutoScroll.value = true;
+        }
+    }
+);
+
+watch(replyForm.processing, (processing) => {
+    if (!processing && pendingThreadAutoScroll.value) {
+        scrollThreadToBottom("smooth");
+    }
 });
 
 onBeforeUnmount(() => {
@@ -475,6 +557,7 @@ const sendInlineReply = () => {
     if (!activeConversationData.value) return;
 
     trackInteraction();
+    pendingThreadAutoScroll.value = true;
     replyForm.receiver_id = String(activeConversationData.value.user_id);
     replyForm.post(route("messages.store"), {
         preserveScroll: true,
@@ -596,6 +679,11 @@ onMounted(() => {
 
     if (typeof document !== "undefined") {
         document.addEventListener("visibilitychange", handleVisibilityChange);
+    }
+
+    if (activeConversationData.value) {
+        pendingThreadAutoScroll.value = true;
+        scrollThreadToBottom("auto");
     }
 });
 </script>
@@ -835,7 +923,11 @@ onMounted(() => {
                                 </button>
                             </div>
 
-                            <div class="space-y-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+                            <div
+                                ref="threadScrollContainer"
+                                class="space-y-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
+                                @scroll.passive="handleThreadScroll"
+                            >
                                 <div
                                     v-if="threadMessages.length === 0"
                                     class="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500"
