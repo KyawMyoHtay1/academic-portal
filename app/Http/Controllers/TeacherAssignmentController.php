@@ -113,10 +113,11 @@ class TeacherAssignmentController extends Controller
             ->pluck('late_count', 'assignment_submissions.assignment_id');
 
         $assignments = $assignments
-            ->map(function ($assignment) use ($expectedStudentsCount, $lateCounts) {
+            ->map(function ($assignment) use ($expectedStudentsCount, $lateCounts, $user) {
                 $submissionsCount = (int) ($assignment->submissions_count ?? 0);
                 $gradedCount = (int) ($assignment->graded_submissions_count ?? 0);
                 $expectedCount = max($expectedStudentsCount, 0);
+                $isOwner = (int) ($assignment->created_by ?? 0) === (int) ($user->id ?? 0);
 
                 return [
                     'id' => $assignment->id,
@@ -138,6 +139,7 @@ class TeacherAssignmentController extends Controller
                         ? min(100, round(($gradedCount / $expectedCount) * 100))
                         : 0,
                     'is_overdue' => $assignment->isOverdue(),
+                    'can_manage' => $isOwner,
                     'creator_name' => $assignment->creator?->name ?? null,
                 ];
             });
@@ -319,7 +321,11 @@ class TeacherAssignmentController extends Controller
         $user = Auth::user();
 
         if ($assignment->created_by !== $user->id) {
-            abort(403, 'You can only view submissions for your own assignments.');
+            $creatorName = $assignment->creator?->name ?? 'another teacher';
+            abort(
+                403,
+                "You can only view submissions for your own assignments. This assignment was created by {$creatorName}."
+            );
         }
 
         $dueAt = $this->assignmentDueAt($assignment);

@@ -88,6 +88,11 @@ const submissionPercent = (assignment) =>
 
 const gradedPercent = (assignment) =>
     Math.min(100, Math.max(0, Number(assignment?.graded_percent ?? 0)));
+
+const ownershipHint = (assignment) =>
+    `Only ${
+        assignment?.creator_name ?? "the assignment creator"
+    } can manage submissions and grading for this assignment.`;
 </script>
 
 <template>
@@ -285,32 +290,50 @@ const gradedPercent = (assignment) =>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <Link
-                                        :href="route('teacher.assignments.submissions', assignment.id)"
-                                        class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
-                                    >
-                                        View Submissions
-                                    </Link>
-                                    <button
-                                        v-if="assignment.status === 'draft'"
-                                        type="button"
-                                        @click="publishAssignment(assignment.id)"
-                                        class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-                                    >
-                                        Publish
-                                    </button>
-                                    <Link
-                                        :href="route('teacher.assignments.edit', assignment.id)"
-                                        class="rounded-md bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-200"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <button
-                                        @click="deleteAssignment(assignment.id)"
-                                        class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200"
-                                    >
-                                        Delete
-                                    </button>
+                                    <template v-if="assignment.can_manage">
+                                        <Link
+                                            :href="route('teacher.assignments.submissions', assignment.id)"
+                                            class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                                        >
+                                            View Submissions
+                                        </Link>
+                                        <button
+                                            v-if="assignment.status === 'draft'"
+                                            type="button"
+                                            @click="publishAssignment(assignment.id)"
+                                            class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                        >
+                                            Publish
+                                        </button>
+                                        <Link
+                                            :href="route('teacher.assignments.edit', assignment.id)"
+                                            class="rounded-md bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-200"
+                                        >
+                                            Edit
+                                        </Link>
+                                        <button
+                                            @click="deleteAssignment(assignment.id)"
+                                            class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200"
+                                        >
+                                            Delete
+                                        </button>
+                                    </template>
+                                    <template v-else>
+                                        <button
+                                            type="button"
+                                            disabled
+                                            :title="ownershipHint(assignment)"
+                                            class="cursor-not-allowed rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500 opacity-70"
+                                        >
+                                            View Submissions
+                                        </button>
+                                        <span
+                                            class="inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[10px] font-semibold text-amber-800"
+                                            :title="ownershipHint(assignment)"
+                                        >
+                                            Read-only
+                                        </span>
+                                    </template>
                                 </div>
                             </div>
                         </div>
