@@ -1,0 +1,68 @@
+@startuml Timebox2_Class_Initial
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 2 - Initial Class Diagram (Grades, Fee Payment, Assignment)
+
+class User {
+}
+
+class Student {
+}
+
+class Course {
+}
+
+class Subject {
+}
+
+class Grade {
+}
+
+class GradeReviewLog {
+}
+
+class Fee {
+}
+
+class FeeStatusLog {
+}
+
+class Assignment {
+}
+
+class AssignmentSubmission {
+}
+
+class StripeWebhookEvent {
+}
+
+class SubjectGradeCalculator {
+}
+
+' Relationships
+Student "1" -- "0..*" Grade
+Subject "1" -- "0..*" Grade
+Course  "0..1" -- "0..*" Grade
+Grade   "1" -- "0..*" GradeReviewLog
+
+Student "1" -- "0..*" Fee
+Fee     "1" -- "0..*" FeeStatusLog
+
+Subject "1" -- "0..*" Assignment
+Course  "1" -- "0..*" Assignment
+Assignment "1" -- "0..*" AssignmentSubmission
+Student    "1" -- "0..*" AssignmentSubmission
+
+User "1" -- "0..*" Grade             : teacher/staff (graded_by, reviewed_by)
+User "1" -- "0..*" Fee               : staff (processed_by)
+User "1" -- "0..*" Assignment        : teacher (created_by)
+User "1" -- "0..*" AssignmentSubmission : teacher (graded_by)
+
+StripeWebhookEvent "0..*" -- "0..*" Fee : updates payment status
+
+SubjectGradeCalculator ..> Grade
+SubjectGradeCalculator ..> Assignment
+SubjectGradeCalculator ..> AssignmentSubmission
+
+@enduml
+
