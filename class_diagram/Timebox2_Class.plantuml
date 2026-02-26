@@ -3,6 +3,16 @@ hide circle
 skinparam classAttributeIconSize 0
 title Timebox 2 - Grades, Fee Payment, and Assignment
 
+note right of Grade
+  **Implementation note:**
+  Methods and relationships shown are
+  design-level operations. Actual
+  implementation uses Laravel Eloquent
+  models, services (e.g. SubjectGradeCalculator,
+  EnrollmentService, Fee/Payment services),
+  and controllers for HTTP/API handling.
+end note
+
 class User {
   +id: bigint
   +name: varchar

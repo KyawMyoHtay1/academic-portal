@@ -66,11 +66,7 @@ class Student {
   +UpdateStudent()
   +DeleteStudent()
   +SearchStudent()
-  +GetGrades()
   +GetEnrollments()
-  +GetFees()
-  +GetAttendance()
-  +CalculateGPA()
   +AutoID()
 }
 
@@ -92,7 +88,6 @@ class Course {
   +SearchCourse()
   +GetSubjects()
   +GetEnrollments()
-  +GetTimetables()
   +ValidateCourseCode()
   +AutoID()
 }
@@ -114,9 +109,6 @@ class Subject {
   +UpdateSubject()
   +DeleteSubject()
   +SearchSubject()
-  +GetGrades()
-  +GetTimetables()
-  +GetAttendances()
   +ValidateSubjectCode()
   +AutoID()
 }
