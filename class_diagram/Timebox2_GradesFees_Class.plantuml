@@ -18,6 +18,8 @@ class User {
   +name: varchar
   +email: varchar
   +role: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +student()
 }
@@ -27,6 +29,8 @@ class Student {
   +user_id: bigint
   +student_no: varchar
   +full_name: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +grades()
   +fees()
@@ -37,6 +41,8 @@ class Course {
   +id: bigint
   +course_code: varchar
   +title: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +subjects()
   +grades()
@@ -47,6 +53,8 @@ class Subject {
   +course_id: bigint
   +subject_code: varchar
   +title: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +course()
   +grades()
@@ -63,6 +71,8 @@ class Grade {
   +status: enum(draft,pending,approved,rejected)
   +reviewed_at: timestamp
   +rejection_reason: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +course()
   +subject()
@@ -87,6 +97,8 @@ class GradeReviewLog {
   +action: enum(submitted,approved,rejected)
   +reason: varchar
   +meta: json
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +grade()
   +performer()
@@ -104,6 +116,8 @@ class Fee {
   +payment_method: varchar
   +payment_processed_at: timestamp
   +processed_by: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +student()
   +processor()
@@ -127,6 +141,8 @@ class FeeStatusLog {
   +note: varchar
   +performed_by: bigint
   +meta: json
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +fee()
   +performer()
