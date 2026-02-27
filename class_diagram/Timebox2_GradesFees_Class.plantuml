@@ -1,0 +1,172 @@
+@startuml Timebox2_GradesFees_Class
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 2 - Manage Grades & Fee Payment
+
+note right of Grade
+  **Implementation note:**
+  Methods and relationships shown are
+  design-level operations. Actual
+  implementation uses Laravel Eloquent
+  models, services (e.g. SubjectGradeCalculator,
+  fee/payment services), and controllers
+  for HTTP/API handling.
+end note
+
+class User {
+  +id: bigint
+  +name: varchar
+  +email: varchar
+  +role: varchar
+  --
+  +student()
+}
+
+class Student {
+  +id: bigint
+  +user_id: bigint
+  +student_no: varchar
+  +full_name: varchar
+  --
+  +grades()
+  +fees()
+  +calculateGPA()
+}
+
+class Course {
+  +id: bigint
+  +course_code: varchar
+  +title: varchar
+  --
+  +subjects()
+  +grades()
+}
+
+class Subject {
+  +id: bigint
+  +course_id: bigint
+  +subject_code: varchar
+  +title: varchar
+  --
+  +course()
+  +grades()
+}
+
+class Grade {
+  +id: bigint
+  +subject_id: bigint
+  +course_id: bigint
+  +student_id: bigint
+  +graded_by: bigint
+  +reviewed_by: bigint
+  +score: decimal(5,2)
+  +status: enum(draft,pending,approved,rejected)
+  +reviewed_at: timestamp
+  +rejection_reason: varchar
+  --
+  +course()
+  +subject()
+  +student()
+  +grader()
+  +reviewer()
+  +reviewLogs()
+  +scopeDraft()
+  +scopePending()
+  +scopeApproved()
+  +scopeRejected()
+  +submitForReview(score, gradedBy, courseId)
+  +approve(reviewedBy)
+  +reject(reviewedBy, reason)
+  +getLetterGradeAttribute()
+}
+
+class GradeReviewLog {
+  +id: bigint
+  +grade_id: bigint
+  +performed_by: bigint
+  +action: enum(submitted,approved,rejected)
+  +reason: varchar
+  +meta: json
+  --
+  +grade()
+  +performer()
+}
+
+class Fee {
+  +id: bigint
+  +student_id: bigint
+  +amount: decimal(10,2)
+  +description: varchar
+  +status: enum(pending,payment_pending,failed,paid)
+  +due_date: date
+  +paid_date: date
+  +payment_intent_id: varchar
+  +payment_method: varchar
+  +payment_processed_at: timestamp
+  +processed_by: bigint
+  --
+  +student()
+  +processor()
+  +statusLogs()
+  +scopePending()
+  +scopePaymentPending()
+  +scopeFailed()
+  +scopePaid()
+  +scopeOverdue()
+  +markAsPaymentPending(intentId, performedBy, action, note, meta)
+  +markAsPending(performedBy, action, note, meta)
+  +markAsPaid(method, intentId, processedBy, action, note, meta)
+}
+
+class FeeStatusLog {
+  +id: bigint
+  +fee_id: bigint
+  +from_status: varchar
+  +to_status: varchar
+  +action: varchar
+  +note: varchar
+  +performed_by: bigint
+  +meta: json
+  --
+  +fee()
+  +performer()
+}
+
+class StripeWebhookEvent {
+  +id: bigint
+  +event_id: varchar
+  +event_type: varchar
+  +payload: json
+  +processed_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class SubjectGradeCalculator {
+  +calculateSuggestedGrade(subjectId, studentId)
+  +calculateForSubjectStudents(subjectId, studentIds)
+  +calculateForStudentSubjects(subjectIds, studentId)
+}
+
+Course  "1" -- "0..*" Subject
+Subject "1" -- "0..*" Grade
+Course  "0..1" -- "0..*" Grade
+Student "1" -- "0..*" Grade
+User    "1" -- "0..*" Grade         : graded_by
+User    "1" -- "0..*" Grade         : reviewed_by
+Grade   "1" -- "0..*" GradeReviewLog
+User    "1" -- "0..*" GradeReviewLog : performed_by
+
+Student "1" -- "0..*" Fee
+User    "0..1" -- "0..*" Fee          : processed_by
+Fee     "1" -- "0..*" FeeStatusLog
+User    "0..1" -- "0..*" FeeStatusLog : performed_by
+
+StripeWebhookEvent "0..*" -- "0..*" Fee : updates payment status
+
+SubjectGradeCalculator ..> Grade
+SubjectGradeCalculator ..> Subject
+SubjectGradeCalculator ..> Student
+
+@enduml
+

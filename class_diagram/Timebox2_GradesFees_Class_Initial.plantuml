@@ -1,0 +1,59 @@
+@startuml Timebox2_GradesFees_Class_Initial
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 2 - Initial Class Diagram (Manage Grades & Fee Payment)
+
+class User {
+}
+
+class Student {
+}
+
+class Course {
+}
+
+class Subject {
+}
+
+class Grade {
+}
+
+class GradeReviewLog {
+}
+
+class Fee {
+}
+
+class FeeStatusLog {
+}
+
+class StripeWebhookEvent {
+}
+
+class SubjectGradeCalculator {
+}
+
+' Grade relationships
+Student "1" -- "0..*" Grade
+Subject "1" -- "0..*" Grade
+Course  "0..1" -- "0..*" Grade
+Grade   "1" -- "0..*" GradeReviewLog
+
+User "1" -- "0..*" Grade         : teacher/staff (graded_by, reviewed_by)
+User "1" -- "0..*" GradeReviewLog : performed_by
+
+SubjectGradeCalculator ..> Grade
+SubjectGradeCalculator ..> Subject
+SubjectGradeCalculator ..> Student
+
+' Fee & payment relationships
+Student "1" -- "0..*" Fee
+Fee     "1" -- "0..*" FeeStatusLog
+
+User "1" -- "0..*" Fee          : staff (processed_by)
+User "1" -- "0..*" FeeStatusLog : performed_by
+
+StripeWebhookEvent "0..*" -- "0..*" Fee : updates payment status
+
+@enduml
+
