@@ -40,6 +40,11 @@ const filteredSubjects = computed(() => {
 
     return list;
 });
+
+const stats = computed(() => ({
+    subjects: props.subjects?.length ?? 0,
+    courses: courses.value.length,
+}));
 </script>
 
 <template>
@@ -60,6 +65,35 @@ const filteredSubjects = computed(() => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="mb-6 grid gap-4 md:grid-cols-2">
+                    <div class="portal-card p-5">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Subjects
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-slate-900">
+                            {{ stats.subjects }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-600">
+                            Subjects you can manage assignments for
+                        </p>
+                    </div>
+                    <div class="portal-card p-5 bg-emerald-50">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            Courses
+                        </p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-900">
+                            {{ stats.courses }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Unique courses covered
+                        </p>
+                    </div>
+                </div>
+
                 <div class="portal-card overflow-hidden p-6">
                     <div class="mb-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
