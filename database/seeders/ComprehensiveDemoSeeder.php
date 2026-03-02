@@ -54,6 +54,7 @@ class ComprehensiveDemoSeeder extends Seeder
         $this->seedAssignmentSubmissions($assignments, $teacherUsers);
 
         $this->seedFinalGradesAndReviewLogs($subjectsByCourseId, $teacherUsers, $staffUsers);
+        $this->seedStudentGradeDetailsBreakdownSample($teacherUsers, $staffUsers);
         $this->seedFees($students, $staffUsers);
 
         $announcements = $this->seedAnnouncements($staffUsers);
@@ -657,6 +658,244 @@ class ComprehensiveDemoSeeder extends Seeder
                     );
                 }
             }
+        }
+    }
+
+    /**
+     * Ensure the student Grade Details & Breakdown page has rich sample data.
+     *
+     * This seeds one deterministic scenario for student01@example.com including:
+     * - Published assignments in one enrolled subject
+     * - Graded, submitted, and not-submitted assignment states
+     * - Approved final grade plus review logs
+     *
+     * @param  Collection<int, User>  $teacherUsers
+     * @param  Collection<int, User>  $staffUsers
+     */
+    private function seedStudentGradeDetailsBreakdownSample(Collection $teacherUsers, Collection $staffUsers): void
+    {
+        $studentUser = User::query()->where('email', 'student01@example.com')->first();
+        $student = $studentUser?->student;
+        if (! $student) {
+            return;
+        }
+
+        $courseId = (int) DB::table('course_student')
+            ->where('student_id', $student->id)
+            ->whereIn('status', ['approved', 'withdrawal_pending'])
+            ->orderBy('course_id')
+            ->value('course_id');
+
+        if ($courseId <= 0) {
+            return;
+        }
+
+        $subject = Subject::query()
+            ->where('course_id', $courseId)
+            ->orderBy('subject_code')
+            ->first(['id', 'course_id', 'subject_code', 'title']);
+
+        if (! $subject) {
+            return;
+        }
+
+        $teacherId = $this->resolveTeacherIdForSubject((int) $subject->id, $teacherUsers);
+        $reviewerId = (int) ($staffUsers->first()?->id ?? $teacherId);
+
+        $assignmentDefinitions = [
+            [
+                'title_prefix' => 'Breakdown Quiz 1',
+                'description' => 'Sample quiz for Grade Details breakdown view.',
+                'due_date' => Carbon::now()->subDays(18)->toDateString(),
+                'max_score' => 20,
+            ],
+            [
+                'title_prefix' => 'Breakdown Lab 1',
+                'description' => 'Sample lab task for Grade Details breakdown view.',
+                'due_date' => Carbon::now()->subDays(12)->toDateString(),
+                'max_score' => 30,
+            ],
+            [
+                'title_prefix' => 'Breakdown Case Study',
+                'description' => 'Sample case study for Grade Details breakdown view.',
+                'due_date' => Carbon::now()->subDays(6)->toDateString(),
+                'max_score' => 25,
+            ],
+            [
+                'title_prefix' => 'Breakdown Reflection',
+                'description' => 'Sample reflection task to demonstrate not-submitted state.',
+                'due_date' => Carbon::now()->addDays(3)->toDateString(),
+                'max_score' => 25,
+            ],
+        ];
+
+        $assignments = collect($assignmentDefinitions)
+            ->map(function (array $definition) use ($subject, $courseId, $teacherId) {
+                return Assignment::updateOrCreate(
+                    [
+                        'subject_id' => $subject->id,
+                        'title' => $definition['title_prefix'].' - '.$subject->subject_code,
+                    ],
+                    [
+                        'course_id' => $courseId,
+                        'created_by' => $teacherId,
+                        'description' => $definition['description'],
+                        'due_date' => $definition['due_date'],
+                        'due_time' => '23:59:00',
+                        'max_score' => $definition['max_score'],
+                        'status' => Assignment::STATUS_PUBLISHED,
+                        'allowed_file_types' => ['pdf', 'docx', 'txt'],
+                        'max_file_size' => 5120,
+                    ]
+                );
+            })
+            ->values();
+
+        if ($assignments->count() < 4) {
+            return;
+        }
+
+        $gradedSubmissionSpecs = [
+            [
+                'assignment' => $assignments[0],
+                'score' => 17.5,
+                'status' => AssignmentSubmission::STATUS_GRADED,
+                'feedback' => 'Strong work with complete answers.',
+                'graded_at' => Carbon::now()->subDays(5),
+            ],
+            [
+                'assignment' => $assignments[1],
+                'score' => 19.5,
+                'status' => AssignmentSubmission::STATUS_RETURNED,
+                'feedback' => 'Good attempt. Recheck the final optimization step.',
+                'graded_at' => Carbon::now()->subDays(3),
+            ],
+        ];
+
+        foreach ($gradedSubmissionSpecs as $spec) {
+            /** @var Assignment $assignment */
+            $assignment = $spec['assignment'];
+            $filePath = sprintf(
+                'assignments/seed/grade-details-assignment-%d-student-%d.txt',
+                $assignment->id,
+                $student->id
+            );
+
+            Storage::disk('public')->put(
+                $filePath,
+                sprintf('Grade details sample submission for assignment %d and student %d.', $assignment->id, $student->id)
+            );
+
+            AssignmentSubmission::updateOrCreate(
+                [
+                    'assignment_id' => $assignment->id,
+                    'student_id' => $student->id,
+                ],
+                [
+                    'file_path' => $filePath,
+                    'original_filename' => basename($filePath),
+                    'comments' => 'Seeded for Grade Details & Breakdown page sample data.',
+                    'score' => $spec['score'],
+                    'feedback' => $spec['feedback'],
+                    'graded_by' => $teacherId,
+                    'graded_at' => $spec['graded_at'],
+                    'status' => $spec['status'],
+                ]
+            );
+        }
+
+        $submittedAssignment = $assignments[2];
+        $submittedFilePath = sprintf(
+            'assignments/seed/grade-details-assignment-%d-student-%d.txt',
+            $submittedAssignment->id,
+            $student->id
+        );
+        Storage::disk('public')->put(
+            $submittedFilePath,
+            sprintf(
+                'Ungraded sample submission for assignment %d and student %d.',
+                $submittedAssignment->id,
+                $student->id
+            )
+        );
+
+        AssignmentSubmission::updateOrCreate(
+            [
+                'assignment_id' => $submittedAssignment->id,
+                'student_id' => $student->id,
+            ],
+            [
+                'file_path' => $submittedFilePath,
+                'original_filename' => basename($submittedFilePath),
+                'comments' => 'Submitted, awaiting grading.',
+                'score' => null,
+                'feedback' => null,
+                'graded_by' => null,
+                'graded_at' => null,
+                'status' => AssignmentSubmission::STATUS_SUBMITTED,
+            ]
+        );
+
+        AssignmentSubmission::query()
+            ->where('assignment_id', $assignments[3]->id)
+            ->where('student_id', $student->id)
+            ->delete();
+
+        $grade = Grade::updateOrCreate(
+            [
+                'subject_id' => $subject->id,
+                'student_id' => $student->id,
+            ],
+            [
+                'course_id' => $courseId,
+                'graded_by' => $teacherId,
+                'score' => 78.0,
+                'status' => Grade::STATUS_APPROVED,
+                'reviewed_by' => $reviewerId,
+                'reviewed_at' => Carbon::now()->subDays(1),
+                'rejection_reason' => null,
+            ]
+        );
+
+        GradeReviewLog::updateOrCreate(
+            [
+                'grade_id' => $grade->id,
+                'action' => 'submitted',
+            ],
+            [
+                'performed_by' => $teacherId,
+                'reason' => null,
+                'meta' => [
+                    'seeded' => true,
+                    'source' => 'grade_details_breakdown_sample',
+                    'subject_id' => $subject->id,
+                    'course_id' => $courseId,
+                ],
+            ]
+        );
+
+        GradeReviewLog::updateOrCreate(
+            [
+                'grade_id' => $grade->id,
+                'action' => 'approved',
+            ],
+            [
+                'performed_by' => $reviewerId,
+                'reason' => null,
+                'meta' => [
+                    'seeded' => true,
+                    'source' => 'grade_details_breakdown_sample',
+                ],
+            ]
+        );
+
+        if ($this->command) {
+            $this->command->line(
+                sprintf(
+                    'Grade breakdown sample ensured for student01@example.com (%s).',
+                    $subject->subject_code
+                )
+            );
         }
     }
 
