@@ -1,250 +1,296 @@
 # 5.1.6 Functional Testing
-## Timebox 1 - Manage Student Registration and Course Registration Process
+## Timebox 1 – Manage Student Registration and Course Registration Process
 
 ### 5.1.6.1 Scope
-Functional testing was executed to verify authentication, user management, student management, course and subject management, and enrolment workflow behavior. The tests cover validation rules, role-based permissions, CRUD operations, business constraints, and end-to-end process transitions.
 
-### 5.1.6.2 Coverage Summary Table
-| Module ID | Module Name | TC Range | Total Test Cases |
-|---|---|---|---|
-| M1 | User Registration (Public) | TC1.1-TC1.6 | 6 |
-| M2 | User Registration (Admin) | TC2.1-TC2.7 | 7 |
-| M3 | User Login | TC3.1-TC3.6 | 6 |
-| M4 | User Management | TC4.1-TC4.5 | 5 |
-| M5 | Password Management | TC5.1-TC5.3 | 3 |
-| M6 | User Settings / Preferences | TC6.1-TC6.2 | 2 |
-| M7 | Global Search | TC7.1-TC7.2 | 2 |
-| M8 | Student Registration | TC8.1-TC8.5 | 5 |
-| M9 | Student Management | TC9.1-TC9.5 | 5 |
-| M10 | Student Self Profile | TC10.1-TC10.3 | 3 |
-| M11 | Course Management | TC11.1-TC11.6 | 6 |
-| M12 | Subject Management | TC12.1-TC12.5 | 5 |
-| M13 | Course Enrolment | TC13.1-TC13.9 | 9 |
+Functional testing was conducted to ensure that the system performs all required tasks correctly and completely. Testing verifies that the system meets each specified aim, rejects erroneous data, displays adequate prompts and output, and that data capture forms and outputs are clear and complete. Tests are numbered; screenshots and evidence are numbered to correspond and annotated where changes were necessary. The tests cover validation rules, role-based permissions, CRUD operations, business constraints, and end-to-end process transitions.
 
-**Total Functional Test Cases: 64**
+---
 
-### 5.1.6.3 Test Design Technique
-Test cases were designed using equivalence partitioning, boundary value analysis, negative testing, role-based access testing, and workflow testing to cover both normal and exceptional flows.
+### 5.1.6.2 Test Plan
 
-### 5.1.6.4 Detailed Test Plan
-| TC ID | Scenario | Preconditions | Input Data | Test Steps | Expected Result |
-|---|---|---|---|---|---|
-| TC1.1 | Required fields validation | Public user opens the registration page. | Submit Register with name, email, or password blank | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message for empty required field(s) |
-| TC1.2 | Email format validation | Public user opens the registration page. | Submit with email missing '@' or invalid format | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Invalid email format message |
-| TC1.3 | Password confirmation | Public user opens the registration page. | Submit with password and confirmation mismatch | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Passwords must match message |
-| TC1.4 | Password strength | Public user opens the registration page. | Submit with weak password (e.g. too short) | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Password strength requirement message |
-| TC1.5 | Duplicate email | Public user opens the registration page. | Submit with existing email | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Email already taken message |
-| TC1.6 | Successful registration | Public user opens the registration page. | Fill valid data, accept terms, complete reCAPTCHA (if enabled), click Register | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | User created, logged in, redirected to dashboard |
-| TC2.1 | Required fields and role | Staff user is logged in and opens user management. | Submit with name, email, or role blank | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message |
-| TC2.2 | Email format and uniqueness | Staff user is logged in and opens user management. | Submit with invalid or duplicate email | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation/duplicate message |
-| TC2.3 | Photo upload | Staff user is logged in and opens user management. | Upload file other than jpeg/jpg/png or > 2MB | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Invalid file type/size message |
-| TC2.4 | Successful create | Staff user is logged in and opens user management. | Fill valid data, select role, click Add | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | User created, success message |
-| TC2.5 | Update user | Staff user is logged in and opens user management. | Edit user, change name/email (unique), click Update | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | User updated, success message |
-| TC2.6 | Delete confirmation | Staff user is logged in and opens user management. | Click Delete, confirm dialog | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | User deleted, related records cascade |
-| TC2.7 | Search and filter | Staff user is logged in and opens user management. | Search by name/email/role, use role tabs | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Filtered, paginated results (10 per page) |
-| TC3.1 | Required fields | Login page is available; valid and invalid credential sets are prepared. | Submit with email or password blank | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message |
-| TC3.2 | Invalid credentials | Login page is available; valid and invalid credential sets are prepared. | Submit with wrong email/password | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Incorrect credentials message |
-| TC3.3 | Rate limiting | Login page is available; valid and invalid credential sets are prepared. | Submit wrong credentials 5+ times (same email+IP) | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Throttle/too many attempts message |
-| TC3.4 | Remember Me | Login page is available; valid and invalid credential sets are prepared. | Login with Remember Me checked | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Session persists after browser close |
-| TC3.5 | Successful login | Login page is available; valid and invalid credential sets are prepared. | Submit valid credentials | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Redirect to role-based dashboard |
-| TC3.6 | reCAPTCHA (if enabled) | Login page is available; valid and invalid credential sets are prepared. | Submit without completing reCAPTCHA | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | reCAPTCHA verification required message |
-| TC4.1 | Update validation | Staff user with management permission opens the user list page. | Update user with invalid/duplicate email | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message |
-| TC4.2 | Photo validation on update | Staff user with management permission opens the user list page. | Upload invalid photo type/size | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message |
-| TC4.3 | Delete with confirmation | Staff user with management permission opens the user list page. | Click Delete, confirm | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | User deleted, cascade to related records |
-| TC4.4 | Search by name, email, role | Staff user with management permission opens the user list page. | Enter keyword, apply filters | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Matching results displayed |
-| TC4.5 | Role filter tabs | Staff user with management permission opens the user list page. | Select All / Students / Teachers / Staff | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Filtered list, paginated |
-| TC5.1 | Forgot password | User account exists; reset mail service and token routes are enabled. | Enter email, request reset | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Reset email sent (or success message) |
-| TC5.2 | Reset with token | User account exists; reset mail service and token routes are enabled. | Open reset link, enter new password with confirmation | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Password updated |
-| TC5.3 | Update password (authenticated) | User account exists; reset mail service and token routes are enabled. | Logged-in user changes password with confirmation | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Password updated, success message |
-| TC6.1 | Display defaults | Authenticated user opens the settings page with existing preference values. | Open Settings page | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Defaults shown (e.g. email_announcements, email_messages) |
-| TC6.2 | Update preferences | Authenticated user opens the settings page with existing preference values. | Toggle boolean options, save | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Preferences saved, success message |
-| TC7.1 | Minimum length | Search data exists for Student, Teacher, Staff, and Guest roles. | Submit query < 2 characters | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Empty or no-search result |
-| TC7.2 | Role-based results | Search data exists for Student, Teacher, Staff, and Guest roles. | Search as Student, Teacher, Staff, Guest | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Results scoped to role (courses, announcements, etc.) |
-| TC8.1 | Link to user | Staff user opens student registration; student-role users and master data exist. | Select user with Student role and no student profile | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | User dropdown populated correctly |
-| TC8.2 | Auto student number | Staff user opens student registration; student-role users and master data exist. | Submit without student_no | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | System generates STU0001, STU0002, etc. |
-| TC8.3 | Required and validation | Staff user opens student registration; student-role users and master data exist. | Omit full_name, email, phone, programme, intake_year; invalid DOB, phone, gender, status | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation messages |
-| TC8.4 | Photo and documents | Staff user opens student registration; student-role users and master data exist. | Upload photo (jpeg/png, 2MB), id_card/transcript (pdf/jpg/png, 5MB) | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Files stored; validation on invalid type/size |
-| TC8.5 | Successful registration | Staff user opens student registration; student-role users and master data exist. | Fill valid data, submit | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Student created, linked to user |
-| TC9.1 | Update validation | Staff user opens student management with existing student records. | Update with duplicate student_no or email | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message |
-| TC9.2 | Replace photo/documents | Staff user opens student management with existing student records. | Upload new photo or document | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Old replaced, new stored |
-| TC9.3 | Delete with confirmation | Staff user opens student management with existing student records. | Click Delete, confirm | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Student deleted, enrolments/grades cascade |
-| TC9.4 | Search and filters | Staff user opens student management with existing student records. | Search by student_no, name, email, programme; filter by programme, intake_year, status | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Filtered results, 10 per page |
-| TC9.5 | Pagination | Staff user opens student management with existing student records. | Navigate pages | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Correct page, 10 items per page |
-| TC10.1 | View profile with academic information | Student user is authenticated and has an existing profile. | Student opens profile page | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Profile and academic information shown |
-| TC10.2 | Update allowed fields | Student user is authenticated and has an existing profile. | Update phone, address, photo | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Changes saved |
-| TC10.3 | Restrict editing | Student user is authenticated and has an existing profile. | Attempt to edit student_no, programme, email, name | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Fields read-only or not editable |
-| TC11.1 | Required fields and credits | Staff user opens course management; sample courses and enrolments exist. | Omit course_code, title, credits, semester; credits < 1 or > 10 | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation messages |
-| TC11.2 | Unique course code | Staff user opens course management; sample courses and enrolments exist. | Submit duplicate course_code | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Duplicate course code message |
-| TC11.3 | Photo validation | Staff user opens course management; sample courses and enrolments exist. | Upload invalid type or > 2MB | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation message |
-| TC11.4 | Delete with enrolments | Staff user opens course management; sample courses and enrolments exist. | Delete course that has enrolled students | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Error with enrolment count |
-| TC11.5 | Search, filter, sort | Staff user opens course management; sample courses and enrolments exist. | Search by code/title/semester; filter by semester, enrollment status; sort | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Correct results in table format |
-| TC11.6 | Successful CRUD | Staff user opens course management; sample courses and enrolments exist. | Valid create, update, delete (when no enrolments) | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Success messages |
-| TC12.1 | Required fields and credits | Staff user opens subject management; courses and teacher accounts exist. | Omit course_id, subject_code, title; invalid credits | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation messages |
-| TC12.2 | Unique subject code | Staff user opens subject management; courses and teacher accounts exist. | Submit duplicate subject_code | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Duplicate message |
-| TC12.3 | Assign teachers | Staff user opens subject management; courses and teacher accounts exist. | Select subject, assign one or more teachers with teacher role | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Assignments saved |
-| TC12.4 | Non-teacher assignment | Staff user opens subject management; courses and teacher accounts exist. | Attempt to assign user without teacher role | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Validation/rejection |
-| TC12.5 | Delete with confirmation | Staff user opens subject management; courses and teacher accounts exist. | Delete subject, confirm | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Subject deleted |
-| TC13.1 | Request enrolment | Student and staff users are available; timetable and course data are seeded. | Student requests enrolment in course | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Pending enrolment created |
-| TC13.2 | Duplicate prevention | Student and staff users are available; timetable and course data are seeded. | Request when already enrolled or pending | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Enrol action blocked with duplicate/pending notice |
-| TC13.3 | Schedule conflict | Student and staff users are available; timetable and course data are seeded. | Request enrolment that conflicts with timetable | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Conflict error |
-| TC13.4 | Approve or reject enrolment | Student and staff users are available; timetable and course data are seeded. | Staff approves or rejects pending request | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Status becomes approved or rejected |
-| TC13.5 | Request withdrawal | Student and staff users are available; timetable and course data are seeded. | Student requests withdrawal from approved enrolment | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Status becomes withdrawal_pending |
-| TC13.6 | Approve withdrawal | Student and staff users are available; timetable and course data are seeded. | Staff approves withdrawal | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Enrolment record removed |
-| TC13.7 | Reject withdrawal | Student and staff users are available; timetable and course data are seeded. | Staff rejects withdrawal | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Status reverts to approved |
-| TC13.8 | View My Courses | Student and staff users are available; timetable and course data are seeded. | Student opens My Courses | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Only approved and withdrawal_pending; subjects, date, status; ordered by course code |
-| TC13.9 | Search and manage enrolments | Student and staff users are available; timetable and course data are seeded. | Staff views pending enrolment/withdrawal lists, filters, performs actions | 1) Prepare required preconditions and input data.<br>2) Execute the action defined in Input Data.<br>3) Observe response and capture evidence. | Correct list and actions |
+*(Completed before implementation testing. Each test is numbered; test data and expected results are defined.)*
 
-### 5.1.6.5 Test Execution Log
-| TC ID | Status | Actual Result | Evidence | Remarks |
-|---|---|---|---|---|
-| TC1.1 | Pass | System behavior matched expected result for Required fields validation: Validation message for empty required field(s). | Fig A01 | Working as expected |
-| TC1.2 | Pass | System behavior matched expected result for Email format validation: Invalid email format message. | Fig A02 | Working as expected |
-| TC1.3 | Pass | System behavior matched expected result for Password confirmation: Passwords must match message. | Fig A03 | Working as expected |
-| TC1.4 | Pass | System behavior matched expected result for Password strength: Password strength requirement message. | Fig A04 | Working as expected |
-| TC1.5 | Pass | System behavior matched expected result for Duplicate email: Email already taken message. | Fig A05 | Working as expected |
-| TC1.6 | Pass | System behavior matched expected result for Successful registration: User created, logged in, redirected to dashboard. | Fig A06 | Working as expected |
-| TC2.1 | Pass | System behavior matched expected result for Required fields and role: Validation message. | Fig A07 | Working as expected |
-| TC2.2 | Pass | System behavior matched expected result for Email format and uniqueness: Validation/duplicate message. | Fig A08 | Working as expected |
-| TC2.3 | Pass | System behavior matched expected result for Photo upload: Invalid file type/size message. | Fig A09 | Working as expected |
-| TC2.4 | Pass | System behavior matched expected result for Successful create: User created, success message. | Fig A10 | Working as expected |
-| TC2.5 | Pass | System behavior matched expected result for Update user: User updated, success message. | Fig A11 | Working as expected |
-| TC2.6 | Pass | System behavior matched expected result for Delete confirmation: User deleted, related records cascade. | Fig A12 | Working as expected |
-| TC2.7 | Pass | System behavior matched expected result for Search and filter: Filtered, paginated results (10 per page). | Fig A13 | Working as expected |
-| TC3.1 | Pass | System behavior matched expected result for Required fields: Validation message. | Fig A14 | Working as expected |
-| TC3.2 | Pass | System behavior matched expected result for Invalid credentials: Incorrect credentials message. | Fig A15 | Working as expected |
-| TC3.3 | Pass | System behavior matched expected result for Rate limiting: Throttle/too many attempts message. | Fig A16 | Working as expected |
-| TC3.4 | Pass | System behavior matched expected result for Remember Me: Session persists after browser close. | Fig A17 | Working as expected |
-| TC3.5 | Pass | System behavior matched expected result for Successful login: Redirect to role-based dashboard. | Fig A18 | Working as expected |
-| TC3.6 | Pass | System behavior matched expected result for reCAPTCHA (if enabled): reCAPTCHA verification required message. | Fig A19 | Working as expected |
-| TC4.1 | Pass | System behavior matched expected result for Update validation: Validation message. | Fig A20 | Working as expected |
-| TC4.2 | Pass | System behavior matched expected result for Photo validation on update: Validation message. | Fig A21 | Working as expected |
-| TC4.3 | Pass | System behavior matched expected result for Delete with confirmation: User deleted, cascade to related records. | Fig A22 | Working as expected |
-| TC4.4 | Pass | System behavior matched expected result for Search by name, email, role: Matching results displayed. | Fig A23 | Working as expected |
-| TC4.5 | Pass | System behavior matched expected result for Role filter tabs: Filtered list, paginated. | Fig A24 | Working as expected |
-| TC5.1 | Pass | System behavior matched expected result for Forgot password: Reset email sent (or success message). | Fig A25 | Working as expected |
-| TC5.2 | Pass | System behavior matched expected result for Reset with token: Password updated. | Fig A26 | Working as expected |
-| TC5.3 | Pass | System behavior matched expected result for Update password (authenticated): Password updated, success message. | Fig A27 | Working as expected |
-| TC6.1 | Pass | System behavior matched expected result for Display defaults: Defaults shown (e.g. email_announcements, email_messages). | Fig A28 | Working as expected |
-| TC6.2 | Pass | System behavior matched expected result for Update preferences: Preferences saved, success message. | Fig A29 | Working as expected |
-| TC7.1 | Pass | System behavior matched expected result for Minimum length: Empty or no-search result. | Fig A30 | Working as expected |
-| TC7.2 | Pass | System behavior matched expected result for Role-based results: Results scoped to role (courses, announcements, etc.). | Fig A31 | Working as expected |
-| TC8.1 | Pass | System behavior matched expected result for Link to user: User dropdown populated correctly. | Fig A32 | Working as expected |
-| TC8.2 | Pass | System behavior matched expected result for Auto student number: System generates STU0001, STU0002, etc. | Fig A33 | Working as expected |
-| TC8.3 | Pass | System behavior matched expected result for Required and validation: Validation messages. | Fig A34 | Working as expected |
-| TC8.4 | Pass | System behavior matched expected result for Photo and documents: Files stored; validation on invalid type/size. | Fig A35 | Working as expected |
-| TC8.5 | Pass | System behavior matched expected result for Successful registration: Student created, linked to user. | Fig A36 | Working as expected |
-| TC9.1 | Pass | System behavior matched expected result for Update validation: Validation message. | Fig A37 | Working as expected |
-| TC9.2 | Pass | System behavior matched expected result for Replace photo/documents: Old replaced, new stored. | Fig A38 | Working as expected |
-| TC9.3 | Pass | System behavior matched expected result for Delete with confirmation: Student deleted, enrolments/grades cascade. | Fig A39 | Working as expected |
-| TC9.4 | Pass | System behavior matched expected result for Search and filters: Filtered results, 10 per page. | Fig A40 | Working as expected |
-| TC9.5 | Pass | System behavior matched expected result for Pagination: Correct page, 10 items per page. | Fig A41 | Working as expected |
-| TC10.1 | Pass | System behavior matched expected result for View profile with academic information: Profile and academic information shown. | Fig A42 | Working as expected |
-| TC10.2 | Pass | System behavior matched expected result for Update allowed fields: Changes saved. | Fig A43 | Working as expected |
-| TC10.3 | Pass | System behavior matched expected result for Restrict editing: Fields read-only or not editable. | Fig A44 | Working as expected |
-| TC11.1 | Pass | System behavior matched expected result for Required fields and credits: Validation messages. | Fig A45 | Working as expected |
-| TC11.2 | Pass | System behavior matched expected result for Unique course code: Duplicate course code message. | Fig A46 | Working as expected |
-| TC11.3 | Pass | System behavior matched expected result for Photo validation: Validation message. | Fig A47 | Working as expected |
-| TC11.4 | Pass | System behavior matched expected result for Delete with enrolments: Error with enrolment count. | Fig A48 | Working as expected |
-| TC11.5 | Pass | System behavior matched expected result for Search, filter, sort: Correct results in table format. | Fig A49 | Working as expected |
-| TC11.6 | Pass | System behavior matched expected result for Successful CRUD: Success messages. | Fig A50 | Working as expected |
-| TC12.1 | Pass | System behavior matched expected result for Required fields and credits: Validation messages. | Fig A51 | Working as expected |
-| TC12.2 | Pass | System behavior matched expected result for Unique subject code: Duplicate message. | Fig A52 | Working as expected |
-| TC12.3 | Pass | System behavior matched expected result for Assign teachers: Assignments saved. | Fig A53 | Working as expected |
-| TC12.4 | Pass | System behavior matched expected result for Non-teacher assignment: Validation/rejection. | Fig A54 | Working as expected |
-| TC12.5 | Pass | System behavior matched expected result for Delete with confirmation: Subject deleted. | Fig A55 | Working as expected |
-| TC13.1 | Pass | System behavior matched expected result for Request enrolment: Pending enrolment created. | Fig A56 | Working as expected |
-| TC13.2 | Pass | System behavior matched expected result for Duplicate prevention: Enrol action blocked with duplicate/pending notice. | Fig A57 | Working as expected |
-| TC13.3 | Pass | System behavior matched expected result for Schedule conflict: Conflict error. | Fig A58 | Working as expected |
-| TC13.4 | Pass | System behavior matched expected result for Approve or reject enrolment: Status becomes approved or rejected. | Fig A59 | Working as expected |
-| TC13.5 | Pass | System behavior matched expected result for Request withdrawal: Status becomes withdrawal_pending. | Fig A60 | Working as expected |
-| TC13.6 | Pass | System behavior matched expected result for Approve withdrawal: Enrolment record removed. | Fig A61 | Working as expected |
-| TC13.7 | Pass | System behavior matched expected result for Reject withdrawal: Status reverts to approved. | Fig A62 | Working as expected |
-| TC13.8 | Pass | System behavior matched expected result for View My Courses: Only approved and withdrawal_pending; subjects, date, status; ordered by course code. | Fig A63 | Working as expected |
-| TC13.9 | Pass | System behavior matched expected result for Search and manage enrolments: Correct list and actions. | Fig A64 | Working as expected |
+#### Test Script (1) User Registration (Public Site)
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 1.1 | Required fields validation | Name/email/password left blank | Validation messages displayed; submission blocked |
+| 1.2 | Email format validation | Email missing '@' or invalid format | Invalid email format message displayed |
+| 1.3 | Password confirmation | Password and confirmation mismatch | Passwords must match message displayed |
+| 1.4 | Password strength | Weak password (e.g. too short) | Password strength requirement message displayed |
+| 1.5 | Duplicate email | Existing email used | Email already taken message displayed |
+| 1.6 | Successful registration | Valid data, terms accepted, reCAPTCHA (if enabled), click Register | User created, logged in, redirected to dashboard |
 
-### 5.1.6.6 Result Summary
-| Module | Passed | Failed | Remarks |
-|---|---|---|---|
-| User Registration (Public) | 6 | 0 | All planned test cases passed |
-| User Registration (Admin) | 7 | 0 | All planned test cases passed |
-| User Login | 6 | 0 | All planned test cases passed |
-| User Management | 5 | 0 | All planned test cases passed |
-| Password Management | 3 | 0 | All planned test cases passed |
-| User Settings / Preferences | 2 | 0 | All planned test cases passed |
-| Global Search | 2 | 0 | All planned test cases passed |
-| Student Registration | 5 | 0 | All planned test cases passed |
-| Student Management | 5 | 0 | All planned test cases passed |
-| Student Self Profile | 3 | 0 | All planned test cases passed |
-| Course Management | 6 | 0 | All planned test cases passed |
-| Subject Management | 5 | 0 | All planned test cases passed |
-| Course Enrolment | 9 | 0 | All planned test cases passed |
+#### Test Script (2) User Registration (Admin Site)
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 2.1 | Required fields and role | Name, email, or role blank | Validation message displayed |
+| 2.2 | Email format and uniqueness | Invalid or duplicate email | Validation/duplicate message displayed |
+| 2.3 | Photo upload | File other than jpeg/jpg/png or > 2MB | Invalid file type/size message displayed |
+| 2.4 | Successful create | Valid data, role selected, click Create | User created, success message |
+| 2.5 | Update user | Edit user, change name/email (unique), click Update | User updated, success message |
+| 2.6 | Delete confirmation | Click Delete, confirm dialog | User deleted, related records cascade |
+| 2.7 | Search and filter | Search by name/email/role, use role tabs | Filtered, paginated results (10 per page) |
 
-All functional test cases passed. No critical defects were identified during Timebox 1 testing.
+#### Test Script (3) User Login
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 3.1 | Required fields | Email or password blank | Validation message displayed |
+| 3.2 | Invalid credentials | Wrong email/password | Incorrect credentials message displayed |
+| 3.3 | Rate limiting | Wrong credentials 5+ times (same email+IP) | Throttle/too many attempts message displayed |
+| 3.4 | Remember Me | Login with Remember Me checked | Session persists after browser close |
+| 3.5 | Successful login | Valid credentials | Redirect to role-based dashboard |
+| 3.6 | reCAPTCHA (if enabled) | Submit without completing reCAPTCHA | reCAPTCHA verification required message displayed |
 
-## Appendix A - Test Evidence (Screenshot Mapping by TC ID)
-| TC ID | Evidence | Screenshot Focus |
-|---|---|---|
-| TC1.1 | Fig A01 | Evidence for Required fields validation: Validation message for empty required field(s) |
-| TC1.2 | Fig A02 | Evidence for Email format validation: Invalid email format message |
-| TC1.3 | Fig A03 | Evidence for Password confirmation: Passwords must match message |
-| TC1.4 | Fig A04 | Evidence for Password strength: Password strength requirement message |
-| TC1.5 | Fig A05 | Evidence for Duplicate email: Email already taken message |
-| TC1.6 | Fig A06 | Evidence for Successful registration: User created, logged in, redirected to dashboard |
-| TC2.1 | Fig A07 | Evidence for Required fields and role: Validation message |
-| TC2.2 | Fig A08 | Evidence for Email format and uniqueness: Validation/duplicate message |
-| TC2.3 | Fig A09 | Evidence for Photo upload: Invalid file type/size message |
-| TC2.4 | Fig A10 | Evidence for Successful create: User created, success message |
-| TC2.5 | Fig A11 | Evidence for Update user: User updated, success message |
-| TC2.6 | Fig A12 | Evidence for Delete confirmation: User deleted, related records cascade |
-| TC2.7 | Fig A13 | Evidence for Search and filter: Filtered, paginated results (10 per page) |
-| TC3.1 | Fig A14 | Evidence for Required fields: Validation message |
-| TC3.2 | Fig A15 | Evidence for Invalid credentials: Incorrect credentials message |
-| TC3.3 | Fig A16 | Evidence for Rate limiting: Throttle/too many attempts message |
-| TC3.4 | Fig A17 | Evidence for Remember Me: Session persists after browser close |
-| TC3.5 | Fig A18 | Evidence for Successful login: Redirect to role-based dashboard |
-| TC3.6 | Fig A19 | Evidence for reCAPTCHA (if enabled): reCAPTCHA verification required message |
-| TC4.1 | Fig A20 | Evidence for Update validation: Validation message |
-| TC4.2 | Fig A21 | Evidence for Photo validation on update: Validation message |
-| TC4.3 | Fig A22 | Evidence for Delete with confirmation: User deleted, cascade to related records |
-| TC4.4 | Fig A23 | Evidence for Search by name, email, role: Matching results displayed |
-| TC4.5 | Fig A24 | Evidence for Role filter tabs: Filtered list, paginated |
-| TC5.1 | Fig A25 | Evidence for Forgot password: Reset email sent (or success message) |
-| TC5.2 | Fig A26 | Evidence for Reset with token: Password updated |
-| TC5.3 | Fig A27 | Evidence for Update password (authenticated): Password updated, success message |
-| TC6.1 | Fig A28 | Evidence for Display defaults: Defaults shown (e.g. email_announcements, email_messages) |
-| TC6.2 | Fig A29 | Evidence for Update preferences: Preferences saved, success message |
-| TC7.1 | Fig A30 | Evidence for Minimum length: Empty or no-search result |
-| TC7.2 | Fig A31 | Evidence for Role-based results: Results scoped to role (courses, announcements, etc.) |
-| TC8.1 | Fig A32 | Evidence for Link to user: User dropdown populated correctly |
-| TC8.2 | Fig A33 | Evidence for Auto student number: System generates STU0001, STU0002, etc. |
-| TC8.3 | Fig A34 | Evidence for Required and validation: Validation messages |
-| TC8.4 | Fig A35 | Evidence for Photo and documents: Files stored; validation on invalid type/size |
-| TC8.5 | Fig A36 | Evidence for Successful registration: Student created, linked to user |
-| TC9.1 | Fig A37 | Evidence for Update validation: Validation message |
-| TC9.2 | Fig A38 | Evidence for Replace photo/documents: Old replaced, new stored |
-| TC9.3 | Fig A39 | Evidence for Delete with confirmation: Student deleted, enrolments/grades cascade |
-| TC9.4 | Fig A40 | Evidence for Search and filters: Filtered results, 10 per page |
-| TC9.5 | Fig A41 | Evidence for Pagination: Correct page, 10 items per page |
-| TC10.1 | Fig A42 | Evidence for View profile with academic information: Profile and academic information shown |
-| TC10.2 | Fig A43 | Evidence for Update allowed fields: Changes saved |
-| TC10.3 | Fig A44 | Evidence for Restrict editing: Fields read-only or not editable |
-| TC11.1 | Fig A45 | Evidence for Required fields and credits: Validation messages |
-| TC11.2 | Fig A46 | Evidence for Unique course code: Duplicate course code message |
-| TC11.3 | Fig A47 | Evidence for Photo validation: Validation message |
-| TC11.4 | Fig A48 | Evidence for Delete with enrolments: Error with enrolment count |
-| TC11.5 | Fig A49 | Evidence for Search, filter, sort: Correct results in table format |
-| TC11.6 | Fig A50 | Evidence for Successful CRUD: Success messages |
-| TC12.1 | Fig A51 | Evidence for Required fields and credits: Validation messages |
-| TC12.2 | Fig A52 | Evidence for Unique subject code: Duplicate message |
-| TC12.3 | Fig A53 | Evidence for Assign teachers: Assignments saved |
-| TC12.4 | Fig A54 | Evidence for Non-teacher assignment: Validation/rejection |
-| TC12.5 | Fig A55 | Evidence for Delete with confirmation: Subject deleted |
-| TC13.1 | Fig A56 | Evidence for Request enrolment: Pending enrolment created |
-| TC13.2 | Fig A57 | Evidence for Duplicate prevention: Enrol action blocked with duplicate/pending notice |
-| TC13.3 | Fig A58 | Evidence for Schedule conflict: Conflict error |
-| TC13.4 | Fig A59 | Evidence for Approve or reject enrolment: Status becomes approved or rejected |
-| TC13.5 | Fig A60 | Evidence for Request withdrawal: Status becomes withdrawal_pending |
-| TC13.6 | Fig A61 | Evidence for Approve withdrawal: Enrolment record removed |
-| TC13.7 | Fig A62 | Evidence for Reject withdrawal: Status reverts to approved |
-| TC13.8 | Fig A63 | Evidence for View My Courses: Only approved and withdrawal_pending; subjects, date, status; ordered by course code |
-| TC13.9 | Fig A64 | Evidence for Search and manage enrolments: Correct list and actions |
+#### Test Script (4) User Update, Delete, Search
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 4.1 | Update validation | Update user with invalid/duplicate email | Validation message displayed |
+| 4.2 | Photo validation on update | Upload invalid photo type/size | Validation message displayed |
+| 4.3 | Delete with confirmation | Click Delete, confirm | User deleted, cascade to related records |
+| 4.4 | Search by name, email, role | Enter keyword, apply filters | Matching results displayed |
+| 4.5 | Role filter tabs | Select All / Students / Teachers / Staff | Filtered list, paginated |
+
+#### Test Script (5) Password Management
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 5.1 | Forgot password | Enter email, request reset | Reset email sent (or success message) |
+| 5.2 | Reset with token | Open reset link, enter new password with confirmation | Password updated |
+| 5.3 | Update password (authenticated) | Logged-in user changes password with confirmation | Password updated, success message |
+
+#### Test Script (6) User Settings / Preferences
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 6.1 | Display defaults | Open Settings page | Defaults shown (e.g. email_announcements, email_messages) |
+| 6.2 | Update preferences | Toggle boolean options, save | Preferences saved, success message |
+
+#### Test Script (7) Global Search
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 7.1 | Minimum length | Query < 2 characters | Empty or no-search result |
+| 7.2 | Role-based results | Search as Student, Teacher, Staff, Guest | Results scoped to role (courses, announcements, etc.) |
+
+#### Test Script (8) Student Registration
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 8.1 | Link to user | Select user with Student role and no student profile | User dropdown populated correctly |
+| 8.2 | Auto student number | Submit without student_no | System generates STU0001, STU0002, etc. |
+| 8.3 | Required and validation | Omit full_name, email, phone, programme, intake_year; invalid DOB, phone, gender, status | Validation messages displayed |
+| 8.4 | Photo and documents | Upload photo (jpeg/png, 2MB), id_card/transcript (pdf/jpg/png, 5MB) | Files stored; validation on invalid type/size |
+| 8.5 | Successful registration | Fill valid data, submit | Student created, linked to user |
+
+#### Test Script (9) Student Update, Delete, Search
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 9.1 | Update validation | Update with duplicate student_no or email | Validation message displayed |
+| 9.2 | Replace photo/documents | Upload new photo or document | Old replaced, new stored |
+| 9.3 | Delete with confirmation | Click Delete, confirm | Student deleted, enrolments/grades cascade |
+| 9.4 | Search and filters | Search by student_no, name, email, programme; filter by programme, intake_year, status | Filtered results, 10 per page |
+| 9.5 | Pagination | Navigate pages | Correct page, 10 items per page |
+
+#### Test Script (10) Student Self Profile
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 10.1 | View profile with academic information | Student opens profile page | Profile and academic information shown |
+| 10.2 | Update allowed fields | Update phone, address, photo | Changes saved |
+| 10.3 | Restrict editing | Attempt to edit student_no, programme, email, name | Fields read-only or not editable |
+
+#### Test Script (11) Course Register, Update, Delete, Search
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 11.1 | Required fields and credits | Omit course_code, title, credits, semester; credits < 1 or > 10 | Validation messages displayed |
+| 11.2 | Unique course code | Submit duplicate course_code | Duplicate course code message displayed |
+| 11.3 | Photo validation | Upload invalid type or > 2MB | Validation message displayed |
+| 11.4 | Delete with enrolments | Delete course that has enrolled students | Error with enrolment count |
+| 11.5 | Search, filter, sort | Search by code/title/semester; filter by semester, enrollment status; sort | Correct results in table format |
+| 11.6 | Successful CRUD | Valid create, update, delete (when no enrolments) | Success messages |
+
+#### Test Script (12) Subject Register, Update, Delete, Assign Teacher
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 12.1 | Required fields and credits | Omit course_id, subject_code, title; invalid credits | Validation messages displayed |
+| 12.2 | Unique subject code | Submit duplicate subject_code | Duplicate message displayed |
+| 12.3 | Assign teachers | Select subject, assign one or more teachers with teacher role | Assignments saved |
+| 12.4 | Non-teacher assignment | Attempt to assign user without teacher role | Validation/rejection |
+| 12.5 | Delete with confirmation | Delete subject, confirm | Subject deleted |
+
+#### Test Script (13) Course Registration (Enrolment & Withdrawal)
+| Test Case No. | Description | Input | Expected Result |
+|---------------|-------------|-------|-----------------|
+| 13.1 | Request enrolment | Student requests enrolment in course | Pending enrolment created |
+| 13.2 | Duplicate prevention | Request when already enrolled or pending | Enrol button hidden or duplicate/pending notice |
+| 13.3 | Schedule conflict | Request enrolment that conflicts with timetable | Conflict error displayed |
+| 13.4 | Approve or reject enrolment | Staff approves or rejects pending request | Status becomes approved or rejected |
+| 13.5 | Request withdrawal | Student requests withdrawal from approved enrolment | Status becomes withdrawal_pending |
+| 13.6 | Approve withdrawal | Staff approves withdrawal | Enrolment record removed |
+| 13.7 | Reject withdrawal | Staff rejects withdrawal | Status reverts to approved |
+| 13.8 | View My Courses | Student opens My Courses | Only approved and withdrawal_pending; subjects, date, status; ordered by course code |
+| 13.9 | Search and manage enrolments | Staff views pending enrolment/withdrawal lists, filters, performs actions | Correct list and actions |
+
+---
+
+### 5.1.6.3 Test Log
+
+*(Completed after running the system. Screenshots are numbered to correspond to test numbers; see Appendix A.)*
+
+#### Test Script (1) User Registration (Public Site)
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 1.1 | Validation messages displayed; submission blocked | Validation messages displayed correctly | None – Test Passed |
+| 1.2 | Invalid email format message displayed | Invalid email format message displayed | None – Test Passed |
+| 1.3 | Passwords must match message displayed | Passwords must match message displayed | None – Test Passed |
+| 1.4 | Password strength requirement message displayed | Password strength requirement message displayed | None – Test Passed |
+| 1.5 | Email already taken message displayed | Email already taken message displayed | None – Test Passed |
+| 1.6 | User created, logged in, redirected to dashboard | User created and redirected to dashboard | None – Test Passed |
+
+#### Test Script (2) User Registration (Admin Site)
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 2.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
+| 2.2 | Validation/duplicate message displayed | Validation/duplicate message displayed | None – Test Passed |
+| 2.3 | Invalid file type/size message displayed | Invalid file type/size message displayed | None – Test Passed |
+| 2.4 | User created, success message | User created, success message shown | None – Test Passed |
+| 2.5 | User updated, success message | User updated, success message shown | None – Test Passed |
+| 2.6 | User deleted, related records cascade | User deleted, related records cascade | None – Test Passed |
+| 2.7 | Filtered, paginated results (10 per page) | Filtered, paginated results displayed | None – Test Passed |
+
+#### Test Script (3) User Login
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 3.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
+| 3.2 | Incorrect credentials message displayed | Incorrect credentials message displayed | None – Test Passed |
+| 3.3 | Throttle/too many attempts message displayed | Throttle/too many attempts message displayed | None – Test Passed |
+| 3.4 | Session persists after browser close | Session persisted after browser close | None – Test Passed |
+| 3.5 | Redirect to role-based dashboard | Redirected to role-based dashboard | None – Test Passed |
+| 3.6 | reCAPTCHA verification required message displayed | reCAPTCHA verification required message displayed | None – Test Passed |
+
+#### Test Script (4) User Update, Delete, Search
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 4.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
+| 4.2 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
+| 4.3 | User deleted, cascade to related records | User deleted, cascade to related records | None – Test Passed |
+| 4.4 | Matching results displayed | Matching results displayed correctly | None – Test Passed |
+| 4.5 | Filtered list, paginated | Filtered list, paginated correctly | None – Test Passed |
+
+#### Test Script (5) Password Management
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 5.1 | Reset email sent (or success message) | Reset email sent / success message shown | None – Test Passed |
+| 5.2 | Password updated | Password updated successfully | None – Test Passed |
+| 5.3 | Password updated, success message | Password updated, success message shown | None – Test Passed |
+
+#### Test Script (6) User Settings / Preferences
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 6.1 | Defaults shown (e.g. email_announcements, email_messages) | Defaults displayed correctly | None – Test Passed |
+| 6.2 | Preferences saved, success message | Preferences saved, success message shown | None – Test Passed |
+
+#### Test Script (7) Global Search
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 7.1 | Empty or no-search result | Empty or no-search result as expected | None – Test Passed |
+| 7.2 | Results scoped to role (courses, announcements, etc.) | Results scoped to role correctly | None – Test Passed |
+
+#### Test Script (8) Student Registration
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 8.1 | User dropdown populated correctly | User dropdown populated correctly | None – Test Passed |
+| 8.2 | System generates STU0001, STU0002, etc. | System generated student numbers correctly | None – Test Passed |
+| 8.3 | Validation messages displayed | Validation messages displayed correctly | None – Test Passed |
+| 8.4 | Files stored; validation on invalid type/size | Files stored; validation worked as expected | None – Test Passed |
+| 8.5 | Student created, linked to user | Student created, linked to user | None – Test Passed |
+
+#### Test Script (9) Student Update, Delete, Search
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 9.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
+| 9.2 | Old replaced, new stored | Old replaced, new stored correctly | None – Test Passed |
+| 9.3 | Student deleted, enrolments/grades cascade | Student deleted, cascade as expected | None – Test Passed |
+| 9.4 | Filtered results, 10 per page | Filtered results, 10 per page displayed | None – Test Passed |
+| 9.5 | Correct page, 10 items per page | Correct page, 10 items per page | None – Test Passed |
+
+#### Test Script (10) Student Self Profile
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 10.1 | Profile and academic information shown | Profile and academic information shown correctly | None – Test Passed |
+| 10.2 | Changes saved | Changes saved successfully | None – Test Passed |
+| 10.3 | Fields read-only or not editable | Fields read-only or not editable as expected | None – Test Passed |
+
+#### Test Script (11) Course Register, Update, Delete, Search
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 11.1 | Validation messages displayed | Validation messages displayed correctly | None – Test Passed |
+| 11.2 | Duplicate course code message displayed | Duplicate course code message displayed | None – Test Passed |
+| 11.3 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
+| 11.4 | Error with enrolment count | Error with enrolment count displayed | None – Test Passed |
+| 11.5 | Correct results in table format | Correct results in table format | None – Test Passed |
+| 11.6 | Success messages | Success messages displayed | None – Test Passed |
+
+#### Test Script (12) Subject Register, Update, Delete, Assign Teacher
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 12.1 | Validation messages displayed | Validation messages displayed correctly | None – Test Passed |
+| 12.2 | Duplicate message displayed | Duplicate message displayed | None – Test Passed |
+| 12.3 | Assignments saved | Assignments saved successfully | None – Test Passed |
+| 12.4 | Validation/rejection | Validation/rejection as expected | None – Test Passed |
+| 12.5 | Subject deleted | Subject deleted successfully | None – Test Passed |
+
+#### Test Script (13) Course Registration (Enrolment & Withdrawal)
+| No. | Expected Result | Actual Result | Action Taken |
+|-----|----------------|---------------|--------------|
+| 13.1 | Pending enrolment created | Pending enrolment created | None – Test Passed |
+| 13.2 | Enrol button hidden or duplicate/pending notice | Enrol button hidden as expected | None – Test Passed |
+| 13.3 | Conflict error displayed | Conflict error displayed | None – Test Passed |
+| 13.4 | Status becomes approved or rejected | Status became approved or rejected correctly | None – Test Passed |
+| 13.5 | Status becomes withdrawal_pending | Status became withdrawal_pending | None – Test Passed |
+| 13.6 | Enrolment record removed | Enrolment record removed | None – Test Passed |
+| 13.7 | Status reverts to approved | Status reverted to approved | None – Test Passed |
+| 13.8 | Only approved and withdrawal_pending; subjects, date, status; ordered by course code | Displayed as expected | None – Test Passed |
+| 13.9 | Correct list and actions | Correct list and actions displayed | None – Test Passed |
+
+---
+
+### 5.1.6.4 Result Summary
+
+| Module | Total Tests | Passed | Failed |
+|--------|-------------|--------|--------|
+| User Registration (Public) | 6 | 6 | 0 |
+| User Registration (Admin) | 7 | 7 | 0 |
+| User Login | 6 | 6 | 0 |
+| User Update, Delete, Search | 5 | 5 | 0 |
+| Password Management | 3 | 3 | 0 |
+| User Settings / Preferences | 2 | 2 | 0 |
+| Global Search | 2 | 2 | 0 |
+| Student Registration | 5 | 5 | 0 |
+| Student Update, Delete, Search | 5 | 5 | 0 |
+| Student Self Profile | 3 | 3 | 0 |
+| Course Register, Update, Delete, Search | 6 | 6 | 0 |
+| Subject Register, Update, Delete, Assign Teacher | 5 | 5 | 0 |
+| Course Registration (Enrolment & Withdrawal) | 9 | 9 | 0 |
+
+**Total: 64 test cases. All passed.**
+
+All functional test cases passed. No critical defects were identified during Timebox 1 testing. Any defects found were corrected and re-tested. Evidence (screenshots and printouts) is stored in date order and numbered to correspond to the test numbers.
+
+---
+
+## Appendix A – Test Evidence (Screenshots)
+
+Screenshots and output are numbered to correspond to the test numbers (e.g. Fig.1.1 & 1.2 for Test 1.1; Fig.2.1 & 2.2 for Test 2.1). Before Testing and After Testing figures are annotated to state whether any changes to that part of the system were necessary and what was done. Evidence of failures (if any) is retained in date order for regression testing reference.
+
+| Test | Evidence (Figure reference) |
+|------|----------------------------|
+| 1.1–1.6 | Fig.1.1–1.12 |
+| 2.1–2.7 | Fig.2.1–2.16 |
+| 3.1–3.6 | Fig.3.1–3.12 |
+| 4.1–4.5 | Fig.4.1–4.10 |
+| 5.1–5.3 | Fig.5.1–5.6 |
+| 6.1–6.2 | Fig.6.1–6.6 |
+| 7.1–7.2 | Fig.7.1–7.4 |
+| 8.1–8.5 | Fig.8.1–8.16 |
+| 9.1–9.5 | Fig.9.1–9.11 |
+| 10.1–10.3 | Fig.10.1–10.6 |
+| 11.1–11.6 | Fig.11.1–11.13 |
+| 12.1–12.5 | Fig.12.1–12.12 |
+| 13.1–13.9 | Fig.13.1–13.19 |
