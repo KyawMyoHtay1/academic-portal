@@ -1,296 +1,603 @@
-# 5.1.6 Functional Testing
-## Timebox 1 – Manage Student Registration and Course Registration Process
+Timebox 1 Test Plan
+Test Script 1 – User Registration (Public)
+Test Case Description Input Expected Result
+1.1 Required fields validation Leave name, email, or password blank Validation message displayed; submission blocked
+1.2 Email format validation Enter invalid email format Invalid email message displayed
+1.3 Password confirmation Password and confirm password do not match Password mismatch message displayed
+1.4 Password strength Enter weak password Password strength message displayed
+1.5 Duplicate email Enter existing email Email already taken message displayed
+1.6 Successful registration Enter valid registration data User created and redirected to dashboard
 
-### 5.1.6.1 Scope
+Test Script 2 – User Registration (Admin)
+Test Case Description Input Expected Result
+2.1 Required fields and role Leave required fields blank Validation message displayed
+2.2 Email validation Enter invalid or duplicate email Validation error displayed
+2.3 Photo upload validation Upload invalid file type or size File rejected with error message
+2.4 Create user Enter valid data and submit User created successfully
+2.5 Update user Edit user with valid data User updated successfully
+2.6 Delete user Confirm deletion User deleted successfully
+2.7 Search and filter Enter keyword or select role filter Filtered results displayed
 
-Functional testing was conducted to ensure that the system performs all required tasks correctly and completely. Testing verifies that the system meets each specified aim, rejects erroneous data, displays adequate prompts and output, and that data capture forms and outputs are clear and complete. Tests are numbered; screenshots and evidence are numbered to correspond and annotated where changes were necessary. The tests cover validation rules, role-based permissions, CRUD operations, business constraints, and end-to-end process transitions.
+Test Script 3 – User Login
+Test Case Description Input Expected Result
+3.1 Required fields Leave email or password blank Validation message displayed
+3.2 Invalid credentials Enter incorrect password Error message displayed
+3.3 Rate limiting Attempt login 5+ times with wrong password Too many attempts message displayed
+3.4 Remember Me Select Remember Me and login Session remains active
+3.5 Successful login Enter valid credentials Redirected to dashboard
+3.6 reCAPTCHA validation Submit without completing reCAPTCHA Verification required message displayed
 
----
+Test Script 4 – User Update, Delete, Search
+Test Case Description Input Expected Result
+4.1 Update validation Enter duplicate email Validation message displayed
+4.2 Photo validation Upload invalid photo Validation message displayed
+4.3 Delete user Confirm delete action User removed successfully
+4.4 Search function Enter search keyword Matching records displayed
+4.5 Role filter Select role tab Filtered list displayed
 
-### 5.1.6.2 Test Plan
+Test Script 5 – Password Management
+Test Case Description Input Expected Result
+5.1 Forgot password Enter registered email Reset email sent
+5.2 Reset password Enter valid reset token and new password Password updated successfully
+5.3 Change password Change password while logged in Password changed successfully
 
-*(Completed before implementation testing. Each test is numbered; test data and expected results are defined.)*
+Test Script 6 – User Settings
+Test Case Description Input Expected Result
+6.1 Display default settings Open settings page Default preferences displayed
+6.2 Update preferences Change settings and save Preferences saved successfully
 
-#### Test Script (1) User Registration (Public Site)
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 1.1 | Required fields validation | Name/email/password left blank | Validation messages displayed; submission blocked |
-| 1.2 | Email format validation | Email missing '@' or invalid format | Invalid email format message displayed |
-| 1.3 | Password confirmation | Password and confirmation mismatch | Passwords must match message displayed |
-| 1.4 | Password strength | Weak password (e.g. too short) | Password strength requirement message displayed |
-| 1.5 | Duplicate email | Existing email used | Email already taken message displayed |
-| 1.6 | Successful registration | Valid data, terms accepted, reCAPTCHA (if enabled), click Register | User created, logged in, redirected to dashboard |
+Test Script 7 – Global Search
+Test Case Description Input Expected Result
+7.1 Minimum search length Enter less than 2 characters No results displayed
+7.2 Role-based search Search using different user roles Results limited by role
 
-#### Test Script (2) User Registration (Admin Site)
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 2.1 | Required fields and role | Name, email, or role blank | Validation message displayed |
-| 2.2 | Email format and uniqueness | Invalid or duplicate email | Validation/duplicate message displayed |
-| 2.3 | Photo upload | File other than jpeg/jpg/png or > 2MB | Invalid file type/size message displayed |
-| 2.4 | Successful create | Valid data, role selected, click Create | User created, success message |
-| 2.5 | Update user | Edit user, change name/email (unique), click Update | User updated, success message |
-| 2.6 | Delete confirmation | Click Delete, confirm dialog | User deleted, related records cascade |
-| 2.7 | Search and filter | Search by name/email/role, use role tabs | Filtered, paginated results (10 per page) |
+Test Script 8 – Student Registration
+Test Case Description Input Expected Result
+8.1 Link student to user Select valid student user User dropdown populated correctly
+8.2 Auto student number Leave student number blank System auto-generates student number
+8.3 Validation checks Leave required fields blank Validation messages displayed
+8.4 File upload validation Upload valid/invalid files Files validated and stored correctly
+8.5 Successful registration Enter valid student data Student created successfully
 
-#### Test Script (3) User Login
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 3.1 | Required fields | Email or password blank | Validation message displayed |
-| 3.2 | Invalid credentials | Wrong email/password | Incorrect credentials message displayed |
-| 3.3 | Rate limiting | Wrong credentials 5+ times (same email+IP) | Throttle/too many attempts message displayed |
-| 3.4 | Remember Me | Login with Remember Me checked | Session persists after browser close |
-| 3.5 | Successful login | Valid credentials | Redirect to role-based dashboard |
-| 3.6 | reCAPTCHA (if enabled) | Submit without completing reCAPTCHA | reCAPTCHA verification required message displayed |
+Test Script 9 – Student Update, Delete, Search
+Test Case Description Input Expected Result
+9.1 Update validation Enter duplicate student number Validation message displayed
+9.2 Replace files Upload new photo or document Old file replaced successfully
+9.3 Delete student Confirm delete action Student removed successfully
+9.4 Search and filter Apply filters Filtered results displayed
+9.5 Pagination Navigate to next page Correct records displayed
 
-#### Test Script (4) User Update, Delete, Search
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 4.1 | Update validation | Update user with invalid/duplicate email | Validation message displayed |
-| 4.2 | Photo validation on update | Upload invalid photo type/size | Validation message displayed |
-| 4.3 | Delete with confirmation | Click Delete, confirm | User deleted, cascade to related records |
-| 4.4 | Search by name, email, role | Enter keyword, apply filters | Matching results displayed |
-| 4.5 | Role filter tabs | Select All / Students / Teachers / Staff | Filtered list, paginated |
+Test Script 10 – Student Self Profile
+Test Case Description Input Expected Result
+10.1 View profile Open profile page Student information displayed
+10.2 Update allowed fields Edit phone/address Changes saved successfully
+10.3 Restricted fields Attempt to edit restricted fields Fields not editable
 
-#### Test Script (5) Password Management
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 5.1 | Forgot password | Enter email, request reset | Reset email sent (or success message) |
-| 5.2 | Reset with token | Open reset link, enter new password with confirmation | Password updated |
-| 5.3 | Update password (authenticated) | Logged-in user changes password with confirmation | Password updated, success message |
+Test Script 11 – Course Management
+Test Case Description Input Expected Result
+11.1 Required fields validation Leave required fields blank Validation message displayed
+11.2 Unique course code Enter duplicate course code Error message displayed
+11.3 Photo validation Upload invalid image Validation message displayed
+11.4 Delete with enrolments Delete course with enrolments Error displayed
+11.5 Search/filter/sort Apply search and filters Correct results displayed
+11.6 Successful CRUD Enter valid data Success message displayed
 
-#### Test Script (6) User Settings / Preferences
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 6.1 | Display defaults | Open Settings page | Defaults shown (e.g. email_announcements, email_messages) |
-| 6.2 | Update preferences | Toggle boolean options, save | Preferences saved, success message |
+Test Script 12 – Subject Management
+Test Case Description Input Expected Result
+12.1 Required fields validation Leave required fields blank Validation message displayed
+12.2 Unique subject code Enter duplicate subject code Error message displayed
+12.3 Assign teacher Assign valid teacher Assignment saved successfully
+12.4 Invalid teacher assignment Assign non-teacher user Validation error displayed
+12.5 Delete subject Confirm delete action Subject removed successfully
 
-#### Test Script (7) Global Search
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 7.1 | Minimum length | Query < 2 characters | Empty or no-search result |
-| 7.2 | Role-based results | Search as Student, Teacher, Staff, Guest | Results scoped to role (courses, announcements, etc.) |
+Test Script 13 – Course Enrolment & Withdrawal
+Test Case Description Input Expected Result
+13.1 Request enrolment Student submits enrolment Pending enrolment created
+13.2 Duplicate enrolment prevention Attempt duplicate enrolment Enrolment blocked
+13.3 Schedule conflict Enrol in conflicting course Conflict error displayed
+13.4 Approve/reject enrolment Staff approves or rejects Status updated correctly
+13.5 Request withdrawal Student requests withdrawal Status set to pending
+13.6 Approve withdrawal Staff approves withdrawal Enrolment removed
+13.7 Reject withdrawal Staff rejects withdrawal Status reverted
+13.8 View My Courses Open My Courses page Correct courses displayed
+13.9 Manage enrolments Staff manages enrolments Correct records displayed
 
-#### Test Script (8) Student Registration
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 8.1 | Link to user | Select user with Student role and no student profile | User dropdown populated correctly |
-| 8.2 | Auto student number | Submit without student_no | System generates STU0001, STU0002, etc. |
-| 8.3 | Required and validation | Omit full_name, email, phone, programme, intake_year; invalid DOB, phone, gender, status | Validation messages displayed |
-| 8.4 | Photo and documents | Upload photo (jpeg/png, 2MB), id_card/transcript (pdf/jpg/png, 5MB) | Files stored; validation on invalid type/size |
-| 8.5 | Successful registration | Fill valid data, submit | Student created, linked to user |
+Timebox 1 Test Log
+Test Script (1) User Registration (Public Site)
 
-#### Test Script (9) Student Update, Delete, Search
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 9.1 | Update validation | Update with duplicate student_no or email | Validation message displayed |
-| 9.2 | Replace photo/documents | Upload new photo or document | Old replaced, new stored |
-| 9.3 | Delete with confirmation | Click Delete, confirm | Student deleted, enrolments/grades cascade |
-| 9.4 | Search and filters | Search by student_no, name, email, programme; filter by programme, intake_year, status | Filtered results, 10 per page |
-| 9.5 | Pagination | Navigate pages | Correct page, 10 items per page |
+Test Case Expected Result Actual Result Action Taken Evidence
+1.1 Validation messages displayed; submission blocked Validation messages were displayed as specified. No corrective action required Fig.1.1 & 1.2
 
-#### Test Script (10) Student Self Profile
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 10.1 | View profile with academic information | Student opens profile page | Profile and academic information shown |
-| 10.2 | Update allowed fields | Update phone, address, photo | Changes saved |
-| 10.3 | Restrict editing | Attempt to edit student_no, programme, email, name | Fields read-only or not editable |
+Before Testing – Fig.1.1
 
-#### Test Script (11) Course Register, Update, Delete, Search
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 11.1 | Required fields and credits | Omit course_code, title, credits, semester; credits < 1 or > 10 | Validation messages displayed |
-| 11.2 | Unique course code | Submit duplicate course_code | Duplicate course code message displayed |
-| 11.3 | Photo validation | Upload invalid type or > 2MB | Validation message displayed |
-| 11.4 | Delete with enrolments | Delete course that has enrolled students | Error with enrolment count |
-| 11.5 | Search, filter, sort | Search by code/title/semester; filter by semester, enrollment status; sort | Correct results in table format |
-| 11.6 | Successful CRUD | Valid create, update, delete (when no enrolments) | Success messages |
+After Testing – Fig.1.2
 
-#### Test Script (12) Subject Register, Update, Delete, Assign Teacher
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 12.1 | Required fields and credits | Omit course_id, subject_code, title; invalid credits | Validation messages displayed |
-| 12.2 | Unique subject code | Submit duplicate subject_code | Duplicate message displayed |
-| 12.3 | Assign teachers | Select subject, assign one or more teachers with teacher role | Assignments saved |
-| 12.4 | Non-teacher assignment | Attempt to assign user without teacher role | Validation/rejection |
-| 12.5 | Delete with confirmation | Delete subject, confirm | Subject deleted |
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+1.2 Invalid email format message displayed Email validation functioned correctly No defects identified Fig.1.3 & 1.4
 
-#### Test Script (13) Course Registration (Enrolment & Withdrawal)
-| Test Case No. | Description | Input | Expected Result |
-|---------------|-------------|-------|-----------------|
-| 13.1 | Request enrolment | Student requests enrolment in course | Pending enrolment created |
-| 13.2 | Duplicate prevention | Request when already enrolled or pending | Enrol button hidden or duplicate/pending notice |
-| 13.3 | Schedule conflict | Request enrolment that conflicts with timetable | Conflict error displayed |
-| 13.4 | Approve or reject enrolment | Staff approves or rejects pending request | Status becomes approved or rejected |
-| 13.5 | Request withdrawal | Student requests withdrawal from approved enrolment | Status becomes withdrawal_pending |
-| 13.6 | Approve withdrawal | Staff approves withdrawal | Enrolment record removed |
-| 13.7 | Reject withdrawal | Staff rejects withdrawal | Status reverts to approved |
-| 13.8 | View My Courses | Student opens My Courses | Only approved and withdrawal_pending; subjects, date, status; ordered by course code |
-| 13.9 | Search and manage enrolments | Staff views pending enrolment/withdrawal lists, filters, performs actions | Correct list and actions |
+Before Testing – Fig.1.3
 
----
+After Testing – Fig.1.4
 
-### 5.1.6.3 Test Log
+Test Case Expected Result Actual Result Action Taken Evidence
+1.3 Password mismatch message displayed Password mismatch detected correctly Behaviour matched specification Fig.1.5 & 1.6
 
-*(Completed after running the system. Screenshots are numbered to correspond to test numbers; see Appendix A.)*
+Before Testing – Fig.1.5
 
-#### Test Script (1) User Registration (Public Site)
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 1.1 | Validation messages displayed; submission blocked | Validation messages displayed correctly | None – Test Passed |
-| 1.2 | Invalid email format message displayed | Invalid email format message displayed | None – Test Passed |
-| 1.3 | Passwords must match message displayed | Passwords must match message displayed | None – Test Passed |
-| 1.4 | Password strength requirement message displayed | Password strength requirement message displayed | None – Test Passed |
-| 1.5 | Email already taken message displayed | Email already taken message displayed | None – Test Passed |
-| 1.6 | User created, logged in, redirected to dashboard | User created and redirected to dashboard | None – Test Passed |
+After Testing – Fig.1.6
 
-#### Test Script (2) User Registration (Admin Site)
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 2.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
-| 2.2 | Validation/duplicate message displayed | Validation/duplicate message displayed | None – Test Passed |
-| 2.3 | Invalid file type/size message displayed | Invalid file type/size message displayed | None – Test Passed |
-| 2.4 | User created, success message | User created, success message shown | None – Test Passed |
-| 2.5 | User updated, success message | User updated, success message shown | None – Test Passed |
-| 2.6 | User deleted, related records cascade | User deleted, related records cascade | None – Test Passed |
-| 2.7 | Filtered, paginated results (10 per page) | Filtered, paginated results displayed | None – Test Passed |
+Test Case Expected Result Actual Result Action Taken Evidence
+1.4 Password strength requirement displayed Password strength rule enforced No corrective action required Fig.1.7 & 1.8
 
-#### Test Script (3) User Login
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 3.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
-| 3.2 | Incorrect credentials message displayed | Incorrect credentials message displayed | None – Test Passed |
-| 3.3 | Throttle/too many attempts message displayed | Throttle/too many attempts message displayed | None – Test Passed |
-| 3.4 | Session persists after browser close | Session persisted after browser close | None – Test Passed |
-| 3.5 | Redirect to role-based dashboard | Redirected to role-based dashboard | None – Test Passed |
-| 3.6 | reCAPTCHA verification required message displayed | reCAPTCHA verification required message displayed | None – Test Passed |
+Before Testing – Fig.1.7
 
-#### Test Script (4) User Update, Delete, Search
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 4.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
-| 4.2 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
-| 4.3 | User deleted, cascade to related records | User deleted, cascade to related records | None – Test Passed |
-| 4.4 | Matching results displayed | Matching results displayed correctly | None – Test Passed |
-| 4.5 | Filtered list, paginated | Filtered list, paginated correctly | None – Test Passed |
+After Testing – Fig.1.8
 
-#### Test Script (5) Password Management
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 5.1 | Reset email sent (or success message) | Reset email sent / success message shown | None – Test Passed |
-| 5.2 | Password updated | Password updated successfully | None – Test Passed |
-| 5.3 | Password updated, success message | Password updated, success message shown | None – Test Passed |
+Test Case Expected Result Actual Result Action Taken Evidence
+1.5 Duplicate email message displayed Duplicate email prevented successfully Behaviour matched system specification. Fig.1.9 & 1.10
 
-#### Test Script (6) User Settings / Preferences
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 6.1 | Defaults shown (e.g. email_announcements, email_messages) | Defaults displayed correctly | None – Test Passed |
-| 6.2 | Preferences saved, success message | Preferences saved, success message shown | None – Test Passed |
+Before Testing – Fig.1.9
 
-#### Test Script (7) Global Search
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 7.1 | Empty or no-search result | Empty or no-search result as expected | None – Test Passed |
-| 7.2 | Results scoped to role (courses, announcements, etc.) | Results scoped to role correctly | None – Test Passed |
+After Testing – Fig.1.10
 
-#### Test Script (8) Student Registration
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 8.1 | User dropdown populated correctly | User dropdown populated correctly | None – Test Passed |
-| 8.2 | System generates STU0001, STU0002, etc. | System generated student numbers correctly | None – Test Passed |
-| 8.3 | Validation messages displayed | Validation messages displayed correctly | None – Test Passed |
-| 8.4 | Files stored; validation on invalid type/size | Files stored; validation worked as expected | None – Test Passed |
-| 8.5 | Student created, linked to user | Student created, linked to user | None – Test Passed |
+Test Case Expected Result Actual Result Action Taken Evidence
+1.6 User created and redirected to dashboard Registration completed successfully Functioned according to specification Fig.1.11 & 1.12
 
-#### Test Script (9) Student Update, Delete, Search
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 9.1 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
-| 9.2 | Old replaced, new stored | Old replaced, new stored correctly | None – Test Passed |
-| 9.3 | Student deleted, enrolments/grades cascade | Student deleted, cascade as expected | None – Test Passed |
-| 9.4 | Filtered results, 10 per page | Filtered results, 10 per page displayed | None – Test Passed |
-| 9.5 | Correct page, 10 items per page | Correct page, 10 items per page | None – Test Passed |
+Before Testing – Fig.1.11
 
-#### Test Script (10) Student Self Profile
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 10.1 | Profile and academic information shown | Profile and academic information shown correctly | None – Test Passed |
-| 10.2 | Changes saved | Changes saved successfully | None – Test Passed |
-| 10.3 | Fields read-only or not editable | Fields read-only or not editable as expected | None – Test Passed |
+After Testing – Fig.1.12
 
-#### Test Script (11) Course Register, Update, Delete, Search
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 11.1 | Validation messages displayed | Validation messages displayed correctly | None – Test Passed |
-| 11.2 | Duplicate course code message displayed | Duplicate course code message displayed | None – Test Passed |
-| 11.3 | Validation message displayed | Validation message displayed correctly | None – Test Passed |
-| 11.4 | Error with enrolment count | Error with enrolment count displayed | None – Test Passed |
-| 11.5 | Correct results in table format | Correct results in table format | None – Test Passed |
-| 11.6 | Success messages | Success messages displayed | None – Test Passed |
+Test Script (2) User Registration (Admin Site)
+Test Case Expected Result Actual Result Action Taken Evidence
+2.1 Validation message displayed when name/email/role blank; submission blocked Validation displayed correctly; record not created No corrective action required Fig.2.1 & 2.2
 
-#### Test Script (12) Subject Register, Update, Delete, Assign Teacher
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 12.1 | Validation messages displayed | Validation messages displayed correctly | None – Test Passed |
-| 12.2 | Duplicate message displayed | Duplicate message displayed | None – Test Passed |
-| 12.3 | Assignments saved | Assignments saved successfully | None – Test Passed |
-| 12.4 | Validation/rejection | Validation/rejection as expected | None – Test Passed |
-| 12.5 | Subject deleted | Subject deleted successfully | None – Test Passed |
+Before Testing – Fig.2.1
 
-#### Test Script (13) Course Registration (Enrolment & Withdrawal)
-| No. | Expected Result | Actual Result | Action Taken |
-|-----|----------------|---------------|--------------|
-| 13.1 | Pending enrolment created | Pending enrolment created | None – Test Passed |
-| 13.2 | Enrol button hidden or duplicate/pending notice | Enrol button hidden as expected | None – Test Passed |
-| 13.3 | Conflict error displayed | Conflict error displayed | None – Test Passed |
-| 13.4 | Status becomes approved or rejected | Status became approved or rejected correctly | None – Test Passed |
-| 13.5 | Status becomes withdrawal_pending | Status became withdrawal_pending | None – Test Passed |
-| 13.6 | Enrolment record removed | Enrolment record removed | None – Test Passed |
-| 13.7 | Status reverts to approved | Status reverted to approved | None – Test Passed |
-| 13.8 | Only approved and withdrawal_pending; subjects, date, status; ordered by course code | Displayed as expected | None – Test Passed |
-| 13.9 | Correct list and actions | Correct list and actions displayed | None – Test Passed |
+After Testing – Fig.2.2
 
----
+Test Case Expected Result Actual Result Action Taken Evidence
+2.2 Validation/duplicate message displayed for invalid or duplicate email Email validation worked; duplicate prevented No corrective action required Fig.2.3 & 2.4
 
-### 5.1.6.4 Result Summary
+ 
+Before Testing – Fig.2.3
 
-| Module | Total Tests | Passed | Failed |
-|--------|-------------|--------|--------|
-| User Registration (Public) | 6 | 6 | 0 |
-| User Registration (Admin) | 7 | 7 | 0 |
-| User Login | 6 | 6 | 0 |
-| User Update, Delete, Search | 5 | 5 | 0 |
-| Password Management | 3 | 3 | 0 |
-| User Settings / Preferences | 2 | 2 | 0 |
-| Global Search | 2 | 2 | 0 |
-| Student Registration | 5 | 5 | 0 |
-| Student Update, Delete, Search | 5 | 5 | 0 |
-| Student Self Profile | 3 | 3 | 0 |
-| Course Register, Update, Delete, Search | 6 | 6 | 0 |
-| Subject Register, Update, Delete, Assign Teacher | 5 | 5 | 0 |
-| Course Registration (Enrolment & Withdrawal) | 9 | 9 | 0 |
+After Testing – Fig.2.4
 
-**Total: 64 test cases. All passed.**
+Test Case Expected Result Actual Result Action Taken Evidence
+2.3 Invalid file type/size message displayed; upload rejected File validation worked correctly; invalid files rejected No corrective action required Fig.2.5 & 2.6
 
-All functional test cases passed. No critical defects were identified during Timebox 1 testing. Any defects found were corrected and re-tested. Evidence (screenshots and printouts) is stored in date order and numbered to correspond to the test numbers.
+Before Testing – Fig.2.5
 
----
+After Testing – Fig.2.6
 
-## Appendix A – Test Evidence (Screenshots)
+Test Case Expected Result Actual Result Action Taken Evidence
+2.4 User created successfully; success message displayed User created successfully; success message shown No corrective action required Fig.2.7, Fig.2.8 & Fig.2.9
 
-Screenshots and output are numbered to correspond to the test numbers (e.g. Fig.1.1 & 1.2 for Test 1.1; Fig.2.1 & 2.2 for Test 2.1). Before Testing and After Testing figures are annotated to state whether any changes to that part of the system were necessary and what was done. Evidence of failures (if any) is retained in date order for regression testing reference.
+Before Testing – Fig.2.7
 
-| Test | Evidence (Figure reference) |
-|------|----------------------------|
-| 1.1–1.6 | Fig.1.1–1.12 |
-| 2.1–2.7 | Fig.2.1–2.16 |
-| 3.1–3.6 | Fig.3.1–3.12 |
-| 4.1–4.5 | Fig.4.1–4.10 |
-| 5.1–5.3 | Fig.5.1–5.6 |
-| 6.1–6.2 | Fig.6.1–6.6 |
-| 7.1–7.2 | Fig.7.1–7.4 |
-| 8.1–8.5 | Fig.8.1–8.16 |
-| 9.1–9.5 | Fig.9.1–9.11 |
-| 10.1–10.3 | Fig.10.1–10.6 |
-| 11.1–11.6 | Fig.11.1–11.13 |
-| 12.1–12.5 | Fig.12.1–12.12 |
-| 13.1–13.9 | Fig.13.1–13.19 |
+After Testing – Fig.2.8
+
+After Testing – Fig.2.9
+
+Test Case Expected Result Actual Result Action Taken Evidence
+2.5 User updated successfully; success message displayed User updated successfully; changes saved No corrective action required Fig.2.10 & 2.11
+
+Before Testing – Fig.2.10
+
+After Testing – Fig.2.11
+
+Test Case Expected Result Actual Result Action Taken Evidence
+2.6 User deleted successfully; related records cascade (if applicable) User deleted successfully; deletion confirmed No corrective action required Fig.2.12, Fig.2.13 & Fig.2.14
+Before Testing – Fig.2.12
+
+Before Testing – Fig.2.13
+
+After Testing – Fig.2.14
+
+Test Case Expected Result Actual Result Action Taken Evidence
+2.7 Search and role filters return correct results with pagination Search and filters worked correctly; correct results shown No corrective action required Fig.2.15 & 2.16
+
+Before Testing – Fig.2.15
+
+After Testing – Fig.2.16
+
+Test Script (3) User Login
+Test Case Expected Result Actual Result Action Taken Evidence
+3.1 Validation message displayed when email/password blank Validation displayed correctly; login blocked No corrective action required Fig.3.1 & 3.2
+
+Before Testing – Fig.3.1
+
+After Testing – Fig.3.2
+
+Test Case Expected Result Actual Result Action Taken Evidence
+3.2 Incorrect credentials message displayed Incorrect credentials message displayed correctly No corrective action required Fig.3.3 & 3.4
+
+Before Testing – Fig.3.3
+
+After Testing – Fig.3.4
+
+Test Case Expected Result Actual Result Action Taken Evidence
+3.3 Throttle/too many attempts message displayed after 5+ failures Rate limiting triggered correctly No corrective action required Fig.3.5 & 3.6
+
+Before Testing – Fig.3.5
+
+After Testing – Fig.3.6
+
+Test Case Expected Result Actual Result Action Taken Evidence
+3.4 Session persists after browser close when Remember Me checked Session persisted as expected No corrective action required Fig.3.7 & 3.8
+
+Before Testing – Fig.3.7
+
+After Testing – Fig.3.8
+
+Test Case Expected Result Actual Result Action Taken Evidence
+3.5 Redirect to role-based dashboard after valid login Redirected correctly to dashboard No corrective action required Fig.3.9 & 3.10
+
+Before Testing – Fig.3.9
+
+After Testing – Fig.3.10
+
+Test Case Expected Result Actual Result Action Taken Evidence
+3.6 reCAPTCHA required message displayed if not completed (if enabled) reCAPTCHA message displayed correctly No corrective action required Fig.3.11 & 3.12
+
+Before Testing – Fig.3.11
+
+After Testing – Fig.3.12
+
+Test Script (4) User Update, Delete, Search
+Test Case Expected Result Actual Result Action Taken Evidence
+4.1 Validation message displayed when updating with invalid/duplicate email Validation displayed correctly; update blocked No corrective action required Fig.4.1 & 4.2
+
+Before Testing – Fig.4.1
+
+After Testing – Fig.4.2
+
+Test Case Expected Result Actual Result Action Taken Evidence
+4.2 Validation message displayed for invalid photo upload Photo validation worked correctly No corrective action required Fig.4.3 & 4.4
+
+ 
+Before Testing – Fig.4.3
+
+After Testing – Fig.4.4
+
+Test Case Expected Result Actual Result Action Taken Evidence
+4.3 User deleted successfully after confirmation; related records handled Deletion performed correctly; confirmation shown No corrective action required Fig.4.5 & 4.6
+
+Before Testing – Fig.4.5
+
+After Testing – Fig.4.6
+
+Test Case Expected Result Actual Result Action Taken Evidence
+4.4 Search returns matching records based on keyword/filter Correct matching results displayed No corrective action required Fig.4.7 & 4.8
+
+Before Testing – Fig.4.7
+
+After Testing – Fig.4.8
+
+Test Case Expected Result Actual Result Action Taken Evidence
+4.5 Role tabs filter list correctly with pagination Filter worked correctly; pagination correct No corrective action required Fig.4.9 & 4.10
+
+Before Testing – Fig.4.9
+
+After Testing – Fig.4.10
+
+Test Script (5) Password Management
+
+Test Case Expected Result Actual Result Action Taken Evidence
+5.1 Reset email sent / success message shown after request Reset flow worked; success shown No corrective action required Fig.5.1 & 5.2
+
+Before Testing – Fig.5.1
+
+After Testing – Fig.5.2
+
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+5.2 Password updated successfully using reset token Password reset successful No corrective action required Fig.5.3 & 5.4
+
+Before Testing – Fig.5.3
+
+After Testing – Fig.5.4
+
+Test Case Expected Result Actual Result Action Taken Evidence
+5.3 Password updated successfully for logged-in user Password update successful; confirmation shown No corrective action required Fig.5.5 & 5.6
+
+Before Testing – Fig.5.5
+
+After Testing – Fig.5.6
+
+Test Script (6) User Settings / Preferences
+Test Case Expected Result Actual Result Action Taken Evidence
+6.1 Default settings displayed correctly Defaults displayed correctly No corrective action required Fig.6.1, Fig.6.2, Fig.6.3 & Fig.6.4
+
+Before Testing – Fig.6.1
+
+After Testing – Fig.6.2
+
+After Testing – Fig.6.3
+
+After Testing – Fig.6.4
+
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+6.2 Preferences saved successfully; success message shown Preferences saved successfully No corrective action required Fig.6.5 & 6.6
+
+Before Testing – Fig.6.5
+
+After Testing – Fig.6.6
+
+Test Script (7) Global Search
+Test Case Expected Result Actual Result Action Taken Evidence
+7.1 Query < 2 characters returns empty/no-search result Behaviour corrects; no results displayed No corrective action required Fig.7.1 & 7.2
+
+Before Testing – Fig.7.1
+
+After Testing – Fig.7.2
+
+Test Case Expected Result Actual Result Action Taken Evidence
+7.2 Results scoped correctly by role Role-based results displayed correctly No corrective action required Fig.7.3 & 7.4
+
+Before Testing – Fig.7.3
+
+After Testing – Fig.7.4
+
+Test Script (8) Student Registration
+Test Case Expected Result Actual Result Action Taken Evidence
+8.1 User dropdown shows only Student-role users without student profile Dropdown populated correctly with eligible users No corrective action required Fig.8.1 & 8.2
+
+Before Testing – Fig.8.1
+
+After Testing – Fig.8.2
+
+ 
+
+Test Case Expected Result Actual Result Action Taken Evidence
+8.2 Student number auto-generated when left blank (e.g., STU0001…) Student number generated correctly No corrective action required Fig.8.3, Fig.8.4, Fig.8.5 & Fig.8.6
+
+Before Testing – Fig.8.3
+
+Before Testing – Fig.8.4
+After Testing – Fig.8.5
+
+After Testing – Fig.8.6
+
+Test Case Expected Result Actual Result Action Taken Evidence
+8.3 Validation messages displayed for missing/invalid required fields Validation displayed correctly; submission blocked No corrective action required Fig.8.7, Fig.8.8, Fig.8.9 & Fig.8.10
+
+Before Testing – Fig.8.7
+
+Before Testing – Fig.8.8
+
+After Testing – Fig.8.9
+
+After Testing – Fig.8.10
+
+Test Case Expected Result Actual Result Action Taken Evidence
+8.4 File upload validates type/size and stores valid files Upload validation worked; valid files stored No corrective action required Fig.8.11 & 8.12
+
+Before Testing – Fig.8.11
+
+After Testing – Fig.8.12
+
+Test Case Expected Result Actual Result Action Taken Evidence
+8.5 Student record created and linked to selected user Student created successfully and linked No corrective action required Fig.8.13, Fig.8.14, Fig.8.15 & Fig.8.16
+
+Before Testing – Fig.8.13
+
+Before Testing – Fig.8.14
+
+After Testing – Fig.8.15
+
+After Testing – Fig.8.16
+
+Test Script (9) Student Update, Delete, Search
+
+Test Case Expected Result Actual Result Action Taken Evidence
+9.1 Validation message shown for duplicate student_no/email Validation displayed correctly; update blocked No corrective action required Fig.9.1 & 9.2
+
+Before Testing – Fig.9.1
+
+After Testing – Fig.9.2
+
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+9.2 New photo/document replaces old; new file stored correctly Replacement worked; old file replaced No corrective action required Fig.9.3 & 9.4
+
+Before Testing – Fig.9.3
+
+After Testing – Fig.9.4
+
+Test Case Expected Result Actual Result Action Taken Evidence
+9.3 Student deleted after confirmation; related records cascaded Deletion successful; cascade executed No corrective action required Fig.9.5, Fig.9.6 & Fig.9.7
+
+Before Testing – Fig.9.5
+
+After Testing – Fig.9.6
+
+After Testing – Fig.9.7
+
+Test Case Expected Result Actual Result Action Taken Evidence
+9.4 Search/filters return correct results (10 per page) Results filtered correctly; pagination correct No corrective action required Fig.9.8 & 9.9
+
+Before Testing – Fig.9.8
+
+After Testing – Fig.9.9
+
+Test Case Expected Result Actual Result Action Taken Evidence
+9.5 Pagination navigates correct records per page (10 items) Correct page data displayed No corrective action required Fig.9.10 & 9.11
+
+Before Testing – Fig.9.10
+
+After Testing – Fig.9.11
+
+Test Script (10) Student Self Profile
+
+Test Case Expected Result Actual Result Action Taken Evidence
+10.1 Profile page displays student & academic information Information displayed correctly No corrective action required Fig.10.1, Fig.10.2 & Fig.10.3
+
+Before Testing – Fig.10.1
+
+After Testing – Fig.10.2
+
+After Testing – Fig.10.3
+
+Test Case Expected Result Actual Result Action Taken Evidence
+10.2 Allowed fields update successfully (phone/address/photo) Changes saved successfully No corrective action required Fig.10.4 & 10.5
+Before Testing – Fig.10.4
+
+After Testing – Fig.10.5
+
+Test Case Expected Result Actual Result Action Taken Evidence
+10.3 Restricted fields are read-only/not editable Restricted fields not editable No corrective action required Fig.10.6
+
+Fig.10.6
+
+Test Script (11) Course Management
+Test Case Expected Result Actual Result Action Taken Evidence
+11.1 Validation shown for missing fields/invalid credits Validation worked correctly No corrective action required Fig.11.1 & 11.2
+
+Before Testing – Fig.11.1
+
+After Testing – Fig.11.2
+
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+11.2 Duplicate course code rejected with error message Duplicate blocked successfully No corrective action required Fig.11.4 & 11.5
+
+Before Testing – Fig.11.4
+
+After Testing – Fig.11.5
+
+Test Case Expected Result Actual Result Action Taken Evidence
+11.3 invalid photo type/size rejected with validation message Validation worked correctly No corrective action required Fig.11.6 & 11.7
+
+Before Testing – Fig.11.6
+
+After Testing – Fig.11.7
+
+Test Case Expected Result Actual Result Action Taken Evidence
+11.4 Course with enrolments cannot be deleted; error shown Deletion blocked; enrolment error shown No corrective action required Fig.11.8 & 11.9
+
+Before Testing – Fig.11.8
+
+After Testing – Fig.11.9
+
+Test Case Expected Result Actual Result Action Taken Evidence
+11.5 Search/filter/sort displays correct table results Correct results displayed No corrective action required Fig.11.10 & 11.11
+
+Before Testing – Fig.11.10
+
+After Testing – Fig.11.11
+
+Test Case Expected Result Actual Result Action Taken Evidence
+11.6 Valid CRUD actions succeed with success message CRUD performed successfully No corrective action required Fig.11.12 & 11.13
+
+Before Testing – Fig.11.12
+
+After Testing – Fig.11.13
+
+Test Script (12) Subject Management
+Test Case Expected Result Actual Result Action Taken Evidence
+12.1 Validation shown for missing fields/invalid credits Validation displayed correctly No corrective action required Fig.12.1, Fig.12.2 & Fig.12.3
+
+Before Testing – Fig.12.1
+
+Before Testing – Fig.12.2
+
+After Testing – Fig.12.3
+
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+12.2 Duplicate subject_code rejected with error message Duplicate blocked successfully No corrective action required Fig.12.4 & 12.5
+
+Before Testing – Fig.12.4
+
+After Testing – Fig.12.5
+
+Test Case Expected Result Actual Result Action Taken Evidence
+12.3 Assigning valid teacher(s) saves assignments Assignments saved correctly No corrective action required Fig.12.6, Fig.12.7 & Fig.12.8
+
+Before Testing – Fig.12.6
+
+Before Testing – Fig.12.7
+
+After Testing – Fig.12.8
+
+Test Case Expected Result Actual Result Action Taken Evidence
+12.4 Non-teacher assignment rejected with validation Rejected as expected No corrective action required Fig.12.9 & 12.10
+
+Before Testing – Fig.12.9
+
+After Testing – Fig.12.10
+
+Test Case Expected Result Actual Result Action Taken Evidence
+12.5 Subject deleted after confirmation Deleted successfully No corrective action required Fig.12.11 & 12.12
+
+Before Testing – Fig.12.11
+
+After Testing – Fig.12.12
+
+Test Script (13) Course Registration (Enrolment & Withdrawal)
+Test Case Expected Result Actual Result Action Taken Evidence
+13.1 Enrolment request creates pending record Pending enrolment created successfully No corrective action required Fig.13.1, Fig.13.2 & Fig.13.3
+
+Before Testing – Fig.13.1
+
+After Testing – Fig.13.2
+
+ 
+Test Case Expected Result Actual Result Action Taken Evidence
+13.2 Duplicate enrolment prevented (button hidden / notice shown) Duplicate prevented; Enrol button hidden No corrective action required Fig.13.4
+
+Fig.13.4
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.3 Schedule conflict displays conflict error Conflict error displayed correctly No corrective action required Fig.13.5 & 13.6
+
+Before Testing – Fig.13.5
+
+After Testing – Fig.13.6
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.4 Staff approval/rejection updates status correctly Status updated correctly No corrective action required Fig.13.7 & 13.8
+
+Before Testing – Fig.13.7
+
+After Testing – Fig.13.8
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.5 Withdrawal request changes status to withdrawal_pending Status changed correctly No corrective action required Fig.13.9 & 13.10
+
+Before Testing – Fig.13.9
+
+After Testing – Fig.13.10
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.6 Approving withdrawal removes enrolment record Enrolment removed successfully No corrective action required Fig.13.11 & 13.12
+
+Before Testing – Fig.13.11
+
+Before Testing – Fig.13.12
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.7 Rejecting withdrawal restores approved status Status reverted correctly No corrective action required Fig.13.13, Fig.13.14 & Fig.13.15
+
+Before Testing – Fig.13.13
+
+After Testing – Fig.13.14
+
+After Testing – Fig.13.15
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.8 My Courses shows only approved/withdrawal_pending correctly ordered Correct list displayed No corrective action required Fig.13.16 & 13.17
+
+Before Testing – Fig.13.16
+
+After Testing – Fig.13.17
+
+Test Case Expected Result Actual Result Action Taken Evidence
+13.9 Staff can view/manage pending lists with correct actions Lists/actions displayed correctly No corrective action required Fig.13.18 & 13.19
+
+Before Testing – Fig.13.18
+
+After Testing – Fig.13.19
