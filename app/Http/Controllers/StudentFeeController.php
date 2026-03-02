@@ -80,13 +80,13 @@ class StudentFeeController extends Controller
         if ($fee->status === Fee::STATUS_PAID) {
             return redirect()
                 ->route('student.fees.index')
-                ->with('error', 'This fee has already been marked as paid.');
+                ->with('error', 'Action blocked: this fee is already marked as paid, so another payment confirmation cannot be submitted.');
         }
 
         if ($fee->status === Fee::STATUS_PAYMENT_PENDING) {
             return redirect()
                 ->route('student.fees.index')
-                ->with('error', 'You already have a pending payment confirmation for this fee.');
+                ->with('error', 'Action blocked: a payment confirmation for this fee is already pending admin review.');
         }
 
         $fee->markAsPaymentPending(
