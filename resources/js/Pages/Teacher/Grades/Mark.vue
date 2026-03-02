@@ -117,9 +117,10 @@ const gradeEntries = computed(() => {
     const q = query.value.trim().toLowerCase();
 
     return form.grades
-        .map((record) => {
+        .map((record, index) => {
             const student = studentsById.value.get(record.student_id);
-            return { record, student };
+            const scoreError = form.errors[`grades.${index}.score`] ?? null;
+            return { record, student, index, scoreError };
         })
         .filter((entry) => {
             const status = entry.student?.status ?? null;
@@ -144,6 +145,13 @@ const gradeEntries = computed(() => {
             return name.includes(q) || no.includes(q);
         });
 });
+
+const scoreFieldErrors = computed(() =>
+    Object.entries(form.errors)
+        .filter(([key]) => /^grades\.\d+\.score$/.test(key))
+        .map(([, message]) => String(message))
+        .filter((message, index, all) => all.indexOf(message) === index),
+);
 
 const subjectDashboard = computed(() => {
     const workflow = {
@@ -755,12 +763,9 @@ const submit = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td
-                                                        class="whitespace-nowrap px-4 py-4 text-center"
-                                                    >
-                                                        <div
-                                                            class="flex items-center justify-center gap-2"
-                                                        >
+                                                    <td class="px-4 py-4 text-center">
+                                                        <div class="flex flex-col items-center gap-1">
+                                                            <div class="flex items-center justify-center gap-2">
                                                             <input
                                                                 v-model="
                                                                     entry.record
@@ -777,6 +782,8 @@ const submit = () => {
                                                                 "
                                                                  class="w-28 rounded-md border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy disabled:cursor-not-allowed disabled:opacity-60"
                                                                  :class="{
+                                                                     'border-red-300 ring-1 ring-red-200':
+                                                                         entry.scoreError,
                                                                      'ring-1 ring-amber-200 bg-amber-100/70':
                                                                          !entry
                                                                              .student
@@ -926,6 +933,13 @@ const submit = () => {
                                                                     )
                                                                 }}%
                                                             </span>
+                                                            </div>
+                                                            <p
+                                                                v-if="entry.scoreError"
+                                                                class="text-center text-[11px] font-medium text-red-700"
+                                                            >
+                                                                {{ entry.scoreError }}
+                                                            </p>
                                                         </div>
                                                     </td>
                                                     <td
@@ -1537,6 +1551,22 @@ const submit = () => {
                                 >
                                     {{ form.errors.grades }}
                                 </p>
+                                <div
+                                    v-if="scoreFieldErrors.length > 0"
+                                    class="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+                                >
+                                    <p class="font-semibold">
+                                        Please correct invalid score entries.
+                                    </p>
+                                    <ul class="mt-1 list-disc pl-4">
+                                        <li
+                                            v-for="(message, idx) in scoreFieldErrors"
+                                            :key="`${message}-${idx}`"
+                                        >
+                                            {{ message }}
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <!-- Form Actions -->
