@@ -9,6 +9,8 @@ class User {
   +email: varchar
   +role: varchar
   +photo: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +student()
   +sentMessages()
@@ -26,6 +28,8 @@ class Student {
   +user_id: bigint
   +student_no: varchar
   +full_name: varchar
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +user()
   +courses()
@@ -36,6 +40,9 @@ class Course {
   +id: bigint
   +course_code: varchar
   +title: varchar
+  +attendance_threshold: decimal(5,2)
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +subjects()
   +students()
@@ -49,6 +56,9 @@ class Subject {
   +course_id: bigint
   +subject_code: varchar
   +title: varchar
+  +attendance_threshold: decimal(5,2)
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +course()
   +teachers()
@@ -64,6 +74,8 @@ class Timetable {
   +end_time: time
   +location: varchar
   +created_by: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +subject()
   +creator()
@@ -76,6 +88,8 @@ class Attendance {
   +student_id: bigint
   +date: date
   +status: enum(present,absent)
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +subject()
   +student()
@@ -85,9 +99,11 @@ class Attendance {
 class LowAttendanceAlertState {
   +id: bigint
   +student_id: bigint
-  +last_rate: decimal
+  +last_rate: decimal(5,2)
   +is_below_threshold: boolean
   +last_alert_sent_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +student()
 }
@@ -103,6 +119,10 @@ class Announcement {
   +audience: json
   +publish_at: timestamp
   +expires_at: timestamp
+  +visible_from: timestamp
+  +visible_until: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +author()
   +reads()
@@ -116,6 +136,8 @@ class AnnouncementRead {
   +user_id: bigint
   +read_at: timestamp
   +acknowledged_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +announcement()
   +user()
@@ -129,6 +151,8 @@ class Message {
   +receiver_role: varchar
   +body: text
   +read: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
   --
   +sender()
   +receiver()
@@ -141,6 +165,8 @@ class Notification <<laravel-notification>> {
   +type: varchar
   +data: text
   +read_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
 }
 
 class ContactMessage {
@@ -154,6 +180,8 @@ class ContactMessage {
   +reply: text
   +is_read: boolean
   +replied_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
 }
 
 class FeedbackMessage {
@@ -164,6 +192,8 @@ class FeedbackMessage {
   +message: text
   +is_read: boolean
   +replied_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
 }
 
 Course  "1" -- "0..*" Subject
