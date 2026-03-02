@@ -368,6 +368,24 @@ const getGradeBadge = (score) => {
     return null;
 };
 
+const formatDateTimeLocal = (dateTimeValue) => {
+    if (!dateTimeValue) return "-";
+
+    const parsed = new Date(dateTimeValue);
+    if (Number.isNaN(parsed.getTime())) {
+        return String(dateTimeValue);
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    }).format(parsed);
+};
+
 const submit = () => {
     form.post(route("teacher.grades.store", props.subject.id));
 };
@@ -1062,9 +1080,11 @@ const submit = () => {
                                                             >
                                                                 Updated:
                                                                 {{
-                                                                    entry
-                                                                        .student
-                                                                        .grade_updated_at
+                                                                    formatDateTimeLocal(
+                                                                        entry
+                                                                            .student
+                                                                            .grade_updated_at,
+                                                                    )
                                                                 }}
                                                             </span>
                                                         </div>
@@ -1497,8 +1517,9 @@ const submit = () => {
                                                                                 class="text-slate-500"
                                                                             >
                                                                                 {{
-                                                                                    log.performed_at ??
-                                                                                    "-"
+                                                                                    formatDateTimeLocal(
+                                                                                        log.performed_at,
+                                                                                    )
                                                                                 }}
                                                                             </span>
                                                                         </div>

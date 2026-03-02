@@ -135,7 +135,7 @@ class TeacherGradesController extends Controller
                 'rejection_reason' => $grade?->rejection_reason,
                 'graded_by' => $grade?->grader?->name,
                 'graded_by_id' => $grade?->graded_by,
-                'grade_updated_at' => $grade?->updated_at?->format('Y-m-d H:i'),
+                'grade_updated_at' => $grade?->updated_at?->toIso8601String(),
                 'can_edit_score' => $editLockReason === null,
                 'edit_lock_reason' => $editLockReason,
                 'grade_audit_trail' => $grade
@@ -146,7 +146,7 @@ class TeacherGradesController extends Controller
                                 'action' => $log->action,
                                 'reason' => $log->reason,
                                 'performed_by' => $log->performer?->name,
-                                'performed_at' => $log->created_at?->format('Y-m-d H:i'),
+                                'performed_at' => $log->created_at?->toIso8601String(),
                                 'meta' => $log->meta,
                             ];
                         })
