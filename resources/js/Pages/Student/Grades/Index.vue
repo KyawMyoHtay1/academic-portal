@@ -436,20 +436,21 @@ const getLetterGrade = (score) => {
                                 }}
                             </p>
                         </div>
-                        <div
-                            v-if="gpa !== null"
-                            class="portal-card p-5 bg-indigo-50"
-                        >
+                        <div class="portal-card p-5 bg-indigo-50">
                             <p
                                 class="text-xs font-semibold uppercase tracking-wide text-indigo-700"
                             >
                                 GPA (Grade Point Average)
                             </p>
                             <p class="mt-2 text-2xl font-bold text-indigo-900">
-                                {{ gpa.toFixed(2) }}
+                                {{ gpa !== null ? gpa.toFixed(2) : "N/A" }}
                             </p>
                             <p class="mt-1 text-xs text-indigo-700">
-                                Based on {{ totalGrades }} grade(s)
+                                {{
+                                    gpa !== null
+                                        ? `Based on ${totalGrades} grade(s)`
+                                        : "No approved grades yet"
+                                }}
                             </p>
                         </div>
                     </div>
