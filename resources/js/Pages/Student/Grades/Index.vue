@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head } from "@inertiajs/vue3";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import debounce from "lodash/debounce";
@@ -1055,7 +1056,7 @@ const getLetterGrade = (score) => {
                                                                             {{ event.performed_by ?? "System" }}
                                                                         </span>
                                                                         <span class="text-slate-500">
-                                                                            {{ event.performed_at ?? "-" }}
+                                                                            {{ formatDateTimeLocal(event.performed_at) }}
                                                                         </span>
                                                                     </div>
                                                                     <p

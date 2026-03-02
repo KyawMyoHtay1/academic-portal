@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head, router } from "@inertiajs/vue3";
 import debounce from "lodash/debounce";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
@@ -420,7 +421,7 @@ const iconClass = (type) => {
                                     </div>
 
                                     <p class="mt-1 text-sm text-slate-700">{{ notification.message }}</p>
-                                    <p class="mt-2 text-xs text-slate-500">{{ notification.created_at }}</p>
+                                    <p class="mt-2 text-xs text-slate-500">{{ formatDateTimeLocal(notification.created_at) }}</p>
                                 </div>
                             </div>
 

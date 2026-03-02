@@ -459,8 +459,8 @@ class StaffTimetableController extends Controller
             'created_by' => $entry->created_by,
             'creator_name' => $entry->creator?->name ?? null,
             'duration_minutes' => $durationMinutes,
-            'created_at' => $entry->created_at?->toDateTimeString(),
-            'updated_at' => $entry->updated_at?->toDateTimeString(),
+            'created_at' => $entry->created_at?->toIso8601String(),
+            'updated_at' => $entry->updated_at?->toIso8601String(),
         ];
     }
 

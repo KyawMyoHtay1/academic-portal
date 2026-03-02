@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
@@ -491,7 +492,7 @@ const applyCommentTemplate = () => {
                                         </div>
 
                                         <p class="text-xs text-slate-500">
-                                            {{ submission.student?.student_no }} - Submitted: {{ submission.submitted_at }}
+                                            {{ submission.student?.student_no }} - Submitted: {{ formatDateTimeLocal(submission.submitted_at) }}
                                         </p>
 
                                         <p v-if="submission.comments" class="mt-2 text-sm text-slate-700">
@@ -521,7 +522,7 @@ const applyCommentTemplate = () => {
                                         {{ submission.feedback }}
                                     </div>
                                     <div class="mt-1 text-xs text-slate-500">
-                                        Graded by {{ submission.graded_by }} on {{ submission.graded_at }}
+                                        Graded by {{ submission.graded_by }} on {{ formatDateTimeLocal(submission.graded_at) }}
                                     </div>
                                 </div>
                             </div>

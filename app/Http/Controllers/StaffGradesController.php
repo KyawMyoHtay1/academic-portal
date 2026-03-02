@@ -332,9 +332,9 @@ class StaffGradesController extends Controller
                     'letter_grade' => $letterGrade,
                     'status' => $grade->status,
                     'graded_by' => $grade->grader?->name,
-                    'submitted_at' => $grade->updated_at?->toDateTimeString(),
+                    'submitted_at' => $grade->updated_at?->toIso8601String(),
                     'reviewed_by' => $grade->reviewer?->name,
-                    'reviewed_at' => $grade->reviewed_at?->toDateTimeString(),
+                    'reviewed_at' => $grade->reviewed_at?->toIso8601String(),
                     'rejection_reason' => $grade->rejection_reason,
                 ] : null,
                 'assignment' => [

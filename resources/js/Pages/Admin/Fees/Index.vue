@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 
@@ -608,7 +609,7 @@ watch(entries, (list) => {
                                                         <template v-if="fee.status === 'paid' && (fee.processed_by || fee.payment_processed_at)">
                                                             <p class="mt-1 text-sm text-slate-700">{{ fee.processed_by || "-" }}</p>
                                                             <p v-if="fee.payment_processed_at" class="text-xs text-slate-500">
-                                                                {{ fee.payment_processed_at }}
+                                                                {{ formatDateTimeLocal(fee.payment_processed_at) }}
                                                             </p>
                                                         </template>
                                                         <p v-else class="mt-1 text-sm text-slate-700">-</p>
@@ -626,7 +627,7 @@ watch(entries, (list) => {
                                                                 {{ event.label }}
                                                             </p>
                                                             <p class="text-xs text-slate-500">
-                                                                {{ event.created_at || "-" }}
+                                                                {{ formatDateTimeLocal(event.created_at) }}
                                                                 <span v-if="event.performed_by"> - {{ event.performed_by }}</span>
                                                             </p>
                                                             <p v-if="event.note" class="text-xs text-slate-500">

@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head, Link } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
@@ -215,7 +216,7 @@ const hasScore = (assignment) =>
                                             <p class="mt-1 text-xs font-medium text-slate-800">
                                                 {{
                                                     assignment.submission
-                                                        ? `Submitted: ${assignment.submission.submitted_at}`
+                                                        ? `Submitted: ${formatDateTimeLocal(assignment.submission.submitted_at)}`
                                                         : "Not submitted yet"
                                                 }}
                                             </p>

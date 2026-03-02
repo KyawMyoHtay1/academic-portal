@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
@@ -187,7 +188,7 @@ const downloadSubmission = () => {
                         <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                             <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Submission</p>
                             <p class="mt-1 text-xs font-medium text-slate-800">
-                                {{ props.submission ? `Submitted: ${props.submission.submitted_at}` : "Not submitted yet" }}
+                                {{ props.submission ? `Submitted: ${formatDateTimeLocal(props.submission.submitted_at)}` : "Not submitted yet" }}
                             </p>
                         </div>
 
@@ -217,7 +218,7 @@ const downloadSubmission = () => {
                             Your Submission
                         </p>
                         <p class="mt-1 text-sm text-slate-600">
-                            Submitted on {{ props.submission.submitted_at }}
+                            Submitted on {{ formatDateTimeLocal(props.submission.submitted_at) }}
                         </p>
                     </div>
 
@@ -256,7 +257,7 @@ const downloadSubmission = () => {
                                 </p>
                             </div>
                             <p v-if="props.submission.graded_at" class="mt-2 text-xs text-emerald-600">
-                                Graded on {{ props.submission.graded_at }}{{ props.submission.grader ? ` by ${props.submission.grader}` : "" }}
+                                Graded on {{ formatDateTimeLocal(props.submission.graded_at) }}{{ props.submission.grader ? ` by ${props.submission.grader}` : "" }}
                             </p>
                         </div>
                     </div>

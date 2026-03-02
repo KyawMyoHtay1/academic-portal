@@ -29,8 +29,8 @@ class NotificationController extends Controller
                     'type' => $normalizedType,
                     'title' => $notification->data['title'] ?? 'Notification',
                     'message' => $notification->data['message'] ?? '',
-                    'read_at' => $notification->read_at?->format('Y-m-d H:i'),
-                    'created_at' => $notification->created_at->format('Y-m-d H:i'),
+                    'read_at' => $notification->read_at?->toIso8601String(),
+                    'created_at' => $notification->created_at->toIso8601String(),
                     'url' => $notification->data['url'] ?? $this->resolveNotificationUrl($notification->data, $user),
                 ];
             });

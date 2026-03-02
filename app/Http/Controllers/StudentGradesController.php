@@ -93,7 +93,7 @@ class StudentGradesController extends Controller
                                     'action' => $log->action,
                                     'reason' => $log->reason,
                                     'performed_by' => $log->performer?->name,
-                                    'performed_at' => $log->created_at?->format('Y-m-d H:i'),
+                                    'performed_at' => $log->created_at?->toIso8601String(),
                                 ];
                             })
                             ->values()

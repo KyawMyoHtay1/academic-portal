@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 
@@ -698,7 +699,7 @@ const exportUrl = (format) =>
                                         <td class="px-4 py-3 text-sm text-slate-700">
                                             <div>{{ row.grade?.graded_by ?? "-" }}</div>
                                             <div class="text-xs text-slate-500">
-                                                {{ row.grade?.submitted_at ?? "" }}
+                                                {{ formatDateTimeLocal(row.grade?.submitted_at) }}
                                             </div>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-slate-700">
@@ -768,7 +769,7 @@ const exportUrl = (format) =>
                                                     Reviewed by {{ row.grade.reviewed_by }}
                                                 </div>
                                                 <div v-if="row.grade?.reviewed_at">
-                                                    {{ row.grade.reviewed_at }}
+                                                    {{ formatDateTimeLocal(row.grade.reviewed_at) }}
                                                 </div>
                                                 <div
                                                     v-if="row.grade?.rejection_reason"

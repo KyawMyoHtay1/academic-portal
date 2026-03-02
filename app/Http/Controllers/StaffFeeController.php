@@ -97,7 +97,7 @@ class StaffFeeController extends Controller
                 'due_date' => $fee->due_date->format('Y-m-d'),
                 'paid_date' => $fee->paid_date?->format('Y-m-d'),
                 'processed_by' => $fee->processor?->name,
-                'payment_processed_at' => $fee->payment_processed_at?->toDateTimeString(),
+                'payment_processed_at' => $fee->payment_processed_at?->toIso8601String(),
                 'created_at' => $fee->created_at->format('Y-m-d'),
                 'is_late' => $isLate,
                 'days_overdue' => $isLate ? $fee->due_date->diffInDays($today) : null,
@@ -690,7 +690,7 @@ class StaffFeeController extends Controller
                     'to_status' => $log->to_status,
                     'performed_by' => $log->performer?->name,
                     'note' => $log->note,
-                    'created_at' => $log->created_at?->format('Y-m-d H:i'),
+                    'created_at' => $log->created_at?->toIso8601String(),
                 ];
             })
             ->all();
@@ -711,7 +711,7 @@ class StaffFeeController extends Controller
             'to_status' => $fee->status,
             'performed_by' => $fee->processor?->name,
             'note' => null,
-            'created_at' => $fee->updated_at?->format('Y-m-d H:i'),
+            'created_at' => $fee->updated_at?->toIso8601String(),
         ]];
     }
 
