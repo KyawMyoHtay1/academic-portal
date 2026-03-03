@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -152,26 +153,64 @@ class StaffTimetableController extends Controller
 
         $subject = Subject::findOrFail($data['subject_id']);
 
-        $conflicts = $this->overlapQuery($subject, $data)->get();
-        if ($conflicts->isNotEmpty()) {
-            $conflictDetails = $this->mapConflictDetails($conflicts);
+        $days = collect($data['day_of_week_list'] ?? [])
+            ->filter(fn ($day) => in_array($day, self::DAY_ORDER, true))
+            ->values()
+            ->all();
 
+        if ($days === [] && ! empty($data['day_of_week']) && in_array($data['day_of_week'], self::DAY_ORDER, true)) {
+            $days = [$data['day_of_week']];
+        }
+
+        if ($days === []) {
+            return back()
+                ->withErrors(['day_of_week_list' => 'Please select at least one day of the week.'])
+                ->withInput();
+        }
+
+        $allConflictDetails = [];
+        $conflictMessage = null;
+
+        foreach ($days as $day) {
+            $dayData = [
+                ...$data,
+                'day_of_week' => $day,
+            ];
+
+            $conflicts = $this->overlapQuery($subject, $dayData)->get();
+            if ($conflicts->isEmpty()) {
+                continue;
+            }
+
+            $conflictMessage ??= $this->buildConflictMessage($day, $conflicts);
+            $allConflictDetails = [
+                ...$allConflictDetails,
+                ...$this->mapConflictDetails($conflicts),
+            ];
+        }
+
+        if ($allConflictDetails !== []) {
             return back()
                 ->withErrors([
-                    'start_time' => $this->buildConflictMessage($data['day_of_week'], $conflicts),
-                    'conflict_details' => json_encode($conflictDetails, JSON_UNESCAPED_UNICODE),
+                    'day_of_week_list' => 'One or more selected days have timetable conflicts.',
+                    'start_time' => $conflictMessage ?? 'Timetable conflict detected for selected day(s).',
+                    'conflict_details' => json_encode($allConflictDetails, JSON_UNESCAPED_UNICODE),
                 ])
                 ->withInput();
         }
 
-        $timetable = Timetable::create([
-            'subject_id' => $data['subject_id'],
-            'day_of_week' => $data['day_of_week'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'location' => $data['location'] ?? null,
-            'created_by' => $request->user()->id,
-        ]);
+        $createdEntries = DB::transaction(function () use ($days, $data, $request) {
+            return collect($days)->map(function ($day) use ($data, $request) {
+                return Timetable::create([
+                    'subject_id' => $data['subject_id'],
+                    'day_of_week' => $day,
+                    'start_time' => $data['start_time'],
+                    'end_time' => $data['end_time'],
+                    'location' => $data['location'] ?? null,
+                    'created_by' => $request->user()->id,
+                ]);
+            });
+        });
 
         // Notify enrolled students and assigned teachers
         $course = $subject->course;
@@ -179,13 +218,20 @@ class StaffTimetableController extends Controller
             ->merge($course->students->pluck('user'))
             ->merge($course->teachers);
 
-        $notifiables->filter()->each(function ($user) use ($timetable) {
-            $user->notify(new TimetableUpdated($timetable, 'created'));
+        $notifiables->filter()->each(function ($user) use ($createdEntries) {
+            foreach ($createdEntries as $entry) {
+                $user->notify(new TimetableUpdated($entry, 'created'));
+            }
         });
+
+        $createdCount = $createdEntries->count();
+        $message = $createdCount === 1
+            ? 'Timetable entry created successfully.'
+            : "Timetable entries created successfully for {$createdCount} day(s).";
 
         return redirect()
             ->route('admin.timetables.index')
-            ->with('success', 'Timetable entry created successfully.');
+            ->with('success', $message);
     }
 
     /**
