@@ -177,6 +177,27 @@ const markAsRead = (id) => {
     router.post(route("notifications.read", id), {}, { preserveScroll: true });
 };
 
+const openNotification = (notification) => {
+    const targetUrl = notification?.url;
+    if (!targetUrl) return;
+
+    const navigate = () => {
+        router.visit(targetUrl);
+    };
+
+    if (notification.read_at) {
+        navigate();
+        return;
+    }
+
+    router.post(route("notifications.read", notification.id), {}, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: navigate,
+        onError: navigate,
+    });
+};
+
 const markAllAsRead = () => {
     router.post(route("notifications.read-all"), {}, { preserveScroll: true });
 };
@@ -426,13 +447,14 @@ const iconClass = (type) => {
                             </div>
 
                             <div class="flex items-center gap-2">
-                                <a
+                                <button
                                     v-if="notification.url"
-                                    :href="notification.url"
+                                    type="button"
+                                    @click="openNotification(notification)"
                                     class="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
                                 >
                                     Open
-                                </a>
+                                </button>
                                 <button
                                     v-if="!notification.read_at"
                                     type="button"
