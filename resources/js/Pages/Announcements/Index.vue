@@ -21,6 +21,11 @@ const tabs = [
 const activeTab = ref("all");
 const query = ref("");
 const selected = ref(null);
+const localAnnouncements = ref(
+    (props.announcements ?? []).map((announcement) => ({
+        ...announcement,
+    }))
+);
 
 const isUnread = (a) => !a.read_at;
 const isUrgent = (a) => a.priority === "urgent";
@@ -28,7 +33,7 @@ const isPinned = (a) => !!a.pinned;
 const needsAck = (a) => !!a.require_ack && !a.acknowledged_at;
 
 const stats = computed(() => {
-    const list = props.announcements ?? [];
+    const list = localAnnouncements.value;
     return {
         total: list.length,
         unread: list.filter(isUnread).length,
@@ -39,7 +44,7 @@ const stats = computed(() => {
 
 const filtered = computed(() => {
     const q = query.value.trim().toLowerCase();
-    let list = props.announcements ?? [];
+    let list = localAnnouncements.value;
 
     if (activeTab.value === "pinned") list = list.filter(isPinned);
     if (activeTab.value === "unread") list = list.filter(isUnread);
@@ -56,6 +61,20 @@ const filtered = computed(() => {
     return list;
 });
 
+const patchAnnouncement = (announcementId, patch) => {
+    const index = localAnnouncements.value.findIndex((a) => a.id === announcementId);
+    if (index === -1) return;
+
+    localAnnouncements.value[index] = {
+        ...localAnnouncements.value[index],
+        ...patch,
+    };
+
+    if (selected.value?.id === announcementId) {
+        selected.value = localAnnouncements.value[index];
+    }
+};
+
 const open = (a) => {
     selected.value = a;
 };
@@ -66,18 +85,49 @@ const close = () => {
 
 const markRead = (a) => {
     if (!a || a.read_at) return;
-    router.post(route("announcements.read", a.id), {}, { preserveScroll: true });
+    router.post(route("announcements.read", a.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            patchAnnouncement(a.id, { read_at: new Date().toISOString() });
+        },
+    });
 };
 
 const acknowledge = (a) => {
     if (!a || !a.require_ack || a.acknowledged_at) return;
-    router.post(route("announcements.ack", a.id), {}, { preserveScroll: true });
+    router.post(route("announcements.ack", a.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            const nowIso = new Date().toISOString();
+            patchAnnouncement(a.id, {
+                read_at: a.read_at ?? nowIso,
+                acknowledged_at: nowIso,
+            });
+        },
+    });
 };
 
 watch(
     () => selected.value?.id,
     () => {
         if (selected.value) markRead(selected.value);
+    }
+);
+
+watch(
+    () => props.announcements,
+    (announcements) => {
+        localAnnouncements.value = (announcements ?? []).map((announcement) => ({
+            ...announcement,
+        }));
+
+        if (!selected.value) return;
+        const refreshedSelected = localAnnouncements.value.find(
+            (announcement) => announcement.id === selected.value.id
+        );
+        if (refreshedSelected) {
+            selected.value = refreshedSelected;
+        }
     }
 );
 
