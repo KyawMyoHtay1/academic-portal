@@ -187,8 +187,7 @@ class StaffEnrollmentController extends Controller
     {
         $result = $this->enrollmentService->approveEnrollment($enrollment);
 
-        return redirect()
-            ->route('admin.enrollments.index')
+        return back()
             ->with($result['level'], $result['message']);
     }
 
@@ -202,8 +201,7 @@ class StaffEnrollmentController extends Controller
             $this->normalizeDecisionReason($request->input('reason'))
         );
 
-        return redirect()
-            ->route('admin.enrollments.index')
+        return back()
             ->with($result['level'], $result['message']);
     }
 
@@ -214,8 +212,7 @@ class StaffEnrollmentController extends Controller
     {
         $result = $this->enrollmentService->approveWithdrawal($enrollment);
 
-        return redirect()
-            ->route('admin.enrollments.index')
+        return back()
             ->with($result['level'], $result['message']);
     }
 
@@ -229,8 +226,7 @@ class StaffEnrollmentController extends Controller
             $this->normalizeDecisionReason($request->input('reason'))
         );
 
-        return redirect()
-            ->route('admin.enrollments.index')
+        return back()
             ->with($result['level'], $result['message']);
     }
 

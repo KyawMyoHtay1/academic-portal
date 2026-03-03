@@ -162,8 +162,7 @@ class TeacherAnnouncementController extends Controller
 
         $announcement->delete();
 
-        return redirect()
-            ->route('teacher.announcements.index')
+        return back()
             ->with('success', 'Announcement deleted successfully.');
     }
 

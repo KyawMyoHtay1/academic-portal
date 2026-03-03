@@ -245,8 +245,7 @@ class StaffFeeController extends Controller
 
         $fee->delete();
 
-        return redirect()
-            ->route('admin.fees.index')
+        return back()
             ->with('success', 'Fee deleted successfully.');
     }
 

@@ -148,8 +148,7 @@ class StaffAnnouncementController extends Controller
     {
         $announcement->delete();
 
-        return redirect()
-            ->route('admin.announcements.index')
+        return back()
             ->with('success', 'Announcement deleted successfully.');
     }
 

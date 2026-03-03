@@ -278,8 +278,7 @@ class StaffUserController extends Controller
     {
         // Prevent staff from deleting their own account
         if (auth()->id() === $user->id) {
-            return redirect()
-                ->route('admin.users.index')
+            return back()
                 ->with('error', 'You cannot delete your own account while logged in as this user.');
         }
 
@@ -307,8 +306,7 @@ class StaffUserController extends Controller
             ]
         );
 
-        return redirect()
-            ->route('admin.users.index')
+        return back()
             ->with('success', 'User deleted successfully.');
     }
 
@@ -325,14 +323,12 @@ class StaffUserController extends Controller
             ->values();
 
         if ($ids->isEmpty()) {
-            return redirect()
-                ->route('admin.users.index')
+            return back()
                 ->with('info', 'No users selected for deletion.');
         }
 
         if (auth()->id() && $ids->contains((int) auth()->id())) {
-            return redirect()
-                ->route('admin.users.index')
+            return back()
                 ->with('error', 'You cannot delete your own account in bulk actions.');
         }
 
@@ -368,8 +364,7 @@ class StaffUserController extends Controller
             ]
         );
 
-        return redirect()
-            ->route('admin.users.index')
+        return back()
             ->with('success', "{$users->count()} user(s) deleted successfully.");
     }
 

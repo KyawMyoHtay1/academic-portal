@@ -177,8 +177,7 @@ class StaffCourseController extends Controller
             ->count();
 
         if ($enrolledCount > 0) {
-            return redirect()
-                ->route('admin.courses.index')
+            return back()
                 ->with('error', "Cannot delete course. {$enrolledCount} student(s) are currently enrolled.");
         }
 
@@ -204,8 +203,7 @@ class StaffCourseController extends Controller
             ]
         );
 
-        return redirect()
-            ->route('admin.courses.index')
+        return back()
             ->with('success', 'Course deleted successfully.');
     }
 

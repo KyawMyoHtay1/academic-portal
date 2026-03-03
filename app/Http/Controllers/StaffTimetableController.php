@@ -274,8 +274,7 @@ class StaffTimetableController extends Controller
     {
         $timetable->delete();
 
-        return redirect()
-            ->route('admin.timetables.index')
+        return back()
             ->with('success', 'Timetable entry deleted successfully.');
     }
 
