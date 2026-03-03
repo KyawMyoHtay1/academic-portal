@@ -1,0 +1,62 @@
+@startuml Timebox3_Class_Initial
+hide circle
+skinparam classAttributeIconSize 0
+title Timebox 3 - Initial Class Diagram (Timetable, Attendance & Communication)
+
+class User {
+}
+
+class Student {
+}
+
+class Course {
+}
+
+class Subject {
+}
+
+class Timetable {
+}
+
+class Attendance {
+}
+
+class LowAttendanceAlertState {
+}
+
+class Announcement {
+}
+
+class AnnouncementRead {
+}
+
+class Message {
+}
+
+class Notification {
+}
+
+class ContactMessage {
+}
+
+class FeedbackMessage {
+}
+
+' Relationships
+Course  "1" -- "0..*" Subject
+Subject "1" -- "0..*" Timetable
+Subject "1" -- "0..*" Attendance
+Student "1" -- "0..*" Attendance
+Student "1" -- "0..1" LowAttendanceAlertState
+
+User "1" -- "0..*" Announcement       : author
+Announcement "1" -- "0..*" AnnouncementRead
+User "1" -- "0..*" AnnouncementRead
+
+User "1" -- "0..*" Message            : sender
+User "1" -- "0..*" Message            : receiver
+
+User "1" -- "0..*" Notification       : notifiable
+
+@enduml
+
