@@ -258,8 +258,7 @@ class StaffFeeController extends Controller
         $this->authorize('approvePayment', $fee);
 
         if ($fee->status !== Fee::STATUS_PAYMENT_PENDING) {
-            return redirect()
-                ->route('admin.fees.index')
+            return back()
                 ->with('error', 'Fee payment confirmation not found or already processed.');
         }
 
@@ -276,8 +275,7 @@ class StaffFeeController extends Controller
             $student->user->notify(new FeeStatusUpdated($fee));
         }
 
-        return redirect()
-            ->route('admin.fees.index')
+        return back()
             ->with('success', "Payment confirmed for fee of GBP {$fee->amount}.");
     }
 
@@ -289,8 +287,7 @@ class StaffFeeController extends Controller
         $this->authorize('rejectPayment', $fee);
 
         if ($fee->status !== Fee::STATUS_PAYMENT_PENDING) {
-            return redirect()
-                ->route('admin.fees.index')
+            return back()
                 ->with('error', 'Fee payment confirmation not found or already processed.');
         }
 
@@ -305,8 +302,7 @@ class StaffFeeController extends Controller
             $student->user->notify(new FeeStatusUpdated($fee));
         }
 
-        return redirect()
-            ->route('admin.fees.index')
+        return back()
             ->with('success', "Payment confirmation rejected for fee of GBP {$fee->amount}.");
     }
 
