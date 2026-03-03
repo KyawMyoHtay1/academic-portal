@@ -261,6 +261,7 @@ class StaffTimetableController extends Controller
                 'id' => $timetable->id,
                 'subject_id' => $timetable->subject_id,
                 'day_of_week' => $timetable->day_of_week,
+                'day_of_week_list' => [$timetable->day_of_week],
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'location' => $timetable->location,
@@ -278,25 +279,78 @@ class StaffTimetableController extends Controller
 
         $subject = Subject::findOrFail($data['subject_id']);
 
-        $conflicts = $this->overlapQuery($subject, $data, $timetable->id)->get();
-        if ($conflicts->isNotEmpty()) {
-            $conflictDetails = $this->mapConflictDetails($conflicts);
+        $days = collect($data['day_of_week_list'] ?? [])
+            ->filter(fn ($day) => in_array($day, self::DAY_ORDER, true))
+            ->values()
+            ->all();
 
+        if ($days === [] && ! empty($data['day_of_week']) && in_array($data['day_of_week'], self::DAY_ORDER, true)) {
+            $days = [$data['day_of_week']];
+        }
+
+        if ($days === []) {
+            return back()
+                ->withErrors(['day_of_week_list' => 'Please select at least one day of the week.'])
+                ->withInput();
+        }
+
+        $allConflictDetails = [];
+        $conflictMessage = null;
+
+        foreach ($days as $day) {
+            $dayData = [
+                ...$data,
+                'day_of_week' => $day,
+            ];
+
+            $conflicts = $this->overlapQuery($subject, $dayData, $timetable->id)->get();
+            if ($conflicts->isEmpty()) {
+                continue;
+            }
+
+            $conflictMessage ??= $this->buildConflictMessage($day, $conflicts);
+            $allConflictDetails = [
+                ...$allConflictDetails,
+                ...$this->mapConflictDetails($conflicts),
+            ];
+        }
+
+        if ($allConflictDetails !== []) {
             return back()
                 ->withErrors([
-                    'start_time' => $this->buildConflictMessage($data['day_of_week'], $conflicts),
-                    'conflict_details' => json_encode($conflictDetails, JSON_UNESCAPED_UNICODE),
+                    'day_of_week_list' => 'One or more selected days have timetable conflicts.',
+                    'start_time' => $conflictMessage ?? 'Timetable conflict detected for selected day(s).',
+                    'conflict_details' => json_encode($allConflictDetails, JSON_UNESCAPED_UNICODE),
                 ])
                 ->withInput();
         }
 
-        $timetable->update([
-            'subject_id' => $data['subject_id'],
-            'day_of_week' => $data['day_of_week'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'location' => $data['location'] ?? null,
-        ]);
+        $primaryDay = array_shift($days);
+        $result = DB::transaction(function () use ($timetable, $data, $primaryDay, $days, $request) {
+            $timetable->update([
+                'subject_id' => $data['subject_id'],
+                'day_of_week' => $primaryDay,
+                'start_time' => $data['start_time'],
+                'end_time' => $data['end_time'],
+                'location' => $data['location'] ?? null,
+            ]);
+
+            $createdEntries = collect($days)->map(function ($day) use ($data, $request) {
+                return Timetable::create([
+                    'subject_id' => $data['subject_id'],
+                    'day_of_week' => $day,
+                    'start_time' => $data['start_time'],
+                    'end_time' => $data['end_time'],
+                    'location' => $data['location'] ?? null,
+                    'created_by' => $request->user()->id,
+                ]);
+            });
+
+            return [
+                'updated' => $timetable->fresh(),
+                'created' => $createdEntries,
+            ];
+        });
 
         // Notify enrolled students and assigned teachers
         $course = $subject->course;
@@ -304,13 +358,26 @@ class StaffTimetableController extends Controller
             ->merge($course->students->pluck('user'))
             ->merge($course->teachers);
 
-        $notifiables->filter()->each(function ($user) use ($timetable) {
-            $user->notify(new TimetableUpdated($timetable, 'updated'));
+        $notifiables->filter()->each(function ($user) use ($result) {
+            /** @var \App\Models\Timetable $updatedEntry */
+            $updatedEntry = $result['updated'];
+            $user->notify(new TimetableUpdated($updatedEntry, 'updated'));
+
+            /** @var Collection<int, \App\Models\Timetable> $createdEntries */
+            $createdEntries = $result['created'];
+            foreach ($createdEntries as $entry) {
+                $user->notify(new TimetableUpdated($entry, 'created'));
+            }
         });
+
+        $additionalCount = $result['created']->count();
+        $message = $additionalCount === 0
+            ? 'Timetable entry updated successfully.'
+            : "Timetable entry updated and {$additionalCount} additional day(s) created successfully.";
 
         return redirect()
             ->route('admin.timetables.index')
-            ->with('success', 'Timetable entry updated successfully.');
+            ->with('success', $message);
     }
 
     /**

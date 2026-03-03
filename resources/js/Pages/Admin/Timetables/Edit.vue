@@ -17,11 +17,37 @@ const props = defineProps({
 
 const form = useForm({
     subject_id: props.timetable.subject_id,
-    day_of_week: props.timetable.day_of_week,
+    day_of_week_list: props.timetable.day_of_week_list ?? [props.timetable.day_of_week],
     start_time: props.timetable.start_time,
     end_time: props.timetable.end_time,
     location: props.timetable.location || "",
 });
+
+const dayOptions = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+];
+
+const weekdayOptions = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+const selectedDayCount = computed(() => form.day_of_week_list.length);
+
+const selectWeekdays = () => {
+    form.day_of_week_list = [...weekdayOptions];
+};
+
+const selectAllDays = () => {
+    form.day_of_week_list = [...dayOptions];
+};
+
+const clearSelectedDays = () => {
+    form.day_of_week_list = [];
+};
 
 const submit = () => {
     form.put(route("admin.timetables.update", props.timetable.id));
@@ -46,12 +72,13 @@ const conflictDetails = computed(() => {
 });
 
 watch(
-    () => [form.subject_id, form.day_of_week, form.start_time, form.end_time],
+    () => [form.subject_id, form.day_of_week_list, form.start_time, form.end_time],
     () => {
-        if (form.errors.conflict_details || form.errors.start_time) {
-            form.clearErrors("conflict_details", "start_time");
+        if (form.errors.conflict_details || form.errors.start_time || form.errors.day_of_week_list || form.errors.day_of_week) {
+            form.clearErrors("conflict_details", "start_time", "day_of_week_list", "day_of_week");
         }
-    }
+    },
+    { deep: true }
 );
 </script>
 
@@ -119,39 +146,66 @@ watch(
                                 </p>
                             </div>
 
-                            <!-- Day of week -->
+                            <!-- Days of week -->
                             <div>
-                                <label
-                                    for="day_of_week"
-                                    class="block text-sm font-medium text-slate-700"
-                                >
-                                    Day of Week
+                                <div class="flex items-start justify-between gap-3">
+                                    <label class="block text-sm font-medium text-slate-700">
+                                    Days of Week
                                     <span class="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="day_of_week"
-                                    v-model="form.day_of_week"
-                                    required
-                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
+                                    </label>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <button
+                                            type="button"
+                                            class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                            @click="selectWeekdays"
+                                        >
+                                            Mon-Fri
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                            @click="selectAllDays"
+                                        >
+                                            All Days
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                            @click="clearSelectedDays"
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    class="mt-2 grid grid-cols-2 gap-2 rounded-md border p-3 sm:grid-cols-4"
                                     :class="{
-                                        'border-red-300 focus:border-red-500 focus:ring-red-500':
-                                            form.errors.day_of_week,
+                                        'border-red-300': form.errors.day_of_week_list || form.errors.day_of_week,
+                                        'border-slate-200': !form.errors.day_of_week_list && !form.errors.day_of_week,
                                     }"
                                 >
-                                    <option value="">Select day</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select>
+                                    <label
+                                        v-for="day in dayOptions"
+                                        :key="day"
+                                        class="inline-flex items-center gap-2 text-sm text-slate-700"
+                                    >
+                                        <input
+                                            v-model="form.day_of_week_list"
+                                            type="checkbox"
+                                            :value="day"
+                                            class="h-4 w-4 rounded border-slate-300 text-portal-navy focus:ring-portal-navy"
+                                        />
+                                        <span>{{ day }}</span>
+                                    </label>
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Selected: {{ selectedDayCount }} day(s).
+                                </p>
                                 <p
-                                    v-if="form.errors.day_of_week"
+                                    v-if="form.errors.day_of_week_list || form.errors.day_of_week"
                                     class="mt-1 text-sm text-red-600"
                                 >
-                                    {{ form.errors.day_of_week }}
+                                    {{ form.errors.day_of_week_list || form.errors.day_of_week }}
                                 </p>
                                 <p class="mt-1 text-xs text-slate-500">
                                     Conflict details will be shown if this update overlaps with another session.
@@ -289,7 +343,7 @@ watch(
                                     <span v-if="form.processing"
                                         >Updating...</span
                                     >
-                                    <span v-else>Update Entry</span>
+                                    <span v-else>Update {{ selectedDayCount > 1 ? "Entries" : "Entry" }}</span>
                                 </button>
                             </div>
                         </div>
