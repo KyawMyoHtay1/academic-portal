@@ -39,7 +39,7 @@ const form = useForm({
     date: new Date().toISOString().split("T")[0], // Today's date as default
     attendance: props.students.map((student) => ({
         student_id: student.id,
-        status: "present", // Default to present
+        status: "", // Start unmarked
     })),
 });
 
@@ -68,19 +68,49 @@ const stats = computed(() => {
     const total = form.attendance.length;
     const present = form.attendance.filter((r) => r.status === "present").length;
     const absent = form.attendance.filter((r) => r.status === "absent").length;
+    const unmarked = total - present - absent;
     return {
         total,
         present,
         absent,
+        unmarked,
         presentPct: total > 0 ? Math.round((present / total) * 100) : 0,
     };
 });
 
-const markAll = (status) => {
-    form.attendance.forEach((r) => {
-        r.status = status;
-    });
+const setStudentStatus = (studentId, status) => {
+    const index = form.attendance.findIndex((r) => r.student_id === studentId);
+    if (index === -1) return;
+
+    // Replace the row object to guarantee reactive updates for nested form data.
+    form.attendance[index] = {
+        ...form.attendance[index],
+        status,
+    };
 };
+
+const markAll = (status) => {
+    form.attendance = form.attendance.map((record) => ({
+        ...record,
+        status,
+    }));
+};
+
+const statusErrorMessage = computed(() => {
+    if (form.errors.attendance) {
+        return form.errors.attendance;
+    }
+
+    const hasStatusError = Object.keys(form.errors).some((key) =>
+        /^attendance\.\d+\.status$/.test(key)
+    );
+
+    if (hasStatusError) {
+        return "Please mark each student as Present or Absent before saving.";
+    }
+
+    return "";
+});
 
 const submit = () => {
     form.post(route("teacher.attendance.store", props.subject.id));
@@ -402,6 +432,12 @@ watch(
                                 <p class="mt-1 text-xs text-slate-500">
                                     Quick-mark present/absent and save.
                                 </p>
+                                <p
+                                    v-if="stats.unmarked > 0"
+                                    class="mt-1 text-xs font-medium text-amber-700"
+                                >
+                                    Unmarked students: {{ stats.unmarked }}
+                                </p>
                             </div>
                             <div class="relative w-full sm:w-64">
                                 <input
@@ -556,9 +592,11 @@ watch(
                                                                     ? 'bg-emerald-100 text-emerald-800'
                                                                     : 'bg-white text-slate-700 hover:bg-slate-50'
                                                             "
-                                                            @click="
-                                                                entry.record.status =
+                                                            @click.stop.prevent="
+                                                                setStudentStatus(
+                                                                    entry.record.student_id,
                                                                     'present'
+                                                                )
                                                             "
                                                         >
                                                             Present
@@ -573,9 +611,11 @@ watch(
                                                                     ? 'bg-rose-100 text-rose-800'
                                                                     : 'bg-white text-slate-700 hover:bg-slate-50'
                                                             "
-                                                            @click="
-                                                                entry.record.status =
+                                                            @click.stop.prevent="
+                                                                setStudentStatus(
+                                                                    entry.record.student_id,
                                                                     'absent'
+                                                                )
                                                             "
                                                         >
                                                             Absent
@@ -606,10 +646,10 @@ watch(
                                 </div>
 
                                 <p
-                                    v-if="form.errors.attendance"
+                                    v-if="statusErrorMessage"
                                     class="mt-2 text-sm text-red-600"
                                 >
-                                    {{ form.errors.attendance }}
+                                    {{ statusErrorMessage }}
                                 </p>
                             </div>
 
@@ -625,7 +665,9 @@ watch(
                                 </Link>
                                 <button
                                     type="submit"
-                                    :disabled="form.processing"
+                                    :disabled="
+                                        form.processing || stats.unmarked > 0
+                                    "
                                     class="rounded-md bg-portal-navy px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 disabled:opacity-50"
                                 >
                                     <span v-if="form.processing">

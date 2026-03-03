@@ -23,4 +23,15 @@ class StoreAttendanceRequest extends FormRequest
             'attendance.*.status' => ['required', 'in:present,absent'],
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'attendance.*.status.required' => 'Please mark each student as present or absent before saving.',
+            'attendance.*.status.in' => 'Attendance status must be either present or absent.',
+        ];
+    }
 }
