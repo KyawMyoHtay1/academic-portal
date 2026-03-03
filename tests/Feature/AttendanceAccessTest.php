@@ -147,6 +147,81 @@ class AttendanceAccessTest extends TestCase
         ]);
     }
 
+    public function test_non_assigned_teacher_cannot_access_or_record_attendance_for_subject(): void
+    {
+        $assignedTeacher = User::factory()->create([
+            'role' => 'teacher',
+        ]);
+
+        $nonAssignedTeacher = User::factory()->create([
+            'role' => 'teacher',
+        ]);
+
+        $studentUser = User::factory()->create([
+            'role' => 'student',
+        ]);
+
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'student_no' => 'STU'.str_pad((string) $studentUser->id, 6, '0', STR_PAD_LEFT),
+            'full_name' => $studentUser->name,
+            'email' => $studentUser->email,
+            'programme' => 'BSc Computing',
+            'intake_year' => '2026',
+        ]);
+
+        $course = Course::create([
+            'course_code' => 'CSE321',
+            'title' => 'Secure Systems',
+            'credits' => 20,
+            'semester' => 'Semester 1',
+        ]);
+
+        $subject = Subject::create([
+            'course_id' => $course->id,
+            'subject_code' => 'SUB321',
+            'title' => 'Secure Systems Core',
+            'credits' => 20,
+        ]);
+
+        DB::table('subject_teacher')->insert([
+            'subject_id' => $subject->id,
+            'user_id' => $assignedTeacher->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $student->courses()->attach($course->id, [
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this
+            ->actingAs($nonAssignedTeacher)
+            ->get(route('teacher.attendance.show', $subject))
+            ->assertForbidden();
+
+        $this
+            ->actingAs($nonAssignedTeacher)
+            ->post(route('teacher.attendance.store', $subject), [
+                'date' => now()->toDateString(),
+                'attendance' => [
+                    [
+                        'student_id' => $student->id,
+                        'status' => 'present',
+                    ],
+                ],
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('attendances', [
+            'subject_id' => $subject->id,
+            'student_id' => $student->id,
+            'date' => now()->toDateString(),
+        ]);
+    }
+
     /**
      * @return array{0: \App\Models\User, 1: \App\Models\Student}
      */
