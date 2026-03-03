@@ -44,6 +44,8 @@ class StudentAssignmentController extends Controller
             ->get()
             ->map(function ($assignment) {
                 $submission = $assignment->submissions->first();
+                $isGradedSubmission = $this->isSubmissionGraded($submission);
+                $canSubmit = $assignment->canSubmit() && ! $isGradedSubmission;
 
                 return [
                     'id' => $assignment->id,
@@ -63,7 +65,8 @@ class StudentAssignmentController extends Controller
                         'title' => $assignment->course->title,
                     ],
                     'is_overdue' => $assignment->isOverdue(),
-                    'can_submit' => $assignment->canSubmit(),
+                    'can_submit' => $canSubmit,
+                    'resubmission_locked_by_grading' => $isGradedSubmission,
                     'submission' => $submission ? [
                         'id' => $submission->id,
                         'file_path' => $submission->file_path,
@@ -113,6 +116,8 @@ class StudentAssignmentController extends Controller
         $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
             ->where('student_id', $student->id)
             ->first();
+        $isGradedSubmission = $this->isSubmissionGraded($submission);
+        $canSubmit = $assignment->canSubmit() && ! $isGradedSubmission;
 
         return Inertia::render('Student/Assignments/Show', [
             'assignment' => [
@@ -135,7 +140,8 @@ class StudentAssignmentController extends Controller
                     'title' => $assignment->course->title,
                 ],
                 'is_overdue' => $assignment->isOverdue(),
-                'can_submit' => $assignment->canSubmit(),
+                'can_submit' => $canSubmit,
+                'resubmission_locked_by_grading' => $isGradedSubmission,
             ],
             'submission' => $submission ? [
                 'id' => $submission->id,
@@ -175,15 +181,21 @@ class StudentAssignmentController extends Controller
             abort(403, 'You are not enrolled in this course.');
         }
 
+        // Check if already submitted (allow resubmission only when not graded and before due date)
+        $existingSubmission = AssignmentSubmission::where('assignment_id', $assignment->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if ($this->isSubmissionGraded($existingSubmission)) {
+            return back()->withErrors([
+                'file' => 'Resubmission is not allowed because this assignment has already been graded.',
+            ]);
+        }
+
         // Check if assignment is still open for submission
         if (! $assignment->canSubmit()) {
             return back()->withErrors(['file' => 'This assignment is no longer accepting submissions.']);
         }
-
-        // Check if already submitted (allow resubmission before due date)
-        $existingSubmission = AssignmentSubmission::where('assignment_id', $assignment->id)
-            ->where('student_id', $student->id)
-            ->first();
 
         $data = $request->validated();
 
@@ -279,5 +291,16 @@ class StudentAssignmentController extends Controller
             $submission->file_path,
             $submission->original_filename
         );
+    }
+
+    private function isSubmissionGraded(?AssignmentSubmission $submission): bool
+    {
+        if (! $submission) {
+            return false;
+        }
+
+        return $submission->status === AssignmentSubmission::STATUS_GRADED
+            || $submission->score !== null
+            || $submission->graded_at !== null;
     }
 }

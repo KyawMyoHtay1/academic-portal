@@ -28,6 +28,10 @@ const hasScore = computed(
     () => props.submission?.score !== null && props.submission?.score !== undefined
 );
 
+const resubmissionLockedByGrading = computed(
+    () => Boolean(props.assignment?.resubmission_locked_by_grading)
+);
+
 const submissionStatusLabel = computed(() => {
     if (hasScore.value) return "Graded";
     if (props.submission) return "Submitted";
@@ -262,12 +266,15 @@ const downloadSubmission = () => {
                         </div>
                     </div>
 
-                    <div v-if="props.assignment.can_submit" class="mt-6 rounded-md border border-slate-200 bg-slate-50 p-4">
+                    <div
+                        v-if="props.assignment.can_submit && !resubmissionLockedByGrading"
+                        class="mt-6 rounded-md border border-slate-200 bg-slate-50 p-4"
+                    >
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-sm font-semibold text-slate-900">Resubmit (optional)</p>
                                 <p class="mt-1 text-xs text-slate-600">
-                                    You can replace your file until the due date/time. If already graded, resubmission will reset the grade.
+                                    You can replace your file until the due date/time.
                                 </p>
                             </div>
                             <button
@@ -338,6 +345,18 @@ const downloadSubmission = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+
+                    <div
+                        v-else-if="resubmissionLockedByGrading"
+                        class="mt-6 rounded-md border border-emerald-200 bg-emerald-50 p-4"
+                    >
+                        <p class="text-sm font-semibold text-emerald-900">
+                            Resubmission is locked
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-800">
+                            This assignment has already been graded, so resubmission is no longer allowed.
+                        </p>
                     </div>
                 </div>
 
