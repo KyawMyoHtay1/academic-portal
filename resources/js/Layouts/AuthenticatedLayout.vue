@@ -934,9 +934,9 @@ const truncateNotificationText = (value, max = 96) => {
             <div class="flex min-h-screen flex-1 flex-col sm:ml-64">
                 <!-- Top bar -->
                 <header
-                    class="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6 lg:px-8"
+                    class="sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm sm:flex-nowrap sm:justify-between sm:px-6 lg:px-8"
                 >
-                    <div class="flex items-center gap-3">
+                    <div class="order-1 flex min-w-0 items-center gap-2 sm:gap-3">
                         <button
                             type="button"
                             class="inline-flex items-center rounded-md p-2 text-slate-600 hover:bg-slate-100 sm:hidden"
@@ -959,19 +959,19 @@ const truncateNotificationText = (value, max = 96) => {
                             </svg>
                         </button>
 
-                        <div>
+                        <div class="min-w-0">
                             <p
-                                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 sm:text-xs"
                             >
-                                University Academic Portal
+                                <span class="sm:hidden">UAP</span>
+                                <span class="hidden sm:inline"
+                                    >University Academic Portal</span
+                                >
                             </p>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
-                        <!-- Global search -->
-                        <GlobalSearch />
-
+                    <div class="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-4 sm:gap-4">
                         <!-- Google Translate -->
                         <GoogleTranslate />
 
@@ -1148,7 +1148,7 @@ const truncateNotificationText = (value, max = 96) => {
                                             />
                                         </span>
                                         <svg
-                                            class="h-4 w-4 text-slate-400"
+                                            class="hidden h-4 w-4 text-slate-400 sm:block"
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20"
                                             fill="currentColor"
@@ -1194,6 +1194,11 @@ const truncateNotificationText = (value, max = 96) => {
                                 </template>
                             </Dropdown>
                         </div>
+                    </div>
+
+                    <div class="order-3 w-full sm:order-2 sm:w-auto">
+                        <!-- Global search -->
+                        <GlobalSearch />
                     </div>
                 </header>
 
