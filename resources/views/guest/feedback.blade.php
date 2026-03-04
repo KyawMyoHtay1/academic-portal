@@ -253,5 +253,79 @@
 </div>
 @endsection
 
+@push('scripts')
+@if (config('recaptcha.site_key'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var siteKey = @json(config('recaptcha.site_key'));
+        var form = document.querySelector('form[data-recaptcha-action="feedback"]');
+        if (!siteKey || !form) return;
+
+        var tokenInput = form.querySelector('input[name="recaptcha_token"]');
+        if (!tokenInput) return;
+
+        var submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+        var isSubmitting = false;
+
+        function setButtonState(disabled) {
+            if (!submitButton) return;
+            submitButton.disabled = !!disabled;
+        }
+
+        function showClientError(message) {
+            var existing = form.querySelector('[data-recaptcha-client-error]');
+            if (existing) existing.remove();
+
+            var node = document.createElement('div');
+            node.setAttribute('data-recaptcha-client-error', '1');
+            node.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800';
+            node.textContent = message;
+            form.prepend(node);
+        }
+
+        function clearClientError() {
+            var existing = form.querySelector('[data-recaptcha-client-error]');
+            if (existing) existing.remove();
+        }
+
+        function fail(message) {
+            tokenInput.value = '';
+            setButtonState(false);
+            showClientError(message || 'reCAPTCHA verification failed. Please try again.');
+        }
+
+        form.addEventListener('submit', function (event) {
+            if (isSubmitting) return;
+
+            event.preventDefault();
+            clearClientError();
+            setButtonState(true);
+
+            if (!window.grecaptcha || typeof window.grecaptcha.ready !== 'function') {
+                fail('reCAPTCHA failed to load. Please refresh the page and try again.');
+                return;
+            }
+
+            window.grecaptcha.ready(function () {
+                window.grecaptcha.execute(siteKey, { action: 'feedback' })
+                    .then(function (token) {
+                        if (!token) {
+                            fail('reCAPTCHA verification failed. Please try again.');
+                            return;
+                        }
+
+                        tokenInput.value = token;
+                        isSubmitting = true;
+                        form.submit();
+                    })
+                    .catch(function () {
+                        fail('reCAPTCHA verification failed. Please try again.');
+                    });
+            });
+        });
+    });
+</script>
+@endif
+@endpush
 
 
