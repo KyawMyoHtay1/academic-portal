@@ -19,7 +19,11 @@ class ContactController extends Controller
     {
         $validated = $request->validated();
 
-        if (config('recaptcha.site_key') && isset($validated['recaptcha_token'])) {
+        $shouldVerifyRecaptcha = ! app()->environment('local')
+            && filled(config('recaptcha.site_key'))
+            && filled(config('recaptcha.secret_key'));
+
+        if ($shouldVerifyRecaptcha && isset($validated['recaptcha_token'])) {
             /** @var RecaptchaService $recaptcha */
             $recaptcha = app(RecaptchaService::class);
             if (! $recaptcha->verify($validated['recaptcha_token'], $request->ip())) {
