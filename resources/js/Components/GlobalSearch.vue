@@ -173,7 +173,7 @@ onUnmounted(() => {
 <template>
     <div class="relative" ref="dropdownRef">
         <div
-            class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600 transition focus-within:border-portal-navy focus-within:bg-white focus-within:ring-2 focus-within:ring-portal-navy/20 sm:w-64"
+            class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600 transition focus-within:border-portal-navy focus-within:bg-white focus-within:ring-2 focus-within:ring-portal-navy/20 md:w-64"
         >
             <svg
                 class="h-4 w-4 shrink-0 text-slate-400"
@@ -200,7 +200,7 @@ onUnmounted(() => {
                 @keydown="handleKeydown"
             />
             <kbd
-                class="hidden shrink-0 rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 sm:inline-block"
+                class="hidden shrink-0 rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 md:inline-block"
                 >⌘K</kbd
             >
         </div>

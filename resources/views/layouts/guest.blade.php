@@ -1187,6 +1187,109 @@
                 }
             });
         });
+
+        // reCAPTCHA v3 for guest forms (contact/feedback).
+        document.addEventListener('DOMContentLoaded', function () {
+            var recaptchaSiteKey = @json(config('recaptcha.site_key'));
+            if (!recaptchaSiteKey) return;
+
+            var forms = Array.prototype.slice.call(
+                document.querySelectorAll('form[data-recaptcha-action]')
+            );
+            if (!forms.length) return;
+
+            function hideLoadingOverlay() {
+                var loadingNode = document.getElementById('guest-page-loading');
+                if (loadingNode) {
+                    loadingNode.classList.remove('is-visible');
+                }
+            }
+
+            function clearRecaptchaError(form) {
+                var errorNode = form.querySelector('[data-recaptcha-client-error]');
+                if (errorNode) {
+                    errorNode.remove();
+                }
+            }
+
+            function showRecaptchaError(form, message) {
+                clearRecaptchaError(form);
+                var errorNode = document.createElement('div');
+                errorNode.setAttribute('data-recaptcha-client-error', '1');
+                errorNode.className = 'rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800';
+                errorNode.textContent = message;
+                form.prepend(errorNode);
+            }
+
+            function setSubmitButtonsState(form, isBusy) {
+                var submitButtons = form.querySelectorAll(
+                    'button[type="submit"], input[type="submit"]'
+                );
+                submitButtons.forEach(function (button) {
+                    if (isBusy) {
+                        button.setAttribute('data-recaptcha-was-disabled', button.disabled ? '1' : '0');
+                        button.disabled = true;
+                    } else {
+                        if (button.getAttribute('data-recaptcha-was-disabled') !== '1') {
+                            button.disabled = false;
+                        }
+                        button.removeAttribute('data-recaptcha-was-disabled');
+                    }
+                });
+            }
+
+            forms.forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.getAttribute('data-recaptcha-submitting') === '1') {
+                        return;
+                    }
+
+                    var tokenInput = form.querySelector('input[name="recaptcha_token"]');
+                    if (!tokenInput) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    clearRecaptchaError(form);
+                    setSubmitButtonsState(form, true);
+
+                    var action = form.getAttribute('data-recaptcha-action') || 'submit';
+
+                    function fail(message) {
+                        tokenInput.value = '';
+                        setSubmitButtonsState(form, false);
+                        hideLoadingOverlay();
+                        showRecaptchaError(
+                            form,
+                            message || 'reCAPTCHA verification failed. Please refresh and try again.'
+                        );
+                    }
+
+                    if (!window.grecaptcha || typeof window.grecaptcha.ready !== 'function') {
+                        fail('reCAPTCHA failed to load. Please refresh the page and try again.');
+                        return;
+                    }
+
+                    window.grecaptcha.ready(function () {
+                        window.grecaptcha
+                            .execute(recaptchaSiteKey, { action: action })
+                            .then(function (token) {
+                                if (!token) {
+                                    fail('reCAPTCHA verification failed. Please try again.');
+                                    return;
+                                }
+
+                                tokenInput.value = token;
+                                form.setAttribute('data-recaptcha-submitting', '1');
+                                form.submit();
+                            })
+                            .catch(function () {
+                                fail('reCAPTCHA verification failed. Please try again.');
+                            });
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
