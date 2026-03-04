@@ -25,7 +25,11 @@ class StoreContactMessageRequest extends FormRequest
             'message' => ['required', 'string', 'max:5000'],
         ];
 
-        if (config('recaptcha.site_key')) {
+        $shouldValidateRecaptcha = ! app()->environment('local')
+            && filled(config('recaptcha.site_key'))
+            && filled(config('recaptcha.secret_key'));
+
+        if ($shouldValidateRecaptcha) {
             $rules['recaptcha_token'] = ['required', 'string'];
         }
 
