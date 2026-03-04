@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class MessageController extends Controller
 {
@@ -143,10 +144,20 @@ class MessageController extends Controller
             ));
         }
 
-        broadcast(new MessageSent($message, [
-            (int) $user->id,
-            (int) $data['receiver_id'],
-        ]));
+        try {
+            broadcast(new MessageSent($message, [
+                (int) $user->id,
+                (int) $data['receiver_id'],
+            ]));
+        } catch (Throwable $exception) {
+            // Realtime delivery is best-effort. Message persistence must still succeed.
+            Log::warning('message.broadcast_failed', [
+                'message_id' => (int) $message->id,
+                'sender_id' => (int) $user->id,
+                'receiver_id' => (int) $data['receiver_id'],
+                'exception' => $exception->getMessage(),
+            ]);
+        }
 
         Log::info('message.sent', [
             'sender_id' => $user->id,
