@@ -1193,6 +1193,21 @@
             var recaptchaSiteKey = @json(config('recaptcha.site_key'));
             if (!recaptchaSiteKey) return;
 
+            function hasRecaptchaApi() {
+                return !!window.grecaptcha
+                    && typeof window.grecaptcha.ready === 'function'
+                    && typeof window.grecaptcha.execute === 'function';
+            }
+
+            // Run once on page load so the v3 badge appears consistently on guest pages.
+            if (hasRecaptchaApi()) {
+                window.grecaptcha.ready(function () {
+                    window.grecaptcha
+                        .execute(recaptchaSiteKey, { action: 'guest_pageview' })
+                        .catch(function () {});
+                });
+            }
+
             var forms = Array.prototype.slice.call(
                 document.querySelectorAll('form[data-recaptcha-action]')
             );
@@ -1265,7 +1280,7 @@
                         );
                     }
 
-                    if (!window.grecaptcha || typeof window.grecaptcha.ready !== 'function') {
+                    if (!hasRecaptchaApi()) {
                         fail('reCAPTCHA failed to load. Please refresh the page and try again.');
                         return;
                     }
