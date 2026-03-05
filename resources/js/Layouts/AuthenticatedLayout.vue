@@ -934,7 +934,7 @@ const truncateNotificationText = (value, max = 96) => {
             <div class="flex min-h-screen flex-1 flex-col sm:ml-64">
                 <!-- Top bar -->
                 <header
-                    class="sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm md:flex-nowrap md:justify-between md:px-6 lg:px-8"
+                    class="sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm md:flex-nowrap md:px-6 lg:px-8"
                 >
                     <div class="order-1 flex min-w-0 items-center gap-2 md:gap-3">
                         <button
@@ -971,7 +971,7 @@ const truncateNotificationText = (value, max = 96) => {
                         </div>
                     </div>
 
-                    <div class="order-2 ml-auto flex items-center gap-2 md:order-3 md:ml-4 md:gap-4">
+                    <div class="order-2 ml-auto flex items-center gap-2 md:order-3 md:ml-2 md:gap-4">
                         <!-- Google Translate -->
                         <GoogleTranslate />
 
@@ -1196,7 +1196,7 @@ const truncateNotificationText = (value, max = 96) => {
                         </div>
                     </div>
 
-                    <div class="order-3 w-full md:order-2 md:w-auto">
+                    <div class="order-3 w-full md:order-2 md:ml-auto md:w-auto">
                         <!-- Global search -->
                         <GlobalSearch />
                     </div>
