@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import PortalLogo from "@/Components/PortalLogo.vue";
 import GlobalSearch from "@/Components/GlobalSearch.vue";
 import Dropdown from "@/Components/Dropdown.vue";
@@ -449,6 +449,59 @@ const notificationsPreview = computed(
 );
 
 const isMarkingNotificationsRead = ref(false);
+const isRefreshingUnreadSharedProps = ref(false);
+const UNREAD_REFRESH_INTERVAL_MS = 20000;
+
+let stopRouterSuccessListener = null;
+let unreadRefreshTimer = null;
+
+const refreshUnreadSharedProps = () => {
+    if (isRefreshingUnreadSharedProps.value) {
+        return;
+    }
+
+    isRefreshingUnreadSharedProps.value = true;
+
+    router.reload({
+        only: ["unread", "notificationsPreview"],
+        preserveState: true,
+        preserveScroll: true,
+        onFinish: () => {
+            isRefreshingUnreadSharedProps.value = false;
+        },
+    });
+};
+
+const startUnreadRefreshTimer = () => {
+    if (unreadRefreshTimer !== null || typeof window === "undefined") {
+        return;
+    }
+
+    unreadRefreshTimer = window.setInterval(() => {
+        if (typeof document !== "undefined" && document.hidden) {
+            return;
+        }
+
+        refreshUnreadSharedProps();
+    }, UNREAD_REFRESH_INTERVAL_MS);
+};
+
+const stopUnreadRefreshTimer = () => {
+    if (unreadRefreshTimer === null || typeof window === "undefined") {
+        return;
+    }
+
+    window.clearInterval(unreadRefreshTimer);
+    unreadRefreshTimer = null;
+};
+
+const handleVisibilityChange = () => {
+    if (typeof document !== "undefined" && document.hidden) {
+        return;
+    }
+
+    refreshUnreadSharedProps();
+};
 
 const markAllNotificationsRead = () => {
     if (isMarkingNotificationsRead.value) {
@@ -504,6 +557,52 @@ const openNotificationFromPreview = (notification) => {
 const openNotificationCenter = () => {
     router.visit(route("notifications.index"));
 };
+
+onMounted(() => {
+    stopRouterSuccessListener = router.on("success", (event) => {
+        const method = String(event?.detail?.visit?.method ?? "get")
+            .trim()
+            .toLowerCase();
+
+        const visitOnly = Array.isArray(event?.detail?.visit?.only)
+            ? event.detail.visit.only
+            : [];
+        const updatesUnreadViaPartialReload = visitOnly.some(
+            (key) =>
+                key === "unread" ||
+                key.startsWith("unread.") ||
+                key === "notificationsPreview" ||
+                key.startsWith("notificationsPreview.")
+        );
+
+        if (
+            method === "get" &&
+            (visitOnly.length === 0 || updatesUnreadViaPartialReload)
+        ) {
+            return;
+        }
+
+        refreshUnreadSharedProps();
+    });
+
+    startUnreadRefreshTimer();
+
+    if (typeof document !== "undefined") {
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+    }
+});
+
+onUnmounted(() => {
+    if (typeof stopRouterSuccessListener === "function") {
+        stopRouterSuccessListener();
+    }
+
+    stopUnreadRefreshTimer();
+
+    if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }
+});
 
 const truncateNotificationText = (value, max = 96) => {
     const text = String(value ?? "").trim();
@@ -1262,4 +1361,3 @@ const truncateNotificationText = (value, max = 96) => {
         </div>
     </div>
 </template>
-
