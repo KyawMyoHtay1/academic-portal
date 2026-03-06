@@ -6,6 +6,8 @@ The deployment diagram is defined in PlantUML format:
 
 - **File:** `deployment/AcademicPortal_Deployment.plantuml`
 
+Open this file and render it with the PlantUML extension (or paste into [PlantUML Online](https://www.plantuml.com/plantuml/uml)). Use the file as-is; in PlantUML, comments use `'` (single quote)—do not add lines starting with `#` or the renderer may assume a sequence diagram and show a syntax error.
+
 Generate the image (e.g. PNG) using PlantUML or your IDE’s PlantUML plugin. The diagram shows the physical deployment of the Academic Portal across client devices, network, web server, database server, and backup server.
 
 ---
