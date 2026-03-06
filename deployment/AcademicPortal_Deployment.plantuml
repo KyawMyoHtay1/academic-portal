@@ -1,102 +1,93 @@
 @startuml AcademicPortal_Deployment
-' Professional deployment diagram - University Academic Portal
+title Deployment Diagram - University Academic Portal
+left to right direction
 
-title Deployment Diagram – University Academic Portal
-
-skinparam backgroundColor #FAFAFA
 skinparam shadowing false
-skinparam defaultFontSize 11
-skinparam defaultFontName Arial
-skinparam componentStyle rectangle
+skinparam roundcorner 12
 skinparam defaultTextAlignment center
-skinparam roundCorner 8
+skinparam componentStyle rectangle
+skinparam backgroundColor #FAFAFA
+
 skinparam node {
-  BackgroundColor #FFFFFF
-  BorderColor #37474F
-  BorderThickness 2
+  BackgroundColor white
+  BorderColor #444444
 }
 skinparam database {
-  BackgroundColor #E3F2FD
-  BorderColor #1976D2
+  BackgroundColor #E8F0FE
+  BorderColor #3B82F6
 }
 skinparam cloud {
-  BackgroundColor #E8F5E9
-  BorderColor #388E3C
+  BackgroundColor #ECFDF3
+  BorderColor #22C55E
 }
-skinparam arrow {
-  Color #546E7A
-  FontSize 10
-}
-
-' ========== CLIENT LAYER ==========
-node "Client Device\n(Mobile / Laptop)" as Client #FFFFFF {
-  artifact "Google Chrome"
-  artifact "Mozilla Firefox"
-  artifact "PDF Reader"
-  artifact "Antivirus"
+skinparam note {
+  BackgroundColor #FFFBEA
+  BorderColor #D4B106
 }
 
-' ========== NETWORK LAYER ==========
-node "Router" as Router #F5F5F5
-node "Firewall" as Firewall #FFEBEE
-cloud "Cloud / Internet" as Internet #E8F5E9
-
-' ========== APPLICATION SERVER ==========
-node "Web Server" as WebServer #E8F5E9 {
-  artifact "Apache / Nginx"
-  artifact "PHP 8.2"
-  artifact "Laravel 12"
-  artifact "Vue 3 + Inertia"
-  artifact "Academic Portal Application"
+node "Client Device\n(Mobile / Laptop)" as Client {
+  artifact "Google Chrome" as Chrome
+  artifact "Mozilla Firefox" as Firefox
+  artifact "PDF Reader" as PDF
+  artifact "Antivirus" as AV
 }
 
-' ========== DATA LAYER ==========
-node "Database Server" as DBServer #FFF3E0 {
-  database "MySQL\nacademic_portal"
+node "Router" as Router
+node "Firewall" as Firewall
+cloud "Cloud / Internet" as Internet
+
+node "Web Server" as WebServer {
+  artifact "Apache / Nginx" as WebStack
+  artifact "PHP 8.2" as PHP
+  artifact "Laravel 12" as Laravel
+  artifact "Vue 3 + Inertia" as Vue
+  artifact "Academic Portal Application" as App
 }
 
-node "Backup Server" as BackupServer #E3F2FD {
-  database "MySQL Backup\nacademic_portal"
+node "Database Server" as DBServer {
+  database "MySQL\nacademic_portal" as DB
 }
 
-' ========== CONNECTIONS ==========
-Client -right-> Router : HTTPS / TCP/IP
-Router -right-> Firewall : TCP/IP
-Firewall -right-> Internet : Secured
-Internet -right-> WebServer : HTTPS
+node "Backup Server" as BackupServer {
+  database "MySQL Backup\nacademic_portal" as BackupDB
+}
 
-WebServer -down-> DBServer : MySQL Protocol
-DBServer -right-> BackupServer : VPN\nBackup / Replication
+Client --> Router : HTTPS / TCP/IP
+Router --> Firewall : TCP/IP
+Firewall --> Internet : Secured traffic
+Internet --> WebServer : HTTPS
 
-' ========== ANNOTATIONS ==========
+WebServer --> DBServer : MySQL Protocol
+DBServer --> BackupServer : VPN\nBackup / Replication
+
 note right of Client
-  **Users**
-  Access the Academic Portal
-  using Chrome or Firefox on
-  mobile devices or laptops.
+**Users**
+Students, lecturers, and administrators
+access the Academic Portal using
+Chrome or Firefox on laptops
+or mobile devices.
 end note
 
 note right of WebServer
-  **Application Stack**
-  Apache/Nginx, PHP 8.2,
-  Laravel 12 backend,
-  Vue 3 + Inertia frontend.
+**Application Stack**
+Hosts the web application using
+Apache/Nginx, PHP 8.2, Laravel 12,
+and Vue 3 + Inertia.
 end note
 
-note right of DBServer
-  **Primary Data Store**
-  users, students, courses,
-  subjects, grades, fees,
-  assignments, timetable,
-  attendance, announcements,
-  messages, notifications.
+note bottom of DBServer
+**Primary Data Store**
+Stores users, students, courses,
+subjects, grades, fees, assignments,
+timetables, attendance, announcements,
+messages, and notifications.
 end note
 
 note right of BackupServer
-  **Disaster Recovery**
-  Receives database backups
-  via VPN from primary server
-  to prevent data loss.
+**Disaster Recovery**
+Receives secured database backups
+from the primary database server
+through VPN to reduce data loss.
 end note
 
 @enduml
