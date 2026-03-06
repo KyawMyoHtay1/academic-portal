@@ -1,6 +1,5 @@
 @startuml AcademicPortal_Deployment
 title Deployment Diagram - University Academic Portal
-top to bottom direction
 
 skinparam shadowing false
 skinparam roundcorner 12
@@ -23,74 +22,116 @@ skinparam cloud {
   BorderColor #22C55E
 }
 
-skinparam note {
-  BackgroundColor #FFFBEA
-  BorderColor #D4B106
+' ========== CLIENT LAYER (separate nodes like library) ==========
+node "Mobile (Client Device)" as Mobile {
+  artifact "Google Chrome"
+  artifact "Antivirus"
 }
 
-node "Client Device\n(Mobile / Laptop)" as Client {
-  artifact "Google Chrome"
-  artifact "Mozilla Firefox"
+node "Laptop (Client Device)" as Laptop {
+  artifact "Firefox"
+  artifact "Chrome"
   artifact "PDF Reader"
   artifact "Antivirus"
 }
 
+' ========== NETWORK LAYER ==========
 node "Router" as Router
 node "Firewall" as Firewall
 cloud "Cloud / Internet" as Internet
 
+' ========== WEB SERVER (granular like library - Apache + PHP files) ==========
 node "Web Server" as WebServer {
-  artifact "Apache / Nginx"
-  artifact "PHP 8.2"
-  artifact "Laravel 12"
-  artifact "Vue 3 + Inertia"
-  artifact "Academic Portal Application"
+  component "<<Apache / Nginx>>" as Apache
+  artifact "DashboardController.php"
+  artifact "ProfileController.php"
+  artifact "SettingsController.php"
+  artifact "SearchController.php"
+  artifact "StudentController.php"
+  artifact "StudentProfileController.php"
+  artifact "StudentGradesController.php"
+  artifact "StudentFeeController.php"
+  artifact "StudentAssignmentController.php"
+  artifact "StudentAttendanceController.php"
+  artifact "StudentTimetableController.php"
+  artifact "StaffUserController.php"
+  artifact "StaffCourseController.php"
+  artifact "StaffSubjectController.php"
+  artifact "StaffCourseTeacherController.php"
+  artifact "StaffSubjectTeacherController.php"
+  artifact "StaffEnrollmentController.php"
+  artifact "StaffGradesController.php"
+  artifact "StaffFeeController.php"
+  artifact "StaffTimetableController.php"
+  artifact "StaffAnnouncementController.php"
+  artifact "StaffAttendanceReportController.php"
+  artifact "StaffAttendanceAlertsController.php"
+  artifact "StaffContactMessageController.php"
+  artifact "StaffFeedbackMessageController.php"
+  artifact "StaffFailedJobController.php"
+  artifact "TeacherCoursesController.php"
+  artifact "TeacherGradesController.php"
+  artifact "TeacherAssignmentController.php"
+  artifact "TeacherAttendanceController.php"
+  artifact "TeacherTimetableController.php"
+  artifact "TeacherAnnouncementController.php"
+  artifact "CourseController.php"
+  artifact "CourseRegistrationController.php"
+  artifact "MyCoursesController.php"
+  artifact "AnnouncementController.php"
+  artifact "MessageController.php"
+  artifact "NotificationController.php"
+  artifact "PaymentController.php"
+  artifact "ContactController.php"
+  artifact "FeedbackController.php"
+  artifact "AuthenticatedSessionController.php"
+  artifact "RegisteredUserController.php"
+  artifact "PasswordResetLinkController.php"
+  artifact "NewPasswordController.php"
 }
 
+' ========== DATABASE SERVER (MySQL + tables like library) ==========
 node "Database Server" as DBServer {
-  database "MySQL\nacademic_portal"
+  database "academic_portal" as DB
+  component "<<MySQL>>" as MySQL
+  artifact "users, students, courses, subjects"
+  artifact "course_student, course_teacher, subject_teacher"
+  artifact "grades, grade_review_logs, fees, fee_status_logs"
+  artifact "assignments, assignment_submissions"
+  artifact "timetables, attendances, low_attendance_alert_states"
+  artifact "announcements, announcement_reads"
+  artifact "messages, notifications"
+  artifact "contact_messages, feedback_messages"
+  artifact "stripe_webhook_events, enrollment_status_logs"
+  artifact "system_settings, sessions, password_reset_tokens"
+  artifact "cache, jobs, failed_jobs"
 }
 
+' ========== BACKUP SERVER (same schema as library) ==========
 node "Backup Server" as BackupServer {
-  database "MySQL Backup\nacademic_portal"
+  database "academic_portal" as BackupDB
+  component "<<MySQL>>" as MySQLBackup
+  artifact "users, students, courses, subjects"
+  artifact "course_student, course_teacher, subject_teacher"
+  artifact "grades, grade_review_logs, fees, fee_status_logs"
+  artifact "assignments, assignment_submissions"
+  artifact "timetables, attendances, low_attendance_alert_states"
+  artifact "announcements, announcement_reads"
+  artifact "messages, notifications"
+  artifact "contact_messages, feedback_messages"
+  artifact "stripe_webhook_events, enrollment_status_logs"
+  artifact "system_settings, sessions, password_reset_tokens"
+  artifact "cache, jobs, failed_jobs"
 }
 
-Client --> Router : HTTPS / TCP/IP
+' ========== CONNECTIONS (left to right like library) ==========
+Mobile --> Router : TCP/IP
+Laptop --> Router : TCP/IP
 Router --> Firewall : TCP/IP
-Firewall --> Internet : Secured traffic
-Internet --> WebServer : HTTPS
+Firewall --> Internet : TCP/IP
+Internet --> WebServer : TCP/IP
 
-WebServer --> DBServer : MySQL Protocol
+WebServer --> DBServer : TCP/IP
 DBServer --> BackupServer : VPN\nBackup / Replication
-
-note right of Client
-**Users**
-Students, lecturers, and administrators
-access the Academic Portal using
-Chrome or Firefox on laptops
-or mobile devices.
-end note
-
-note right of WebServer
-**Application Stack**
-Apache/Nginx, PHP 8.2,
-Laravel 12 backend and
-Vue 3 + Inertia frontend.
-end note
-
-note right of DBServer
-**Primary Data Store**
-Stores users, students, courses,
-subjects, grades, fees,
-assignments, timetable,
-attendance, announcements,
-messages, notifications.
-end note
-
-note right of BackupServer
-**Disaster Recovery**
-Database backups are transferred
-via VPN to prevent data loss.
-end note
 
 @enduml
