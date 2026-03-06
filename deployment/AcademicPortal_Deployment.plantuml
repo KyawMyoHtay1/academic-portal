@@ -1,6 +1,6 @@
 @startuml AcademicPortal_Deployment
 title Deployment Diagram - University Academic Portal
-left to right direction
+top to bottom direction
 
 skinparam shadowing false
 skinparam roundcorner 12
@@ -12,24 +12,27 @@ skinparam node {
   BackgroundColor white
   BorderColor #444444
 }
+
 skinparam database {
   BackgroundColor #E8F0FE
   BorderColor #3B82F6
 }
+
 skinparam cloud {
   BackgroundColor #ECFDF3
   BorderColor #22C55E
 }
+
 skinparam note {
   BackgroundColor #FFFBEA
   BorderColor #D4B106
 }
 
 node "Client Device\n(Mobile / Laptop)" as Client {
-  artifact "Google Chrome" as Chrome
-  artifact "Mozilla Firefox" as Firefox
-  artifact "PDF Reader" as PDF
-  artifact "Antivirus" as AV
+  artifact "Google Chrome"
+  artifact "Mozilla Firefox"
+  artifact "PDF Reader"
+  artifact "Antivirus"
 }
 
 node "Router" as Router
@@ -37,19 +40,19 @@ node "Firewall" as Firewall
 cloud "Cloud / Internet" as Internet
 
 node "Web Server" as WebServer {
-  artifact "Apache / Nginx" as WebStack
-  artifact "PHP 8.2" as PHP
-  artifact "Laravel 12" as Laravel
-  artifact "Vue 3 + Inertia" as Vue
-  artifact "Academic Portal Application" as App
+  artifact "Apache / Nginx"
+  artifact "PHP 8.2"
+  artifact "Laravel 12"
+  artifact "Vue 3 + Inertia"
+  artifact "Academic Portal Application"
 }
 
 node "Database Server" as DBServer {
-  database "MySQL\nacademic_portal" as DB
+  database "MySQL\nacademic_portal"
 }
 
 node "Backup Server" as BackupServer {
-  database "MySQL Backup\nacademic_portal" as BackupDB
+  database "MySQL Backup\nacademic_portal"
 }
 
 Client --> Router : HTTPS / TCP/IP
@@ -70,24 +73,24 @@ end note
 
 note right of WebServer
 **Application Stack**
-Hosts the web application using
-Apache/Nginx, PHP 8.2, Laravel 12,
-and Vue 3 + Inertia.
+Apache/Nginx, PHP 8.2,
+Laravel 12 backend and
+Vue 3 + Inertia frontend.
 end note
 
-note bottom of DBServer
+note right of DBServer
 **Primary Data Store**
 Stores users, students, courses,
-subjects, grades, fees, assignments,
-timetables, attendance, announcements,
-messages, and notifications.
+subjects, grades, fees,
+assignments, timetable,
+attendance, announcements,
+messages, notifications.
 end note
 
 note right of BackupServer
 **Disaster Recovery**
-Receives secured database backups
-from the primary database server
-through VPN to reduce data loss.
+Database backups are transferred
+via VPN to prevent data loss.
 end note
 
 @enduml
