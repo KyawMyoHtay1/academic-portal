@@ -1,0 +1,85 @@
+@startuml AcademicPortal_Deployment
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 11
+title University Academic Portal – Deployment Diagram
+
+' ========== CLIENT LAYER ==========
+node "Mobile (Client Device)" as Mobile {
+  component "Chrome" as MobileChrome
+  component "Antivirus" as MobileAV
+}
+
+node "Laptop (Client Device)" as Laptop {
+  component "Firefox" as LaptopFF
+  component "Chrome" as LaptopChrome
+  component "PDF Reader" as LaptopPDF
+  component "Antivirus" as LaptopAV
+}
+
+' ========== NETWORK LAYER ==========
+node "Router" as Router #E8E8E8
+node "Firewall" as Firewall #FFE0E0
+cloud "Cloud / Internet" as Cloud #E0F0FF
+
+' ========== APPLICATION SERVER ==========
+node "Web Server" as WebServer #E8F5E9 {
+  component "<<Apache/Nginx>>" as WebSvc
+  component "PHP 8.2" as PHP
+  component "Laravel 12" as Laravel
+  component "Vue 3 / Inertia" as Frontend
+  note right of Laravel
+    **Application modules**
+    • Auth, Users, Students
+    • Courses, Subjects
+    • Enrolment & Withdrawal
+    • Grades, Fees, Assignments
+    • Timetable, Attendance
+    • Announcements, Messages
+    • Contact & Feedback
+    • Notifications
+    • Stripe (payments)
+  end note
+}
+
+' ========== DATA LAYER ==========
+node "Database Server" as DBServer #FFF3E0 {
+  database "MySQL\nacademic_portal" as MySQL
+  note right of MySQL
+    **Tables:** users, students, courses,
+    subjects, course_student, grades,
+    grade_review_logs, fees, fee_status_logs,
+    assignments, assignment_submissions,
+    timetables, attendances,
+    low_attendance_alert_states,
+    announcements, announcement_reads,
+    messages, notifications,
+    contact_messages, feedback_messages,
+    stripe_webhook_events,
+    enrollment_status_logs,
+    system_settings, cache, jobs,
+    sessions, password_reset_tokens
+  end note
+}
+
+' ========== BACKUP LAYER ==========
+node "Backup Server" as BackupServer #E3F2FD {
+  database "MySQL\nacademic_portal" as MySQLBackup
+  note right of MySQLBackup
+    Same schema as primary.
+    VPN used to store backup
+    to prevent data loss.
+  end note
+}
+
+' ========== CONNECTIONS ==========
+Mobile -down-> Router : TCP/IP
+Laptop -down-> Router : TCP/IP
+Router -down-> Firewall : TCP/IP
+Firewall -down-> Cloud : TCP/IP
+Cloud -down-> WebServer : TCP/IP
+WebServer -down-> DBServer : TCP/IP
+
+DBServer -right-> BackupServer : VPN\n(backup / replication)
+
+@enduml
