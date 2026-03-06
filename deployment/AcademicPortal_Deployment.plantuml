@@ -23,6 +23,11 @@ skinparam cloud {
   BorderColor #22C55E
 }
 
+actor Guest
+actor Student
+actor Teacher
+actor Staff
+
 node "Client Device\n(Mobile / Laptop)" as Client {
   artifact "Web Browser\n(Chrome / Firefox)"
   artifact "PDF Reader"
@@ -51,6 +56,11 @@ together {
   }
 }
 
+Guest --> Client
+Student --> Client
+Teacher --> Client
+Staff --> Client
+
 Client --> Router : HTTPS / TCP/IP
 Router --> Firewall : TCP/IP
 Firewall --> Internet : Secured traffic
@@ -60,7 +70,7 @@ WebServer --> DBServer : MySQL
 DBServer --> BackupServer : VPN\nBackup / Replication
 
 note right of Client
-Students, lecturers, and administrators
+Guests, students, teachers, and staff
 access the Academic Portal through
 web browsers on laptops or mobile devices.
 end note
@@ -87,4 +97,5 @@ from the primary database
 server via VPN for
 disaster recovery.
 end note
+
 @enduml
