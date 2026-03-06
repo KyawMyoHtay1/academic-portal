@@ -1,85 +1,102 @@
 @startuml AcademicPortal_Deployment
-!theme plain
-skinparam backgroundColor #FEFEFE
-skinparam defaultFontSize 11
-title University Academic Portal – Deployment Diagram
+' Professional deployment diagram - University Academic Portal
 
-' ========== CLIENT LAYER ==========
-node "Mobile (Client Device)" as Mobile {
-  component "Chrome" as MobileChrome
-  component "Antivirus" as MobileAV
+title Deployment Diagram – University Academic Portal
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+skinparam roundCorner 8
+skinparam node {
+  BackgroundColor #FFFFFF
+  BorderColor #37474F
+  BorderThickness 2
+}
+skinparam database {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+}
+skinparam cloud {
+  BackgroundColor #E8F5E9
+  BorderColor #388E3C
+}
+skinparam arrow {
+  Color #546E7A
+  FontSize 10
 }
 
-node "Laptop (Client Device)" as Laptop {
-  component "Firefox" as LaptopFF
-  component "Chrome" as LaptopChrome
-  component "PDF Reader" as LaptopPDF
-  component "Antivirus" as LaptopAV
+' ========== CLIENT LAYER ==========
+node "Client Device\n(Mobile / Laptop)" as Client #FFFFFF {
+  artifact "Google Chrome"
+  artifact "Mozilla Firefox"
+  artifact "PDF Reader"
+  artifact "Antivirus"
 }
 
 ' ========== NETWORK LAYER ==========
-node "Router" as Router #E8E8E8
-node "Firewall" as Firewall #FFE0E0
-cloud "Cloud / Internet" as Cloud #E0F0FF
+node "Router" as Router #F5F5F5
+node "Firewall" as Firewall #FFEBEE
+cloud "Cloud / Internet" as Internet #E8F5E9
 
 ' ========== APPLICATION SERVER ==========
 node "Web Server" as WebServer #E8F5E9 {
-  component "<<Apache/Nginx>>" as WebSvc
-  component "PHP 8.2" as PHP
-  component "Laravel 12" as Laravel
-  component "Vue 3 / Inertia" as Frontend
-  note right of Laravel
-    **Application modules**
-    • Auth, Users, Students
-    • Courses, Subjects
-    • Enrolment & Withdrawal
-    • Grades, Fees, Assignments
-    • Timetable, Attendance
-    • Announcements, Messages
-    • Contact & Feedback
-    • Notifications
-    • Stripe (payments)
-  end note
+  artifact "Apache / Nginx"
+  artifact "PHP 8.2"
+  artifact "Laravel 12"
+  artifact "Vue 3 + Inertia"
+  artifact "Academic Portal Application"
 }
 
 ' ========== DATA LAYER ==========
 node "Database Server" as DBServer #FFF3E0 {
-  database "MySQL\nacademic_portal" as MySQL
-  note right of MySQL
-    **Tables:** users, students, courses,
-    subjects, course_student, grades,
-    grade_review_logs, fees, fee_status_logs,
-    assignments, assignment_submissions,
-    timetables, attendances,
-    low_attendance_alert_states,
-    announcements, announcement_reads,
-    messages, notifications,
-    contact_messages, feedback_messages,
-    stripe_webhook_events,
-    enrollment_status_logs,
-    system_settings, cache, jobs,
-    sessions, password_reset_tokens
-  end note
+  database "MySQL\nacademic_portal"
 }
 
-' ========== BACKUP LAYER ==========
 node "Backup Server" as BackupServer #E3F2FD {
-  database "MySQL\nacademic_portal" as MySQLBackup
-  note right of MySQLBackup
-    Same schema as primary.
-    VPN used to store backup
-    to prevent data loss.
-  end note
+  database "MySQL Backup\nacademic_portal"
 }
 
 ' ========== CONNECTIONS ==========
-Mobile -down-> Router : TCP/IP
-Laptop -down-> Router : TCP/IP
-Router -down-> Firewall : TCP/IP
-Firewall -down-> Cloud : TCP/IP
-Cloud -down-> WebServer : TCP/IP
-WebServer -down-> DBServer : TCP/IP
+Client -right-> Router : HTTPS / TCP/IP
+Router -right-> Firewall : TCP/IP
+Firewall -right-> Internet : Secured
+Internet -right-> WebServer : HTTPS
 
-DBServer -right-> BackupServer : VPN\n(backup / replication)
+WebServer -down-> DBServer : MySQL Protocol
+DBServer -right-> BackupServer : VPN\nBackup / Replication
+
+' ========== ANNOTATIONS ==========
+note right of Client
+  **Users**
+  Access the Academic Portal
+  using Chrome or Firefox on
+  mobile devices or laptops.
+end note
+
+note right of WebServer
+  **Application Stack**
+  Apache/Nginx, PHP 8.2,
+  Laravel 12 backend,
+  Vue 3 + Inertia frontend.
+end note
+
+note right of DBServer
+  **Primary Data Store**
+  users, students, courses,
+  subjects, grades, fees,
+  assignments, timetable,
+  attendance, announcements,
+  messages, notifications.
+end note
+
+note right of BackupServer
+  **Disaster Recovery**
+  Receives database backups
+  via VPN from primary server
+  to prevent data loss.
+end note
 
 @enduml
