@@ -49,10 +49,12 @@ node "Web Server\n<<server>>" as WebServer {
 together {
   node "Database Server\n<<server>>" as DBServer {
     database "MySQL\nacademic_portal\n<<database>>"
+    artifact "Tables (grouped)\n- users, students\n- courses, subjects\n- course_student, course_teacher, subject_teacher\n- grades, grade_review_logs\n- fees, fee_status_logs\n- assignments, assignment_submissions\n- timetables, attendances, low_attendance_alert_states\n- announcements, announcement_reads\n- messages, notifications\n- contact_messages, feedback_messages\n- stripe_webhook_events\n- enrollment_status_logs\n- system_settings\n- sessions, password_reset_tokens\n- cache, jobs, failed_jobs"
   }
 
   node "Backup Server\n<<server>>" as BackupServer {
     database "MySQL Backup\nacademic_portal\n<<database>>"
+    artifact "Backup Tables\n(same schema as primary)"
   }
 }
 
