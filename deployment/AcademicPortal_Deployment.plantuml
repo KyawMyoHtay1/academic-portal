@@ -1,88 +1,116 @@
-@startuml
+@startuml AcademicPortal_Deployment
 title Deployment Diagram - University Academic Portal
-top to bottom direction
+left to right direction
 
 skinparam shadowing false
 skinparam roundcorner 12
 skinparam defaultTextAlignment center
 skinparam componentStyle rectangle
-skinparam backgroundColor #FAFAFA
+skinparam backgroundColor #0B0F14
 
 skinparam node {
-  BackgroundColor white
-  BorderColor #444444
-}
-
-skinparam database {
-  BackgroundColor #E8F0FE
-  BorderColor #3B82F6
+  BackgroundColor #FFFFFF
+  BorderColor #E5E7EB
+  FontColor #111827
 }
 
 skinparam cloud {
-  BackgroundColor #ECFDF3
-  BorderColor #22C55E
+  BackgroundColor #0F172A
+  BorderColor #334155
+  FontColor #E5E7EB
 }
 
-node "Client Device\n(Mobile / Laptop)" as Client {
-  artifact "Web Browser\n(Chrome / Firefox)"
+skinparam database {
+  BackgroundColor #111827
+  BorderColor #334155
+  FontColor #E5E7EB
+}
+
+skinparam artifact {
+  BackgroundColor #F9FAFB
+  BorderColor #E5E7EB
+  FontColor #111827
+}
+
+skinparam note {
+  BackgroundColor #FFF7ED
+  BorderColor #FDBA74
+  FontColor #111827
+}
+
+' ========== CLIENTS ==========
+node "Mobile (Client Device)" as Mobile {
+  artifact "Google Chrome"
+  artifact "Antivirus"
+}
+
+node "Laptop (Client Device)" as Laptop {
+  artifact "Mozilla Firefox"
+  artifact "Google Chrome"
   artifact "PDF Reader"
   artifact "Antivirus"
 }
 
+' ========== NETWORK ==========
 node "Router" as Router
 node "Firewall" as Firewall
 cloud "Cloud / Internet" as Internet
 
-node "Web Server" as WebServer {
-  artifact "Apache / Nginx"
+' ========== APPLICATION SERVER ==========
+node "Web Server\n<<Apache / Nginx>>" as WebServer {
   artifact "PHP 8.2"
   artifact "Laravel 12"
   artifact "Vue 3 + Inertia"
   artifact "Academic Portal Application"
+
+  artifact "Auth Controllers\n- AuthenticatedSessionController\n- RegisteredUserController\n- PasswordResetLinkController\n- NewPasswordController"
+
+  artifact "Student Module\n- StudentProfileController\n- StudentGradesController\n- StudentFeeController\n- StudentAssignmentController\n- StudentAttendanceController\n- StudentTimetableController"
+
+  artifact "Teacher Module\n- TeacherCoursesController\n- TeacherGradesController\n- TeacherAssignmentController\n- TeacherAttendanceController\n- TeacherTimetableController\n- TeacherAnnouncementController"
+
+  artifact "Staff/Admin Module\n- StaffUserController\n- StaffCourseController\n- StaffSubjectController\n- StaffEnrollmentController\n- StaffGradesController\n- StaffFeeController\n- StaffTimetableController\n- StaffAnnouncementController\n- StaffAttendanceReportController\n- StaffContactMessageController\n- StaffFeedbackMessageController"
+
+  artifact "Common Services\n- NotificationController\n- MessageController\n- SearchController\n- PaymentController (Stripe)\n- ContactController\n- FeedbackController"
 }
 
-node "Database Server" as DBServer {
-  database "MySQL\nacademic_portal"
+' ========== DATABASE SERVERS ==========
+node "Database Server\n<<MySQL>>" as DBServer {
+  database "academic_portal" as PrimaryDB
+  artifact "Tables\n- users\n- students\n- courses\n- subjects\n- course_student\n- course_teacher\n- subject_teacher\n- grades\n- grade_review_logs\n- fees\n- fee_status_logs\n- assignments\n- assignment_submissions\n- timetables\n- attendances\n- low_attendance_alert_states\n- announcements\n- announcement_reads\n- messages\n- notifications\n- contact_messages\n- feedback_messages\n- stripe_webhook_events\n- enrollment_status_logs\n- system_settings\n- sessions\n- password_reset_tokens\n- cache\n- jobs\n- failed_jobs"
 }
 
-node "Backup Server" as BackupServer {
-  database "MySQL Backup\nacademic_portal"
+node "Backup Server\n<<MySQL>>" as BackupServer {
+  database "academic_portal" as BackupDB
+  artifact "Backup Copy\n(same tables as primary)"
 }
 
-Client --> Router : HTTPS / TCP/IP
+' ========== CONNECTIONS ==========
+Mobile --> Router : TCP/IP
+Laptop --> Router : TCP/IP
 Router --> Firewall : TCP/IP
-Firewall --> Internet : Secured traffic
-Internet --> WebServer : HTTPS
-
-WebServer --> DBServer : MySQL Protocol
+Firewall --> Internet : TCP/IP
+Internet --> WebServer : HTTPS / TCP/IP
+WebServer --> DBServer : MySQL / TCP/IP
 DBServer --> BackupServer : VPN\nBackup / Replication
 
-note right of Client
-Students, lecturers, and administrators
-access the Academic Portal through
-web browsers on laptops or mobile devices.
+' ========== NOTES ==========
+note bottom of Mobile
+Users access the portal via
+web browser (mobile).
 end note
 
-note right of WebServer
-Runs the Academic Portal application
-using Apache/Nginx, PHP 8.2,
-Laravel 12 backend and
-Vue 3 + Inertia frontend.
+note bottom of Laptop
+Users access the portal via
+web browser (laptop).
 end note
 
-note right of DBServer
-Stores academic data including:
-users, students, courses,
-subjects, grades, fees,
-assignments, timetables,
-attendance, announcements,
-messages, and notifications.
+note bottom of DBServer
+Primary academic database server.
 end note
 
-note right of BackupServer
-Receives secure backups
-from the primary database
-server via VPN for
-disaster recovery.
+note bottom of BackupServer
+Backup database server for disaster recovery.
 end note
+
 @enduml
