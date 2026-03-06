@@ -1,4 +1,4 @@
-@startuml
+@startuml AcademicPortal_Deployment
 title Deployment Diagram - University Academic Portal
 top to bottom direction
 
@@ -23,43 +23,41 @@ skinparam cloud {
   BorderColor #22C55E
 }
 
-actor Guest
-actor Student
-actor Teacher
-actor Staff
-
-node "Client Device\n(Mobile / Laptop)" as Client {
+' ========= NODES / DEVICES =========
+node "Client Device\n(Mobile / Laptop)\n<<device>>" as Client {
   artifact "Web Browser\n(Chrome / Firefox)"
   artifact "PDF Reader"
   artifact "Antivirus"
 }
 
-node "Router" as Router
-node "Firewall" as Firewall
+node "Router\n<<device>>" as Router
+node "Firewall\n<<device>>" as Firewall
 cloud "Cloud / Internet" as Internet
 
-node "Web Server" as WebServer {
-  artifact "Apache / Nginx"
-  artifact "PHP 8.2"
-  artifact "Laravel 12"
-  artifact "Vue 3 + Inertia"
-  artifact "Academic Portal Application"
+node "Web Server\n<<server>>" as WebServer {
+  node "Web Runtime\n<<executionEnvironment>>" as WebRuntime {
+    artifact "Apache / Nginx"
+    artifact "PHP 8.2"
+    artifact "Laravel 12"
+    artifact "Vue 3 + Inertia"
+    artifact "Academic Portal Application"
+  }
+
+  artifact "Deployment Spec (.env)\nAPP_ENV, APP_KEY\nDB_* , STRIPE_*"
 }
 
 together {
-  node "Database Server" as DBServer {
-    database "MySQL\nacademic_portal"
+  node "Database Server\n<<server>>" as DBServer {
+    database "MySQL\nacademic_portal\n<<database>>"
   }
 
-  node "Backup Server" as BackupServer {
-    database "MySQL Backup\nacademic_portal"
+  node "Backup Server\n<<server>>" as BackupServer {
+    database "MySQL Backup\nacademic_portal\n<<database>>"
   }
 }
 
-Guest --> Client
-Student --> Client
-Teacher --> Client
-Staff --> Client
+cloud "Stripe API\n<<external>>" as Stripe
+cloud "Email Service (SMTP)\n<<external>>" as Mail
 
 Client --> Router : HTTPS / TCP/IP
 Router --> Firewall : TCP/IP
@@ -68,9 +66,11 @@ Internet --> WebServer : HTTPS
 
 WebServer --> DBServer : MySQL
 DBServer --> BackupServer : VPN\nBackup / Replication
+WebServer --> Stripe : HTTPS (Payments)
+WebServer --> Mail : SMTP/HTTPS (Emails)
 
 note right of Client
-Guests, students, teachers, and staff
+Users (students, teachers, staff/admin)
 access the Academic Portal through
 web browsers on laptops or mobile devices.
 end note
