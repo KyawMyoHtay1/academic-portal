@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,6 +45,7 @@ class ComprehensiveDemoSeeder extends Seeder
         $this->seedTeachingAssignments($courses, $subjectsByCourseId, $teacherUsers);
 
         $students = $this->seedStudents($studentUsers);
+        $photoSummary = $this->seedInternetPhotos($courses, $subjectsByCourseId, $staffUsers, $teacherUsers, $studentUsers, $students);
         $this->seedEnrollments($students, $courses);
 
         $this->seedTimetables($subjectsByCourseId, $staffUsers);
@@ -69,6 +71,14 @@ class ComprehensiveDemoSeeder extends Seeder
             $this->command->line('Staff: alice.staff@example.com, brian.staff@example.com');
             $this->command->line('Teacher: amelia.teacher@example.com, ben.teacher@example.com, chloe.teacher@example.com');
             $this->command->line('Students: student01@example.com ... student18@example.com');
+            $this->command->line(sprintf(
+                'Photos seeded: %d courses, %d subjects, %d users, %d students (%d failed downloads).',
+                $photoSummary['courses'],
+                $photoSummary['subjects'],
+                $photoSummary['users'],
+                $photoSummary['students'],
+                $photoSummary['failed']
+            ));
         }
     }
 
@@ -1223,6 +1233,195 @@ class ComprehensiveDemoSeeder extends Seeder
                 'replied_at' => null,
             ]
         );
+    }
+
+    /**
+     * @param  Collection<int, Course>  $courses
+     * @param  Collection<int, Collection<int, Subject>>  $subjectsByCourseId
+     * @param  Collection<int, User>  $staffUsers
+     * @param  Collection<int, User>  $teacherUsers
+     * @param  Collection<int, User>  $studentUsers
+     * @param  Collection<int, Student>  $students
+     * @return array{courses:int,subjects:int,users:int,students:int,failed:int}
+     */
+    private function seedInternetPhotos(
+        Collection $courses,
+        Collection $subjectsByCourseId,
+        Collection $staffUsers,
+        Collection $teacherUsers,
+        Collection $studentUsers,
+        Collection $students
+    ): array {
+        $summary = [
+            'courses' => 0,
+            'subjects' => 0,
+            'users' => 0,
+            'students' => 0,
+            'failed' => 0,
+        ];
+
+        if (! $this->canDownloadSeedPhotos()) {
+            if ($this->command) {
+                $this->command->warn('Skipping internet photo download: image host is unreachable.');
+            }
+
+            return $summary;
+        }
+
+        $coursePhotosByCode = [
+            'CSE101' => 'https://images.pexels.com/photos/7457914/pexels-photo-7457914.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+            'CSE102' => 'https://images.pexels.com/photos/5408005/pexels-photo-5408005.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+            'CSE201' => 'https://images.pexels.com/photos/270404/pexels-photo-270404.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+            'CSE202' => 'https://images.pexels.com/photos/34803988/pexels-photo-34803988.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+            'CSE301' => 'https://images.pexels.com/photos/256219/pexels-photo-256219.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+        ];
+
+        foreach ($courses as $course) {
+            $sourceUrl = $coursePhotosByCode[$course->course_code] ?? null;
+            if (! $sourceUrl) {
+                continue;
+            }
+
+            $storedPath = $this->downloadPhotoIfNeeded(
+                $sourceUrl,
+                'courses',
+                'seed-course-'.strtolower($course->course_code)
+            );
+
+            if ($storedPath) {
+                $course->update(['photo' => $storedPath]);
+                $summary['courses']++;
+            } else {
+                $summary['failed']++;
+            }
+        }
+
+        $subjectPhotosBySuffix = [
+            '01' => 'https://images.pexels.com/photos/18471488/pexels-photo-18471488.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+            '02' => 'https://images.pexels.com/photos/34803968/pexels-photo-34803968.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+            '03' => 'https://images.pexels.com/photos/33607952/pexels-photo-33607952.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260',
+        ];
+
+        foreach ($subjectsByCourseId->flatten() as $subject) {
+            $suffix = substr((string) $subject->subject_code, -2);
+            $sourceUrl = $subjectPhotosBySuffix[$suffix] ?? null;
+            if (! $sourceUrl) {
+                continue;
+            }
+
+            $storedPath = $this->downloadPhotoIfNeeded(
+                $sourceUrl,
+                'subjects',
+                'seed-subject-'.strtolower(str_replace(['/', '\\'], '-', (string) $subject->subject_code))
+            );
+
+            if ($storedPath) {
+                $subject->update(['photo' => $storedPath]);
+                $summary['subjects']++;
+            } else {
+                $summary['failed']++;
+            }
+        }
+
+        $portraitUrls = [
+            'https://images.pexels.com/photos/5757563/pexels-photo-5757563.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-5757563.jpg&fm=jpg',
+            'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?cs=srgb&dl=pexels-artem-podrez-5212345.jpg&fm=jpg',
+            'https://images.pexels.com/photos/3831645/pexels-photo-3831645.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-3831645.jpg&fm=jpg',
+            'https://images.pexels.com/photos/7841834/pexels-photo-7841834.jpeg?cs=srgb&dl=pexels-anna-shvets-7841834.jpg&fm=jpg',
+            'https://images.pexels.com/photos/6146931/pexels-photo-6146931.jpeg?cs=srgb&dl=pexels-kampus-6146931.jpg&fm=jpg',
+            'https://images.pexels.com/photos/5212682/pexels-photo-5212682.jpeg?cs=srgb&dl=pexels-artem-podrez-5212682.jpg&fm=jpg',
+            'https://images.pexels.com/photos/4124035/pexels-photo-4124035.jpeg?cs=srgb&dl=pexels-anna-shvets-4124035.jpg&fm=jpg',
+        ];
+
+        $users = $staffUsers->concat($teacherUsers)->concat($studentUsers)->values();
+        foreach ($users as $index => $user) {
+            $sourceUrl = $portraitUrls[$index % count($portraitUrls)];
+            $storedPath = $this->downloadPhotoIfNeeded($sourceUrl, 'users', 'seed-user-'.$user->id);
+
+            if ($storedPath) {
+                $user->update(['photo' => $storedPath]);
+                $summary['users']++;
+            } else {
+                $summary['failed']++;
+            }
+        }
+
+        foreach ($students->values() as $index => $student) {
+            $sourceUrl = $portraitUrls[($index + 2) % count($portraitUrls)];
+            $storedPath = $this->downloadPhotoIfNeeded($sourceUrl, 'students', 'seed-student-'.$student->id);
+
+            if ($storedPath) {
+                $student->update(['photo' => $storedPath]);
+                $summary['students']++;
+            } else {
+                $summary['failed']++;
+            }
+        }
+
+        return $summary;
+    }
+
+    private function downloadPhotoIfNeeded(string $url, string $folder, string $basename): ?string
+    {
+        $disk = Storage::disk('public');
+        $extension = $this->inferImageExtensionFromUrl($url);
+        $path = sprintf('%s/%s.%s', trim($folder, '/'), $basename, $extension);
+
+        if ($disk->exists($path)) {
+            return $path;
+        }
+
+        try {
+            $response = Http::retry(2, 400)
+                ->timeout(25)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'UniversityPortalSeeder/1.0',
+                ])
+                ->get($url);
+
+            if (! $response->successful()) {
+                return null;
+            }
+
+            $contentType = strtolower((string) $response->header('Content-Type'));
+            if ($contentType !== '' && ! str_starts_with($contentType, 'image/')) {
+                return null;
+            }
+
+            $disk->put($path, $response->body());
+
+            return $path;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function inferImageExtensionFromUrl(string $url): string
+    {
+        $path = (string) parse_url($url, PHP_URL_PATH);
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+
+        if (! in_array($extension, $allowed, true)) {
+            return 'jpg';
+        }
+
+        return $extension === 'jpeg' ? 'jpg' : $extension;
+    }
+
+    private function canDownloadSeedPhotos(): bool
+    {
+        $probeUrl = 'https://images.pexels.com/photos/7457914/pexels-photo-7457914.jpeg?auto=compress&cs=tinysrgb&h=120&w=120';
+
+        try {
+            return Http::timeout(6)
+                ->connectTimeout(3)
+                ->get($probeUrl)
+                ->successful();
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**
