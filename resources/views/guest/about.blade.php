@@ -1,4 +1,4 @@
-﻿@extends('layouts.guest')
+@extends('layouts.guest')
 
 @section('title', 'About Us')
 
@@ -186,18 +186,18 @@
                 <div class="portal-slider-track h-[34rem] overflow-visible bg-transparent md:h-[26rem] lg:h-[22rem]">
                     <div class="portal-slide is-active" data-portal-slide>
                         <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
-                            <p class="text-5xl font-bold leading-none text-slate-300">â€œ</p>
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
                             <p class="about-testimonial-quote text-xl">Great learning support and clear communication from teachers and staff throughout every semester.</p>
                         </div>
                         <div class="absolute right-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
-                            <p class="text-5xl font-bold leading-none text-slate-300">â€œ</p>
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
                             <p class="about-testimonial-quote text-xl">A campus culture that really motivates students to stay focused and confident.</p>
                         </div>
                         <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
                             <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
                                 <img src="{{ asset('images/fox_images/person_1.jpg') }}" alt="Student testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
                                 <div class="flex-1">
-                                    <p class="text-5xl font-bold leading-none text-slate-200">â€œ</p>
+                                    <p class="text-5xl font-bold leading-none text-slate-200">“</p>
                                     <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
                                         Far beyond basic administration, this university helped me grow academically and personally through strong mentoring and structured support.
                                     </p>
@@ -210,18 +210,18 @@
 
                     <div class="portal-slide" data-portal-slide>
                         <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
-                            <p class="text-5xl font-bold leading-none text-slate-300">â€œ</p>
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
                             <p class="about-testimonial-quote text-xl">The portal made daily academic tasks faster and less stressful.</p>
                         </div>
                         <div class="absolute right-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
-                            <p class="text-5xl font-bold leading-none text-slate-300">â€œ</p>
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
                             <p class="about-testimonial-quote text-xl">Support teams responded quickly whenever I had schedule or fee questions.</p>
                         </div>
                         <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
                             <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
                                 <img src="{{ asset('images/fox_images/person_2.jpg') }}" alt="Parent testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
                                 <div class="flex-1">
-                                    <p class="text-5xl font-bold leading-none text-slate-200">â€œ</p>
+                                    <p class="text-5xl font-bold leading-none text-slate-200">“</p>
                                     <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
                                         As a parent, I appreciate the transparency of progress, attendance, and communication. It gives me confidence in my child's learning journey.
                                     </p>
@@ -234,18 +234,18 @@
 
                     <div class="portal-slide" data-portal-slide>
                         <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
-                            <p class="text-5xl font-bold leading-none text-slate-300">â€œ</p>
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
                             <p class="about-testimonial-quote text-xl">A practical and student-first system that supports teaching quality.</p>
                         </div>
                         <div class="absolute right-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
-                            <p class="text-5xl font-bold leading-none text-slate-300">â€œ</p>
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
                             <p class="about-testimonial-quote text-xl">Class coordination became much easier with timetable and messaging tools.</p>
                         </div>
                         <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
                             <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
                                 <img src="{{ asset('images/fox_images/person_4.jpg') }}" alt="Teacher testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
                                 <div class="flex-1">
-                                    <p class="text-5xl font-bold leading-none text-slate-200">â€œ</p>
+                                    <p class="text-5xl font-bold leading-none text-slate-200">“</p>
                                     <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
                                         The integrated workflow for attendance, grades, and announcements lets teachers focus more on learning outcomes than repetitive admin work.
                                     </p>
@@ -386,5 +386,3 @@
     </section>
 </div>
 @endsection
-
-

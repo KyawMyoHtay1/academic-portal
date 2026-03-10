@@ -1,4 +1,4 @@
-﻿@extends('layouts.guest')
+@extends('layouts.guest')
 
 @section('title', 'Welcome to University Academic Portal')
 
