@@ -75,8 +75,8 @@
             <div class="max-w-2xl">
                 <div class="relative flex gap-3">
                     <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="absolute inset-y-0 left-0 z-10 pl-4 flex items-center pointer-events-none">
+                            <svg class="guest-search-icon h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
@@ -84,7 +84,7 @@
                             type="text"
                             id="courseSearch"
                             placeholder="Search courses by name, code, or semester..."
-                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)] focus:border-transparent transition-all"
+                            class="relative z-0 w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)] focus:border-transparent transition-all"
                         >
                     </div>
                     <button
@@ -651,4 +651,3 @@
 </script>
 @endpush
 @endsection
-
