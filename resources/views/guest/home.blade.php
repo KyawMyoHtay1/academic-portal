@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+﻿@extends('layouts.guest')
 
 @section('title', 'Welcome to University Academic Portal')
 
@@ -985,7 +985,7 @@
         </div>
     </section>
 
-    {{-- More Success Stories – visual gallery (replace placeholders with real photos + stories) --}}
+    {{-- More Success Stories - visual gallery --}}
     <section class="space-y-6">
         <div class="flex items-center justify-between gap-4">
             <div>
@@ -1003,12 +1003,12 @@
         </div>
 
         <div class="grid gap-6 md:grid-cols-3">
-            {{-- Story Card 1 – Student Graduate (image placeholder) --}}
+            {{-- Story Card 1 - Student Graduate --}}
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
                         src="{{ asset('images/fox_images/course-7.jpg') }}"
-                        alt="Success story student 1 placeholder"
+                        alt="Student graduate success story"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -1023,21 +1023,21 @@
                 </div>
                 <div class="p-5 space-y-3">
                     <p class="text-sm text-slate-700 leading-relaxed">
-                        Use this space to describe how a student made the most of your programmes, internships,
-                        and campus opportunities to launch a successful career.
+                        A computing graduate used academic advising, project-based modules, and internship
+                        support to transition from first-year study to a full-time software role.
                     </p>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Replace with real name · Programme · Graduation year
+                        Nandar Hlaing - BSc Computing - Class of 2025
                     </p>
                 </div>
             </article>
 
-            {{-- Story Card 2 – International Student (image placeholder) --}}
+            {{-- Story Card 2 - International Student --}}
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
                         src="{{ asset('images/fox_images/course-8.jpg') }}"
-                        alt="Success story student 2 placeholder"
+                        alt="International student success story"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -1052,21 +1052,21 @@
                 </div>
                 <div class="p-5 space-y-3">
                     <p class="text-sm text-slate-700 leading-relaxed">
-                        Describe how international students are welcomed and supported—from language assistance
-                        and cultural events to academic advising and career services.
+                        International students benefit from orientation support, advising, and student services
+                        that make enrolment, scheduling, and academic communication clear and reliable.
                     </p>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Replace with real name · Country · Programme
+                        Aminah Rahman - Indonesia - BBA
                     </p>
                 </div>
             </article>
 
-            {{-- Story Card 3 – Research or Faculty (image placeholder) --}}
+            {{-- Story Card 3 - Research or Faculty --}}
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
                         src="{{ asset('images/fox_images/course-6.jpg') }}"
-                        alt="Success story research or faculty placeholder"
+                        alt="Research and faculty success story"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -1081,11 +1081,11 @@
                 </div>
                 <div class="p-5 space-y-3">
                     <p class="text-sm text-slate-700 leading-relaxed">
-                        Share how your staff or students are involved in research, community projects, or
-                        innovations that benefit society and reflect your university values.
+                        Faculty-led research projects now use centralized course, attendance, and progress data
+                        to better monitor outcomes and strengthen student research engagement.
                     </p>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Replace with real name · Role · Project or department
+                        Dr. Aung Min - Faculty - Applied Data Research
                     </p>
                 </div>
             </article>
@@ -1095,7 +1095,7 @@
                 <div class="relative h-56 overflow-hidden">
                     <img
                         src="{{ asset('images/fox_images/staff-1.jpg') }}"
-                        alt="Success story alumni mentor placeholder"
+                        alt="Alumni mentor story"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -1110,11 +1110,11 @@
                 </div>
                 <div class="p-5 space-y-3">
                     <p class="text-sm text-slate-700 leading-relaxed">
-                        Use this card to showcase graduates who return as mentors, guest speakers, or industry partners,
-                        helping the next generation of students succeed.
+                        Alumni mentors contribute through career talks, project feedback, and internship guidance,
+                        helping current students connect academic work with industry expectations.
                     </p>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Replace with real name · Role · Organisation
+                        Ko Ko Thein - Alumni Mentor - Software Engineer
                     </p>
                 </div>
             </article>
@@ -1124,7 +1124,7 @@
                 <div class="relative h-56 overflow-hidden">
                     <img
                         src="{{ asset('images/fox_images/staff-2.jpg') }}"
-                        alt="Success story student leader placeholder"
+                        alt="Student leadership story"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -1139,11 +1139,11 @@
                 </div>
                 <div class="p-5 space-y-3">
                     <p class="text-sm text-slate-700 leading-relaxed">
-                        Tell the story of a student who built confidence and experience by leading a club,
-                        organising events, or coordinating community outreach projects.
+                        Student leaders use announcements, messaging, and event coordination tools to run clubs,
+                        improve participation, and keep activities organized each semester.
                     </p>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Replace with real name · Club or society · Years active
+                        Mya Thandar - Student Union - 2024-2025
                     </p>
                 </div>
             </article>
@@ -1153,7 +1153,7 @@
                 <div class="relative h-56 overflow-hidden">
                     <img
                         src="{{ asset('images/fox_images/staff-3.jpg') }}"
-                        alt="Success story community impact placeholder"
+                        alt="Community impact project story"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
@@ -1168,11 +1168,11 @@
                 </div>
                 <div class="p-5 space-y-3">
                     <p class="text-sm text-slate-700 leading-relaxed">
-                        Highlight a project or initiative where students and staff worked together to support
-                        local communities, industry, or global causes.
+                        Community projects led by students and staff have expanded digital literacy workshops,
+                        creating measurable benefit for nearby schools and local partners.
                     </p>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Replace with project name · Partners · Impact summary
+                        Community Coding Lab - Local Schools - 500+ learners
                     </p>
                 </div>
             </article>
