@@ -247,8 +247,17 @@
         #google_translate_element select.goog-te-combo {
             display: none;
         }
-        .skiptranslate {
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-menu-frame.skiptranslate,
+        .goog-te-balloon-frame.skiptranslate {
             display: none !important;
+            visibility: hidden !important;
+        }
+        /* Keep reCAPTCHA v3 badge visible and interactive on guest pages. */
+        .grecaptcha-badge {
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
         /* Simple image slider — fixed size and consistent transition */
         .portal-slider {
@@ -1203,14 +1212,28 @@
                     && typeof window.grecaptcha.execute === 'function';
             }
 
-            // Run once on page load so the v3 badge appears consistently on guest pages.
-            if (hasRecaptchaApi()) {
-                window.grecaptcha.ready(function () {
-                    window.grecaptcha
-                        .execute(recaptchaSiteKey, { action: 'guest_pageview' })
-                        .catch(function () {});
-                });
+            // Run on page load so the v3 badge appears consistently on guest pages.
+            // Retry briefly because grecaptcha may initialize after DOMContentLoaded.
+            function runGuestPageviewRecaptcha(remainingAttempts) {
+                if (hasRecaptchaApi()) {
+                    window.grecaptcha.ready(function () {
+                        window.grecaptcha
+                            .execute(recaptchaSiteKey, { action: 'guest_pageview' })
+                            .catch(function () {});
+                    });
+                    return;
+                }
+
+                if (remainingAttempts <= 0) {
+                    return;
+                }
+
+                window.setTimeout(function () {
+                    runGuestPageviewRecaptcha(remainingAttempts - 1);
+                }, 200);
             }
+
+            runGuestPageviewRecaptcha(25);
 
             var forms = Array.prototype.slice.call(
                 document.querySelectorAll('form[data-recaptcha-action]')
