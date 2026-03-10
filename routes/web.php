@@ -181,6 +181,39 @@ Route::get('/guest/courses', function () {
     ]);
 })->name('guest.courses');
 
+Route::get('/guest/courses/{course}', function (Course $course) {
+    $course->loadCount(['subjects', 'teachers']);
+
+    $approvedEnrollments = DB::table('course_student')
+        ->where('course_id', $course->id)
+        ->where('status', 'approved')
+        ->count();
+
+    $relatedCourses = Course::query()
+        ->whereKeyNot($course->id)
+        ->where('semester', $course->semester)
+        ->orderBy('course_code')
+        ->take(4)
+        ->get(['id', 'course_code', 'title', 'credits', 'semester', 'photo']);
+
+    if ($relatedCourses->count() < 4) {
+        $needed = 4 - $relatedCourses->count();
+        $extra = Course::query()
+            ->whereKeyNot($course->id)
+            ->whereNotIn('id', $relatedCourses->pluck('id'))
+            ->orderBy('course_code')
+            ->take($needed)
+            ->get(['id', 'course_code', 'title', 'credits', 'semester', 'photo']);
+        $relatedCourses = $relatedCourses->concat($extra);
+    }
+
+    return view('guest.course-show', [
+        'course' => $course,
+        'approvedEnrollments' => $approvedEnrollments,
+        'relatedCourses' => $relatedCourses,
+    ]);
+})->whereNumber('course')->name('guest.courses.show');
+
 Route::get('/guest/news', function () {
     return view('guest.news', [
         'announcements' => Announcement::query()

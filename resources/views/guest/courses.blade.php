@@ -513,12 +513,16 @@
                                 </svg>
                                 <span>{{ $course->semester }}</span>
                             </div>
-                            <div class="flex items-center gap-2 text-sm font-semibold text-[color:var(--portal-navy)]">
+                            <a
+                                href="{{ route('guest.courses.show', $course->id) }}"
+                                class="flex items-center gap-2 text-sm font-semibold text-[color:var(--portal-navy)] hover:text-slate-900"
+                                aria-label="View details for {{ $course->title }}"
+                            >
                                 <span>View Details</span>
                                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
