@@ -164,7 +164,7 @@
                     <div class="absolute inset-0 overflow-hidden">
                         <div
                             class="portal-slide-image"
-                            style="background-image: url('{{ asset('images/home/modern_learning.png') }}');"
+                            style="background-image: url('{{ asset('images/fox_images/bg_1.jpg') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -186,7 +186,7 @@
                     <div class="absolute inset-0 overflow-hidden">
                         <div
                             class="portal-slide-image"
-                            style="background-image: url('{{ asset('images/home/student_life.png') }}');"
+                            style="background-image: url('{{ asset('images/fox_images/bg_3.jpg') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -208,7 +208,7 @@
                     <div class="absolute inset-0 overflow-hidden">
                         <div
                             class="portal-slide-image"
-                            style="background-image: url('{{ asset('images/home/lab.png') }}');"
+                            style="background-image: url('{{ asset('images/fox_images/bg_5.jpg') }}');"
                         ></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
@@ -225,7 +225,7 @@
                 {{-- Custom Image Slide 4: Add your first custom image here --}}
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/campus.png') }}'); background-size: cover; background-position: center;"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/fox_images/image_1.jpg') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
@@ -239,7 +239,7 @@
                 {{-- Custom Image Slide 5: Add your second custom image here --}}
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/academic.png') }}'); background-size: cover; background-position: center;"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/fox_images/image_2.jpg') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
@@ -253,7 +253,7 @@
                 {{-- Custom Image Slide 6: Add your third custom image here --}}
                 <div class="portal-slide" data-portal-slide>
                     <div class="absolute inset-0 overflow-hidden">
-                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/home/innovation.png') }}'); background-size: cover; background-position: center;"></div>
+                        <div class="portal-slide-image" style="background-image: url('{{ asset('images/fox_images/image_3.jpg') }}'); background-size: cover; background-position: center;"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-end">
                             <div class="p-6 md:p-8 space-y-2 text-white">
@@ -885,7 +885,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/journey1.jpg') }}"
+                        src="{{ asset('images/fox_images/image_1.jpg') }}"
                         alt="Success story student 1 placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -914,7 +914,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/journey2.jpg') }}"
+                        src="{{ asset('images/fox_images/image_2.jpg') }}"
                         alt="Success story student 2 placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -943,7 +943,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/journey3.jpg') }}"
+                        src="{{ asset('images/fox_images/image_3.jpg') }}"
                         alt="Success story research or faculty placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -972,7 +972,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/community.png') }}"
+                        src="{{ asset('images/fox_images/image_4.jpg') }}"
                         alt="Success story alumni mentor placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1001,7 +1001,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/student_life.png') }}"
+                        src="{{ asset('images/fox_images/image_5.jpg') }}"
                         alt="Success story student leader placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1030,7 +1030,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/home/innovation.png') }}"
+                        src="{{ asset('images/fox_images/image_6.jpg') }}"
                         alt="Success story community impact placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
