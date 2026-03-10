@@ -37,6 +37,16 @@
         opacity: 1;
         transform: scale(1.18);
     }
+
+    .about-testimonial-slider .portal-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .about-testimonial-slider .portal-slide > article {
+        width: 100%;
+    }
 </style>
 @endpush
 
@@ -172,8 +182,8 @@
         </div>
 
         <div class="mx-auto max-w-6xl">
-            <div class="portal-slider" data-portal-slider data-autoplay="true" data-interval="6500">
-                <div class="portal-slider-track h-[30rem] overflow-visible bg-transparent md:h-[24rem] lg:h-[22rem]">
+            <div class="portal-slider about-testimonial-slider" data-portal-slider data-autoplay="true" data-interval="6500">
+                <div class="portal-slider-track h-[34rem] overflow-visible bg-transparent md:h-[26rem] lg:h-[22rem]">
                     <div class="portal-slide is-active" data-portal-slide>
                         <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
                             <p class="text-5xl font-bold leading-none text-slate-300">“</p>
@@ -376,6 +386,5 @@
     </section>
 </div>
 @endsection
-
 
 
