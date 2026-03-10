@@ -50,7 +50,7 @@
                                     @break
                                 @case('sparkles')
                                     <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l2.5 6L14 11.5 7.5 14 5 20l-2.5-6L-4 11.5 2.5 9 5 3zM17 4l1.3 3 3 1.3-3 1.3L17 13l-1.3-3-3-1.3 3-1.3L17 4z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l1.8 3.7L18 8.5l-3.2 1.6L13 14l-1-2-1 2-1.8-3.9L6 8.5l4.2-1.8L12 3zM18.5 13l.9 1.8 1.8.9-1.8.9-.9 1.8-.9-1.8-1.8-.9 1.8-.9.9-1.8z"/>
                                     </svg>
                                     @break
                                 @case('sport')
