@@ -396,6 +396,7 @@
             'guest.policies' => 'Policies & Guidelines',
             'guest.services' => 'Academic Services',
             'guest.support' => 'Support & Help Desk',
+            'guest.user-manual.page' => 'User Manual',
             'guest.feedback' => 'Feedback & Suggestions',
             'guest.contact' => 'Contact',
         ];
@@ -404,7 +405,7 @@
         $guestSection = null;
         if (in_array($guestRouteName, ['guest.about', 'guest.vision', 'guest.policies', 'guest.feedback'])) {
             $guestSection = 'About';
-        } elseif (in_array($guestRouteName, ['guest.services', 'guest.support', 'guest.contact'])) {
+        } elseif (in_array($guestRouteName, ['guest.services', 'guest.support', 'guest.user-manual.page', 'guest.contact'])) {
             $guestSection = 'Help & Services';
         }
 
@@ -462,7 +463,7 @@
 
                 {{-- Help / Services group --}}
                 <div class="relative group">
-                    <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.services','guest.support','guest.contact') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
+                    <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.services','guest.support','guest.user-manual.page','guest.contact') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
@@ -474,6 +475,7 @@
                     <div class="invisible absolute right-0 z-40 top-full w-52 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
                         <a href="{{ route('guest.services') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.services') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Academic Services</a>
                         <a href="{{ route('guest.support') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.support') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Support & Help Desk</a>
+                        <a href="{{ route('guest.user-manual.page') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.user-manual.page') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">User Manual</a>
                         <a href="{{ route('guest.contact') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.contact') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Contact Us</a>
                     </div>
                 </div>
@@ -680,6 +682,7 @@
                     <div class="grid grid-cols-1 gap-2 text-sm text-slate-100/90">
                         <a class="hover:text-amber-200 transition" href="{{ route('guest.services') }}">Academic Services</a>
                         <a class="hover:text-amber-200 transition" href="{{ route('guest.support') }}">Support & Help Desk</a>
+                        <a class="hover:text-amber-200 transition" href="{{ route('guest.user-manual.page') }}">User Manual</a>
                         <a class="hover:text-amber-200 transition" href="{{ route('guest.contact') }}">Contact</a>
                         <a class="hover:text-amber-200 transition" href="{{ route('guest.policies') }}">Policies & Guidelines</a>
                         <a class="hover:text-amber-200 transition" href="{{ route('guest.feedback') }}">Feedback & Suggestions</a>

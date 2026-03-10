@@ -51,7 +51,42 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
+// Resolve manual PDF path while supporting both underscore and space filenames.
+$resolveUserManualPath = static function (): string {
+    $candidates = [
+        public_path('docs/University_Academic_Portal_User_Manual.pdf'),
+        public_path('docs/University Academic Portal User Manual.pdf'),
+    ];
+
+    foreach ($candidates as $path) {
+        if (is_file($path)) {
+            return $path;
+        }
+    }
+
+    abort(404, 'User manual PDF not found.');
+};
+
 // Guest-facing public pages (read-only)
+Route::get('/guest/user-manual', function () use ($resolveUserManualPath) {
+    $path = $resolveUserManualPath();
+
+    return response()->file($path, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="University_Academic_Portal_User_Manual.pdf"',
+        'X-Content-Type-Options' => 'nosniff',
+    ]);
+})->name('guest.user-manual.view');
+
+Route::get('/guest/user-manual/download', function () use ($resolveUserManualPath) {
+    $path = $resolveUserManualPath();
+
+    return response()->download($path, 'University_Academic_Portal_User_Manual.pdf', [
+        'Content-Type' => 'application/pdf',
+        'X-Content-Type-Options' => 'nosniff',
+    ]);
+})->name('guest.user-manual.download');
+
 Route::get('/', function () {
     // Dynamic Statistics
     $totalCourses = Course::count();
@@ -303,6 +338,7 @@ Route::post('/guest/contact', [ContactController::class, 'store'])
 
 Route::view('/guest/policies', 'guest.policies')->name('guest.policies');
 Route::view('/guest/feedback', 'guest.feedback')->name('guest.feedback');
+Route::view('/guest/user-manuals', 'guest.user-manual')->name('guest.user-manual.page');
 
 // Guest feedback form submission (stores into feedback_messages)
 Route::post('/guest/feedback', [FeedbackController::class, 'store'])
