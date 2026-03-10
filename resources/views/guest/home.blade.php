@@ -46,6 +46,9 @@
     .home-story-card:hover .home-story-image {
         transform: scale(1.05);
     }
+    .home-video-modal video {
+        background: #000;
+    }
 </style>
 @endpush
 
@@ -301,6 +304,13 @@
         </div>
     </section>
 
+    @php
+        $campusVideoRelativePath = 'videos/fox-campus-tour.mp4';
+        $campusVideoPoster = asset('images/fox_images/about-2.jpg');
+        $campusVideoAsset = asset($campusVideoRelativePath);
+        $campusVideoExists = file_exists(public_path($campusVideoRelativePath));
+    @endphp
+
     {{-- University overview block (orange overlay style) --}}
     <section class="relative overflow-hidden rounded-3xl shadow-2xl ring-1 ring-slate-900/20">
         <img
@@ -323,6 +333,8 @@
                         type="button"
                         class="home-play-button absolute left-1/2 top-1/2 inline-flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-orange-500 shadow-xl transition hover:scale-105"
                         aria-label="Play university introduction video"
+                        data-home-video-open
+                        aria-controls="home-video-modal"
                     >
                         <svg class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M8 5.14v13.72c0 .8.86 1.3 1.55.9l10.3-6.86a1.03 1.03 0 000-1.8L9.55 4.24A1.03 1.03 0 008 5.14z"/>
@@ -373,6 +385,56 @@
             </div>
         </div>
     </section>
+
+    <div
+        id="home-video-modal"
+        class="home-video-modal fixed inset-0 z-[90] hidden items-center justify-center px-4 py-6"
+        aria-hidden="true"
+        hidden
+        data-home-video-modal
+    >
+        <button
+            type="button"
+            class="absolute inset-0 bg-slate-950/85 backdrop-blur-[2px]"
+            aria-label="Close video modal"
+            data-home-video-close
+        ></button>
+
+        <div class="relative z-10 w-full max-w-5xl overflow-hidden rounded-2xl border border-white/20 bg-black shadow-2xl">
+            <div class="flex items-center justify-between bg-slate-900/95 px-4 py-3 text-sm text-white">
+                <p class="font-semibold tracking-wide">University Introduction Video</p>
+                <button
+                    type="button"
+                    class="rounded-lg border border-white/30 px-3 py-1.5 font-semibold text-white transition hover:bg-white/10"
+                    data-home-video-close
+                >
+                    Close
+                </button>
+            </div>
+            <div class="aspect-video w-full bg-black">
+                @if($campusVideoExists)
+                    <video
+                        class="h-full w-full"
+                        controls
+                        preload="metadata"
+                        playsinline
+                        data-home-video-player
+                        poster="{{ $campusVideoPoster }}"
+                    >
+                        <source src="{{ $campusVideoAsset }}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                @else
+                    <div class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-white">
+                        <p class="text-xl font-semibold">Video file not found</p>
+                        <p class="text-sm text-slate-300">
+                            Add your video at <span class="font-semibold text-amber-300">public/videos/fox-campus-tour.mp4</span>.
+                        </p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 
     {{-- Certified teachers --}}
     <section class="space-y-10 rounded-3xl border border-slate-200 bg-slate-100 px-6 py-12 shadow-sm ring-1 ring-slate-900/5 md:px-10 md:py-16">
@@ -1223,3 +1285,62 @@
     </section>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.querySelector('[data-home-video-modal]');
+        const openButtons = Array.from(document.querySelectorAll('[data-home-video-open]'));
+
+        if (!modal || openButtons.length === 0) {
+            return;
+        }
+
+        const closeButtons = Array.from(modal.querySelectorAll('[data-home-video-close]'));
+        const player = modal.querySelector('[data-home-video-player]');
+        let lastFocused = null;
+
+        const openModal = () => {
+            lastFocused = document.activeElement;
+            modal.hidden = false;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('overflow-hidden');
+
+            if (player) {
+                const playPromise = player.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(() => {});
+                }
+            }
+        };
+
+        const closeModal = () => {
+            modal.setAttribute('aria-hidden', 'true');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            modal.hidden = true;
+            document.body.classList.remove('overflow-hidden');
+
+            if (player) {
+                player.pause();
+                player.currentTime = 0;
+            }
+
+            if (lastFocused && typeof lastFocused.focus === 'function') {
+                lastFocused.focus();
+            }
+        };
+
+        openButtons.forEach((button) => button.addEventListener('click', openModal));
+        closeButtons.forEach((button) => button.addEventListener('click', closeModal));
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modal.hidden) {
+                closeModal();
+            }
+        });
+    });
+</script>
+@endpush
