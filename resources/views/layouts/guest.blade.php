@@ -295,6 +295,24 @@
         .portal-slider-dot.is-active {
             opacity: 1;
         }
+        /* Keep guest navbar search icon crisp across browsers. */
+        .guest-search-icon {
+            filter: none !important;
+            opacity: 0.95;
+            stroke-width: 2.2;
+            shape-rendering: geometricPrecision;
+        }
+        #guest-search-input {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        #guest-search-input::-webkit-search-decoration,
+        #guest-search-input::-webkit-search-cancel-button,
+        #guest-search-input::-webkit-search-results-button,
+        #guest-search-input::-webkit-search-results-decoration {
+            display: none;
+            -webkit-appearance: none;
+        }
         /* University Academic Portal logo: hover lift and glow */
         a .portal-logo,
         .portal-logo-link .portal-logo {
@@ -494,7 +512,7 @@
                 {{-- Search everything (guest) --}}
                 <div class="relative min-w-[12.5rem] flex-1 sm:flex-none" id="guest-search-wrapper" data-search-url="{{ route('search') }}">
                     <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600 transition focus-within:border-[color:var(--portal-navy)] focus-within:bg-white focus-within:ring-2 focus-within:ring-[color:var(--portal-navy)]/20 sm:w-56">
-                        <svg class="h-4 w-4 shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="guest-search-icon h-4 w-4 shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <input
