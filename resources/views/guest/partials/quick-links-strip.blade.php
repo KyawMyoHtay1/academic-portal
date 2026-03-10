@@ -40,7 +40,7 @@
             </span>
             <span class="font-semibold">Support</span>
         </a>
-        <a href="{{ route('guest.user-manual.view') }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 px-5 py-3 text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">
+        <a href="{{ route('guest.user-manual.page') }}" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 px-5 py-3 text-slate-700 hover:border-[color:var(--portal-navy)] hover:bg-[color:var(--portal-navy)]/5 hover:text-[color:var(--portal-navy)] transition-all">
             <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-[color:var(--portal-navy)]/10 text-[color:var(--portal-navy)]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2m-1 4H8m8 0v8a2 2 0 01-2 2h-4a2 2 0 01-2-2v-8m8 0H8" />
