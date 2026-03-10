@@ -49,6 +49,24 @@
     .home-video-modal video {
         background: #000;
     }
+    .home-video-card[data-inline-playing="true"] [data-home-inline-toggle] {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .home-video-card[data-inline-playing="true"]:hover [data-home-inline-toggle],
+    .home-video-card[data-inline-playing="true"] [data-home-inline-toggle]:focus-visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .home-play-button.is-pause-state::before {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .home-video-card[data-inline-playing="true"] [data-home-inline-toggle] {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
 </style>
 @endpush
 
@@ -323,7 +341,7 @@
 
         <div class="relative z-10 px-6 py-10 md:px-10 md:py-14">
             <div class="grid items-center gap-8 lg:grid-cols-2">
-                <div class="relative overflow-hidden rounded-2xl border border-white/20 shadow-xl">
+                <div class="home-video-card relative overflow-hidden rounded-2xl border border-white/20 shadow-xl" data-home-video-card data-inline-playing="false">
                     @if($campusVideoExists)
                         <video
                             class="h-[320px] w-full object-cover md:h-[420px]"
@@ -338,6 +356,15 @@
                         >
                             <source src="{{ $campusVideoAsset }}" type="video/mp4">
                         </video>
+                        <button
+                            type="button"
+                            class="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-white/30 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-black/55"
+                            aria-label="Open full video in modal"
+                            data-home-video-open
+                            aria-controls="home-video-modal"
+                        >
+                            Open Video
+                        </button>
                     @else
                         <img
                             src="{{ asset('images/fox_images/about-2.jpg') }}"
@@ -348,12 +375,14 @@
                     <button
                         type="button"
                         class="home-play-button absolute left-1/2 top-1/2 inline-flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-orange-500 shadow-xl transition duration-200 hover:scale-105"
-                        aria-label="Play university introduction video"
-                        data-home-video-open
-                        aria-controls="home-video-modal"
+                        aria-label="Pause university introduction video"
+                        data-home-inline-toggle
                     >
-                        <svg class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-home-play-icon>
                             <path d="M8 5.14v13.72c0 .8.86 1.3 1.55.9l10.3-6.86a1.03 1.03 0 000-1.8L9.55 4.24A1.03 1.03 0 008 5.14z"/>
+                        </svg>
+                        <svg class="hidden h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-home-pause-icon>
+                            <path d="M7 5h4v14H7V5zm6 0h4v14h-4V5z"/>
                         </svg>
                     </button>
                 </div>
@@ -1307,15 +1336,43 @@
     document.addEventListener('DOMContentLoaded', function () {
         const inlineVideos = Array.from(document.querySelectorAll('[data-home-inline-video]'));
         const setInlinePlayButtonState = (video) => {
-            const container = video.parentElement;
-            const playButton = container ? container.querySelector('[data-home-video-open]') : null;
-            if (!playButton) return;
+            const container = video.closest('[data-home-video-card]');
+            const toggleButton = container ? container.querySelector('[data-home-inline-toggle]') : null;
+            if (!toggleButton) return;
 
             const isPlaying = !video.paused && !video.ended && video.readyState > 2;
-            playButton.classList.toggle('opacity-0', isPlaying);
-            playButton.classList.toggle('pointer-events-none', isPlaying);
-            playButton.setAttribute('aria-hidden', isPlaying ? 'true' : 'false');
+            if (container) {
+                container.setAttribute('data-inline-playing', isPlaying ? 'true' : 'false');
+            }
+
+            toggleButton.classList.toggle('is-pause-state', isPlaying);
+            toggleButton.setAttribute('aria-label', isPlaying ? 'Pause university introduction video' : 'Play university introduction video');
+
+            const playIcon = toggleButton.querySelector('[data-home-play-icon]');
+            const pauseIcon = toggleButton.querySelector('[data-home-pause-icon]');
+            if (playIcon) playIcon.classList.toggle('hidden', isPlaying);
+            if (pauseIcon) pauseIcon.classList.toggle('hidden', !isPlaying);
         };
+
+        const inlineToggleButtons = Array.from(document.querySelectorAll('[data-home-inline-toggle]'));
+        inlineToggleButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const container = button.closest('[data-home-video-card]');
+                const video = container ? container.querySelector('[data-home-inline-video]') : null;
+                if (!(video instanceof HTMLVideoElement)) return;
+
+                event.preventDefault();
+                if (video.paused || video.ended) {
+                    const playPromise = video.play();
+                    if (playPromise && typeof playPromise.catch === 'function') {
+                        playPromise.catch(() => {});
+                    }
+                } else {
+                    video.pause();
+                }
+                setInlinePlayButtonState(video);
+            });
+        });
 
         inlineVideos.forEach((video) => {
             ['play', 'playing', 'pause', 'ended', 'error', 'stalled', 'waiting'].forEach((eventName) => {
