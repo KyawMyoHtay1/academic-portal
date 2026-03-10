@@ -37,7 +37,7 @@
         <iframe
             src="{{ route('guest.user-manual.view', [], false) }}"
             title="University Academic Portal User Manual PDF"
-            class="h-[70vh] w-full rounded-xl border border-slate-200"
+            class="h-[88vh] w-full rounded-xl border border-slate-200"
         ></iframe>
     </section>
 </div>
