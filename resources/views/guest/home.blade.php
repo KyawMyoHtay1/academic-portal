@@ -43,6 +43,9 @@
     .home-teacher-card:hover .home-teacher-image {
         transform: scale(1.04);
     }
+    .home-story-card:hover .home-story-image {
+        transform: scale(1.05);
+    }
 </style>
 @endpush
 
@@ -423,6 +426,118 @@
                     <h3 class="text-3xl font-bold text-slate-900">Monshe Henderson</h3>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Science Teacher</p>
                     <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    {{-- Story cards section (news-style design) --}}
+    <section class="space-y-8 rounded-3xl border border-slate-200 bg-slate-100 px-6 py-12 shadow-sm ring-1 ring-slate-900/5 md:px-10 md:py-16">
+        <div class="max-w-3xl">
+            <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--portal-navy)]">Campus Stories</p>
+            <h2 class="mt-2 text-3xl font-bold text-slate-900 md:text-4xl">Latest Student and Campus Updates</h2>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="relative overflow-hidden">
+                    <img src="{{ asset('images/home/student_life.png') }}" alt="Campus story one" class="home-story-image h-64 w-full object-cover transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
+                        <span class="text-4xl font-bold leading-none">26</span>
+                        <span class="mt-1 text-lg">June</span>
+                        <span class="text-lg">2019</span>
+                    </div>
+                </div>
+                <div class="space-y-4 p-6">
+                    <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-4xl">Skills To Develop Your Child Memory</h3>
+                    <p class="text-lg leading-relaxed text-slate-600">
+                        Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+                    </p>
+                    <div class="flex items-center justify-between pt-2">
+                        <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
+                            Read More
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <div class="flex items-center gap-3 text-lg">
+                            <span class="font-semibold text-orange-500">Admin</span>
+                            <span class="inline-flex items-center gap-1 text-slate-400">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
+                                </svg>
+                                3
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="relative overflow-hidden">
+                    <img src="{{ asset('images/home/community.png') }}" alt="Campus story two" class="home-story-image h-64 w-full object-cover transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
+                        <span class="text-4xl font-bold leading-none">26</span>
+                        <span class="mt-1 text-lg">June</span>
+                        <span class="text-lg">2019</span>
+                    </div>
+                </div>
+                <div class="space-y-4 p-6">
+                    <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-4xl">Skills To Develop Your Child Memory</h3>
+                    <p class="text-lg leading-relaxed text-slate-600">
+                        Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+                    </p>
+                    <div class="flex items-center justify-between pt-2">
+                        <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
+                            Read More
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <div class="flex items-center gap-3 text-lg">
+                            <span class="font-semibold text-orange-500">Admin</span>
+                            <span class="inline-flex items-center gap-1 text-slate-400">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
+                                </svg>
+                                3
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="relative overflow-hidden">
+                    <img src="{{ asset('images/home/campuslife.png') }}" alt="Campus story three" class="home-story-image h-64 w-full object-cover transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
+                        <span class="text-4xl font-bold leading-none">26</span>
+                        <span class="mt-1 text-lg">June</span>
+                        <span class="text-lg">2019</span>
+                    </div>
+                </div>
+                <div class="space-y-4 p-6">
+                    <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-4xl">Skills To Develop Your Child Memory</h3>
+                    <p class="text-lg leading-relaxed text-slate-600">
+                        Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+                    </p>
+                    <div class="flex items-center justify-between pt-2">
+                        <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
+                            Read More
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <div class="flex items-center gap-3 text-lg">
+                            <span class="font-semibold text-orange-500">Admin</span>
+                            <span class="inline-flex items-center gap-1 text-slate-400">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
+                                </svg>
+                                3
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </article>
         </div>
