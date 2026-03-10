@@ -22,6 +22,21 @@
     .about-rise:nth-child(2) { animation-delay: 0.08s; }
     .about-rise:nth-child(3) { animation-delay: 0.16s; }
     .about-rise:nth-child(4) { animation-delay: 0.24s; }
+
+    .about-testimonial-side {
+        opacity: 0.22;
+        filter: grayscale(20%);
+    }
+
+    .about-testimonial-quote {
+        line-height: 1.6;
+    }
+
+    .about-dot.is-active {
+        background-color: rgb(249 115 22);
+        opacity: 1;
+        transform: scale(1.18);
+    }
 </style>
 @endpush
 
@@ -115,6 +130,129 @@
                 <li>Cross-disciplinary innovation</li>
                 <li>Graduates who create positive change</li>
             </ul>
+        </div>
+    </section>
+
+    <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-slate-900/5">
+        <div class="h-14 bg-gradient-to-r from-orange-500/90 via-amber-500/80 to-orange-500/90"></div>
+        <div class="grid lg:grid-cols-2">
+            <div class="bg-slate-100 px-6 py-10 md:px-10 md:py-12">
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">University Story</p>
+                <h2 class="mt-3 text-3xl font-bold leading-tight text-slate-900 md:text-5xl">University Academic Portal Established Since 1960</h2>
+                <div class="mt-6 space-y-4 text-base leading-relaxed text-slate-600">
+                    <p>
+                        Our institution has evolved through decades of academic commitment, guided by a clear mission: deliver accessible, high-quality education and prepare graduates for real-world impact.
+                    </p>
+                    <p>
+                        Over time, we expanded programs, strengthened faculty expertise, and invested in modern campus and digital infrastructure to support learning, research, and student wellbeing.
+                    </p>
+                    <p>
+                        Today, the University Academic Portal continues this legacy by bringing core academic services into one reliable, student-centered platform.
+                    </p>
+                </div>
+            </div>
+            <div class="relative min-h-[340px] md:min-h-[420px] lg:min-h-[520px]">
+                <img
+                    src="{{ asset('images/home/student_life.png') }}"
+                    alt="Students on campus"
+                    class="absolute inset-0 h-full w-full object-cover"
+                >
+            </div>
+        </div>
+        <div class="h-14 bg-gradient-to-r from-orange-500/90 via-amber-500/80 to-orange-500/90"></div>
+    </section>
+
+    <section class="space-y-8 rounded-3xl border border-slate-200 bg-slate-100 px-6 py-12 shadow-sm ring-1 ring-slate-900/5 md:px-10 md:py-16">
+        <div class="mx-auto max-w-3xl text-center">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Testimonials</p>
+            <h2 class="mt-2 text-4xl font-bold text-slate-900 md:text-6xl">Student Says About Us</h2>
+            <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600 md:text-xl">
+                Hear from learners and families who experienced our teaching quality, student support, and academic growth environment.
+            </p>
+        </div>
+
+        <div class="mx-auto max-w-6xl">
+            <div class="portal-slider" data-portal-slider data-autoplay="true" data-interval="6500">
+                <div class="portal-slider-track h-[30rem] overflow-visible bg-transparent md:h-[24rem] lg:h-[22rem]">
+                    <div class="portal-slide is-active" data-portal-slide>
+                        <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
+                            <p class="about-testimonial-quote text-xl">Great learning support and clear communication from teachers and staff throughout every semester.</p>
+                        </div>
+                        <div class="absolute right-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
+                            <p class="about-testimonial-quote text-xl">A campus culture that really motivates students to stay focused and confident.</p>
+                        </div>
+                        <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
+                            <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
+                                <img src="{{ asset('images/home/journey1.jpg') }}" alt="Student testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
+                                <div class="flex-1">
+                                    <p class="text-5xl font-bold leading-none text-slate-200">“</p>
+                                    <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
+                                        Far beyond basic administration, this university helped me grow academically and personally through strong mentoring and structured support.
+                                    </p>
+                                    <p class="mt-4 text-3xl font-semibold text-slate-900">Racky Henderson</p>
+                                    <p class="mt-1 text-lg font-semibold text-orange-500">Final-Year Student</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="portal-slide" data-portal-slide>
+                        <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
+                            <p class="about-testimonial-quote text-xl">The portal made daily academic tasks faster and less stressful.</p>
+                        </div>
+                        <div class="absolute right-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
+                            <p class="about-testimonial-quote text-xl">Support teams responded quickly whenever I had schedule or fee questions.</p>
+                        </div>
+                        <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
+                            <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
+                                <img src="{{ asset('images/home/journey2.jpg') }}" alt="Parent testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
+                                <div class="flex-1">
+                                    <p class="text-5xl font-bold leading-none text-slate-200">“</p>
+                                    <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
+                                        As a parent, I appreciate the transparency of progress, attendance, and communication. It gives me confidence in my child's learning journey.
+                                    </p>
+                                    <p class="mt-4 text-3xl font-semibold text-slate-900">Henry Dee</p>
+                                    <p class="mt-1 text-lg font-semibold text-orange-500">Parent</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="portal-slide" data-portal-slide>
+                        <div class="absolute left-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
+                            <p class="about-testimonial-quote text-xl">A practical and student-first system that supports teaching quality.</p>
+                        </div>
+                        <div class="absolute right-0 top-1/2 hidden w-56 -translate-y-1/2 text-slate-400 lg:block about-testimonial-side">
+                            <p class="text-5xl font-bold leading-none text-slate-300">“</p>
+                            <p class="about-testimonial-quote text-xl">Class coordination became much easier with timetable and messaging tools.</p>
+                        </div>
+                        <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
+                            <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
+                                <img src="{{ asset('images/home/journey3.jpg') }}" alt="Teacher testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
+                                <div class="flex-1">
+                                    <p class="text-5xl font-bold leading-none text-slate-200">“</p>
+                                    <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
+                                        The integrated workflow for attendance, grades, and announcements lets teachers focus more on learning outcomes than repetitive admin work.
+                                    </p>
+                                    <p class="mt-4 text-3xl font-semibold text-slate-900">Ariana Cole</p>
+                                    <p class="mt-1 text-lg font-semibold text-orange-500">Faculty Member</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-center gap-3">
+                    <button type="button" class="about-dot h-3 w-3 rounded-full bg-slate-300 opacity-80 transition-all" data-portal-slider-dot aria-label="Go to testimonial 1"></button>
+                    <button type="button" class="about-dot h-3 w-3 rounded-full bg-slate-300 opacity-80 transition-all" data-portal-slider-dot aria-label="Go to testimonial 2"></button>
+                    <button type="button" class="about-dot h-3 w-3 rounded-full bg-slate-300 opacity-80 transition-all" data-portal-slider-dot aria-label="Go to testimonial 3"></button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -238,7 +376,6 @@
     </section>
 </div>
 @endsection
-
 
 
 
