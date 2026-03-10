@@ -438,108 +438,62 @@
             <h2 class="mt-2 text-3xl font-bold text-slate-900 md:text-4xl">Latest Student and Campus Updates</h2>
         </div>
 
+        @php
+            $storyAnnouncements = collect($publicAnnouncements)->take(6);
+            $storyImages = [
+                'images/home/student_life.png',
+                'images/home/community.png',
+                'images/home/campuslife.png',
+                'images/home/modern_learning.png',
+                'images/home/lab.png',
+                'images/home/innovation.png',
+            ];
+        @endphp
+
         <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <div class="relative overflow-hidden">
-                    <img src="{{ asset('images/home/student_life.png') }}" alt="Campus story one" class="home-story-image h-64 w-full object-cover transition-transform duration-500">
-                    <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
-                        <span class="text-4xl font-bold leading-none">26</span>
-                        <span class="mt-1 text-lg">June</span>
-                        <span class="text-lg">2019</span>
-                    </div>
-                </div>
-                <div class="space-y-4 p-6">
-                    <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-4xl">Skills To Develop Your Child Memory</h3>
-                    <p class="text-lg leading-relaxed text-slate-600">
-                        Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
-                    </p>
-                    <div class="flex items-center justify-between pt-2">
-                        <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
-                            Read More
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                        <div class="flex items-center gap-3 text-lg">
-                            <span class="font-semibold text-orange-500">Admin</span>
-                            <span class="inline-flex items-center gap-1 text-slate-400">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
-                                </svg>
-                                3
-                            </span>
+            @forelse($storyAnnouncements as $index => $story)
+                <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div class="relative overflow-hidden">
+                        <img
+                            src="{{ asset($storyImages[$index % count($storyImages)]) }}"
+                            alt="{{ $story->title }}"
+                            class="home-story-image h-64 w-full object-cover transition-transform duration-500"
+                        >
+                        <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
+                            <span class="text-4xl font-bold leading-none">{{ $story->created_at?->format('d') ?? now()->format('d') }}</span>
+                            <span class="mt-1 text-lg">{{ $story->created_at?->format('F') ?? now()->format('F') }}</span>
+                            <span class="text-lg">{{ $story->created_at?->format('Y') ?? now()->format('Y') }}</span>
                         </div>
                     </div>
-                </div>
-            </article>
-
-            <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <div class="relative overflow-hidden">
-                    <img src="{{ asset('images/home/community.png') }}" alt="Campus story two" class="home-story-image h-64 w-full object-cover transition-transform duration-500">
-                    <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
-                        <span class="text-4xl font-bold leading-none">26</span>
-                        <span class="mt-1 text-lg">June</span>
-                        <span class="text-lg">2019</span>
-                    </div>
-                </div>
-                <div class="space-y-4 p-6">
-                    <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-4xl">Skills To Develop Your Child Memory</h3>
-                    <p class="text-lg leading-relaxed text-slate-600">
-                        Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
-                    </p>
-                    <div class="flex items-center justify-between pt-2">
-                        <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
-                            Read More
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                        <div class="flex items-center gap-3 text-lg">
-                            <span class="font-semibold text-orange-500">Admin</span>
-                            <span class="inline-flex items-center gap-1 text-slate-400">
+                    <div class="space-y-4 p-6">
+                        <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-3xl">{{ \Illuminate\Support\Str::limit($story->title, 48) }}</h3>
+                        <p class="text-lg leading-relaxed text-slate-600">
+                            {{ \Illuminate\Support\Str::limit($story->body, 120) }}
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
+                                Read More
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
-                                3
-                            </span>
+                            </a>
+                            <div class="flex items-center gap-3 text-lg">
+                                <span class="font-semibold text-orange-500">{{ $story->author_name ?? 'Admin' }}</span>
+                                <span class="inline-flex items-center gap-1 text-slate-400">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
+                                    </svg>
+                                    {{ $story->comments_count ?? 0 }}
+                                </span>
+                            </div>
                         </div>
                     </div>
+                </article>
+            @empty
+                <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white/80 p-8 text-center text-slate-600">
+                    No campus stories available yet.
                 </div>
-            </article>
-
-            <article class="home-story-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <div class="relative overflow-hidden">
-                    <img src="{{ asset('images/home/campuslife.png') }}" alt="Campus story three" class="home-story-image h-64 w-full object-cover transition-transform duration-500">
-                    <div class="absolute bottom-0 left-0 flex w-20 flex-col items-center bg-indigo-600 py-2 text-white shadow-lg">
-                        <span class="text-4xl font-bold leading-none">26</span>
-                        <span class="mt-1 text-lg">June</span>
-                        <span class="text-lg">2019</span>
-                    </div>
-                </div>
-                <div class="space-y-4 p-6">
-                    <h3 class="text-2xl font-bold leading-tight text-slate-900 md:text-4xl">Skills To Develop Your Child Memory</h3>
-                    <p class="text-lg leading-relaxed text-slate-600">
-                        Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
-                    </p>
-                    <div class="flex items-center justify-between pt-2">
-                        <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
-                            Read More
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                        <div class="flex items-center gap-3 text-lg">
-                            <span class="font-semibold text-orange-500">Admin</span>
-                            <span class="inline-flex items-center gap-1 text-slate-400">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"/>
-                                </svg>
-                                3
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </article>
+            @endforelse
         </div>
     </section>
 
