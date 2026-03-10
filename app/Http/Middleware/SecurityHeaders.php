@@ -12,7 +12,9 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        $response->headers->set('X-Frame-Options', 'DENY');
+        // Allow same-origin embedding only for the manual PDF preview route.
+        $allowSameOriginEmbedding = $request->routeIs('guest.user-manual.view');
+        $response->headers->set('X-Frame-Options', $allowSameOriginEmbedding ? 'SAMEORIGIN' : 'DENY');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
@@ -52,6 +54,8 @@ class SecurityHeaders
             $connectSources[] = 'ws:';
         }
 
+        $frameAncestors = $allowSameOriginEmbedding ? "'self'" : "'none'";
+
         $csp = implode('; ', [
             "default-src 'self'",
             'script-src '.implode(' ', $scriptSources),
@@ -65,7 +69,7 @@ class SecurityHeaders
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",
-            "frame-ancestors 'none'",
+            "frame-ancestors {$frameAncestors}",
         ]);
         $response->headers->set('Content-Security-Policy', $csp);
 

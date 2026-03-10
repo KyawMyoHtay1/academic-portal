@@ -127,8 +127,8 @@
                 <h3 class="mt-4 text-lg font-semibold text-slate-900">User Guides</h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-600">Step-by-step walkthroughs for key tasks: enrollment, grading, attendance, fee checks, and more. Follow along to complete processes correctly the first time.</p>
                 <div class="mt-3 flex items-center gap-4">
-                    <a href="{{ route('guest.user-manual.page') }}" class="inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-emerald-600">View User Manual (PDF)</a>
-                    <a href="{{ route('guest.user-manual.download') }}" class="inline-flex text-sm font-semibold text-emerald-700 hover:text-emerald-800">Download PDF</a>
+                    <a href="{{ route('guest.user-manual.page', [], false) }}" class="inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-emerald-600">View User Manual (PDF)</a>
+                    <a href="{{ route('guest.user-manual.download', [], false) }}" class="inline-flex text-sm font-semibold text-emerald-700 hover:text-emerald-800">Download PDF</a>
                 </div>
             </div>
             <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
@@ -243,4 +243,3 @@
     </section>
 </div>
 @endsection
-

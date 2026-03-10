@@ -15,10 +15,10 @@
                 View the complete user manual directly on this page. You can also open it in a new tab or download it as a PDF for offline use.
             </p>
             <div class="mt-6 flex flex-wrap items-center gap-3">
-                <a href="{{ route('guest.user-manual.view') }}" target="_blank" rel="noopener" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] hover:bg-slate-100">
+                <a href="{{ route('guest.user-manual.view', [], false) }}" target="_blank" rel="noopener" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] hover:bg-slate-100">
                     Open In New Tab
                 </a>
-                <a href="{{ route('guest.user-manual.download') }}" class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
+                <a href="{{ route('guest.user-manual.download', [], false) }}" class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
                     Download PDF
                 </a>
             </div>
@@ -35,7 +35,7 @@
             </p>
         </div>
         <iframe
-            src="{{ route('guest.user-manual.view') }}"
+            src="{{ route('guest.user-manual.view', [], false) }}"
             title="University Academic Portal User Manual PDF"
             class="h-[70vh] w-full rounded-xl border border-slate-200"
         ></iframe>
