@@ -304,7 +304,7 @@
     {{-- University overview block (orange overlay style) --}}
     <section class="relative overflow-hidden rounded-3xl shadow-2xl ring-1 ring-slate-900/20">
         <img
-            src="{{ asset('images/home/campuslife.png') }}"
+            src="{{ asset('images/fox_images/bg_2.jpg') }}"
             alt="University campus background"
             class="absolute inset-0 h-full w-full object-cover"
         >
@@ -315,7 +315,7 @@
             <div class="grid items-center gap-8 lg:grid-cols-2">
                 <div class="relative overflow-hidden rounded-2xl border border-white/20 shadow-xl">
                     <img
-                        src="{{ asset('images/home/learningexcellence.png') }}"
+                        src="{{ asset('images/fox_images/about-2.jpg') }}"
                         alt="University aerial view"
                         class="h-[320px] w-full object-cover md:h-[420px]"
                     >
@@ -387,7 +387,7 @@
         <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/home/journey1.jpg') }}" alt="Bianca Wilson" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-1.jpg') }}" alt="Bianca Wilson" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Bianca Wilson</h3>
@@ -398,7 +398,7 @@
 
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/home/journey2.jpg') }}" alt="Mitch Parker" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-2.jpg') }}" alt="Mitch Parker" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Mitch Parker</h3>
@@ -409,7 +409,7 @@
 
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/home/journey3.jpg') }}" alt="Stella Smith" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-3.jpg') }}" alt="Stella Smith" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Stella Smith</h3>
@@ -420,7 +420,7 @@
 
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/courses/faculty.png') }}" alt="Monshe Henderson" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-4.jpg') }}" alt="Monshe Henderson" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Monshe Henderson</h3>
@@ -441,12 +441,12 @@
         @php
             $storyAnnouncements = collect($publicAnnouncements)->take(6);
             $storyImages = [
-                'images/home/student_life.png',
-                'images/home/community.png',
-                'images/home/campuslife.png',
-                'images/home/modern_learning.png',
-                'images/home/lab.png',
-                'images/home/innovation.png',
+                'images/fox_images/image_1.jpg',
+                'images/fox_images/image_2.jpg',
+                'images/fox_images/image_3.jpg',
+                'images/fox_images/image_4.jpg',
+                'images/fox_images/image_5.jpg',
+                'images/fox_images/image_6.jpg',
             ];
         @endphp
 

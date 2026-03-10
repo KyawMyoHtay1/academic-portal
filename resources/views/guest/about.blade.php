@@ -163,7 +163,7 @@
             </div>
             <div class="relative min-h-[340px] md:min-h-[420px] lg:min-h-[520px]">
                 <img
-                    src="{{ asset('images/home/student_life.png') }}"
+                    src="{{ asset('images/fox_images/about-2.jpg') }}"
                     alt="Students on campus"
                     class="absolute inset-0 h-full w-full object-cover"
                 >
@@ -195,7 +195,7 @@
                         </div>
                         <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
                             <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
-                                <img src="{{ asset('images/home/journey1.jpg') }}" alt="Student testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
+                                <img src="{{ asset('images/fox_images/person_1.jpg') }}" alt="Student testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
                                 <div class="flex-1">
                                     <p class="text-5xl font-bold leading-none text-slate-200">“</p>
                                     <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
@@ -219,7 +219,7 @@
                         </div>
                         <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
                             <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
-                                <img src="{{ asset('images/home/journey2.jpg') }}" alt="Parent testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
+                                <img src="{{ asset('images/fox_images/person_2.jpg') }}" alt="Parent testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
                                 <div class="flex-1">
                                     <p class="text-5xl font-bold leading-none text-slate-200">“</p>
                                     <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
@@ -243,7 +243,7 @@
                         </div>
                         <article class="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl md:px-8">
                             <div class="flex flex-col items-start gap-4 md:flex-row md:items-center">
-                                <img src="{{ asset('images/home/journey3.jpg') }}" alt="Teacher testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
+                                <img src="{{ asset('images/fox_images/person_3.jpg') }}" alt="Teacher testimonial avatar" class="h-24 w-24 rounded-full object-cover ring-4 ring-slate-100">
                                 <div class="flex-1">
                                     <p class="text-5xl font-bold leading-none text-slate-200">“</p>
                                     <p class="about-testimonial-quote -mt-3 text-2xl text-slate-700">
@@ -386,5 +386,4 @@
     </section>
 </div>
 @endsection
-
 
