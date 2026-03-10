@@ -388,16 +388,17 @@
                 </div>
 
                 <div class="space-y-5 text-white">
-                    <h2 class="text-4xl font-bold leading-tight md:text-5xl">Fox University</h2>
+                    <h2 class="text-4xl font-bold leading-tight md:text-5xl">University Academic Portal</h2>
                     <p class="text-lg leading-relaxed text-slate-100">
-                        Separated they live in. A small river named Duden flows by their place and supplies
-                        it with the necessary regelialia. It is a paradisematic country. A small river named
-                        Duden flows by their place and supplies it with the necessary regelialia.
+                        The University Academic Portal brings student registration, course enrolment, grades,
+                        fee payment, timetable, attendance, and communication into one integrated platform.
+                        Students, teachers, and administrative staff can complete daily tasks faster with
+                        fewer manual errors.
                     </p>
                     <p class="text-lg leading-relaxed text-slate-100">
-                        It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-                        A small river named Duden flows by their place and supplies it with the necessary
-                        regelialia.
+                        With secure role-based access, real-time status updates, and connected workflows,
+                        the system improves service quality across departments while creating a smoother
+                        academic experience for learners.
                     </p>
                 </div>
             </div>
@@ -486,8 +487,8 @@
         <div class="mx-auto max-w-4xl text-center">
             <h2 class="text-4xl font-bold text-slate-900 md:text-5xl">Certified Teachers</h2>
             <p class="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
-                Separated they live in. A small river named Duden flows by their place and supplies
-                it with the necessary regelialia. It is a paradisematic country.
+                Our faculty team combines academic expertise, student mentoring, and practical teaching
+                approaches to support strong learning outcomes across every programme.
             </p>
         </div>
 
@@ -499,7 +500,7 @@
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Bianca Wilson</h3>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Teacher</p>
-                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">Supports first-year students through structured learning plans and regular mentoring sessions.</p>
                 </div>
             </article>
 
@@ -510,7 +511,7 @@
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Mitch Parker</h3>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">English Teacher</p>
-                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">Guides academic writing, communication skills, and assessment preparation across semesters.</p>
                 </div>
             </article>
 
@@ -521,7 +522,7 @@
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Stella Smith</h3>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Art Teacher</p>
-                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">Combines creative practice with project-based learning to build confidence and portfolio quality.</p>
                 </div>
             </article>
 
@@ -532,7 +533,7 @@
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Monshe Henderson</h3>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Science Teacher</p>
-                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">Focuses on applied science, lab safety, and research skills aligned with industry expectations.</p>
                 </div>
             </article>
         </div>
@@ -884,17 +885,17 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3 text-slate-300">
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.22 8.5h4.56V23H.22zM8.34 8.5h4.37v1.98h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.2c0-1.48-.03-3.39-2.07-3.39-2.07 0-2.39 1.62-2.39 3.28V23H8.34z"/>
                                 </svg>
                             </a>
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H8.08v-2.9h2.36V9.41c0-2.33 1.39-3.62 3.52-3.62 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18V22c4.78-.8 8.44-4.94 8.44-9.93z"/>
                                 </svg>
                             </a>
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.36 8.55 8.55 0 01-2.71 1.04 4.26 4.26 0 00-7.4 2.91c0 .33.04.65.1.96A12.1 12.1 0 013 4.8a4.26 4.26 0 001.32 5.68 4.23 4.23 0 01-1.93-.53v.05c0 2.07 1.47 3.8 3.43 4.19a4.3 4.3 0 01-1.92.07 4.27 4.27 0 003.98 2.96A8.56 8.56 0 012 19.54 12.07 12.07 0 008.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.34 8.34 0 0022.46 6z"/>
                                 </svg>
@@ -923,17 +924,17 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3 text-slate-300">
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.22 8.5h4.56V23H.22zM8.34 8.5h4.37v1.98h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.2c0-1.48-.03-3.39-2.07-3.39-2.07 0-2.39 1.62-2.39 3.28V23H8.34z"/>
                                 </svg>
                             </a>
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H8.08v-2.9h2.36V9.41c0-2.33 1.39-3.62 3.52-3.62 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18V22c4.78-.8 8.44-4.94 8.44-9.93z"/>
                                 </svg>
                             </a>
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.36 8.55 8.55 0 01-2.71 1.04 4.26 4.26 0 00-7.4 2.91c0 .33.04.65.1.96A12.1 12.1 0 013 4.8a4.26 4.26 0 001.32 5.68 4.23 4.23 0 01-1.93-.53v.05c0 2.07 1.47 3.8 3.43 4.19a4.3 4.3 0 01-1.92.07 4.27 4.27 0 003.98 2.96A8.56 8.56 0 012 19.54 12.07 12.07 0 008.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.34 8.34 0 0022.46 6z"/>
                                 </svg>
@@ -962,17 +963,17 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3 text-slate-300">
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="LinkedIn profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.22 8.5h4.56V23H.22zM8.34 8.5h4.37v1.98h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.2c0-1.48-.03-3.39-2.07-3.39-2.07 0-2.39 1.62-2.39 3.28V23H8.34z"/>
                                 </svg>
                             </a>
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Facebook profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H8.08v-2.9h2.36V9.41c0-2.33 1.39-3.62 3.52-3.62 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18V22c4.78-.8 8.44-4.94 8.44-9.93z"/>
                                 </svg>
                             </a>
-                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile (placeholder)">
+                            <a href="#" class="hover:text-amber-300 transition-colors" aria-label="Twitter profile">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.36 8.55 8.55 0 01-2.71 1.04 4.26 4.26 0 00-7.4 2.91c0 .33.04.65.1.96A12.1 12.1 0 013 4.8a4.26 4.26 0 001.32 5.68 4.23 4.23 0 01-1.93-.53v.05c0 2.07 1.47 3.8 3.43 4.19a4.3 4.3 0 01-1.92.07 4.27 4.27 0 003.98 2.96A8.56 8.56 0 012 19.54 12.07 12.07 0 008.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.34 8.34 0 0022.46 6z"/>
                                 </svg>
@@ -996,7 +997,7 @@
                 </h2>
                 <p class="text-base text-slate-600 mt-2 max-w-2xl">
                     Highlight students, alumni, and staff whose stories represent what makes your university special.
-                    Replace the placeholder images and text below with your own photos and real success stories.
+                    These examples show how the portal and campus opportunities support meaningful outcomes.
                 </p>
             </div>
         </div>
