@@ -22,6 +22,27 @@
         mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
         -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
     }
+    @keyframes playPulse {
+        0% {
+            transform: scale(1);
+            opacity: 0.65;
+        }
+        100% {
+            transform: scale(1.45);
+            opacity: 0;
+        }
+    }
+    .home-play-button::before {
+        content: "";
+        position: absolute;
+        inset: -10px;
+        border-radius: 9999px;
+        border: 2px solid rgba(255, 255, 255, 0.45);
+        animation: playPulse 1.8s ease-out infinite;
+    }
+    .home-teacher-card:hover .home-teacher-image {
+        transform: scale(1.04);
+    }
 </style>
 @endpush
 
@@ -274,6 +295,136 @@
                     <button type="button" class="portal-slider-dot h-2.5 w-2.5 rounded-full bg-white/80 opacity-50" data-portal-slider-dot aria-label="Go to slide 6"></button>
                 </div>
             </div>
+        </div>
+    </section>
+
+    {{-- University overview block (orange overlay style) --}}
+    <section class="relative overflow-hidden rounded-3xl shadow-2xl ring-1 ring-slate-900/20">
+        <img
+            src="{{ asset('images/home/campuslife.png') }}"
+            alt="University campus background"
+            class="absolute inset-0 h-full w-full object-cover"
+        >
+        <div class="absolute inset-0 bg-slate-900/65"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-[color:var(--portal-navy)]/45 to-orange-500/70"></div>
+
+        <div class="relative z-10 px-6 py-10 md:px-10 md:py-14">
+            <div class="grid items-center gap-8 lg:grid-cols-2">
+                <div class="relative overflow-hidden rounded-2xl border border-white/20 shadow-xl">
+                    <img
+                        src="{{ asset('images/home/learningexcellence.png') }}"
+                        alt="University aerial view"
+                        class="h-[320px] w-full object-cover md:h-[420px]"
+                    >
+                    <button
+                        type="button"
+                        class="home-play-button absolute left-1/2 top-1/2 inline-flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-orange-500 shadow-xl transition hover:scale-105"
+                        aria-label="Play university introduction video"
+                    >
+                        <svg class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M8 5.14v13.72c0 .8.86 1.3 1.55.9l10.3-6.86a1.03 1.03 0 000-1.8L9.55 4.24A1.03 1.03 0 008 5.14z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-5 text-white">
+                    <h2 class="text-4xl font-bold leading-tight md:text-5xl">Fox University</h2>
+                    <p class="text-lg leading-relaxed text-slate-100">
+                        Separated they live in. A small river named Duden flows by their place and supplies
+                        it with the necessary regelialia. It is a paradisematic country. A small river named
+                        Duden flows by their place and supplies it with the necessary regelialia.
+                    </p>
+                    <p class="text-lg leading-relaxed text-slate-100">
+                        It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
+                        A small river named Duden flows by their place and supplies it with the necessary
+                        regelialia.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-10 grid grid-cols-2 gap-6 border-t border-white/25 pt-8 md:grid-cols-4">
+                <div class="text-center">
+                    <p class="text-5xl font-bold leading-none text-white">{{ $stats['totalFaculty'] > 0 ? number_format($stats['totalFaculty']) : '18' }}</p>
+                    <p class="mt-3 text-lg font-semibold text-slate-100">Certified Teachers</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-bold leading-none text-white">
+                        @if($stats['totalStudents'] >= 1000)
+                            {{ number_format($stats['totalStudents']) }}
+                        @elseif($stats['totalStudents'] > 0)
+                            {{ number_format($stats['totalStudents']) }}
+                        @else
+                            401
+                        @endif
+                    </p>
+                    <p class="mt-3 text-lg font-semibold text-slate-100">Students</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-bold leading-none text-white">{{ $stats['totalCourses'] > 0 ? number_format($stats['totalCourses']) : '30' }}</p>
+                    <p class="mt-3 text-lg font-semibold text-slate-100">Courses</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-bold leading-none text-white">{{ number_format($stats['awardsWon'] ?? 50) }}</p>
+                    <p class="mt-3 text-lg font-semibold text-slate-100">Awards Won</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Certified teachers --}}
+    <section class="space-y-10 rounded-3xl border border-slate-200 bg-slate-100 px-6 py-12 shadow-sm ring-1 ring-slate-900/5 md:px-10 md:py-16">
+        <div class="mx-auto max-w-4xl text-center">
+            <h2 class="text-4xl font-bold text-slate-900 md:text-5xl">Certified Teachers</h2>
+            <p class="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
+                Separated they live in. A small river named Duden flows by their place and supplies
+                it with the necessary regelialia. It is a paradisematic country.
+            </p>
+        </div>
+
+        <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="overflow-hidden">
+                    <img src="{{ asset('images/home/journey1.jpg') }}" alt="Bianca Wilson" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                </div>
+                <div class="space-y-2 p-5 text-center">
+                    <h3 class="text-3xl font-bold text-slate-900">Bianca Wilson</h3>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Teacher</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                </div>
+            </article>
+
+            <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="overflow-hidden">
+                    <img src="{{ asset('images/home/journey2.jpg') }}" alt="Mitch Parker" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                </div>
+                <div class="space-y-2 p-5 text-center">
+                    <h3 class="text-3xl font-bold text-slate-900">Mitch Parker</h3>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">English Teacher</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                </div>
+            </article>
+
+            <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="overflow-hidden">
+                    <img src="{{ asset('images/home/journey3.jpg') }}" alt="Stella Smith" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                </div>
+                <div class="space-y-2 p-5 text-center">
+                    <h3 class="text-3xl font-bold text-slate-900">Stella Smith</h3>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Art Teacher</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                </div>
+            </article>
+
+            <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="overflow-hidden">
+                    <img src="{{ asset('images/courses/faculty.png') }}" alt="Monshe Henderson" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                </div>
+                <div class="space-y-2 p-5 text-center">
+                    <h3 class="text-3xl font-bold text-slate-900">Monshe Henderson</h3>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Science Teacher</p>
+                    <p class="pt-1 text-sm leading-relaxed text-slate-600">I am an ambitious workaholic, but apart from that, pretty simple person.</p>
+                </div>
+            </article>
         </div>
     </section>
 
@@ -989,4 +1140,3 @@
     </section>
 </div>
 @endsection
-
