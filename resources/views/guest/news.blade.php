@@ -384,7 +384,7 @@
                     $colors = $priorityColors[$priority] ?? $priorityColors['info'];
                 @endphp
                 
-                <article class="announcement-card group relative overflow-hidden rounded-2xl border-2 {{ $isPinned ? 'border-[color:var(--portal-gold)] bg-gradient-to-br from-amber-50 to-white' : 'border-' . $colors['border'] . ' bg-white' }} shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" 
+                <article id="announcement-{{ $item->id }}" class="announcement-card group relative overflow-hidden rounded-2xl border-2 {{ $isPinned ? 'border-[color:var(--portal-gold)] bg-gradient-to-br from-amber-50 to-white' : 'border-' . $colors['border'] . ' bg-white' }} shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" 
                          data-priority="{{ $priority }}" 
                          data-pinned="{{ $isPinned ? 'true' : 'false' }}"
                          data-title="{{ htmlspecialchars(strtolower(strip_tags($item->title)), ENT_QUOTES, 'UTF-8') }}"
@@ -425,7 +425,9 @@
                                 </div>
                                 
                                 <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-[color:var(--portal-navy)] transition-colors">
-                                    {{ $item->title }}
+                                    <a href="{{ route('guest.news.show', $item->id) }}" class="hover:underline decoration-[color:var(--portal-gold)] underline-offset-4">
+                                        {{ $item->title }}
+                                    </a>
                                 </h2>
                             </div>
                             
@@ -629,4 +631,3 @@
 </script>
 @endpush
 @endsection
-

@@ -95,7 +95,7 @@ class SearchController extends Controller
                 'id' => 'announcement-'.$a->id,
                 'title' => $a->title,
                 'subtitle' => 'News',
-                'url' => route('guest.news').'#announcement-'.$a->id,
+                'url' => route('guest.news.show', ['announcement' => $a->id]),
             ];
         }
 
