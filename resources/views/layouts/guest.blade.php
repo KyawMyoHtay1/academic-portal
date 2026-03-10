@@ -255,9 +255,11 @@
         }
         /* Keep reCAPTCHA v3 badge visible and interactive on guest pages. */
         .grecaptcha-badge {
+            display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             pointer-events: auto !important;
+            z-index: 2147483647 !important;
         }
         /* Simple image slider — fixed size and consistent transition */
         .portal-slider {
@@ -1212,28 +1214,42 @@
                     && typeof window.grecaptcha.execute === 'function';
             }
 
-            // Run on page load so the v3 badge appears consistently on guest pages.
-            // Retry briefly because grecaptcha may initialize after DOMContentLoaded.
-            function runGuestPageviewRecaptcha(remainingAttempts) {
-                if (hasRecaptchaApi()) {
-                    window.grecaptcha.ready(function () {
-                        window.grecaptcha
-                            .execute(recaptchaSiteKey, { action: 'guest_pageview' })
-                            .catch(function () {});
-                    });
-                    return;
+            // Trigger once for guest pages so the v3 badge is initialized consistently.
+            // Some networks load grecaptcha after DOMContentLoaded, so retry for a while.
+            var guestRecaptchaBootstrapped = false;
+            function bootstrapGuestPageviewRecaptcha() {
+                if (guestRecaptchaBootstrapped || !hasRecaptchaApi()) {
+                    return false;
                 }
 
-                if (remainingAttempts <= 0) {
-                    return;
-                }
+                window.grecaptcha.ready(function () {
+                    window.grecaptcha
+                        .execute(recaptchaSiteKey, { action: 'guest_pageview' })
+                        .then(function (token) {
+                            if (token) {
+                                guestRecaptchaBootstrapped = true;
+                            }
+                        })
+                        .catch(function () {});
+                });
 
-                window.setTimeout(function () {
-                    runGuestPageviewRecaptcha(remainingAttempts - 1);
-                }, 200);
+                return true;
             }
 
-            runGuestPageviewRecaptcha(25);
+            var recaptchaBootstrapAttempts = 0;
+            var recaptchaBootstrapTimer = window.setInterval(function () {
+                recaptchaBootstrapAttempts += 1;
+                if (bootstrapGuestPageviewRecaptcha() || recaptchaBootstrapAttempts >= 150) {
+                    window.clearInterval(recaptchaBootstrapTimer);
+                }
+            }, 200);
+
+            window.addEventListener('load', bootstrapGuestPageviewRecaptcha, { once: true });
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') {
+                    bootstrapGuestPageviewRecaptcha();
+                }
+            });
 
             var forms = Array.prototype.slice.call(
                 document.querySelectorAll('form[data-recaptcha-action]')
