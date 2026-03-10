@@ -109,7 +109,7 @@ Route::get('/', function () {
     return view('guest.home', [
         'publicCourses' => Course::orderBy('course_code')
             ->take(6)
-            ->get(['id', 'course_code', 'title', 'credits', 'semester']),
+            ->get(['id', 'course_code', 'title', 'credits', 'semester', 'photo']),
         'publicAnnouncements' => Announcement::query()
             ->currentlyVisible()
             ->visibleToUser(null)

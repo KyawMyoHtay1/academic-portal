@@ -679,10 +679,24 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($publicCourses as $course)
+                @php
+                    $fallbackCourseImage = asset('images/fox_images/course-'.(($loop->index % 8) + 1).'.jpg');
+                    $courseImage = $course->photo ? asset('storage/'.$course->photo) : $fallbackCourseImage;
+                @endphp
                 <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     {{-- Gradient Header --}}
                     <div class="h-2 bg-gradient-to-r from-[color:var(--portal-navy)] via-[color:var(--portal-gold)] to-[color:var(--portal-navy)]"></div>
-                    
+
+                    <div class="relative h-44 overflow-hidden">
+                        <img
+                            src="{{ $courseImage }}"
+                            alt="{{ $course->title }}"
+                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='{{ $fallbackCourseImage }}';"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent"></div>
+                    </div>
+                     
                     <div class="p-6">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center gap-3">
