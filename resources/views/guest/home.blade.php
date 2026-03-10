@@ -441,12 +441,12 @@
         @php
             $storyAnnouncements = collect($publicAnnouncements)->take(6);
             $storyImages = [
-                'images/fox_images/image_1.jpg',
-                'images/fox_images/image_2.jpg',
-                'images/fox_images/image_3.jpg',
-                'images/fox_images/image_4.jpg',
-                'images/fox_images/image_5.jpg',
-                'images/fox_images/image_6.jpg',
+                'images/fox_images/course-1.jpg',
+                'images/fox_images/course-2.jpg',
+                'images/fox_images/course-3.jpg',
+                'images/fox_images/course-4.jpg',
+                'images/fox_images/course-5.jpg',
+                'images/fox_images/course-6.jpg',
             ];
         @endphp
 
@@ -885,7 +885,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/fox_images/image_1.jpg') }}"
+                        src="{{ asset('images/fox_images/course-7.jpg') }}"
                         alt="Success story student 1 placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -914,7 +914,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/fox_images/image_2.jpg') }}"
+                        src="{{ asset('images/fox_images/course-8.jpg') }}"
                         alt="Success story student 2 placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -943,7 +943,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/fox_images/image_3.jpg') }}"
+                        src="{{ asset('images/fox_images/course-6.jpg') }}"
                         alt="Success story research or faculty placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -972,7 +972,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/fox_images/image_4.jpg') }}"
+                        src="{{ asset('images/fox_images/staff-1.jpg') }}"
                         alt="Success story alumni mentor placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1001,7 +1001,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/fox_images/image_5.jpg') }}"
+                        src="{{ asset('images/fox_images/staff-2.jpg') }}"
                         alt="Success story student leader placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1030,7 +1030,7 @@
             <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="relative h-56 overflow-hidden">
                     <img
-                        src="{{ asset('images/fox_images/image_6.jpg') }}"
+                        src="{{ asset('images/fox_images/staff-3.jpg') }}"
                         alt="Success story community impact placeholder"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
