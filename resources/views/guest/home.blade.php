@@ -471,7 +471,7 @@
                             {{ \Illuminate\Support\Str::limit($story->body, 120) }}
                         </p>
                         <div class="flex items-center justify-between pt-2">
-                            <a href="{{ route('guest.news') }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
+                            <a href="{{ route('guest.news.show', $story->id) }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
                                 Read More
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>

@@ -200,6 +200,43 @@ Route::get('/guest/news', function () {
     ]);
 })->name('guest.news');
 
+Route::get('/guest/news/{announcement}', function (int $announcement) {
+    $selected = Announcement::query()
+        ->currentlyVisible()
+        ->visibleToUser(null)
+        ->whereKey($announcement)
+        ->firstOrFail([
+            'id',
+            'title',
+            'body',
+            'priority',
+            'pinned',
+            'created_at',
+        ]);
+
+    $relatedAnnouncements = Announcement::query()
+        ->currentlyVisible()
+        ->visibleToUser(null)
+        ->whereKeyNot($selected->id)
+        ->orderByDesc('pinned')
+        ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'important' THEN 2 WHEN 'info' THEN 3 ELSE 4 END")
+        ->orderBy('created_at', 'desc')
+        ->take(3)
+        ->get([
+            'id',
+            'title',
+            'body',
+            'priority',
+            'pinned',
+            'created_at',
+        ]);
+
+    return view('guest.news-show', [
+        'announcement' => $selected,
+        'relatedAnnouncements' => $relatedAnnouncements,
+    ]);
+})->whereNumber('announcement')->name('guest.news.show');
+
 Route::get('/guest/about', function () {
     // Dynamic Statistics
     $totalStudents = Student::count();
