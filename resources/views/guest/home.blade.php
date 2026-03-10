@@ -347,7 +347,7 @@
                     @endif
                     <button
                         type="button"
-                        class="home-play-button absolute left-1/2 top-1/2 inline-flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-orange-500 shadow-xl transition hover:scale-105"
+                        class="home-play-button absolute left-1/2 top-1/2 inline-flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-orange-500 shadow-xl transition duration-200 hover:scale-105"
                         aria-label="Play university introduction video"
                         data-home-video-open
                         aria-controls="home-video-modal"
@@ -1306,6 +1306,25 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const inlineVideos = Array.from(document.querySelectorAll('[data-home-inline-video]'));
+        const setInlinePlayButtonState = (video) => {
+            const container = video.parentElement;
+            const playButton = container ? container.querySelector('[data-home-video-open]') : null;
+            if (!playButton) return;
+
+            const isPlaying = !video.paused && !video.ended && video.readyState > 2;
+            playButton.classList.toggle('opacity-0', isPlaying);
+            playButton.classList.toggle('pointer-events-none', isPlaying);
+            playButton.setAttribute('aria-hidden', isPlaying ? 'true' : 'false');
+        };
+
+        inlineVideos.forEach((video) => {
+            ['play', 'playing', 'pause', 'ended', 'error', 'stalled', 'waiting'].forEach((eventName) => {
+                video.addEventListener(eventName, () => setInlinePlayButtonState(video));
+            });
+            setInlinePlayButtonState(video);
+            window.setTimeout(() => setInlinePlayButtonState(video), 250);
+        });
+
         if (inlineVideos.length > 0 && 'IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
@@ -1320,6 +1339,7 @@
                     } else {
                         video.pause();
                     }
+                    setInlinePlayButtonState(video);
                 });
             }, { threshold: 0.35 });
 
@@ -1336,16 +1356,23 @@
         const closeButtons = Array.from(modal.querySelectorAll('[data-home-video-close]'));
         const player = modal.querySelector('[data-home-video-player]');
         let lastFocused = null;
-        const pauseInlineVideos = () => inlineVideos.forEach((video) => video.pause());
+        const pauseInlineVideos = () => inlineVideos.forEach((video) => {
+            video.pause();
+            setInlinePlayButtonState(video);
+        });
         const resumeInlineVideos = () => {
             inlineVideos.forEach((video) => {
                 const rect = video.getBoundingClientRect();
                 const inView = rect.bottom > 0 && rect.top < window.innerHeight;
-                if (!inView) return;
+                if (!inView) {
+                    setInlinePlayButtonState(video);
+                    return;
+                }
                 const playPromise = video.play();
                 if (playPromise && typeof playPromise.catch === 'function') {
                     playPromise.catch(() => {});
                 }
+                setInlinePlayButtonState(video);
             });
         };
 
