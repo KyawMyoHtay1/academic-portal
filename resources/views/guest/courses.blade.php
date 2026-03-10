@@ -171,6 +171,50 @@
         </div>
     </section>
 
+    @php
+        $coursesOfferItems = [
+            [
+                'icon' => 'calendar',
+                'title' => 'Semester Planning',
+                'description' => 'Clear semester mapping helps students build balanced study plans and avoid timetable conflicts.',
+            ],
+            [
+                'icon' => 'document',
+                'title' => 'Credit Transparency',
+                'description' => 'Each course shows code, credits, and key details so students can track degree requirements accurately.',
+            ],
+            [
+                'icon' => 'check-badge',
+                'title' => 'Enrolment Ready',
+                'description' => 'Availability status and prerequisite checks support faster, more reliable online enrolment decisions.',
+            ],
+            [
+                'icon' => 'office',
+                'title' => 'Faculty Guidance',
+                'description' => 'Students can identify who teaches each module and follow structured guidance throughout the semester.',
+            ],
+            [
+                'icon' => 'sparkles',
+                'title' => 'Practical Learning',
+                'description' => 'Courses combine theory with labs, projects, and applied assignments aligned with industry expectations.',
+            ],
+            [
+                'icon' => 'shield',
+                'title' => 'Academic Integrity',
+                'description' => 'The portal supports consistent records, secure workflows, and clearer accountability for course progress.',
+            ],
+        ];
+    @endphp
+
+    @include('guest.partials.portal-offer-split', [
+        'title' => 'What the Course Portal Offers',
+        'lead' => 'The University Academic Portal helps students and staff manage the course lifecycle in one place.',
+        'intro' => 'From browsing subjects to final enrolment confirmation, course information is organised, searchable, and aligned with academic rules. This reduces errors and makes course planning faster and more transparent.',
+        'items' => $coursesOfferItems,
+        'image' => asset('images/fox_images/about-2.jpg'),
+        'imageAlt' => 'Students on campus discussing coursework',
+    ])
+
     {{-- Icon highlights (consistent with other guest pages) --}}
     @include('guest.partials.icon-highlights')
 

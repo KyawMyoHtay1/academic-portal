@@ -177,6 +177,50 @@
         </div>
     </section>
 
+    @php
+        $newsOfferItems = [
+            [
+                'icon' => 'announcement',
+                'title' => 'Timely Alerts',
+                'description' => 'Students and staff receive current academic notices for deadlines, events, and urgent updates.',
+            ],
+            [
+                'icon' => 'pin',
+                'title' => 'Pinned Notices',
+                'description' => 'Important announcements remain visible at the top so critical information is not missed.',
+            ],
+            [
+                'icon' => 'filter',
+                'title' => 'Priority Filtering',
+                'description' => 'Users can quickly focus on urgent, important, or general information based on relevance.',
+            ],
+            [
+                'icon' => 'document',
+                'title' => 'Policy Updates',
+                'description' => 'Official policy changes and administrative instructions are shared with clear, consistent records.',
+            ],
+            [
+                'icon' => 'clock',
+                'title' => 'Chronological Tracking',
+                'description' => 'Date and time visibility helps users understand the latest valid notice for each academic process.',
+            ],
+            [
+                'icon' => 'archive',
+                'title' => 'News Archive',
+                'description' => 'Past announcements remain searchable to support reference, compliance, and institutional memory.',
+            ],
+        ];
+    @endphp
+
+    @include('guest.partials.portal-offer-split', [
+        'title' => 'What the News Portal Provides',
+        'lead' => 'The News and Announcements module centralises official communication for the University Academic Portal.',
+        'intro' => 'It helps students, lecturers, and administrators stay aligned on key dates, policy updates, and campus activities. By combining priority labels, pinned messages, and searchable history, the portal improves communication clarity across the university.',
+        'items' => $newsOfferItems,
+        'image' => asset('images/fox_images/about-2.jpg'),
+        'imageAlt' => 'Students on campus checking university updates',
+    ])
+
     {{-- Icon highlights (consistent with other guest pages) --}}
     @include('guest.partials.icon-highlights')
 
