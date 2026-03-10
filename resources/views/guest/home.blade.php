@@ -324,11 +324,27 @@
         <div class="relative z-10 px-6 py-10 md:px-10 md:py-14">
             <div class="grid items-center gap-8 lg:grid-cols-2">
                 <div class="relative overflow-hidden rounded-2xl border border-white/20 shadow-xl">
-                    <img
-                        src="{{ asset('images/fox_images/about-2.jpg') }}"
-                        alt="University aerial view"
-                        class="h-[320px] w-full object-cover md:h-[420px]"
-                    >
+                    @if($campusVideoExists)
+                        <video
+                            class="h-[320px] w-full object-cover md:h-[420px]"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            preload="metadata"
+                            poster="{{ $campusVideoPoster }}"
+                            data-home-inline-video
+                            aria-label="University campus introduction video"
+                        >
+                            <source src="{{ $campusVideoAsset }}" type="video/mp4">
+                        </video>
+                    @else
+                        <img
+                            src="{{ asset('images/fox_images/about-2.jpg') }}"
+                            alt="University aerial view"
+                            class="h-[320px] w-full object-cover md:h-[420px]"
+                        >
+                    @endif
                     <button
                         type="button"
                         class="home-play-button absolute left-1/2 top-1/2 inline-flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-orange-500 shadow-xl transition hover:scale-105"
@@ -1289,6 +1305,27 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const inlineVideos = Array.from(document.querySelectorAll('[data-home-inline-video]'));
+        if (inlineVideos.length > 0 && 'IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    const video = entry.target;
+                    if (!(video instanceof HTMLVideoElement)) return;
+
+                    if (entry.isIntersecting) {
+                        const playPromise = video.play();
+                        if (playPromise && typeof playPromise.catch === 'function') {
+                            playPromise.catch(() => {});
+                        }
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: 0.35 });
+
+            inlineVideos.forEach((video) => observer.observe(video));
+        }
+
         const modal = document.querySelector('[data-home-video-modal]');
         const openButtons = Array.from(document.querySelectorAll('[data-home-video-open]'));
 
@@ -1299,6 +1336,18 @@
         const closeButtons = Array.from(modal.querySelectorAll('[data-home-video-close]'));
         const player = modal.querySelector('[data-home-video-player]');
         let lastFocused = null;
+        const pauseInlineVideos = () => inlineVideos.forEach((video) => video.pause());
+        const resumeInlineVideos = () => {
+            inlineVideos.forEach((video) => {
+                const rect = video.getBoundingClientRect();
+                const inView = rect.bottom > 0 && rect.top < window.innerHeight;
+                if (!inView) return;
+                const playPromise = video.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(() => {});
+                }
+            });
+        };
 
         const openModal = () => {
             lastFocused = document.activeElement;
@@ -1307,6 +1356,7 @@
             modal.classList.add('flex');
             modal.setAttribute('aria-hidden', 'false');
             document.body.classList.add('overflow-hidden');
+            pauseInlineVideos();
 
             if (player) {
                 const playPromise = player.play();
@@ -1322,6 +1372,7 @@
             modal.classList.add('hidden');
             modal.hidden = true;
             document.body.classList.remove('overflow-hidden');
+            resumeInlineVideos();
 
             if (player) {
                 player.pause();
