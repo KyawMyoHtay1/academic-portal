@@ -359,23 +359,17 @@ Route::get('/guest/support', function () {
 
 Route::get('/guest/contact', function () {
     // Dynamic Statistics for Contact Page
+    $totalUsers = User::count();
     $totalStudents = Student::count();
     $totalFaculty = User::where('role', 'teacher')->count();
     $totalCourses = Course::count();
 
-    // Get department/role breakdown
-    $adminCount = User::where('role', 'admin')->count();
-    $teacherCount = User::where('role', 'teacher')->count();
-    $studentCount = Student::count();
-
     return view('guest.contact', [
         'stats' => [
+            'totalUsers' => $totalUsers,
             'totalStudents' => $totalStudents,
             'totalFaculty' => $totalFaculty,
             'totalCourses' => $totalCourses,
-            'adminCount' => $adminCount,
-            'teacherCount' => $teacherCount,
-            'studentCount' => $studentCount,
         ],
     ]);
 })->name('guest.contact');

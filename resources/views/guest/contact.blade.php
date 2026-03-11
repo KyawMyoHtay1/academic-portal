@@ -22,6 +22,12 @@
     .contact-rise:nth-child(2) { animation-delay: 0.08s; }
     .contact-rise:nth-child(3) { animation-delay: 0.16s; }
     .contact-rise:nth-child(4) { animation-delay: 0.24s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .contact-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -60,29 +66,29 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Users Reached</p>
-            <p class="mt-1 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalStudents', 0) + data_get($stats, 'totalFaculty', 0)) }}</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Registered Users</p>
+            <p class="mt-1 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalUsers', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Faculty</p>
-            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Students</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalStudents', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Courses</p>
-            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalCourses', 0)) }}</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Faculty</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Office Status</p>
-            <p class="mt-1 text-3xl font-bold text-amber-900">Open Hours</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Courses</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">{{ number_format(data_get($stats, 'totalCourses', 0)) }}</p>
         </div>
     </section>
 
@@ -96,7 +102,7 @@
             <div class="mb-6">
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Send Message</p>
                 <h2 class="mt-2 text-2xl font-bold text-[color:var(--portal-navy)] md:text-3xl">Contact our team</h2>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Complete the form and include enough detail—such as your role, the topic (admissions, grades, support, etc.), and what you need—so we can respond effectively. Specific requests help us reduce delays and provide more accurate guidance on the first response.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Complete the form and include enough detail, such as your role, the topic (admissions, grades, support, and similar), and what you need so we can respond effectively. Specific requests help us reduce delays and provide more accurate guidance on the first response.</p>
             </div>
 
             @if ($errors->any())
@@ -124,6 +130,7 @@
                             id="firstName"
                             name="firstName"
                             required
+                            maxlength="100"
                             value="{{ old('firstName') }}"
                             class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                             placeholder="John"
@@ -136,6 +143,7 @@
                             id="lastName"
                             name="lastName"
                             required
+                            maxlength="100"
                             value="{{ old('lastName') }}"
                             class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                             placeholder="Doe"
@@ -150,6 +158,7 @@
                         id="email"
                         name="email"
                         required
+                        maxlength="255"
                         value="{{ old('email') }}"
                         class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                         placeholder="john.doe@example.com"
@@ -162,6 +171,7 @@
                         type="tel"
                         id="phone"
                         name="phone"
+                        maxlength="30"
                         value="{{ old('phone') }}"
                         class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                         placeholder="+123 456 7890"
@@ -175,6 +185,7 @@
                         id="subject"
                         name="subject"
                         required
+                        maxlength="100"
                         value="{{ old('subject') }}"
                         class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                         placeholder="How can we help?"
@@ -188,6 +199,7 @@
                         name="message"
                         rows="6"
                         required
+                        maxlength="5000"
                         class="block w-full resize-none rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                         placeholder="Tell us how we can help you..."
                     >{{ old('message') }}</textarea>
@@ -207,14 +219,14 @@
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 </div>
-                <p class="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Contact Details</p>
-                <h3 class="mt-2 text-xl font-bold text-slate-900">Reach us directly</h3>
-                <p class="mt-2 text-sm text-slate-600">Use the details below for general inquiries, or submit the form for a routed, tracked response from the right team.</p>
+                <p class="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Contact Guidance</p>
+                <h3 class="mt-2 text-xl font-bold text-slate-900">How to reach us</h3>
+                <p class="mt-2 text-sm text-slate-600">Use the form on this page for routed responses, or open Support & Help Desk for technical troubleshooting and access problems.</p>
                 <div class="mt-4 space-y-3 text-sm text-slate-700">
-                    <p><span class="font-semibold">Email:</span> info@university.edu</p>
-                    <p><span class="font-semibold">Phone:</span> +123 456 7890</p>
-                    <p><span class="font-semibold">Address:</span> 123 University Avenue, City, Country</p>
-                    <p><span class="font-semibold">Hours:</span> Mon-Fri, 9:00 AM - 5:00 PM</p>
+                    <p><span class="font-semibold">General inquiries:</span> Submit the form on this page.</p>
+                    <p><span class="font-semibold">Technical support:</span> Use Support & Help Desk for login and portal issues.</p>
+                    <p><span class="font-semibold">Message routing:</span> Contact requests are forwarded to staff and admin teams.</p>
+                    <p><span class="font-semibold">Office details:</span> Refer to official university channels for current visit and office-hour information.</p>
                 </div>
             </div>
 
@@ -223,21 +235,21 @@
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                 </div>
                 <h4 class="mt-4 text-lg font-semibold text-slate-900">Admissions</h4>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Questions about applications, requirements, or enrollment: admissions@university.edu. We respond within 1–2 business days.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Use this form for applications, requirements, and enrollment questions. Put "Admissions" in the subject line so the request can be routed quickly.</p>
             </div>
             <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                 </div>
                 <h4 class="mt-4 text-lg font-semibold text-slate-900">Academic Affairs</h4>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Curriculum, programs, and academic policy: academics@university.edu. For grade or course disputes, include your student ID and course code.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Use this form for curriculum, program, and academic policy questions. For course or grade issues, include your student ID and course code.</p>
             </div>
             <div class="contact-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </div>
                 <h4 class="mt-4 text-lg font-semibold text-slate-900">IT Support</h4>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Login issues, portal errors, or access problems: itsupport@university.edu. For urgent access blocks, mention “urgent” in the subject line.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Use Support & Help Desk for login issues, portal errors, and access problems. For urgent access blocks, include "Urgent" in your subject line.</p>
             </div>
         </div>
     </section>
@@ -357,5 +369,3 @@
 </script>
 @endif
 @endpush
-
-
