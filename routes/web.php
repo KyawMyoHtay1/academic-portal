@@ -291,14 +291,14 @@ Route::get('/guest/about', function () {
     $uniqueProgrammes = Student::distinct('programme')
         ->whereNotNull('programme')
         ->count('programme');
-    $totalPrograms = max($uniqueProgrammes, $totalCourses); // Use courses as fallback
+    $totalOfferings = $uniqueProgrammes > 0 ? $uniqueProgrammes : $totalCourses;
 
     return view('guest.about', [
         'stats' => [
             'yearsOfExcellence' => $yearsOfExcellence,
             'totalStudents' => $totalStudents,
             'totalFaculty' => $totalFaculty,
-            'totalPrograms' => $totalPrograms,
+            'totalOfferings' => $totalOfferings,
         ],
     ]);
 })->name('guest.about');

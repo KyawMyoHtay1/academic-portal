@@ -47,6 +47,25 @@
     .about-testimonial-slider .portal-slide > article {
         width: 100%;
     }
+
+    /* Hide mojibake quote glyphs and render a clean opening quote via CSS. */
+    .about-testimonial-side > p:first-child,
+    .about-testimonial-slider article .flex-1 > p:first-child {
+        font-size: 0;
+        line-height: 1;
+    }
+
+    .about-testimonial-side > p:first-child::before,
+    .about-testimonial-slider article .flex-1 > p:first-child::before {
+        content: "\201C";
+        font-size: 3rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .about-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -106,8 +125,8 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Programs Offered</p>
-            <p class="mt-1 text-3xl font-bold text-amber-900">{{ $stats['totalPrograms'] > 0 ? number_format($stats['totalPrograms']) . '+' : '100+' }}</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Academic Offerings</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">{{ $stats['totalOfferings'] > 0 ? number_format($stats['totalOfferings']) . '+' : '100+' }}</p>
         </div>
     </section>
 
@@ -175,7 +194,7 @@
     <section class="space-y-8 rounded-3xl border border-slate-200 bg-slate-100 px-6 py-12 shadow-sm ring-1 ring-slate-900/5 md:px-10 md:py-16">
         <div class="mx-auto max-w-3xl text-center">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-navy)]">Testimonials</p>
-            <h2 class="mt-2 text-4xl font-bold text-slate-900 md:text-6xl">Student Says About Us</h2>
+            <h2 class="mt-2 text-4xl font-bold text-slate-900 md:text-6xl">What Students Say About Us</h2>
             <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600 md:text-xl">
                 Hear from learners and families who experienced our teaching quality, student support, and academic growth environment.
             </p>
