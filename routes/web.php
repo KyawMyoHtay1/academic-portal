@@ -304,8 +304,6 @@ Route::get('/guest/about', function () {
 })->name('guest.about');
 Route::get('/guest/vision', function () {
     // Dynamic Statistics for Vision Page
-    $totalStudents = Student::count();
-    $totalFaculty = User::where('role', 'teacher')->count();
     $totalUsers = User::count();
     $totalCourses = Course::count();
     $totalEnrollments = DB::table('course_student')
@@ -314,8 +312,6 @@ Route::get('/guest/vision', function () {
 
     return view('guest.vision', [
         'stats' => [
-            'totalStudents' => $totalStudents,
-            'totalFaculty' => $totalFaculty,
             'totalUsers' => $totalUsers,
             'totalCourses' => $totalCourses,
             'totalEnrollments' => $totalEnrollments,

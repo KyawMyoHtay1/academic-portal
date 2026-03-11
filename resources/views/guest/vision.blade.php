@@ -21,6 +21,12 @@
 
     .vision-rise:nth-child(2) { animation-delay: 0.08s; }
     .vision-rise:nth-child(3) { animation-delay: 0.16s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .vision-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -66,7 +72,7 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Enrollments</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Approved Enrollments</p>
             <p class="mt-1 text-3xl font-bold text-emerald-900">{{ $stats['totalEnrollments'] > 0 ? number_format($stats['totalEnrollments']) : '0' }}</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
@@ -194,7 +200,6 @@
     </section>
 </div>
 @endsection
-
 
 
 
