@@ -83,6 +83,7 @@ const getMenuIcon = (name) => {
 
 const navigation = computed(() => {
     const user = page.props.auth?.user;
+    const isAdmin = user?.role === "admin";
     const isStaff = user?.role === "staff";
     const isTeacher = user?.role === "teacher";
 
@@ -244,6 +245,39 @@ const navigation = computed(() => {
                     active: route().current("announcements.*"),
                     badge: unreadAnnouncements,
                     icon: getMenuIcon("Announcements"),
+                },
+                {
+                    name: "Notifications",
+                    href: route("notifications.index"),
+                    active: route().current("notifications.*"),
+                    badge: unreadNotifications,
+                    icon: getMenuIcon("Notifications"),
+                },
+                {
+                    name: "Messages",
+                    href: route("messages.index"),
+                    active: route().current("messages.*"),
+                    badge: unreadMessages,
+                    icon: getMenuIcon("Messages"),
+                },
+            ])
+        );
+    }
+
+    if (isAdmin) {
+        items.push(
+            createGroup("Communication", [
+                {
+                    name: "Contact Messages",
+                    href: route("admin.contact-messages.index"),
+                    active: route().current("admin.contact-messages.*"),
+                    icon: getMenuIcon("Contact Messages"),
+                },
+                {
+                    name: "Feedback Messages",
+                    href: route("admin.feedback-messages.index"),
+                    active: route().current("admin.feedback-messages.*"),
+                    icon: getMenuIcon("Feedback Messages"),
                 },
                 {
                     name: "Notifications",

@@ -86,7 +86,7 @@ class StaffContactMessageController extends Controller
     }
 
     /**
-     * Reply to a contact message (store reply text and mark as replied).
+     * Store an internal response note for a contact message.
      */
     public function reply(ReplyContactMessageRequest $request, ContactMessage $contactMessage): RedirectResponse
     {
@@ -98,6 +98,6 @@ class StaffContactMessageController extends Controller
             'is_read' => true,
         ]);
 
-        return back()->with('success', 'Reply saved.');
+        return back()->with('success', 'Response note saved.');
     }
 }

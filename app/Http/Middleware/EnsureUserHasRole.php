@@ -13,18 +13,25 @@ class EnsureUserHasRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         if (! auth()->check()) {
             return redirect()->route('login');
         }
 
         $user = auth()->user();
+        $allowedRoles = array_values(array_filter(array_map('trim', $roles)));
 
-        if (! $user->hasRole($role)) {
-            abort(403, 'Unauthorized access. This page requires '.$role.' role.');
+        if ($allowedRoles === []) {
+            abort(403, 'Unauthorized access. No allowed roles were configured.');
         }
 
-        return $next($request);
+        foreach ($allowedRoles as $role) {
+            if ($user->hasRole($role)) {
+                return $next($request);
+            }
+        }
+
+        abort(403, 'Unauthorized access. This page requires one of these roles: '.implode(', ', $allowedRoles).'.');
     }
 }

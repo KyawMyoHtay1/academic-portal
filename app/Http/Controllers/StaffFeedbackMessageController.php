@@ -96,7 +96,7 @@ class StaffFeedbackMessageController extends Controller
     }
 
     /**
-     * Mark a feedback message as replied.
+     * Mark a feedback message as handled.
      */
     public function markReplied(FeedbackMessage $feedbackMessage): RedirectResponse
     {
@@ -107,6 +107,6 @@ class StaffFeedbackMessageController extends Controller
             ])->save();
         }
 
-        return back()->with('success', 'Feedback marked as replied.');
+        return back()->with('success', 'Feedback marked as handled.');
     }
 }
