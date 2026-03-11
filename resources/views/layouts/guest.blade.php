@@ -1046,7 +1046,9 @@
 
                 let current = 0;
                 const interval = parseInt(slider.dataset.interval || '7000', 10);
-                const autoplay = slider.dataset.autoplay === 'true';
+                const prefersReducedMotion = window.matchMedia
+                    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const autoplay = slider.dataset.autoplay === 'true' && !prefersReducedMotion;
                 let timer = null;
 
                 const dots = Array.from(slider.querySelectorAll('[data-portal-slider-dot]'));

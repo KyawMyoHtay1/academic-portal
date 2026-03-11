@@ -113,11 +113,12 @@ Route::get('/', function () {
         'publicAnnouncements' => Announcement::query()
             ->currentlyVisible()
             ->visibleToUser(null)
+            ->with(['author:id,name'])
             ->orderByDesc('pinned')
             ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'important' THEN 2 WHEN 'info' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->take(5)
-            ->get(['id', 'title', 'body', 'created_at']),
+            ->get(['id', 'user_id', 'title', 'body', 'created_at']),
         'stats' => [
             'totalCourses' => $totalCourses,
             'totalStudents' => $totalStudents,
