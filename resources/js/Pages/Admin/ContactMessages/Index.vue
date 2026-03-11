@@ -14,9 +14,7 @@ const props = defineProps({
     filters: { type: Object, default: () => ({}) },
 });
 
-const items = computed(() => [
-    { label: "Contact Messages" },
-]);
+const items = computed(() => [{ label: "Contact Messages" }]);
 
 const search = ref(props.filters?.q ?? "");
 const selectedStatus = ref(props.filters?.status ?? "all");
@@ -43,12 +41,16 @@ function applyFilters(qValue = search.value) {
     );
 }
 
-watch(search, (value) => {
-    if (searchTimer) window.clearTimeout(searchTimer);
-    searchTimer = window.setTimeout(() => {
-        applyFilters(value);
-    }, 250);
-}, { flush: "post" });
+watch(
+    search,
+    (value) => {
+        if (searchTimer) window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(() => {
+            applyFilters(value);
+        }, 250);
+    },
+    { flush: "post" }
+);
 
 watch(selectedStatus, () => {
     applyFilters();
@@ -128,23 +130,23 @@ export default {
                                 Read: <span class="font-semibold">{{ statusCounts.read ?? 0 }}</span>
                             </div>
                             <div class="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
-                                Replied: <span class="font-semibold">{{ statusCounts.replied ?? 0 }}</span>
+                                Handled: <span class="font-semibold">{{ statusCounts.replied ?? 0 }}</span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <p class="text-sm text-slate-600">
-                                Messages submitted from the public Contact page.
+                                Messages submitted from the public Contact page. Staff can mark them read and save internal follow-up notes.
                             </p>
 
                             <div class="grid w-full gap-2 sm:max-w-2xl sm:grid-cols-2">
                                 <select
                                     v-model="selectedStatus"
-                                    class="w-full rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
                                 >
                                     <option value="all">All statuses</option>
                                     <option value="unread">Unread</option>
                                     <option value="read">Read</option>
-                                    <option value="replied">Replied</option>
+                                    <option value="replied">Handled</option>
                                 </select>
                                 <div class="relative">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -191,7 +193,7 @@ export default {
                                         Date
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                                        Reply
+                                        Response Note
                                     </th>
                                     <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Actions
@@ -216,7 +218,7 @@ export default {
                                                     {{ m.first_name }} {{ m.last_name }}
                                                 </div>
                                                 <div class="text-sm text-slate-600">
-                                                    {{ m.email }}<span v-if="m.phone"> • {{ m.phone }}</span>
+                                                    {{ m.email }}<span v-if="m.phone"> | {{ m.phone }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -237,7 +239,7 @@ export default {
                                     <td class="px-6 py-4 text-sm">
                                         <span
                                             v-if="m.reply"
-                                            class="max-w-xs truncate block text-slate-700"
+                                            class="block max-w-xs truncate text-slate-700"
                                             :title="m.reply"
                                         >
                                             {{ m.reply }}
@@ -246,9 +248,9 @@ export default {
                                             v-else-if="m.replied_at"
                                             class="text-slate-500 italic"
                                         >
-                                            Replied
+                                            Handled
                                         </span>
-                                        <span v-else class="text-slate-400">—</span>
+                                        <span v-else class="text-slate-400">-</span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex flex-wrap justify-end gap-2">
@@ -257,7 +259,7 @@ export default {
                                                 class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                                                 @click="openReplyModal(m)"
                                             >
-                                                {{ m.reply || m.replied_at ? "Edit reply" : "Reply" }}
+                                                {{ m.reply || m.replied_at ? "Edit note" : "Add note" }}
                                             </button>
                                             <button
                                                 type="button"
@@ -288,7 +290,7 @@ export default {
             </div>
         </div>
 
-        <!-- Reply Modal -->
+        <!-- Response Note Modal -->
         <Teleport to="body">
             <div
                 v-if="replyModalOpen"
@@ -297,7 +299,7 @@ export default {
                 role="dialog"
                 aria-modal="true"
             >
-                <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
                     <div
                         class="fixed inset-0 bg-slate-500/75 transition-opacity"
                         aria-hidden="true"
@@ -305,27 +307,30 @@ export default {
                     />
                     <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
                     <div
-                        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+                        class="inline-block transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
                     >
                         <div>
                             <h3
                                 id="modal-title"
                                 class="text-lg font-semibold leading-6 text-slate-900"
                             >
-                                Reply to {{ replyTargetMessage?.first_name }} {{ replyTargetMessage?.last_name }}
+                                Response note for {{ replyTargetMessage?.first_name }} {{ replyTargetMessage?.last_name }}
                             </h3>
                             <p class="mt-1 text-sm text-slate-500">
                                 {{ replyTargetMessage?.email }}
                             </p>
+                            <p class="mt-2 text-sm text-slate-500">
+                                This note stays in the staff inbox. It does not send an email to the sender.
+                            </p>
                             <div class="mt-4">
-                                <label for="reply-text" class="block text-sm font-medium text-slate-700">Your reply</label>
+                                <label for="reply-text" class="block text-sm font-medium text-slate-700">Response note</label>
                                 <textarea
                                     id="reply-text"
                                     v-model="replyForm.reply"
                                     rows="4"
                                     class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-portal-navy focus:ring-portal-navy sm:text-sm"
                                     :class="{ 'border-red-300': replyForm.errors.reply }"
-                                    placeholder="Type your reply here..."
+                                    placeholder="Summarize the follow-up or internal response..."
                                 />
                                 <p v-if="replyForm.errors.reply" class="mt-1 text-sm text-red-600">
                                     {{ replyForm.errors.reply }}
@@ -339,7 +344,7 @@ export default {
                                 class="inline-flex w-full justify-center rounded-md bg-portal-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-portal-navy-dark focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2 disabled:opacity-50 sm:col-start-2"
                                 @click="submitReply"
                             >
-                                {{ replyForm.processing ? "Saving..." : "Save reply" }}
+                                {{ replyForm.processing ? "Saving..." : "Save note" }}
                             </button>
                             <button
                                 type="button"

@@ -18,9 +18,7 @@ const props = defineProps({
     filters: { type: Object, default: () => ({}) },
 });
 
-const items = computed(() => [
-    { label: "Feedback Messages" },
-]);
+const items = computed(() => [{ label: "Feedback Messages" }]);
 
 const search = ref(props.filters?.q ?? "");
 const selectedStatus = ref(props.filters?.status ?? "all");
@@ -42,12 +40,16 @@ function applyFilters(qValue = search.value) {
     );
 }
 
-watch(search, (value) => {
-    if (searchTimer) window.clearTimeout(searchTimer);
-    searchTimer = window.setTimeout(() => {
-        applyFilters(value);
-    }, 250);
-}, { flush: "post" });
+watch(
+    search,
+    (value) => {
+        if (searchTimer) window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(() => {
+            applyFilters(value);
+        }, 250);
+    },
+    { flush: "post" }
+);
 
 watch([selectedStatus, selectedType], () => {
     applyFilters();
@@ -101,9 +103,7 @@ export default {
 
         <div class="py-6">
             <div class="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
-                <div
-                    class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200"
-                >
+                <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
                     <div class="border-b border-slate-200 px-6 py-4">
                         <div class="mb-3 grid gap-2 sm:grid-cols-3">
                             <div class="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
@@ -113,27 +113,27 @@ export default {
                                 Read: <span class="font-semibold">{{ statusCounts.read ?? 0 }}</span>
                             </div>
                             <div class="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
-                                Replied: <span class="font-semibold">{{ statusCounts.replied ?? 0 }}</span>
+                                Handled: <span class="font-semibold">{{ statusCounts.replied ?? 0 }}</span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <p class="text-sm text-slate-600">
-                                Feedback submitted from the public Feedback & Suggestions page.
+                                Feedback submitted from the public Feedback & Suggestions page. Staff can review it and mark follow-up as handled.
                             </p>
 
                             <div class="grid w-full gap-2 sm:max-w-3xl sm:grid-cols-3">
                                 <select
                                     v-model="selectedStatus"
-                                    class="w-full rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
                                 >
                                     <option value="all">All statuses</option>
                                     <option value="unread">Unread</option>
                                     <option value="read">Read</option>
-                                    <option value="replied">Replied</option>
+                                    <option value="replied">Handled</option>
                                 </select>
                                 <select
                                     v-model="selectedType"
-                                    class="w-full rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
                                 >
                                     <option value="all">All types</option>
                                     <option
@@ -176,34 +176,22 @@ export default {
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600"
-                                    >
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         From
                                     </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600"
-                                    >
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Type
                                     </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600"
-                                    >
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Message
                                     </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600"
-                                    >
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Date
                                     </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600"
-                                    >
-                                        Replied
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                        Handled At
                                     </th>
-                                    <th
-                                        class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600"
-                                    >
+                                    <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600">
                                         Actions
                                     </th>
                                 </tr>
@@ -241,7 +229,7 @@ export default {
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="max-w-xl text-sm text-slate-700 whitespace-pre-line">
+                                        <div class="max-w-xl whitespace-pre-line text-sm text-slate-700">
                                             {{ m.message }}
                                         </div>
                                     </td>
@@ -255,7 +243,7 @@ export default {
                                         >
                                             {{ new Date(m.replied_at).toLocaleString() }}
                                         </span>
-                                        <span v-else class="text-slate-400">—</span>
+                                        <span v-else class="text-slate-400">-</span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex flex-wrap justify-end gap-2">
@@ -271,10 +259,10 @@ export default {
                                                 type="button"
                                                 class="inline-flex items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
                                                 :disabled="!!m.replied_at"
-                                                :title="m.replied_at ? 'Already replied' : 'Mark as replied'"
+                                                :title="m.replied_at ? 'Already handled' : 'Mark as handled'"
                                                 @click="markReplied(m.id)"
                                             >
-                                                {{ m.replied_at ? "Replied" : "Mark as replied" }}
+                                                {{ m.replied_at ? "Handled" : "Mark as handled" }}
                                             </button>
                                         </div>
                                     </td>
@@ -293,9 +281,9 @@ export default {
                         </table>
                     </div>
 
-                <div class="mt-4 border-t border-slate-200 px-6 py-4">
-                    <Pagination :links="messages.links" />
-                </div>
+                    <div class="mt-4 border-t border-slate-200 px-6 py-4">
+                        <Pagination :links="messages.links" />
+                    </div>
                 </div>
             </div>
         </div>
