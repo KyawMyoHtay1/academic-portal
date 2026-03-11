@@ -32,6 +32,13 @@
     .pinned-badge {
         animation: pulse 2s ease-in-out infinite;
     }
+    @media (prefers-reduced-motion: reduce) {
+        .animate-fade-in-up,
+        .announcement-card,
+        .pinned-badge {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -206,8 +213,8 @@
             ],
             [
                 'icon' => 'archive',
-                'title' => 'News Archive',
-                'description' => 'Past announcements remain searchable to support reference, compliance, and institutional memory.',
+                'title' => 'Searchable Updates',
+                'description' => 'Current public announcements remain easy to search and filter by title, body, priority, and pinned status.',
             ],
         ];
     @endphp
@@ -215,7 +222,7 @@
     @include('guest.partials.portal-offer-split', [
         'title' => 'What the News Portal Provides',
         'lead' => 'The News and Announcements module centralises official communication for the University Academic Portal.',
-        'intro' => 'It helps students, lecturers, and administrators stay aligned on key dates, policy updates, and campus activities. By combining priority labels, pinned messages, and searchable history, the portal improves communication clarity across the university.',
+        'intro' => 'It helps students, lecturers, and administrators stay aligned on key dates, policy updates, and campus activities. By combining priority labels, pinned messages, and searchable current updates, the portal improves communication clarity across the university.',
         'items' => $newsOfferItems,
         'image' => asset('images/fox_images/about-2.jpg'),
         'imageAlt' => 'Students on campus checking university updates',
@@ -428,7 +435,7 @@
                     $colors = $priorityColors[$priority] ?? $priorityColors['info'];
                 @endphp
                 
-                <article id="announcement-{{ $item->id }}" class="announcement-card group relative overflow-hidden rounded-2xl border-2 {{ $isPinned ? 'border-[color:var(--portal-gold)] bg-gradient-to-br from-amber-50 to-white' : 'border-' . $colors['border'] . ' bg-white' }} shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" 
+                <article id="announcement-{{ $item->id }}" class="announcement-card group relative overflow-hidden rounded-2xl border-2 {{ $isPinned ? 'border-[color:var(--portal-gold)] bg-gradient-to-br from-amber-50 to-white' : $colors['border'] . ' ' . $colors['bg'] }} shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
                          data-priority="{{ $priority }}" 
                          data-pinned="{{ $isPinned ? 'true' : 'false' }}"
                          data-title="{{ htmlspecialchars(strtolower(strip_tags($item->title)), ENT_QUOTES, 'UTF-8') }}"
