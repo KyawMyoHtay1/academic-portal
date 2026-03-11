@@ -26,6 +26,12 @@
     .course-card:nth-child(4) { animation-delay: 0.4s; }
     .course-card:nth-child(5) { animation-delay: 0.5s; }
     .course-card:nth-child(6) { animation-delay: 0.6s; }
+    @media (prefers-reduced-motion: reduce) {
+        .animate-fade-in-up,
+        .course-card {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -57,7 +63,7 @@
                         Browse through our comprehensive catalog of courses designed to shape your future.
                     </p>
                     <p class="mt-3 text-sm md:text-base text-slate-200/90 max-w-2xl">
-                        Each course listing shows key information such as code, credits, semester, and availability so you can plan your academic pathway with confidence. Use the search and filters below to quickly find programmes by name, code, semester, or area of interest.
+                        Each course listing shows key information such as code, credits, and semester so you can plan your academic pathway with confidence. Use the search and filters below to quickly find programmes by name, code, or semester.
                     </p>
                     <p class="mt-2 text-sm md:text-base text-slate-200/90 max-w-2xl">
                         Many courses include labs, projects, or industry-linked activities. As you explore, think about how core subjects, electives, and capstone modules can be combined to support your goals—whether that is further study, research, or entering the workplace.
@@ -280,8 +286,8 @@
                 </div>
                 <div>
                     <div class="text-2xl md:text-3xl font-bold text-[color:var(--portal-navy)]">{{ $stats['availabilityRate'] }}%</div>
-                    <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Available</div>
-                    <p class="text-xs text-slate-500 mt-0.5">Courses open for enrolment</p>
+                    <div class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Enrollment Coverage</div>
+                    <p class="text-xs text-slate-500 mt-0.5">Courses with approved enrolments</p>
                 </div>
             </div>
         </div>
@@ -455,7 +461,7 @@
     <section>
         <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($courses as $course)
-                <div class="course-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                <div id="course-{{ $course->id }}" class="course-card group relative scroll-mt-28 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
                      data-course-code="{{ strtolower($course->course_code) }}"
                      data-course-title="{{ strtolower($course->title) }}"
                      data-semester="{{ strtolower($course->semester ?? '') }}"
