@@ -263,7 +263,7 @@ const navigation = computed(() => {
         );
     }
 
-    // Staff admin features - organized into groups
+    // Staff features - organized into groups
     if (isStaff) {
         items.push(
             createGroup("Academics", [

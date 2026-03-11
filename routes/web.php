@@ -509,7 +509,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         Route::post('/admin/feedback-messages/{feedbackMessage}/mark-replied', [StaffFeedbackMessageController::class, 'markReplied'])->name('admin.feedback-messages.mark-replied');
     });
 
-    // Timebox 2: Staff Admin Features (staff only)
+    // Timebox 2: Staff Features
     Route::middleware('role:staff')->group(function () {
         // Student Management
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
