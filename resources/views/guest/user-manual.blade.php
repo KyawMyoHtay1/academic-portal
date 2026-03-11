@@ -31,14 +31,26 @@
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-xl font-bold text-[color:var(--portal-navy)] md:text-2xl">PDF Preview</h2>
             <p class="text-xs text-slate-500 md:text-sm">
-                If preview is blocked by browser settings, use “Open In New Tab” or “Download PDF”.
+                If preview is blocked by browser settings, use "Open In New Tab" or "Download PDF".
             </p>
         </div>
         <iframe
             src="{{ route('guest.user-manual.view', [], false) }}"
             title="University Academic Portal User Manual PDF"
+            loading="lazy"
             class="h-[88vh] w-full rounded-xl border border-slate-200"
-        ></iframe>
+        >
+            <p class="p-4 text-sm text-slate-600">
+                PDF preview is unavailable in this browser.
+                <a href="{{ route('guest.user-manual.view', [], false) }}" target="_blank" rel="noopener" class="font-semibold text-[color:var(--portal-navy)] hover:text-slate-700">
+                    Open the manual in a new tab
+                </a>
+                or
+                <a href="{{ route('guest.user-manual.download', [], false) }}" class="font-semibold text-[color:var(--portal-navy)] hover:text-slate-700">
+                    download the PDF
+                </a>.
+            </p>
+        </iframe>
     </section>
 </div>
 @endsection
