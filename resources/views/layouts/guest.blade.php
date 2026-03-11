@@ -760,7 +760,7 @@
             <div class="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-200/80 md:flex-row md:items-center md:justify-between">
                 <div class="flex items-center gap-2">
                     <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-                    <span>Secure · Accessible · Student-first</span>
+                    <span>Secure | Accessible | Student-first</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-4">
                     <a class="hover:text-amber-200 transition" href="{{ route('privacy-policy') }}">Privacy Policy</a>
