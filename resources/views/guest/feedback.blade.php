@@ -21,6 +21,12 @@
 
     .feedback-rise:nth-child(2) { animation-delay: 0.08s; }
     .feedback-rise:nth-child(3) { animation-delay: 0.16s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .feedback-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -66,8 +72,8 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Response Window</p>
-            <p class="mt-1 text-3xl font-bold text-emerald-900">Fast</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Review Flow</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">Staff Inbox</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
@@ -80,8 +86,8 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Impact</p>
-            <p class="mt-1 text-3xl font-bold text-amber-900">Continuous</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Purpose</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">Improvements</p>
         </div>
     </section>
 
@@ -122,6 +128,7 @@
                             id="feedbackName"
                             name="name"
                             required
+                            maxlength="150"
                             value="{{ old('name') }}"
                             class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                             placeholder="John Doe"
@@ -134,6 +141,7 @@
                             id="feedbackEmail"
                             name="email"
                             required
+                            maxlength="255"
                             value="{{ old('email') }}"
                             class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                             placeholder="john.doe@example.com"
@@ -164,6 +172,7 @@
                         name="message"
                         rows="6"
                         required
+                        maxlength="5000"
                         class="block w-full resize-none rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:border-[color:var(--portal-navy)] focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-navy)]"
                         placeholder="Share your suggestion, report an issue, or describe your experience..."
                     >{{ old('message') }}</textarea>
@@ -327,5 +336,4 @@
 </script>
 @endif
 @endpush
-
 

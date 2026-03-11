@@ -323,31 +323,19 @@ Route::get('/guest/services', function () {
     // Dynamic Statistics for Services Page
     $totalStudents = Student::count();
     $totalCourses = Course::count();
-    $totalEnrollments = DB::table('course_student')
+    $approvedEnrollments = DB::table('course_student')
         ->where('status', 'approved')
         ->count();
 
-    // Assignment statistics
-    $totalAssignments = DB::table('assignments')->count();
-    $totalSubmissions = DB::table('assignment_submissions')->count();
-
     // Grade statistics
     $totalGrades = DB::table('grades')->count();
-
-    // Fee statistics
-    $totalFees = DB::table('fees')->count();
-    $paidFees = DB::table('fees')->where('status', 'paid')->count();
 
     return view('guest.services', [
         'stats' => [
             'totalStudents' => $totalStudents,
             'totalCourses' => $totalCourses,
-            'totalEnrollments' => $totalEnrollments,
-            'totalAssignments' => $totalAssignments,
-            'totalSubmissions' => $totalSubmissions,
+            'approvedEnrollments' => $approvedEnrollments,
             'totalGrades' => $totalGrades,
-            'totalFees' => $totalFees,
-            'paidFees' => $paidFees,
         ],
     ]);
 })->name('guest.services');
@@ -355,22 +343,16 @@ Route::get('/guest/services', function () {
 Route::get('/guest/support', function () {
     // Dynamic Statistics for Support Page
     $totalStudents = Student::count();
-    $totalFaculty = User::where('role', 'teacher')->count();
     $totalUsers = User::count();
-    $totalAnnouncements = DB::table('announcements')
-        ->where('visible_from', '<=', now())
-        ->where(function ($query) {
-            $query->whereNull('visible_until')
-                ->orWhere('visible_until', '>=', now());
-        })
+    $supportTeamCount = User::query()
+        ->whereIn('role', ['staff', 'admin'])
         ->count();
 
     return view('guest.support', [
         'stats' => [
             'totalStudents' => $totalStudents,
-            'totalFaculty' => $totalFaculty,
             'totalUsers' => $totalUsers,
-            'totalAnnouncements' => $totalAnnouncements,
+            'supportTeamCount' => $supportTeamCount,
         ],
     ]);
 })->name('guest.support');

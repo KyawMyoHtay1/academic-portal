@@ -22,6 +22,12 @@
     .support-rise:nth-child(2) { animation-delay: 0.08s; }
     .support-rise:nth-child(3) { animation-delay: 0.16s; }
     .support-rise:nth-child(4) { animation-delay: 0.24s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .support-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -60,14 +66,14 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Active Users</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-blue-700">Registered Users</p>
             <p class="mt-1 text-3xl font-bold text-blue-900">{{ number_format(data_get($stats, 'totalUsers', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Students Supported</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Students</p>
             <p class="mt-1 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalStudents', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
@@ -75,14 +81,14 @@
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             </div>
             <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Support Team</p>
-            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'totalFaculty', 0)) }}</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">{{ number_format(data_get($stats, 'supportTeamCount', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Service Status</p>
-            <p class="mt-1 text-3xl font-bold text-amber-900">Available</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Access</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">Public</p>
         </div>
     </section>
 
@@ -116,9 +122,9 @@
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
-                <h3 class="mt-4 text-lg font-semibold text-slate-900">FAQs</h3>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Quick answers for common questions about login, grades, timetables, fees, and day-to-day usage. Start here to resolve many issues without waiting for a reply.</p>
-                <a href="{{ route('guest.contact') }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-blue-600">Browse FAQs</a>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Help Guides</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Start with step-by-step help for common portal tasks like login, grades, timetables, fees, and day-to-day navigation before opening a support request.</p>
+                <a href="{{ route('guest.user-manual.page', [], false) }}" class="mt-3 inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-blue-600">Open Help Guides</a>
             </div>
             <div class="support-rise rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
@@ -127,7 +133,7 @@
                 <h3 class="mt-4 text-lg font-semibold text-slate-900">User Guides</h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-600">Step-by-step walkthroughs for key tasks: enrollment, grading, attendance, fee checks, and more. Follow along to complete processes correctly the first time.</p>
                 <div class="mt-3 flex items-center gap-4">
-                    <a href="{{ route('guest.user-manual.page', [], false) }}" class="inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-emerald-600">View User Manual (PDF)</a>
+                    <a href="{{ route('guest.user-manual.page', [], false) }}" class="inline-flex text-sm font-semibold text-[color:var(--portal-navy)] hover:text-emerald-600">Open User Manual</a>
                     <a href="{{ route('guest.user-manual.download', [], false) }}" class="inline-flex text-sm font-semibold text-emerald-700 hover:text-emerald-800">Download PDF</a>
                 </div>
             </div>
@@ -199,8 +205,8 @@
             <div class="flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700 font-bold">1</div>
                 <div>
-                    <p class="text-sm font-semibold text-slate-900">Check FAQs</p>
-                    <p class="mt-1 text-xs leading-relaxed text-slate-600">Review common solutions first; many login, grade, and timetable questions are answered there in under a minute.</p>
+                    <p class="text-sm font-semibold text-slate-900">Check Guides</p>
+                    <p class="mt-1 text-xs leading-relaxed text-slate-600">Review self-help instructions first; many login, grade, and timetable tasks are already covered there.</p>
                 </div>
             </div>
             <div class="flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">

@@ -24,6 +24,12 @@
     .service-rise:nth-child(4) { animation-delay: 0.24s; }
     .service-rise:nth-child(5) { animation-delay: 0.32s; }
     .service-rise:nth-child(6) { animation-delay: 0.40s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .service-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -69,8 +75,8 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-200/80 text-emerald-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Course Enrollments</p>
-            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'totalEnrollments', 0)) }}</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">Approved Enrollments</p>
+            <p class="mt-1 text-3xl font-bold text-emerald-900">{{ number_format(data_get($stats, 'approvedEnrollments', 0)) }}</p>
         </div>
         <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
@@ -180,7 +186,7 @@
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                 </div>
                 <h3 class="mt-4 text-lg font-semibold text-slate-900">Teachers</h3>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Manage attendance, assignment grading, class communication, and academic performance oversight for taught subjects—all from a role-specific interface that reduces clutter and speeds up daily tasks.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Manage attendance, assignment grading, class communication, and academic performance oversight for taught subjects, all from a role-specific interface that reduces clutter and speeds up daily tasks.</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
@@ -243,7 +249,5 @@
     </section>
 </div>
 @endsection
-
-
 
 

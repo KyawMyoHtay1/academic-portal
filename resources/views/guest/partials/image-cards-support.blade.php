@@ -13,8 +13,8 @@
                 </div>
             </div>
             <div class="p-5 border-t border-slate-100">
-                <h3 class="text-lg font-bold text-[color:var(--portal-navy)] mb-1">FAQs & Guides</h3>
-                <p class="text-sm text-slate-600">Quick answers and step-by-step guides for common questions.</p>
+                <h3 class="text-lg font-bold text-[color:var(--portal-navy)] mb-1">Guides & Self-Help</h3>
+                <p class="text-sm text-slate-600">Step-by-step help and quick references for common portal tasks.</p>
             </div>
         </div>
         <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">

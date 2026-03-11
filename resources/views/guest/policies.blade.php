@@ -22,6 +22,12 @@
     .policy-rise:nth-child(2) { animation-delay: 0.08s; }
     .policy-rise:nth-child(3) { animation-delay: 0.16s; }
     .policy-rise:nth-child(4) { animation-delay: 0.24s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .policy-rise {
+            animation: none !important;
+        }
+    }
 </style>
 @endpush
 
@@ -74,15 +80,15 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200/80 text-indigo-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Update Cadence</p>
-            <p class="mt-1 text-3xl font-bold text-indigo-900">Termly</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-indigo-700">Review Cycle</p>
+            <p class="mt-1 text-3xl font-bold text-indigo-900">Periodic</p>
         </div>
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200/80 text-amber-800">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             </div>
-            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Effective Date</p>
-            <p class="mt-1 text-3xl font-bold text-amber-900">Current</p>
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-amber-700">Policy Status</p>
+            <p class="mt-1 text-3xl font-bold text-amber-900">In Effect</p>
         </div>
     </section>
 
@@ -224,7 +230,7 @@
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-slate-900">Contact</h3>
-                    <p class="mt-1 text-sm leading-relaxed text-slate-600">For privacy or data-protection queries, contact our support team or email privacy@university.edu. We aim to respond within the timeframe set out in our policy.</p>
+                    <p class="mt-1 text-sm leading-relaxed text-slate-600">For privacy or data-protection queries, contact our support team through the support or contact pages. We aim to respond within the timeframe set out in our policy.</p>
                 </div>
             </div>
         </div>
@@ -246,7 +252,6 @@
     </section>
 </div>
 @endsection
-
 
 
 
