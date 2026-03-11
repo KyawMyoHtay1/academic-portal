@@ -92,7 +92,7 @@ const getGroupForRoute = (currentRoute) => {
     }
 
     // Staff role groups
-    if (role === "staff" || role === "admin") {
+    if (role === "staff") {
         // Academics group
         if (
             routeName.match(/^admin\.courses\./) ||

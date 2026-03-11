@@ -225,7 +225,7 @@
                 <div class="mt-4 space-y-3 text-sm text-slate-700">
                     <p><span class="font-semibold">General inquiries:</span> Submit the form on this page.</p>
                     <p><span class="font-semibold">Technical support:</span> Use Support & Help Desk for login and portal issues.</p>
-                    <p><span class="font-semibold">Message routing:</span> Contact requests are forwarded to staff and admin teams.</p>
+                    <p><span class="font-semibold">Message routing:</span> Contact requests are forwarded to the staff team.</p>
                     <p><span class="font-semibold">Office details:</span> Refer to official university channels for current visit and office-hour information.</p>
                 </div>
             </div>

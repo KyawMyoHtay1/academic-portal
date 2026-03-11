@@ -83,7 +83,6 @@ const getMenuIcon = (name) => {
 
 const navigation = computed(() => {
     const user = page.props.auth?.user;
-    const isAdmin = user?.role === "admin";
     const isStaff = user?.role === "staff";
     const isTeacher = user?.role === "teacher";
 
@@ -264,39 +263,6 @@ const navigation = computed(() => {
         );
     }
 
-    if (isAdmin) {
-        items.push(
-            createGroup("Communication", [
-                {
-                    name: "Contact Messages",
-                    href: route("admin.contact-messages.index"),
-                    active: route().current("admin.contact-messages.*"),
-                    icon: getMenuIcon("Contact Messages"),
-                },
-                {
-                    name: "Feedback Messages",
-                    href: route("admin.feedback-messages.index"),
-                    active: route().current("admin.feedback-messages.*"),
-                    icon: getMenuIcon("Feedback Messages"),
-                },
-                {
-                    name: "Notifications",
-                    href: route("notifications.index"),
-                    active: route().current("notifications.*"),
-                    badge: unreadNotifications,
-                    icon: getMenuIcon("Notifications"),
-                },
-                {
-                    name: "Messages",
-                    href: route("messages.index"),
-                    active: route().current("messages.*"),
-                    badge: unreadMessages,
-                    icon: getMenuIcon("Messages"),
-                },
-            ])
-        );
-    }
-
     // Staff admin features - organized into groups
     if (isStaff) {
         items.push(
@@ -426,7 +392,7 @@ const headerStatus = computed(() => {
         return "Teaching term in progress";
     }
 
-    if (role === "staff" || role === "admin") {
+    if (role === "staff") {
         return "Administration term in progress";
     }
     return "Academic year in progress";
@@ -455,7 +421,7 @@ const userRoleMeta = computed(() => {
         };
     }
 
-    if (role === "staff" || role === "admin") {
+    if (role === "staff") {
         return {
             label: "Staff",
             statusClasses: "bg-amber-50 text-amber-800 border border-amber-200",

@@ -172,11 +172,11 @@ class NotificationController extends Controller
             }
         }
 
-        if ($type === 'contact' && in_array($role, ['staff', 'admin'], true)) {
+        if ($type === 'contact' && $role === 'staff') {
             return route('admin.contact-messages.index', ['status' => 'unread']);
         }
 
-        if ($type === 'feedback' && in_array($role, ['staff', 'admin'], true)) {
+        if ($type === 'feedback' && $role === 'staff') {
             return route('admin.feedback-messages.index', ['status' => 'unread']);
         }
 

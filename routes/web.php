@@ -345,7 +345,7 @@ Route::get('/guest/support', function () {
     $totalStudents = Student::count();
     $totalUsers = User::count();
     $supportTeamCount = User::query()
-        ->whereIn('role', ['staff', 'admin'])
+        ->where('role', 'staff')
         ->count();
 
     return view('guest.support', [
@@ -496,8 +496,8 @@ Route::middleware(['auth', 'nocache'])->group(function () {
         ->middleware('throttle:120,1')
         ->name('messages.read');
 
-    // Timebox 2: Communication inboxes (staff and admin)
-    Route::middleware('role:staff,admin')->group(function () {
+    // Timebox 2: Communication inboxes (staff only)
+    Route::middleware('role:staff')->group(function () {
         // Contact Messages
         Route::get('/admin/contact-messages', [StaffContactMessageController::class, 'index'])->name('admin.contact-messages.index');
         Route::post('/admin/contact-messages/{contactMessage}/read', [StaffContactMessageController::class, 'markRead'])->name('admin.contact-messages.read');

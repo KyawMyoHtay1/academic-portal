@@ -43,7 +43,7 @@ class ContactController extends Controller
         ]);
 
         $staffRecipients = User::query()
-            ->whereIn('role', ['staff', 'admin'])
+            ->where('role', 'staff')
             ->get();
 
         if ($staffRecipients->isNotEmpty()) {
