@@ -17,7 +17,6 @@ class Assignment extends Model
 
     protected $fillable = [
         'subject_id',
-        'course_id',
         'created_by',
         'title',
         'description',
@@ -40,9 +39,14 @@ class Assignment extends Model
         return $this->belongsTo(Subject::class);
     }
 
-    public function course()
+    public function getCourseAttribute(): ?Course
     {
-        return $this->belongsTo(Course::class);
+        return $this->subject?->course;
+    }
+
+    public function getCourseIdAttribute(): ?int
+    {
+        return $this->subject?->course_id;
     }
 
     public function creator()

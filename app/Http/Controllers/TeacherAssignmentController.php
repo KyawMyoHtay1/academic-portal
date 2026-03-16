@@ -93,7 +93,7 @@ class TeacherAssignmentController extends Controller
             ->count();
 
         $assignments = Assignment::where('subject_id', $subject->id)
-            ->with('creator:id,name')
+            ->with(['creator:id,name', 'subject.course'])
             ->withCount('submissions')
             ->withCount([
                 'submissions as graded_submissions_count' => function ($q) {
@@ -194,7 +194,6 @@ class TeacherAssignmentController extends Controller
         $assignment = Assignment::create([
             ...$data,
             'subject_id' => $subject->id,
-            'course_id' => $subject->course_id,
             'created_by' => $user->id,
         ]);
 
@@ -330,8 +329,9 @@ class TeacherAssignmentController extends Controller
 
         $dueAt = $this->assignmentDueAt($assignment);
 
-        $expectedStudents = $assignment->course
-            ->students()
+        $course = $assignment->course;
+        $expectedStudents = $course
+            ?->students()
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->orderBy('students.full_name')
             ->get(['students.id', 'students.student_no', 'students.full_name', 'students.photo'])
@@ -607,15 +607,15 @@ class TeacherAssignmentController extends Controller
 
     private function notifyEnrolledStudents(Assignment $assignment, string $action): void
     {
-        $students = $assignment->course
-            ?->students()
+        $course = $assignment->course;
+        if (! $course) {
+            return;
+        }
+
+        $students = $course->students()
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->with('user')
             ->get();
-
-        if (! $students) {
-            return;
-        }
 
         $students->pluck('user')
             ->filter()

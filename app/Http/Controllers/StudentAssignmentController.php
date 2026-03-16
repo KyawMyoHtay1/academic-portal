@@ -35,9 +35,12 @@ class StudentAssignmentController extends Controller
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->pluck('courses.id');
 
-        $assignments = Assignment::whereIn('course_id', $enrolledCourseIds)
+        $assignments = Assignment::query()
+            ->whereHas('subject', function ($query) use ($enrolledCourseIds) {
+                $query->whereIn('course_id', $enrolledCourseIds);
+            })
             ->where('status', Assignment::STATUS_PUBLISHED)
-            ->with(['subject', 'course', 'submissions' => function ($query) use ($student) {
+            ->with(['subject.course', 'submissions' => function ($query) use ($student) {
                 $query->where('student_id', $student->id);
             }])
             ->orderBy('due_date', 'asc')
@@ -103,9 +106,11 @@ class StudentAssignmentController extends Controller
             abort(404);
         }
 
+        $assignment->loadMissing('subject.course');
+
         // Check if student is enrolled in the assignment's course
         $isEnrolled = $student->courses()
-            ->where('courses.id', $assignment->course_id)
+            ->where('courses.id', $assignment->subject?->course_id)
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->exists();
 
@@ -171,9 +176,11 @@ class StudentAssignmentController extends Controller
             abort(404);
         }
 
+        $assignment->loadMissing('subject.course');
+
         // Check if student is enrolled
         $isEnrolled = $student->courses()
-            ->where('courses.id', $assignment->course_id)
+            ->where('courses.id', $assignment->subject?->course_id)
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->exists();
 

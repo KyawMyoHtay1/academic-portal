@@ -24,13 +24,17 @@ class GradePublished extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $this->grade->loadMissing('subject.course');
+
+        $course = $this->grade->course;
+
         return [
             'type' => 'grade',
             'title' => 'New grade published',
             'message' => sprintf(
                 'Your grade for %s (%s) has been updated to %s.',
-                $this->grade->course->title,
-                $this->grade->course->course_code,
+                $course?->title ?? 'subject',
+                $course?->course_code ?? 'course',
                 $this->grade->score ?? 'N/A'
             ),
             'grade_id' => $this->grade->id,

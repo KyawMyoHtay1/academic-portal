@@ -30,6 +30,11 @@ class EnrollmentStatusLog extends Model
         return $this->belongsTo(User::class, 'performed_by');
     }
 
+    public function enrollment()
+    {
+        return $this->belongsTo(Enrollment::class, 'enrollment_id');
+    }
+
     public function student()
     {
         return $this->belongsTo(Student::class);
@@ -40,4 +45,3 @@ class EnrollmentStatusLog extends Model
         return $this->belongsTo(Course::class);
     }
 }
-

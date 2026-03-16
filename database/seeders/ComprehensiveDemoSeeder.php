@@ -438,7 +438,6 @@ class ComprehensiveDemoSeeder extends Seeder
                         'title' => 'Weekly Quiz - '.$subject->subject_code,
                     ],
                     [
-                        'course_id' => $course->id,
                         'created_by' => $teacherId,
                         'description' => 'Weekly assessment quiz.',
                         'due_date' => Carbon::now()->addDays(7 + $subjectIndex)->toDateString(),
@@ -457,7 +456,6 @@ class ComprehensiveDemoSeeder extends Seeder
                         'title' => 'Mini Project - '.$subject->subject_code,
                     ],
                     [
-                        'course_id' => $course->id,
                         'created_by' => $teacherId,
                         'description' => 'Practical mini project.',
                         'due_date' => Carbon::now()->subDays(5 + $subjectIndex)->toDateString(),
@@ -477,7 +475,6 @@ class ComprehensiveDemoSeeder extends Seeder
                             'title' => 'Draft Final Report - '.$subject->subject_code,
                         ],
                         [
-                            'course_id' => $course->id,
                             'created_by' => $teacherId,
                             'description' => 'Draft assignment not yet published.',
                             'due_date' => Carbon::now()->addDays(25)->toDateString(),
@@ -622,7 +619,6 @@ class ComprehensiveDemoSeeder extends Seeder
                         'student_id' => $studentId,
                     ],
                     [
-                        'course_id' => $subject->course_id,
                         'graded_by' => $teacherId,
                         'score' => $score,
                         'status' => $status,
@@ -747,7 +743,6 @@ class ComprehensiveDemoSeeder extends Seeder
                         'title' => $definition['title_prefix'].' - '.$subject->subject_code,
                     ],
                     [
-                        'course_id' => $courseId,
                         'created_by' => $teacherId,
                         'description' => $definition['description'],
                         'due_date' => $definition['due_date'],

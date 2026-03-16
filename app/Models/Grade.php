@@ -20,7 +20,6 @@ class Grade extends Model
 
     protected $fillable = [
         'subject_id',
-        'course_id',
         'student_id',
         'graded_by',
         'reviewed_by',
@@ -36,11 +35,16 @@ class Grade extends Model
     ];
 
     /**
-     * The course this grade belongs to.
+     * The course this grade belongs to (via subject).
      */
-    public function course()
+    public function getCourseAttribute(): ?Course
     {
-        return $this->belongsTo(Course::class);
+        return $this->subject?->course;
+    }
+
+    public function getCourseIdAttribute(): ?int
+    {
+        return $this->subject?->course_id;
     }
 
     /**
@@ -100,10 +104,9 @@ class Grade extends Model
         return $query->where('status', self::STATUS_REJECTED);
     }
 
-    public function submitForReview(float $score, int $gradedBy, int $courseId): void
+    public function submitForReview(float $score, int $gradedBy): void
     {
         $this->update([
-            'course_id' => $courseId,
             'graded_by' => $gradedBy,
             'score' => $score,
             'status' => self::STATUS_PENDING,

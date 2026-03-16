@@ -248,7 +248,6 @@ class TeacherGradesController extends Controller
                     'student_id' => $record['student_id'],
                 ],
                 [
-                    'course_id' => $subject->course_id,
                     'graded_by' => $user->id,
                     'score' => $score,
                     'status' => Grade::STATUS_DRAFT,
@@ -384,7 +383,6 @@ class TeacherGradesController extends Controller
                 'student_id' => $student->id,
             ],
             [
-                'course_id' => $subject->course_id,
                 'graded_by' => $user->id,
                 'score' => $score,
                 'status' => Grade::STATUS_PENDING,

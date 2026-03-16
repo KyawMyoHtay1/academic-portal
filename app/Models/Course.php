@@ -46,11 +46,11 @@ class Course extends Model
     }
 
     /**
-     * The grades recorded for this course.
+     * The grades recorded for this course (via subjects).
      */
     public function grades()
     {
-        return $this->hasMany(Grade::class);
+        return $this->hasManyThrough(Grade::class, Subject::class, 'course_id', 'subject_id', 'id', 'id');
     }
 
     /**
@@ -70,10 +70,10 @@ class Course extends Model
     }
 
     /**
-     * The assignments for this course.
+     * The assignments for this course (via subjects).
      */
     public function assignments()
     {
-        return $this->hasMany(Assignment::class);
+        return $this->hasManyThrough(Assignment::class, Subject::class, 'course_id', 'subject_id', 'id', 'id');
     }
 }

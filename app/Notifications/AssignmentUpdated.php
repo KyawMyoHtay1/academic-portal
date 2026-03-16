@@ -27,6 +27,8 @@ class AssignmentUpdated extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $this->assignment->loadMissing('subject.course');
+
         $subjectCode = $this->assignment->subject?->subject_code ?? 'subject';
         $courseCode = $this->assignment->course?->course_code ?? 'course';
         $dueDate = $this->assignment->due_date?->format('Y-m-d') ?? 'N/A';
