@@ -852,7 +852,6 @@ class ComprehensiveDemoSeeder extends Seeder
                 'student_id' => $student->id,
             ],
             [
-                'course_id' => $courseId,
                 'graded_by' => $teacherId,
                 'score' => 78.0,
                 'status' => Grade::STATUS_APPROVED,

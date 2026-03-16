@@ -80,7 +80,6 @@ class TeacherSearchScopeTest extends TestCase
 
         Assignment::create([
             'subject_id' => $subject->id,
-            'course_id' => $courseViaSubject->id,
             'created_by' => $teacher->id,
             'title' => 'Alpha Assignment',
             'description' => 'Visible assignment',
@@ -91,7 +90,6 @@ class TeacherSearchScopeTest extends TestCase
 
         Assignment::create([
             'subject_id' => $hiddenSubject->id,
-            'course_id' => $hiddenCourse->id,
             'created_by' => $otherTeacher->id,
             'title' => 'Alpha Hidden Assignment',
             'description' => 'Hidden assignment',
@@ -192,4 +190,3 @@ class TeacherSearchScopeTest extends TestCase
             ->assertJsonCount(0, 'results');
     }
 }
-

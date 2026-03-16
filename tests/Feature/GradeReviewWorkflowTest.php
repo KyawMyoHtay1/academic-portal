@@ -177,7 +177,6 @@ class GradeReviewWorkflowTest extends TestCase
         ]);
         Grade::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'student_id' => $withdrawalStudent->id,
             'graded_by' => $teacherId,
             'score' => 66,
@@ -200,7 +199,6 @@ class GradeReviewWorkflowTest extends TestCase
         ]);
         Grade::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'student_id' => $pendingStudent->id,
             'graded_by' => $teacherId,
             'score' => 71,
@@ -256,7 +254,6 @@ class GradeReviewWorkflowTest extends TestCase
 
         return Grade::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'student_id' => $student->id,
             'graded_by' => $teacher->id,
             'score' => 78.5,

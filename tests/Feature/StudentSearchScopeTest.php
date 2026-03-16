@@ -91,7 +91,6 @@ class StudentSearchScopeTest extends TestCase
 
         Assignment::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'Alpha Assignment',
             'description' => 'Visible assignment',

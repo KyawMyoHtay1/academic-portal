@@ -204,10 +204,16 @@ class SampleDataSeeder extends Seeder
 
         // Grades for a subset
         foreach ($courses as $course) {
+            $subjectId = $course->subjects()->orderBy('subject_code')->value('id');
+
+            if ($subjectId === null) {
+                continue;
+            }
+
             foreach ($students->take(6) as $i => $student) {
                 Grade::updateOrCreate(
                     [
-                        'course_id' => $course->id,
+                        'subject_id' => $subjectId,
                         'student_id' => $student->id,
                     ],
                     [

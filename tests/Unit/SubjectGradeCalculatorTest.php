@@ -22,7 +22,6 @@ class SubjectGradeCalculatorTest extends TestCase
 
         $assignmentOne = Assignment::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'Assignment 1',
             'description' => 'Task 1',
@@ -33,7 +32,6 @@ class SubjectGradeCalculatorTest extends TestCase
 
         $assignmentTwo = Assignment::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'Assignment 2',
             'description' => 'Task 2',
@@ -120,7 +118,6 @@ class SubjectGradeCalculatorTest extends TestCase
 
         $assignmentOne = Assignment::create([
             'subject_id' => $subjectOne->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'SE Quiz',
             'description' => 'Quiz',
@@ -131,7 +128,6 @@ class SubjectGradeCalculatorTest extends TestCase
 
         $assignmentTwo = Assignment::create([
             'subject_id' => $subjectTwo->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'Physics Quiz',
             'description' => 'Quiz',

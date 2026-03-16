@@ -20,7 +20,6 @@ class TeacherGradeDraftOwnershipTest extends TestCase
 
         Grade::create([
             'subject_id' => $subject->id,
-            'course_id' => $subject->course_id,
             'student_id' => $student->id,
             'graded_by' => $ownerTeacher->id,
             'score' => 77,
@@ -54,7 +53,6 @@ class TeacherGradeDraftOwnershipTest extends TestCase
 
         Grade::create([
             'subject_id' => $subject->id,
-            'course_id' => $subject->course_id,
             'student_id' => $student->id,
             'graded_by' => $ownerTeacher->id,
             'score' => 60,
@@ -88,7 +86,6 @@ class TeacherGradeDraftOwnershipTest extends TestCase
 
         Grade::create([
             'subject_id' => $subject->id,
-            'course_id' => $subject->course_id,
             'student_id' => $student->id,
             'graded_by' => $ownerTeacher->id,
             'score' => 74,

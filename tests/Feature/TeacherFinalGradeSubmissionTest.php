@@ -27,7 +27,6 @@ class TeacherFinalGradeSubmissionTest extends TestCase
 
         $assignment = Assignment::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'Essay 1',
             'description' => 'Essay',
@@ -104,7 +103,6 @@ class TeacherFinalGradeSubmissionTest extends TestCase
 
         $assignment = Assignment::create([
             'subject_id' => $subject->id,
-            'course_id' => $course->id,
             'created_by' => $teacher->id,
             'title' => 'Quiz 1',
             'description' => 'Quiz',
