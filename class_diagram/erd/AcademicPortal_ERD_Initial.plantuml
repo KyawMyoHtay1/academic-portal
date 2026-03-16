@@ -1,0 +1,69 @@
+@startuml
+title <u>University Academic Portal ERD</u>
+
+hide empty members
+hide circle
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam roundCorner 0
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam ArrowColor #4A4A4A
+skinparam defaultFontName Arial
+skinparam entity {
+  BackgroundColor #DCEBFF
+  BorderColor #8FAFD6
+  FontColor #222222
+}
+
+entity "contact_messages" as ContactMessage
+entity "feedback_messages" as FeedbackMessage
+
+entity "announcements" as Announcement
+entity "notifications" as Notification
+entity "users" as User
+entity "messages" as Message
+
+entity "fees" as Fee
+entity "students" as Student
+entity "course_student" as Enrollment
+entity "courses" as Course
+entity "subjects" as Subject
+entity "grades" as Grade
+entity "timetables" as Timetable
+entity "attendances" as Attendance
+
+' Layout hints
+ContactMessage -[hidden]right-> FeedbackMessage
+
+Announcement -[hidden]right-> Notification
+Notification -[hidden]right-> User
+User -[hidden]right-> Message
+
+Fee -[hidden]right-> Student
+Student -[hidden]right-> Enrollment
+Enrollment -[hidden]right-> Course
+Course -[hidden]right-> Subject
+Subject -[hidden]right-> Grade
+Timetable -[hidden]right-> Attendance
+
+' Core conceptual relationships
+User ||--o| Student : has profile
+
+Student ||--o{ Enrollment
+Course ||--o{ Enrollment
+Course ||--|{ Subject
+
+Student ||--o{ Fee
+Subject ||--o{ Timetable
+Subject ||--o{ Attendance
+Student ||--o{ Attendance
+Subject ||--o{ Grade
+Student ||--o{ Grade
+
+User ||--o{ Announcement : author
+User ||--o{ Message : sends/receives
+User ||--o{ Notification
+
+@enduml
