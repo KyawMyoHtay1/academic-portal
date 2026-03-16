@@ -63,7 +63,6 @@ class Subject {
 class Grade {
   +id: bigint
   +subject_id: bigint
-  +course_id: bigint
   +student_id: bigint
   +graded_by: bigint
   +reviewed_by: bigint
@@ -74,7 +73,8 @@ class Grade {
   +created_at: timestamp
   +updated_at: timestamp
   --
-  +course()
+  +getCourseAttribute()
+  +getCourseIdAttribute()
   +subject()
   +student()
   +grader()
@@ -84,7 +84,7 @@ class Grade {
   +scopePending()
   +scopeApproved()
   +scopeRejected()
-  +submitForReview(score, gradedBy, courseId)
+  +submitForReview(score, gradedBy)
   +approve(reviewedBy)
   +reject(reviewedBy, reason)
   +getLetterGradeAttribute()
@@ -166,12 +166,12 @@ class SubjectGradeCalculator {
 
 Course  "1" -- "0..*" Subject
 Subject "1" -- "0..*" Grade
-Course  "0..1" -- "0..*" Grade
 Student "1" -- "0..*" Grade
 User    "1" -- "0..*" Grade         : graded_by
 User    "1" -- "0..*" Grade         : reviewed_by
 Grade   "1" -- "0..*" GradeReviewLog
 User    "1" -- "0..*" GradeReviewLog : performed_by
+Grade ..> Course : derives via Subject
 
 Student "1" -- "0..*" Fee
 User    "0..1" -- "0..*" Fee          : processed_by
@@ -185,4 +185,3 @@ SubjectGradeCalculator ..> Subject
 SubjectGradeCalculator ..> Student
 
 @enduml
-

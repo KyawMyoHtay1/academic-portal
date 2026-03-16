@@ -114,12 +114,13 @@ The project includes a larger set of models than can be discussed individually i
 | `User` | Core authenticated identity for student, teacher, and staff access. | `app/Models/User.php` |
 | `Student` | Stores student-specific academic and profile information. | `app/Models/Student.php` |
 | `Course` | Represents academic courses and their administrative data. | `app/Models/Course.php` |
+| `Enrollment` | Represents student-course enrolment rows and status state in the pivot table. | `app/Models/Enrollment.php` |
 | `Subject` | Represents subjects linked to courses and teaching allocation. | `app/Models/Subject.php` |
-| `Grade` | Stores grade information and publication status. | `app/Models/Grade.php` |
+| `Grade` | Stores subject-level grade information and publication status, with course context derived through the linked subject. | `app/Models/Grade.php` |
 | `GradeReviewLog` | Records review actions for grade workflow traceability. | `app/Models/GradeReviewLog.php` |
 | `Fee` | Stores student fee records, balances, and payment state. | `app/Models/Fee.php` |
 | `FeeStatusLog` | Records changes to fee status for audit purposes. | `app/Models/FeeStatusLog.php` |
-| `Assignment` | Represents published coursework tasks and related metadata. | `app/Models/Assignment.php` |
+| `Assignment` | Represents subject-linked coursework tasks, with course context derived through the subject. | `app/Models/Assignment.php` |
 | `AssignmentSubmission` | Stores student assignment submissions and submission state. | `app/Models/AssignmentSubmission.php` |
 | `Timetable` | Stores scheduled teaching sessions and timetable entries. | `app/Models/Timetable.php` |
 | `Attendance` | Stores attendance records for students in scheduled sessions. | `app/Models/Attendance.php` |
@@ -130,7 +131,7 @@ The project includes a larger set of models than can be discussed individually i
 | `ContactMessage` | Stores enquiries submitted through the contact form. | `app/Models/ContactMessage.php` |
 | `FeedbackMessage` | Stores user or guest feedback submitted to the portal. | `app/Models/FeedbackMessage.php` |
 | `StripeWebhookEvent` | Stores payment webhook records related to Stripe integration. | `app/Models/StripeWebhookEvent.php` |
-| `EnrollmentStatusLog` | Records changes to course enrolment request status. | `app/Models/EnrollmentStatusLog.php` |
+| `EnrollmentStatusLog` | Records changes to course enrolment request status and can reference the related enrolment row. | `app/Models/EnrollmentStatusLog.php` |
 
 ## Appendix C: Implementation Module Summary
 

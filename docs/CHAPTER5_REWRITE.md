@@ -252,7 +252,7 @@ The database schema was implemented incrementally through Laravel migrations. Th
 6. enrolment status logs
 7. system settings
 
-This migration-based implementation approach improved traceability and helped keep schema changes controlled over time.
+This migration-based implementation approach improved traceability and helped keep schema changes controlled over time. Later refinements also removed redundant direct `course_id` storage from subject-based grade and assignment records, and tightened enrolment logging by linking status logs back to enrolment rows where available.
 
 ## 5.8 Overall Testing and Quality Support
 

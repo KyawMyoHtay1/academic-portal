@@ -279,7 +279,7 @@ The database design is relational and centred on the core academic entities:
 14. `notifications`
 15. supporting logs and state tables
 
-This structure supports role-based academic workflows while maintaining referential integrity and traceability. The overall ERD is represented in [AcademicPortal_ERD.plantuml](d:/university-portal/academic-portal/class_diagram/erd/AcademicPortal_ERD.plantuml).
+This structure supports role-based academic workflows while maintaining referential integrity and traceability. Grades and assignments are normalised around `subject_id`, with course context derived through the linked subject, and enrolment status logs can reference the underlying enrolment row for stronger audit linkage. The overall ERD is represented in [AcademicPortal_ERD.plantuml](d:/university-portal/academic-portal/class_diagram/erd/AcademicPortal_ERD.plantuml).
 
 ### 4.6.4 Class Design
 

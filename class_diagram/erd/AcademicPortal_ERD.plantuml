@@ -103,7 +103,6 @@ entity "subject_teacher" as SubjectTeacher {
 
 entity "grades" as Grade {
   *id : bigint <<PK>>
-  course_id : bigint <<FK,nullable>>
   subject_id : bigint <<FK,nullable>>
   student_id : bigint <<FK>>
   graded_by : bigint <<FK,nullable>>
@@ -148,7 +147,6 @@ entity "fees" as Fee {
 entity "assignments" as Assignment {
   *id : bigint <<PK>>
   subject_id : bigint <<FK>>
-  course_id : bigint <<FK>>
   created_by : bigint <<FK>>
   title : varchar
   description : text
@@ -314,7 +312,7 @@ entity "system_settings" as SystemSetting {
 
 entity "enrollment_status_logs" as EnrollmentStatusLog {
   *id : bigint <<PK>>
-  enrollment_id : bigint <<nullable>>
+  enrollment_id : bigint <<FK,nullable>>
   student_id : bigint <<FK>>
   course_id : bigint <<FK>>
   from_status : varchar
@@ -357,7 +355,6 @@ Subject ||--o{ SubjectTeacher
 User    ||--o{ SubjectTeacher : teaches
 
 Subject ||--o{ Grade
-Course  ||--o{ Grade
 Student ||--o{ Grade
 User    ||--o{ Grade : graded_by
 User    ||--o{ Grade : reviewed_by
@@ -368,7 +365,6 @@ Student ||--o{ Fee
 User    ||--o{ Fee : processed_by
 
 Subject ||--o{ Assignment
-Course  ||--o{ Assignment
 User    ||--o{ Assignment : created_by
 Assignment ||--o{ Submission
 Student    ||--o{ Submission
