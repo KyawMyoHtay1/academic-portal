@@ -43,7 +43,22 @@ class StaffCourseController extends Controller
                 'teachers',
             ])
             ->orderBy('course_code')
-            ->get();
+            ->get()
+            ->map(fn (Course $course) => [
+                'id' => $course->id,
+                'course_code' => $course->course_code,
+                'title' => $course->title,
+                'credits' => $course->credits,
+                'semester' => $course->semester,
+                'photo' => $course->photo,
+                'photo_thumb' => ImageService::tablePath($course->photo),
+                'attendance_threshold' => $course->attendance_threshold,
+                'created_at' => $course->created_at?->toIso8601String(),
+                'updated_at' => $course->updated_at?->toIso8601String(),
+                'enrolled_students_count' => (int) ($course->enrolled_students_count ?? 0),
+                'subjects_count' => (int) ($course->subjects_count ?? 0),
+                'teachers_count' => (int) ($course->teachers_count ?? 0),
+            ]);
 
         return Inertia::render('Admin/Courses/Index', [
             'courses' => $courses,

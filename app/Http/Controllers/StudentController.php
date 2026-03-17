@@ -72,6 +72,7 @@ class StudentController extends Controller
                     'intake_year' => $student->intake_year,
                     'status' => $student->status,
                     'photo' => $student->photo,
+                    'photo_thumb' => ImageService::tablePath($student->photo),
                 ];
             });
 

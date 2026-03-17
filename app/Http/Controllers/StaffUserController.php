@@ -63,6 +63,7 @@ class StaffUserController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'photo' => $user->photo,
+                    'photo_thumb' => ImageService::tablePath($user->photo),
                     'created_at' => $user->created_at,
                 ];
             });

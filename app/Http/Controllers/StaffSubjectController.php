@@ -59,6 +59,7 @@ class StaffSubjectController extends Controller
                     'credits' => $subject->credits,
                     'description' => $subject->description,
                     'photo' => $subject->photo,
+                    'photo_thumb' => ImageService::tablePath($subject->photo),
                     'teacher_count' => $subject->teachers->count(),
                     'assignments_count' => (int) ($subject->assignments_count ?? 0),
                     'published_assignments_count' => (int) ($subject->published_assignments_count ?? 0),

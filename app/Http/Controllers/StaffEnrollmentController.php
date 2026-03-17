@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\EnrollmentService;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -381,12 +382,14 @@ class StaffEnrollmentController extends Controller
             'credits' => $row->credits,
             'semester' => $row->semester,
             'course_photo' => $row->course_photo,
+            'course_photo_thumb' => ImageService::tablePath($row->course_photo),
             'student_id' => $row->student_id,
             'student_no' => $row->student_no,
             'student_name' => $row->student_name,
             'student_email' => $row->student_email,
             'programme' => $row->programme,
             'student_photo' => $row->student_photo,
+            'student_photo_thumb' => ImageService::tablePath($row->student_photo),
             'audit_trail' => $auditTrail,
         ];
     }

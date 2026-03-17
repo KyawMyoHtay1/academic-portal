@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\Timetable;
 use App\Models\User;
 use App\Notifications\TimetableUpdated;
+use App\Services\ImageService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -560,10 +561,12 @@ class StaffTimetableController extends Controller
             'subject_code' => $subject?->subject_code,
             'subject_title' => $subject?->title,
             'subject_photo' => $subject?->photo,
+            'subject_photo_thumb' => ImageService::tablePath($subject?->photo),
             'course_code' => $course?->course_code,
             'course_title' => $course?->title,
             'semester' => $course?->semester,
             'course_photo' => $course?->photo,
+            'course_photo_thumb' => ImageService::tablePath($course?->photo),
             'day_of_week' => $entry->day_of_week,
             'start_time' => $entry->start_time,
             'end_time' => $entry->end_time,

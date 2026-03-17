@@ -8,6 +8,7 @@ use App\Models\Fee;
 use App\Models\Student;
 use App\Notifications\FeePaymentReminder;
 use App\Notifications\FeeStatusUpdated;
+use App\Services\ImageService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\Builder;
@@ -91,6 +92,7 @@ class StaffFeeController extends Controller
                 'student_no' => $fee->student->student_no,
                 'student_name' => $fee->student->full_name,
                 'student_photo' => $fee->student->photo,
+                'student_photo_thumb' => ImageService::tablePath($fee->student->photo),
                 'amount' => $fee->amount,
                 'description' => $fee->description,
                 'status' => $fee->status,
