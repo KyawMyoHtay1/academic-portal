@@ -347,7 +347,11 @@ class TeacherAssignmentController extends Controller
             });
 
         $submissionModels = AssignmentSubmission::where('assignment_id', $assignment->id)
-            ->with(['student:id,user_id,student_no,photo,user', 'grader:id,name'])
+            ->with([
+                'student:id,user_id,student_no,photo',
+                'student.user:id,name,email',
+                'grader:id,name',
+            ])
             ->orderBy('updated_at', 'desc')
             ->get();
 
@@ -366,7 +370,7 @@ class TeacherAssignmentController extends Controller
                     'student' => [
                         'id' => $submission->student->id,
                         'student_no' => $submission->student->student_no,
-                        'full_name' => $submission->student->full_name,
+                        'full_name' => $submission->student->user?->name ?? $submission->student->full_name,
                         'photo' => $submission->student->photo,
                     ],
                     'file_path' => $submission->file_path,
@@ -483,7 +487,10 @@ class TeacherAssignmentController extends Controller
         }
 
         $submissions = AssignmentSubmission::where('assignment_id', $assignment->id)
-            ->with('student:id,student_no,full_name')
+            ->with([
+                'student:id,user_id,student_no',
+                'student.user:id,name',
+            ])
             ->orderBy('created_at')
             ->get();
 
@@ -512,7 +519,7 @@ class TeacherAssignmentController extends Controller
 
             $absolutePath = Storage::disk('public')->path($submission->file_path);
             $studentNo = (string) ($submission->student?->student_no ?? 'unknown');
-            $studentName = Str::slug((string) ($submission->student?->full_name ?? 'student'));
+            $studentName = Str::slug((string) ($submission->student?->user?->name ?? $submission->student?->full_name ?? 'student'));
             $safeOriginalName = Str::slug(pathinfo($submission->original_filename, PATHINFO_FILENAME));
             $extension = pathinfo($submission->original_filename, PATHINFO_EXTENSION);
             $safeOriginalName = $safeOriginalName !== '' ? $safeOriginalName : 'submission';
