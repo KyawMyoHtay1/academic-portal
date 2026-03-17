@@ -282,14 +282,16 @@ class StaffGradesController extends Controller
     private function buildSubjectRows(Subject $subject)
     {
         $students = $subject->course->students()
+            ->with('user')
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
-            ->orderBy('students.full_name')
             ->get([
                 'students.id',
+                'students.user_id',
                 'students.student_no',
-                'students.full_name',
                 'students.photo',
-            ]);
+            ])
+            ->sortBy(fn ($s) => strtolower((string) ($s->user?->name ?? '')))
+            ->values();
         $studentIds = $students->pluck('id')->all();
 
         $calculator = new SubjectGradeCalculator();
@@ -323,7 +325,7 @@ class StaffGradesController extends Controller
                 'student' => [
                     'id' => $student->id,
                     'student_no' => $student->student_no,
-                    'full_name' => $student->full_name,
+                    'full_name' => $student->user?->name,
                     'photo' => $student->photo,
                 ],
                 'grade' => $grade ? [

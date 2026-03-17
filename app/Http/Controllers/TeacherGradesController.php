@@ -66,14 +66,16 @@ class TeacherGradesController extends Controller
         }
 
         $students = $subject->course->students()
+            ->with('user')
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
-            ->orderBy('students.full_name')
             ->get([
                 'students.id',
+                'students.user_id',
                 'students.student_no',
-                'students.full_name',
                 'students.photo',
-            ]);
+            ])
+            ->sortBy(fn ($s) => strtolower((string) ($s->user?->name ?? '')))
+            ->values();
         $studentIds = $students->pluck('id')->all();
 
         // Fetch existing grades keyed by student_id
@@ -128,7 +130,7 @@ class TeacherGradesController extends Controller
             return [
                 'id' => $student->id,
                 'student_no' => $student->student_no,
-                'full_name' => $student->full_name,
+                'full_name' => $student->user?->name,
                 'photo' => $student->photo,
                 'score' => $grade?->score,
                 'status' => $grade?->status,

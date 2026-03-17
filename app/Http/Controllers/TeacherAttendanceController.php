@@ -64,14 +64,16 @@ class TeacherAttendanceController extends Controller
 
         // Get enrolled students for the subject's course
         $students = $subject->course->students()
+            ->with('user')
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
-            ->orderBy('students.full_name')
             ->get([
                 'students.id',
+                'students.user_id',
                 'students.student_no',
-                'students.full_name',
                 'students.photo',
-            ]);
+            ])
+            ->sortBy(fn ($s) => strtolower((string) ($s->user?->name ?? '')))
+            ->values();
 
         // Attendance overview per student (for this subject)
         $studentIds = $students->pluck('id');
