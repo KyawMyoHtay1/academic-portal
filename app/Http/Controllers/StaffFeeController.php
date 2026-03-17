@@ -611,8 +611,10 @@ class StaffFeeController extends Controller
                 $q->where('description', 'like', '%'.$search.'%')
                     ->orWhere('amount', 'like', '%'.$search.'%')
                     ->orWhereHas('student', function (Builder $sq) use ($search) {
-                        $sq->where('full_name', 'like', '%'.$search.'%')
-                            ->orWhere('student_no', 'like', '%'.$search.'%');
+                        $sq->where('student_no', 'like', '%'.$search.'%')
+                            ->orWhereHas('user', function (Builder $userQuery) use ($search) {
+                                $userQuery->where('name', 'like', '%'.$search.'%');
+                            });
                     });
             });
         }

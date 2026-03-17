@@ -165,7 +165,10 @@ class TeacherAttendanceController extends Controller
         $sessionDetails = [];
         if (count($detailDates) > 0) {
             $detailRows = Attendance::query()
-                ->with('student:id,student_no,full_name')
+                ->with([
+                    'student:id,user_id,student_no',
+                    'student.user:id,name',
+                ])
                 ->where('subject_id', $subject->id)
                 ->whereIn('date', $detailDates)
                 ->orderByDesc('date')
@@ -182,7 +185,8 @@ class TeacherAttendanceController extends Controller
                             'id' => $attendance->id,
                             'student_id' => $attendance->student_id,
                             'student_no' => $attendance->student?->student_no,
-                            'student_name' => $attendance->student?->full_name,
+                            'student_name' => $attendance->student?->user?->name
+                                ?? $attendance->student?->full_name,
                             'status' => $attendance->status,
                         ];
                     })->values()->all();

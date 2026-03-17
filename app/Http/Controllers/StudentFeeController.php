@@ -101,7 +101,10 @@ class StudentFeeController extends Controller
             ->get(['id', 'role', 'preferences']);
 
         if ($reviewers->isNotEmpty()) {
-            $fee->loadMissing('student:id,student_no,full_name');
+            $fee->loadMissing([
+                'student:id,user_id,student_no',
+                'student.user:id,name',
+            ]);
             Notification::send($reviewers, new FeePaymentPendingReview($fee, 'student_submission'));
         }
 

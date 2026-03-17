@@ -346,7 +346,10 @@ class PaymentService
             return;
         }
 
-        $fee->loadMissing('student:id,student_no,full_name');
+        $fee->loadMissing([
+            'student:id,user_id,student_no',
+            'student.user:id,name',
+        ]);
         Notification::send($reviewers, new FeePaymentPendingReview($fee, $source));
     }
 }
