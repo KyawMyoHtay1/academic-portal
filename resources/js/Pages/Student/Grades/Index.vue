@@ -707,9 +707,14 @@ const getLetterGrade = (score) => {
                                         class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                     >
                                         <img
-                                            v-if="course.photo"
-                                            :src="`/storage/${course.photo}`"
+                                            v-if="course.photo_thumb ?? course.photo"
+                                            :src="`/storage/${course.photo_thumb ?? course.photo}`"
                                             :alt="`Photo for ${course.title}`"
+                                            loading="lazy"
+                                            decoding="async"
+                                            fetchpriority="low"
+                                            width="40"
+                                            height="40"
                                             class="h-full w-full object-cover"
                                         />
                                         <span
@@ -787,10 +792,16 @@ const getLetterGrade = (score) => {
                                                         >
                                                             <img
                                                                 v-if="
+                                                                    subject.photo_thumb ??
                                                                     subject.photo
                                                                 "
-                                                                :src="`/storage/${subject.photo}`"
+                                                                :src="`/storage/${subject.photo_thumb ?? subject.photo}`"
                                                                 :alt="`Photo for ${subject.title}`"
+                                                                loading="lazy"
+                                                                decoding="async"
+                                                                fetchpriority="low"
+                                                                width="36"
+                                                                height="36"
                                                                 class="h-full w-full object-cover"
                                                             />
                                                             <span

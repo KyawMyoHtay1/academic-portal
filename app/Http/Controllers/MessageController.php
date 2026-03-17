@@ -7,6 +7,7 @@ use App\Http\Requests\Messages\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
 use App\Notifications\NewMessageReceived;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -66,9 +67,11 @@ class MessageController extends Controller
                     'body' => $m->body,
                     'sender' => $m->sender?->name ?? 'Unknown',
                     'sender_photo' => $m->sender?->photo,
+                    'sender_photo_thumb' => ImageService::tablePath($m->sender?->photo),
                     'sender_role' => $m->sender?->role ?? 'unknown',
                     'receiver' => $m->receiver?->name ?? 'Unknown',
                     'receiver_photo' => $m->receiver?->photo,
+                    'receiver_photo_thumb' => ImageService::tablePath($m->receiver?->photo),
                     'receiver_role' => $m->receiver_role ?? $m->receiver?->role ?? 'unknown',
                     'read' => $m->read,
                     'is_sent' => $isSent, // Flag to identify sent messages
@@ -95,7 +98,17 @@ class MessageController extends Controller
         $recipients = User::where('id', '!=', $user->id)
             ->orderBy('role')
             ->orderBy('name')
-            ->get(['id', 'name', 'email', 'role', 'photo']);
+            ->get(['id', 'name', 'email', 'role', 'photo'])
+            ->map(function (User $recipient) {
+                return [
+                    'id' => $recipient->id,
+                    'name' => $recipient->name,
+                    'email' => $recipient->email,
+                    'role' => $recipient->role,
+                    'photo' => $recipient->photo,
+                    'photo_thumb' => ImageService::tablePath($recipient->photo),
+                ];
+            });
         $prefillRecipient = null;
         $requestedRecipient = (int) $request->input('to', 0);
         if ($requestedRecipient > 0 && $recipients->contains('id', $requestedRecipient)) {
@@ -245,6 +258,7 @@ class MessageController extends Controller
                     'name' => $otherUser->name,
                     'role' => $otherUser->role,
                     'photo' => $otherUser->photo,
+                    'photo_thumb' => ImageService::tablePath($otherUser->photo),
                     'last_message' => $message->body,
                     'last_sender_id' => $message->sender_id,
                     'last_is_sent' => $message->sender_id === $userId,

@@ -511,9 +511,14 @@ watch(
                                                             class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                                         >
                                                             <img
-                                                                v-if="entry.student?.photo"
-                                                                :src="`/storage/${entry.student.photo}`"
+                                                                v-if="entry.student?.photo_thumb ?? entry.student?.photo"
+                                                                :src="`/storage/${entry.student.photo_thumb ?? entry.student.photo}`"
                                                                 :alt="`Photo for ${entry.student.full_name}`"
+                                                                loading="lazy"
+                                                                decoding="async"
+                                                                fetchpriority="low"
+                                                                width="36"
+                                                                height="36"
                                                                 class="h-full w-full object-cover"
                                                             />
                                                             <span

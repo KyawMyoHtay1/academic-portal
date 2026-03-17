@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Services\ImageService;
 use App\Services\SubjectGradeCalculator;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -76,6 +77,7 @@ class StudentGradesController extends Controller
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
                     'photo' => $subject->photo,
+                    'photo_thumb' => ImageService::tablePath($subject->photo),
                     'score' => $grade?->score,
                     'grade_status' => $grade?->status,
                     // Assignment-based computed grade
@@ -109,6 +111,7 @@ class StudentGradesController extends Controller
                 'credits' => $course->credits,
                 'semester' => $course->semester,
                 'photo' => $course->photo,
+                'photo_thumb' => ImageService::tablePath($course->photo),
                 'subjects' => $subjectsWithGrades,
             ];
         });

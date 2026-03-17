@@ -348,9 +348,14 @@ onBeforeUnmount(() => {
                                             class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100"
                                         >
                                             <img
-                                                v-if="subject.photo"
-                                                :src="`/storage/${subject.photo}`"
+                                                v-if="subject.photo_thumb ?? subject.photo"
+                                                :src="`/storage/${subject.photo_thumb ?? subject.photo}`"
                                                 :alt="`Photo for ${subject.title}`"
+                                                loading="lazy"
+                                                decoding="async"
+                                                fetchpriority="low"
+                                                width="40"
+                                                height="40"
                                                 class="h-full w-full object-cover"
                                             />
                                             <span

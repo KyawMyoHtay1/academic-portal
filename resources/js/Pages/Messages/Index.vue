@@ -1047,9 +1047,14 @@ onMounted(() => {
                                     <div class="flex min-w-0 flex-1 items-start gap-3">
                                         <div class="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
                                             <img
-                                                v-if="message.is_sent ? message.receiver_photo : message.sender_photo"
-                                                :src="`/storage/${message.is_sent ? message.receiver_photo : message.sender_photo}`"
+                                                v-if="message.is_sent ? (message.receiver_photo_thumb ?? message.receiver_photo) : (message.sender_photo_thumb ?? message.sender_photo)"
+                                                :src="`/storage/${message.is_sent ? (message.receiver_photo_thumb ?? message.receiver_photo) : (message.sender_photo_thumb ?? message.sender_photo)}`"
                                                 :alt="`Photo of ${message.is_sent ? message.receiver : message.sender}`"
+                                                loading="lazy"
+                                                decoding="async"
+                                                fetchpriority="low"
+                                                width="44"
+                                                height="44"
                                                 class="h-full w-full object-cover"
                                             />
                                             <div v-else class="flex h-full w-full items-center justify-center text-sm font-semibold text-slate-500">

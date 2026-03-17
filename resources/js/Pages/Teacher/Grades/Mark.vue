@@ -724,10 +724,18 @@ const submit = () => {
                                                                     v-if="
                                                                         entry
                                                                             .student
+                                                                            ?.photo_thumb ??
+                                                                        entry
+                                                                            .student
                                                                             ?.photo
                                                                     "
-                                                                    :src="`/storage/${entry.student.photo}`"
+                                                                    :src="`/storage/${entry.student.photo_thumb ?? entry.student.photo}`"
                                                                     :alt="`Photo for ${entry.student.full_name ?? 'Student'}`"
+                                                                    loading="lazy"
+                                                                    decoding="async"
+                                                                    fetchpriority="low"
+                                                                    width="36"
+                                                                    height="36"
                                                                     class="h-full w-full object-cover"
                                                                 />
                                                                 <span

@@ -164,9 +164,14 @@ const stats = computed(() => ({
                                         class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                     >
                                         <img
-                                            v-if="subject.photo"
-                                            :src="`/storage/${subject.photo}`"
+                                            v-if="subject.photo_thumb ?? subject.photo"
+                                            :src="`/storage/${subject.photo_thumb ?? subject.photo}`"
                                             :alt="`Photo for ${subject.title}`"
+                                            loading="lazy"
+                                            decoding="async"
+                                            fetchpriority="low"
+                                            width="40"
+                                            height="40"
                                             class="h-full w-full object-cover"
                                         />
                                         <span

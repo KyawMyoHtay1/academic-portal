@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\User;
 use App\Notifications\GradeReviewRequested;
 use App\Services\SubjectGradeCalculator;
+use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,7 @@ class TeacherGradesController extends Controller
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
                     'photo' => $subject->photo,
+                    'photo_thumb' => ImageService::tablePath($subject->photo),
                     'course_code' => $subject->course->course_code,
                     'course_title' => $subject->course->title,
                 ];
@@ -132,6 +134,7 @@ class TeacherGradesController extends Controller
                 'student_no' => $student->student_no,
                 'full_name' => $student->user?->name,
                 'photo' => $student->photo,
+                'photo_thumb' => ImageService::tablePath($student->photo),
                 'score' => $grade?->score,
                 'status' => $grade?->status,
                 'rejection_reason' => $grade?->rejection_reason,

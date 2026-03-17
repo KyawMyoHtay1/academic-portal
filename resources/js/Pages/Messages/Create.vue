@@ -256,9 +256,14 @@ onBeforeUnmount(() => {
                                         class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100"
                                     >
                                         <img
-                                            v-if="selectedRecipient?.photo"
-                                            :src="`/storage/${selectedRecipient.photo}`"
+                                            v-if="selectedRecipient?.photo_thumb ?? selectedRecipient?.photo"
+                                            :src="`/storage/${selectedRecipient.photo_thumb ?? selectedRecipient.photo}`"
                                             :alt="`Photo of ${selectedRecipient?.name}`"
+                                            loading="lazy"
+                                            decoding="async"
+                                            fetchpriority="low"
+                                            width="40"
+                                            height="40"
                                             class="h-full w-full object-cover"
                                         />
                                         <span

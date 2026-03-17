@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Notifications\AttendanceAlert;
+use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,7 @@ class TeacherAttendanceController extends Controller
                     'subject_code' => $subject->subject_code,
                     'title' => $subject->title,
                     'photo' => $subject->photo,
+                    'photo_thumb' => ImageService::tablePath($subject->photo),
                     'course_code' => $subject->course->course_code,
                     'course_title' => $subject->course->title,
                 ];
@@ -73,7 +75,17 @@ class TeacherAttendanceController extends Controller
                 'students.photo',
             ])
             ->sortBy(fn ($s) => strtolower((string) ($s->user?->name ?? '')))
-            ->values();
+            ->values()
+            ->map(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'user_id' => $student->user_id,
+                    'student_no' => $student->student_no,
+                    'photo' => $student->photo,
+                    'photo_thumb' => ImageService::tablePath($student->photo),
+                    'full_name' => $student->user?->name ?? $student->full_name,
+                ];
+            });
 
         // Attendance overview per student (for this subject)
         $studentIds = $students->pluck('id');
