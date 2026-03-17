@@ -21,11 +21,9 @@ const props = defineProps({
 
 const form = useForm({
     student_no: props.student.student_no,
-    full_name: props.student.full_name,
     dob: props.student.dob || "",
     gender: props.student.gender || "",
     nationality: props.student.nationality || "",
-    email: props.student.email,
     phone: props.student.phone || "",
     address: props.student.address || "",
     emergency_contact_name: props.student.emergency_contact_name || "",
@@ -246,18 +244,16 @@ const removePhoto = () => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
-                            Full Name
+                            Full Name (from linked user)
                         </label>
                         <input
-                            v-model="form.full_name"
                             type="text"
+                            :value="props.student.full_name || ''"
+                            disabled
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                         />
-                        <p
-                            v-if="form.errors.full_name"
-                            class="mt-1 text-xs text-red-600"
-                        >
-                            {{ form.errors.full_name }}
+                        <p class="mt-1 text-xs text-slate-500">
+                            Name is managed in the linked user account.
                         </p>
                     </div>
                 </div>
@@ -330,18 +326,16 @@ const removePhoto = () => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
-                            Email
+                            Email (from linked user)
                         </label>
                         <input
-                            v-model="form.email"
                             type="email"
+                            :value="props.student.email || ''"
+                            disabled
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                         />
-                        <p
-                            v-if="form.errors.email"
-                            class="mt-1 text-xs text-red-600"
-                        >
-                            {{ form.errors.email }}
+                        <p class="mt-1 text-xs text-slate-500">
+                            Email is managed in the linked user account.
                         </p>
                     </div>
                 </div>
@@ -579,7 +573,7 @@ const removePhoto = () => {
                         </div>
                         <img
                             :src="student.photo_url"
-                            :alt="`Current photo for ${form.full_name}`"
+                            :alt="`Current photo for ${props.student.full_name || 'student'}`"
                             class="h-24 w-24 rounded-md object-cover border border-slate-200"
                         />
                     </div>

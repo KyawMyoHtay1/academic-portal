@@ -22,11 +22,9 @@ entity "students" as Student {
   *id : bigint <<PK>>
   user_id : bigint <<FK>>
   student_no : varchar <<UK>>
-  full_name : varchar
   dob : date
   gender : varchar
   nationality : varchar
-  email : varchar <<UK>>
   phone : varchar
   address : text
   emergency_contact_name : varchar
@@ -44,6 +42,11 @@ entity "students" as Student {
   created_at : timestamp
   updated_at : timestamp
 }
+
+note right of Student
+  Identity fields (name/email) are stored in `users`.
+  `students` extends the user with academic/profile data.
+end note
 
 entity "courses" as Course {
   *id : bigint <<PK>>

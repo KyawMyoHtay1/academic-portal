@@ -39,11 +39,9 @@ class Student {
   +id: bigint
   +user_id: bigint
   +student_no: varchar
-  +full_name: varchar
   +dob: date
   +gender: varchar
   +nationality: varchar
-  +email: varchar
   +phone: varchar
   +address: text
   +emergency_contact_name: varchar
@@ -69,6 +67,10 @@ class Student {
   +GetEnrollments()
   +AutoID()
 }
+
+note right of Student
+  Identity fields (name/email) are derived via User.
+end note
 
 class Course {
   +id: bigint

@@ -29,7 +29,6 @@ class Student {
   +id: bigint
   +user_id: bigint
   +student_no: varchar
-  +full_name: varchar
   +created_at: timestamp
   +updated_at: timestamp
   --
@@ -37,6 +36,10 @@ class Student {
   +fees()
   +calculateGPA()
 }
+
+note right of Student
+  Identity fields (name/email) are derived via User.
+end note
 
 class Course {
   +id: bigint

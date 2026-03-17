@@ -477,10 +477,10 @@ export default {
                                 <button
                                     type="button"
                                     class="inline-flex items-center gap-1 hover:text-slate-700"
-                                    @click="toggleSort('full_name')"
+                                    @click="toggleSort('name')"
                                 >
                                     Name
-                                    <span class="text-[10px] text-slate-400">{{ sortLabel("full_name") }}</span>
+                                    <span class="text-[10px] text-slate-400">{{ sortLabel("name") }}</span>
                                 </button>
                             </th>
                             <th
@@ -561,7 +561,7 @@ export default {
                                             v-else
                                             class="text-xs font-semibold text-slate-500"
                                         >
-                                            {{ student.full_name[0] }}
+                                            {{ (student.full_name || student.student_no || "?")[0] }}
                                         </span>
                                     </div>
                                 </div>

@@ -26,11 +26,9 @@ const props = defineProps({
 const form = useForm({
     user_id: "",
     student_no: "",
-    full_name: "",
     dob: "",
     gender: "",
     nationality: "",
-    email: "",
     phone: "",
     address: "",
     emergency_contact_name: "",
@@ -140,8 +138,8 @@ const emailPrefix = (value) => {
 };
 
 const duplicateWarnings = computed(() => {
-    const name = normalize(form.full_name);
-    const email = normalize(form.email);
+    const name = normalize(selectedUser.value?.name);
+    const email = normalize(selectedUser.value?.email);
 
     if (name === "" && email === "") {
         return [];
@@ -200,6 +198,12 @@ const duplicateWarnings = computed(() => {
         .filter(Boolean)
         .sort((a, b) => b.score - a.score)
         .slice(0, 5);
+});
+
+const selectedUser = computed(() => {
+    const id = String(form.user_id || "");
+    if (!id) return null;
+    return props.users.find((u) => String(u.id) === id) || null;
 });
 
 const getErrorMessage = (value) => (Array.isArray(value) ? value[0] : value || "");
@@ -358,18 +362,16 @@ const transcriptError = computed(() => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
-                            Full Name
+                            Full Name (from linked user)
                         </label>
                         <input
-                            v-model="form.full_name"
                             type="text"
+                            :value="selectedUser?.name || ''"
+                            disabled
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                         />
-                        <p
-                            v-if="form.errors.full_name"
-                            class="mt-1 text-xs text-red-600"
-                        >
-                            {{ form.errors.full_name }}
+                        <p class="mt-1 text-xs text-slate-500">
+                            Name is managed in the user account.
                         </p>
                     </div>
 
@@ -443,18 +445,16 @@ const transcriptError = computed(() => {
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-600"
                         >
-                            Email
+                            Email (from linked user)
                         </label>
                         <input
-                            v-model="form.email"
                             type="email"
+                            :value="selectedUser?.email || ''"
+                            disabled
                             class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-portal-navy focus:ring-portal-navy"
                         />
-                        <p
-                            v-if="form.errors.email"
-                            class="mt-1 text-xs text-red-600"
-                        >
-                            {{ form.errors.email }}
+                        <p class="mt-1 text-xs text-slate-500">
+                            Email is managed in the user account.
                         </p>
                     </div>
 
