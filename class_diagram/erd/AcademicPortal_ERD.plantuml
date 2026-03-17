@@ -157,6 +157,8 @@ entity "timetables" as Timetable {
   created_by : bigint <<FK,nullable>>
   created_at : timestamp
   updated_at : timestamp
+  --
+  <<UK(subject_id,day_of_week,start_time,end_time)>>
 }
 
 entity "attendances" as Attendance {
