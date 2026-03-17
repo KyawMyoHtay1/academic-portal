@@ -144,40 +144,6 @@ entity "fees" as Fee {
   updated_at : timestamp
 }
 
-entity "assignments" as Assignment {
-  *id : bigint <<PK>>
-  subject_id : bigint <<FK>>
-  created_by : bigint <<FK>>
-  title : varchar
-  description : text
-  due_date : date
-  due_time : time
-  max_score : int
-  status : enum       ' draft, published, closed
-  allowed_file_types : json
-  max_file_size : int
-  created_at : timestamp
-  updated_at : timestamp
-}
-
-entity "assignment_submissions" as Submission {
-  *id : bigint <<PK>>
-  assignment_id : bigint <<FK>>
-  student_id : bigint <<FK>>
-  file_path : varchar
-  original_filename : varchar
-  comments : text
-  score : decimal(5,2)
-  feedback : text
-  graded_by : bigint <<FK,nullable>>
-  graded_at : timestamp
-  status : enum       ' submitted, graded, returned
-  created_at : timestamp
-  updated_at : timestamp
-  --
-  <<UK(assignment_id,student_id)>>
-}
-
 entity "timetables" as Timetable {
   *id : bigint <<PK>>
   subject_id : bigint <<FK>>
@@ -363,12 +329,6 @@ User    ||--o{ GradeLog : performed_by
 
 Student ||--o{ Fee
 User    ||--o{ Fee : processed_by
-
-Subject ||--o{ Assignment
-User    ||--o{ Assignment : created_by
-Assignment ||--o{ Submission
-Student    ||--o{ Submission
-User       ||--o{ Submission : graded_by
 
 Subject ||--o{ Timetable
 User    ||--o{ Timetable : created_by
