@@ -242,7 +242,8 @@ class StaffSubjectController extends Controller
             ]
         );
 
-        return back()
+        return redirect()
+            ->route('admin.subjects.index')
             ->with('success', 'Subject deleted successfully.');
     }
 
