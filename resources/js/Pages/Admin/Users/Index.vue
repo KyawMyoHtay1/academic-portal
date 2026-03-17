@@ -515,9 +515,14 @@ const bulkDeleteUsers = () => {
                                                 class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center"
                                             >
                                                 <img
-                                                    v-if="user.photo"
-                                                    :src="`/storage/${user.photo}`"
+                                                    v-if="user.photo_thumb || user.photo"
+                                                    :src="`/storage/${user.photo_thumb ?? user.photo}`"
                                                     :alt="`Photo for ${user.name}`"
+                                                    width="40"
+                                                    height="40"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    fetchpriority="low"
                                                     class="h-full w-full object-cover"
                                                 />
                                                 <span

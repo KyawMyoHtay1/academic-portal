@@ -453,9 +453,14 @@ const deleteCourse = (courseId) => {
                                         <div class="flex items-center gap-3">
                                             <div class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
                                                 <img
-                                                    v-if="course.photo"
-                                                    :src="`/storage/${course.photo}`"
+                                                    v-if="course.photo_thumb || course.photo"
+                                                    :src="`/storage/${course.photo_thumb ?? course.photo}`"
                                                     :alt="`Photo for ${course.title}`"
+                                                    width="40"
+                                                    height="40"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    fetchpriority="low"
                                                     class="h-full w-full object-cover"
                                                 />
                                                 <div v-else class="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-500">

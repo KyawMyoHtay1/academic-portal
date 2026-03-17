@@ -545,9 +545,14 @@ const formatThreshold = (value) =>
                                                     class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100"
                                                 >
                                                     <img
-                                                        v-if="subject.photo"
-                                                        :src="`/storage/${subject.photo}`"
+                                                        v-if="subject.photo_thumb || subject.photo"
+                                                        :src="`/storage/${subject.photo_thumb ?? subject.photo}`"
                                                         :alt="`Photo for ${subject.title}`"
+                                                        width="40"
+                                                        height="40"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        fetchpriority="low"
                                                         class="h-full w-full object-cover"
                                                     />
                                                     <span v-else class="text-xs font-semibold text-slate-500">

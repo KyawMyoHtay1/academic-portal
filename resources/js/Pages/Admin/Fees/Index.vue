@@ -491,9 +491,14 @@ watch(entries, (list) => {
                                             <div class="flex items-start gap-3">
                                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100">
                                                     <img
-                                                        v-if="fee.student_photo"
-                                                        :src="`/storage/${fee.student_photo}`"
+                                                        v-if="fee.student_photo_thumb || fee.student_photo"
+                                                        :src="`/storage/${fee.student_photo_thumb ?? fee.student_photo}`"
                                                         :alt="`Photo for ${fee.student_name}`"
+                                                        width="36"
+                                                        height="36"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        fetchpriority="low"
                                                         class="h-full w-full object-cover"
                                                     />
                                                     <span v-else class="text-xs font-semibold text-slate-500">

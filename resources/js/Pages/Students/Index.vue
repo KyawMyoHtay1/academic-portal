@@ -552,9 +552,14 @@ export default {
                                         class="h-10 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                     >
                                         <img
-                                            v-if="student.photo"
-                                            :src="`/storage/${student.photo}`"
+                                            v-if="student.photo_thumb || student.photo"
+                                            :src="`/storage/${student.photo_thumb ?? student.photo}`"
                                             :alt="`Photo for ${student.full_name}`"
+                                            width="40"
+                                            height="40"
+                                            loading="lazy"
+                                            decoding="async"
+                                            fetchpriority="low"
                                             class="h-full w-full object-cover"
                                         />
                                         <span

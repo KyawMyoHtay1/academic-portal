@@ -635,10 +635,16 @@ const hasReviewActions = (status) =>
                                             >
                                                 <img
                                                     v-if="
+                                                        enrollment.student_photo_thumb ||
                                                         enrollment.student_photo
                                                     "
-                                                    :src="`/storage/${enrollment.student_photo}`"
+                                                    :src="`/storage/${enrollment.student_photo_thumb ?? enrollment.student_photo}`"
                                                     :alt="`Photo for ${enrollment.student_name}`"
+                                                    width="36"
+                                                    height="36"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    fetchpriority="low"
                                                     class="h-full w-full object-cover"
                                                 />
                                                 <span
@@ -682,10 +688,16 @@ const hasReviewActions = (status) =>
                                             >
                                                 <img
                                                     v-if="
+                                                        enrollment.course_photo_thumb ||
                                                         enrollment.course_photo
                                                     "
-                                                    :src="`/storage/${enrollment.course_photo}`"
+                                                    :src="`/storage/${enrollment.course_photo_thumb ?? enrollment.course_photo}`"
                                                     :alt="`Photo for ${enrollment.course_title}`"
+                                                    width="36"
+                                                    height="36"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    fetchpriority="low"
                                                     class="h-full w-full object-cover"
                                                 />
                                                 <span

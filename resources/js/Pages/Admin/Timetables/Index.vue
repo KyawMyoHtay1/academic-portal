@@ -484,9 +484,14 @@ export default {
                                                     class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                                 >
                                                     <img
-                                                        v-if="entry.subject_photo"
-                                                        :src="`/storage/${entry.subject_photo}`"
+                                                        v-if="entry.subject_photo_thumb || entry.subject_photo"
+                                                        :src="`/storage/${entry.subject_photo_thumb ?? entry.subject_photo}`"
                                                         :alt="`Photo for ${entry.subject_title || 'N/A'}`"
+                                                        width="36"
+                                                        height="36"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        fetchpriority="low"
                                                         class="h-full w-full object-cover"
                                                     />
                                                     <span
@@ -514,9 +519,14 @@ export default {
                                                     class="h-9 w-9 overflow-hidden rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center"
                                                 >
                                                     <img
-                                                        v-if="entry.course_photo"
-                                                        :src="`/storage/${entry.course_photo}`"
+                                                        v-if="entry.course_photo_thumb || entry.course_photo"
+                                                        :src="`/storage/${entry.course_photo_thumb ?? entry.course_photo}`"
                                                         :alt="`Photo for ${entry.course_title || 'N/A'}`"
+                                                        width="36"
+                                                        height="36"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        fetchpriority="low"
                                                         class="h-full w-full object-cover"
                                                     />
                                                     <span
