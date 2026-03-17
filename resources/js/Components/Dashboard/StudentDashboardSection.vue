@@ -1,6 +1,10 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
-import DashboardChart from "@/Components/Dashboard/DashboardChart.vue";
+import { defineAsyncComponent } from "vue";
+
+const DashboardChart = defineAsyncComponent(() =>
+    import("@/Components/Dashboard/DashboardChart.vue")
+);
 
 defineProps({
     role: {

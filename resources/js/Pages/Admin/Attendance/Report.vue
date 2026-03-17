@@ -2,9 +2,13 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Pagination from "@/Components/Pagination.vue";
-import DashboardChart from "@/Components/Dashboard/DashboardChart.vue";
 import { Head } from "@inertiajs/vue3";
 import { useStaffAttendanceReport } from "@/composables/useStaffAttendanceReport";
+import { defineAsyncComponent } from "vue";
+
+const DashboardChart = defineAsyncComponent(() =>
+    import("@/Components/Dashboard/DashboardChart.vue")
+);
 
 const props = defineProps({
     overall: {
