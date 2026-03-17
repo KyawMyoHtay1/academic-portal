@@ -332,20 +332,22 @@ class TeacherAssignmentController extends Controller
         $course = $assignment->course;
         $expectedStudents = $course
             ?->students()
+            ->with('user')
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
-            ->orderBy('students.full_name')
-            ->get(['students.id', 'students.student_no', 'students.full_name', 'students.photo'])
+            ->get(['students.id', 'students.user_id', 'students.student_no', 'students.photo'])
+            ->sortBy(fn ($s) => strtolower((string) ($s->user?->name ?? '')))
+            ->values()
             ->map(function ($student) {
                 return [
                     'id' => $student->id,
                     'student_no' => $student->student_no,
-                    'full_name' => $student->full_name,
+                    'full_name' => $student->user?->name,
                     'photo' => $student->photo,
                 ];
             });
 
         $submissionModels = AssignmentSubmission::where('assignment_id', $assignment->id)
-            ->with(['student:id,student_no,full_name,photo', 'grader:id,name'])
+            ->with(['student:id,user_id,student_no,photo,user', 'grader:id,name'])
             ->orderBy('updated_at', 'desc')
             ->get();
 

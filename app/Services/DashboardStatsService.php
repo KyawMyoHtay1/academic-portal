@@ -404,15 +404,16 @@ class DashboardStatsService
 
             return Attendance::query()
                 ->join('students', 'students.id', '=', 'attendances.student_id')
+                ->leftJoin('users', 'users.id', '=', 'students.user_id')
                 ->whereIn('attendances.subject_id', $subjectIdArray)
                 ->selectRaw('
                     students.id as student_id,
                     students.student_no,
-                    students.full_name,
+                    users.name as full_name,
                     COUNT(*) as total_sessions,
                     SUM(CASE WHEN attendances.status = "present" THEN 1 ELSE 0 END) as present_sessions
                 ')
-                ->groupBy('students.id', 'students.student_no', 'students.full_name')
+                ->groupBy('students.id', 'students.student_no', 'users.name')
                 ->havingRaw('COUNT(*) >= 3')
                 ->get()
                 ->map(function ($row) {

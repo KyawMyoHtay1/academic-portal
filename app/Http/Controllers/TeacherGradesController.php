@@ -193,10 +193,11 @@ class TeacherGradesController extends Controller
 
         // Verify all students are enrolled in the subject's course
         $enrolledStudents = $subject->course->students()
+            ->with('user')
             ->wherePivotIn('status', ['approved', 'withdrawal_pending'])
             ->get([
                 'students.id',
-                'students.full_name',
+                'students.user_id',
             ]);
         $enrolledStudentIds = $enrolledStudents->pluck('id')->toArray();
         $existingGrades = Grade::where('subject_id', $subject->id)
