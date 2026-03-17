@@ -98,23 +98,7 @@ class ImageService
             return $tablePath;
         }
 
-        if (! $disk->exists($normalizedPath)) {
-            return $normalizedPath;
-        }
-
-        try {
-            self::storeOptimizedVariant(
-                $disk->path($normalizedPath),
-                $tablePath,
-                self::TABLE_MAX_WIDTH,
-                self::TABLE_MAX_HEIGHT,
-                self::TABLE_JPEG_QUALITY
-            );
-        } catch (\Throwable) {
-            return $normalizedPath;
-        }
-
-        return $disk->exists($tablePath) ? $tablePath : $normalizedPath;
+        return $normalizedPath;
     }
 
     /**
