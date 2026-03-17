@@ -102,6 +102,37 @@ class ImageService
     }
 
     /**
+     * Generate a table thumbnail for an existing stored image.
+     */
+    public static function generateTableThumbnail(?string $path, bool $force = false): bool
+    {
+        $normalizedPath = self::normalizePath($path);
+        if ($normalizedPath === null) {
+            return false;
+        }
+
+        $disk = Storage::disk('public');
+        if (! $disk->exists($normalizedPath)) {
+            return false;
+        }
+
+        $tablePath = self::tableVariantPath($normalizedPath);
+        if (! $force && $disk->exists($tablePath)) {
+            return true;
+        }
+
+        self::storeOptimizedVariant(
+            $disk->path($normalizedPath),
+            $tablePath,
+            self::TABLE_MAX_WIDTH,
+            self::TABLE_MAX_HEIGHT,
+            self::TABLE_JPEG_QUALITY
+        );
+
+        return $disk->exists($tablePath);
+    }
+
+    /**
      * Delete an image file
      *
      * @param  string|null  $path  The file path to delete
