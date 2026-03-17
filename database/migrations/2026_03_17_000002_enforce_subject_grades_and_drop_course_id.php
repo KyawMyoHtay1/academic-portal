@@ -51,20 +51,15 @@ return new class extends Migration
         }
 
         // Ensure uniqueness is enforced on (subject_id, student_id).
-        Schema::table('grades', function (Blueprint $table) {
-            try {
-                $table->dropUnique(['subject_id', 'student_id']);
-            } catch (\Throwable $e) {
-                // ignore
-            }
-            try {
-                $table->dropUnique('grades_subject_id_student_id_unique');
-            } catch (\Throwable $e) {
-                // ignore
-            }
-
-            $table->unique(['subject_id', 'student_id'], 'grades_subject_id_student_id_unique');
-        });
+        if (! $this->hasIndex('grades', 'grades_subject_id_student_id_unique')) {
+            Schema::table('grades', function (Blueprint $table) {
+                try {
+                    $table->unique(['subject_id', 'student_id'], 'grades_subject_id_student_id_unique');
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+            });
+        }
     }
 
     public function down(): void
@@ -175,6 +170,20 @@ return new class extends Migration
 
         Schema::drop('grades');
         Schema::rename('grades_tmp', 'grades');
+    }
+
+    private function hasIndex(string $table, string $indexName): bool
+    {
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return false;
+        }
+
+        $rows = DB::select(
+            "SHOW INDEX FROM `{$table}` WHERE Key_name = ?",
+            [$indexName]
+        );
+
+        return count($rows) > 0;
     }
 };
 
