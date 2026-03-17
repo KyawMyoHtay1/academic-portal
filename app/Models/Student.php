@@ -12,11 +12,9 @@ class Student extends Model
     protected $fillable = [
         'user_id',
         'student_no',
-        'full_name',
         'dob',
         'gender',
         'nationality',
-        'email',
         'phone',
         'address',
         'emergency_contact_name',
@@ -41,6 +39,16 @@ class Student extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
+    public function getEmailAttribute(): ?string
+    {
+        return $this->user?->email;
     }
 
     /**

@@ -25,20 +25,20 @@ class StudentController extends Controller
         $intakeYear = trim((string) ($filters['intake_year'] ?? 'all'));
         $status = trim((string) ($filters['status'] ?? 'all'));
 
-        $allowedSorts = ['student_no', 'full_name', 'programme', 'intake_year', 'status'];
+        $allowedSorts = ['student_no', 'name', 'email', 'programme', 'intake_year', 'status'];
         $requestedSortBy = (string) ($filters['sort_by'] ?? 'student_no');
         $sortBy = in_array($requestedSortBy, $allowedSorts, true)
             ? $requestedSortBy
             : 'student_no';
         $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
-        $studentsQuery = Student::query()->with('user');
+        $studentsQuery = Student::query()->with('user')->leftJoin('users', 'students.user_id', '=', 'users.id')->select('students.*');
 
         if ($search !== '') {
             $studentsQuery->where(function ($query) use ($search): void {
                 $query->where('student_no', 'like', "%{$search}%")
-                    ->orWhere('full_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('users.name', 'like', "%{$search}%")
+                    ->orWhere('users.email', 'like', "%{$search}%")
                     ->orWhere('programme', 'like', "%{$search}%");
             });
         }
@@ -56,7 +56,9 @@ class StudentController extends Controller
         }
 
         $students = $studentsQuery
-            ->orderBy($sortBy, $sortDir)
+            ->when($sortBy === 'name', fn ($q) => $q->orderBy('users.name', $sortDir))
+            ->when($sortBy === 'email', fn ($q) => $q->orderBy('users.email', $sortDir))
+            ->when(! in_array($sortBy, ['name', 'email'], true), fn ($q) => $q->orderBy($sortBy, $sortDir))
             ->orderBy('id')
             ->paginate(10)
             ->withQueryString()
@@ -64,8 +66,8 @@ class StudentController extends Controller
                 return [
                     'id' => $student->id,
                     'student_no' => $student->student_no,
-                    'full_name' => $student->full_name,
-                    'email' => $student->email,
+                    'full_name' => $student->user?->name,
+                    'email' => $student->user?->email,
                     'programme' => $student->programme,
                     'intake_year' => $student->intake_year,
                     'status' => $student->status,
@@ -119,10 +121,18 @@ class StudentController extends Controller
             'users' => $users,
             'programmes' => $this->getProgrammes(),
             'duplicateHintStudents' => Student::query()
-                ->select('id', 'student_no', 'full_name', 'email')
+                ->with('user')
+                ->select('students.id', 'students.student_no', 'students.user_id')
+                ->leftJoin('users', 'students.user_id', '=', 'users.id')
                 ->orderByDesc('id')
                 ->limit(500)
-                ->get(),
+                ->get()
+                ->map(fn (Student $s) => [
+                    'id' => $s->id,
+                    'student_no' => $s->student_no,
+                    'full_name' => $s->user?->name,
+                    'email' => $s->user?->email,
+                ]),
         ]);
     }
 
@@ -202,11 +212,11 @@ class StudentController extends Controller
             'student' => [
                 'id' => $student->id,
                 'student_no' => $student->student_no,
-                'full_name' => $student->full_name,
+                'full_name' => $student->user?->name,
                 'dob' => $student->dob?->toDateString(),
                 'gender' => $student->gender,
                 'nationality' => $student->nationality,
-                'email' => $student->email,
+                'email' => $student->user?->email,
                 'phone' => $student->phone,
                 'address' => $student->address,
                 'emergency_contact_name' => $student->emergency_contact_name,
