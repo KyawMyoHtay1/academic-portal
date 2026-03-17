@@ -10,9 +10,9 @@ use App\Services\Dashboard\TeacherDashboardDataBuilder;
 class DashboardStatsService
 {
     public function __construct(
-        private readonly StaffDashboardDataBuilder ,
-        private readonly TeacherDashboardDataBuilder ,
-        private readonly StudentDashboardDataBuilder ,
+        private readonly StaffDashboardDataBuilder $staffDashboardDataBuilder,
+        private readonly TeacherDashboardDataBuilder $teacherDashboardDataBuilder,
+        private readonly StudentDashboardDataBuilder $studentDashboardDataBuilder,
     ) {}
 
     /**
@@ -20,18 +20,18 @@ class DashboardStatsService
      *
      * @return array<string, mixed>
      */
-    public function build(?User ): array
+    public function build(?User $user): array
     {
-         = now()->addMinutes(2);
+        $cacheTtl = now()->addMinutes(2);
 
-        if (->isStaff()) {
-            return ->staffDashboardDataBuilder->build();
+        if ($user?->isStaff()) {
+            return $this->staffDashboardDataBuilder->build($cacheTtl);
         }
 
-        if (->isTeacher()) {
-            return ->teacherDashboardDataBuilder->build(, );
+        if ($user?->isTeacher()) {
+            return $this->teacherDashboardDataBuilder->build($user, $cacheTtl);
         }
 
-        return ->studentDashboardDataBuilder->build(, );
+        return $this->studentDashboardDataBuilder->build($user, $cacheTtl);
     }
 }
