@@ -37,19 +37,12 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('students', function (Blueprint $table) {
-            if (Schema::hasColumn('students', 'email')) {
-                // Drop unique index if present (name varies by driver/version)
-                try {
-                    $table->dropUnique(['email']);
-                } catch (\Throwable $e) {
-                    // ignore
-                }
+        $studentsEmailUniqueIndex = $this->getUniqueIndexNameForColumn('students', 'email');
 
-                try {
-                    $table->dropUnique('students_email_unique');
-                } catch (\Throwable $e) {
-                    // ignore
+        Schema::table('students', function (Blueprint $table) use ($studentsEmailUniqueIndex) {
+            if (Schema::hasColumn('students', 'email')) {
+                if ($studentsEmailUniqueIndex) {
+                    $table->dropUnique($studentsEmailUniqueIndex);
                 }
             }
 
@@ -102,6 +95,24 @@ return new class extends Migration
                 // ignore
             }
         });
+    }
+
+    private function getUniqueIndexNameForColumn(string $table, string $column): ?string
+    {
+        if (! Schema::hasTable($table)) {
+            return null;
+        }
+
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return null;
+        }
+
+        $rows = DB::select(
+            "SHOW INDEX FROM `{$table}` WHERE Column_name = ? AND Non_unique = 0",
+            [$column]
+        );
+
+        return $rows[0]->Key_name ?? null;
     }
 
     private function rebuildSqliteStudentsWithoutIdentityDupes(): void
@@ -183,4 +194,3 @@ return new class extends Migration
         Schema::rename('students_tmp', 'students');
     }
 };
-
