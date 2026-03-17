@@ -46,6 +46,11 @@ class Student extends Model
         return $this->user?->name;
     }
 
+    public function getFullNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
     public function getEmailAttribute(): ?string
     {
         return $this->user?->email;

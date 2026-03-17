@@ -133,33 +133,41 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('student_no')->unique();
             $table->date('dob')->nullable();
+            $table->string('gender', 20)->nullable();
+            $table->string('nationality', 100)->nullable();
             $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->string('emergency_contact_name')->nullable();
+            $table->string('emergency_contact_phone', 50)->nullable();
             $table->string('programme');
             $table->string('intake_year');
+            $table->string('previous_institution')->nullable();
+            $table->string('previous_qualification')->nullable();
+            $table->string('status', 30)->default('active');
+            $table->text('notes')->nullable();
+            $table->date('enrollment_date')->nullable();
+            $table->string('photo')->nullable();
+            $table->string('id_card')->nullable();
+            $table->string('transcript')->nullable();
             $table->timestamps();
         });
 
-        // Copy common columns that exist.
-        $columns = [
-            'id',
-            'user_id',
-            'student_no',
-            'dob',
-            'phone',
-            'programme',
-            'intake_year',
-            'created_at',
-            'updated_at',
-        ];
-
-        $select = implode(', ', array_map(fn ($c) => "s.$c", $columns));
-        $insert = implode(', ', $columns);
-
-        DB::statement("
-            INSERT INTO students_tmp ($insert)
-            SELECT $select
-            FROM students s
-        ");
+        DB::statement('
+            INSERT INTO students_tmp (
+                id, user_id, student_no, dob, gender, nationality, phone, address,
+                emergency_contact_name, emergency_contact_phone,
+                programme, intake_year, previous_institution, previous_qualification,
+                status, notes, enrollment_date, photo, id_card, transcript,
+                created_at, updated_at
+            )
+            SELECT
+                id, user_id, student_no, dob, gender, nationality, phone, address,
+                emergency_contact_name, emergency_contact_phone,
+                programme, intake_year, previous_institution, previous_qualification,
+                status, notes, enrollment_date, photo, id_card, transcript,
+                created_at, updated_at
+            FROM students
+        ');
 
         Schema::drop('students');
         Schema::rename('students_tmp', 'students');
