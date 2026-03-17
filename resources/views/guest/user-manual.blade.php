@@ -18,7 +18,7 @@
                 <a href="{{ route('guest.user-manual.view', [], false) }}" target="_blank" rel="noopener" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--portal-navy)] hover:bg-slate-100">
                     Open In New Tab
                 </a>
-                <a href="{{ route('guest.user-manual.download', [], false) }}" class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
+                <a href="{{ route('guest.user-manual.download', [], false) }}" download data-skip-loading class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20">
                     Download PDF
                 </a>
             </div>
@@ -46,7 +46,7 @@
                     Open the manual in a new tab
                 </a>
                 or
-                <a href="{{ route('guest.user-manual.download', [], false) }}" class="font-semibold text-[color:var(--portal-navy)] hover:text-slate-700">
+                <a href="{{ route('guest.user-manual.download', [], false) }}" download data-skip-loading class="font-semibold text-[color:var(--portal-navy)] hover:text-slate-700">
                     download the PDF
                 </a>.
             </p>

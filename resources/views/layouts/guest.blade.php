@@ -823,6 +823,7 @@
 
             function isInternalNavigationLink(link) {
                 if (!link) return false;
+                if (link.hasAttribute('data-skip-loading')) return false;
                 if (link.hasAttribute('download')) return false;
 
                 var target = (link.getAttribute('target') || '').toLowerCase();
