@@ -341,6 +341,8 @@
         <img
             src="{{ asset('images/fox_images/bg_2.jpg') }}"
             alt="University campus background"
+            width="2000"
+            height="1503"
             loading="lazy"
             decoding="async"
             class="absolute inset-0 h-full w-full object-cover"
@@ -378,6 +380,8 @@
                         <img
                             src="{{ asset('images/fox_images/about-2.jpg') }}"
                             alt="University aerial view"
+                            width="1000"
+                            height="563"
                             loading="lazy"
                             decoding="async"
                             class="h-[320px] w-full object-cover md:h-[420px]"
@@ -506,7 +510,7 @@
         <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/fox_images/teacher-1.jpg') }}" alt="Bianca Wilson" loading="lazy" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-1.jpg') }}" alt="Bianca Wilson" width="800" height="850" loading="lazy" fetchpriority="low" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Bianca Wilson</h3>
@@ -517,7 +521,7 @@
 
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/fox_images/teacher-2.jpg') }}" alt="Mitch Parker" loading="lazy" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-2.jpg') }}" alt="Mitch Parker" width="800" height="850" loading="lazy" fetchpriority="low" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Mitch Parker</h3>
@@ -528,7 +532,7 @@
 
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/fox_images/teacher-3.jpg') }}" alt="Stella Smith" loading="lazy" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-3.jpg') }}" alt="Stella Smith" width="800" height="850" loading="lazy" fetchpriority="low" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Stella Smith</h3>
@@ -539,7 +543,7 @@
 
             <article class="home-teacher-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <div class="overflow-hidden">
-                    <img src="{{ asset('images/fox_images/teacher-4.jpg') }}" alt="Monshe Henderson" loading="lazy" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
+                    <img src="{{ asset('images/fox_images/teacher-4.jpg') }}" alt="Monshe Henderson" width="800" height="850" loading="lazy" fetchpriority="low" decoding="async" class="home-teacher-image h-64 w-full object-cover transition-transform duration-500">
                 </div>
                 <div class="space-y-2 p-5 text-center">
                     <h3 class="text-3xl font-bold text-slate-900">Monshe Henderson</h3>
@@ -567,6 +571,14 @@
                 'images/fox_images/course-5.jpg',
                 'images/fox_images/course-6.jpg',
             ];
+            $storyImageDimensions = [
+                ['width' => 1000, 'height' => 750],
+                ['width' => 1000, 'height' => 667],
+                ['width' => 1000, 'height' => 750],
+                ['width' => 1000, 'height' => 667],
+                ['width' => 1000, 'height' => 667],
+                ['width' => 1000, 'height' => 667],
+            ];
         @endphp
 
         <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -576,7 +588,10 @@
                         <img
                             src="{{ asset($storyImages[$index % count($storyImages)]) }}"
                             alt="{{ $story->title }}"
+                            width="{{ $storyImageDimensions[$index % count($storyImageDimensions)]['width'] }}"
+                            height="{{ $storyImageDimensions[$index % count($storyImageDimensions)]['height'] }}"
                             loading="lazy"
+                            fetchpriority="low"
                             decoding="async"
                             class="home-story-image h-64 w-full object-cover transition-transform duration-500"
                         >
@@ -813,6 +828,7 @@
                             src="{{ $courseImage }}"
                             alt="{{ $course->title }}"
                             loading="lazy"
+                            fetchpriority="low"
                             decoding="async"
                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             onerror="this.onerror=null;this.src='{{ $fallbackCourseImage }}';"
@@ -1024,7 +1040,10 @@
                     <img
                         src="{{ asset('images/fox_images/course-7.jpg') }}"
                         alt="Student graduate success story"
+                        width="1000"
+                        height="668"
                         loading="lazy"
+                        fetchpriority="low"
                         decoding="async"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1055,7 +1074,10 @@
                     <img
                         src="{{ asset('images/fox_images/course-8.jpg') }}"
                         alt="International student success story"
+                        width="1000"
+                        height="1445"
                         loading="lazy"
+                        fetchpriority="low"
                         decoding="async"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1086,7 +1108,10 @@
                     <img
                         src="{{ asset('images/fox_images/course-6.jpg') }}"
                         alt="Research and faculty success story"
+                        width="1000"
+                        height="667"
                         loading="lazy"
+                        fetchpriority="low"
                         decoding="async"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1117,7 +1142,10 @@
                     <img
                         src="{{ asset('images/fox_images/staff-1.jpg') }}"
                         alt="Alumni mentor story"
+                        width="800"
+                        height="970"
                         loading="lazy"
+                        fetchpriority="low"
                         decoding="async"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1148,7 +1176,10 @@
                     <img
                         src="{{ asset('images/fox_images/staff-2.jpg') }}"
                         alt="Student leadership story"
+                        width="876"
+                        height="1029"
                         loading="lazy"
+                        fetchpriority="low"
                         decoding="async"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
@@ -1179,7 +1210,10 @@
                     <img
                         src="{{ asset('images/fox_images/staff-3.jpg') }}"
                         alt="Community impact project story"
+                        width="861"
+                        height="1006"
                         loading="lazy"
+                        fetchpriority="low"
                         decoding="async"
                         class="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     >
