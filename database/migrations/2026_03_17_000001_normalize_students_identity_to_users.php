@@ -41,8 +41,18 @@ return new class extends Migration
 
         Schema::table('students', function (Blueprint $table) use ($studentsEmailUniqueIndex) {
             if (Schema::hasColumn('students', 'email')) {
+                // Index names differ across databases/environments; don't fail the migration if absent.
                 if ($studentsEmailUniqueIndex) {
-                    $table->dropUnique($studentsEmailUniqueIndex);
+                    try {
+                        $table->dropUnique($studentsEmailUniqueIndex);
+                    } catch (\Throwable $e) {
+                        // ignore
+                    }
+                }
+                try {
+                    $table->dropUnique(['email']);
+                } catch (\Throwable $e) {
+                    // ignore
                 }
             }
 
