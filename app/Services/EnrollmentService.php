@@ -620,7 +620,7 @@ class EnrollmentService
 
     private function studentLabel(?Student $student): string
     {
-        return $student?->full_name ?? 'student';
+        return $student?->user?->name ?? 'student';
     }
 
     private function courseLabel(?Course $course): string
