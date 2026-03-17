@@ -103,7 +103,7 @@ entity "subject_teacher" as SubjectTeacher {
 
 entity "grades" as Grade {
   *id : bigint <<PK>>
-  subject_id : bigint <<FK,nullable>>
+  subject_id : bigint <<FK>>
   student_id : bigint <<FK>>
   graded_by : bigint <<FK,nullable>>
   reviewed_by : bigint <<FK,nullable>>
@@ -133,7 +133,7 @@ entity "fees" as Fee {
   student_id : bigint <<FK>>
   amount : decimal(10,2)
   description : varchar
-  status : enum       ' pending, payment_pending, paid
+  status : enum       ' pending, payment_pending, failed, paid
   due_date : date
   paid_date : date
   payment_intent_id : varchar
