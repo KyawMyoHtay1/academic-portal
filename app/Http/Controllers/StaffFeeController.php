@@ -122,8 +122,19 @@ class StaffFeeController extends Controller
     {
         $this->authorize('create', Fee::class);
 
-        $students = Student::orderBy('full_name')
-            ->get(['id', 'student_no', 'full_name', 'photo']);
+        $students = Student::query()
+            ->with('user')
+            ->leftJoin('users', 'students.user_id', '=', 'users.id')
+            ->select('students.*')
+            ->orderBy('users.name')
+            ->get()
+            ->map(fn (Student $s) => [
+                'id' => $s->id,
+                'student_no' => $s->student_no,
+                'full_name' => $s->user?->name,
+                'email' => $s->user?->email,
+                'photo' => $s->photo,
+            ]);
 
         return Inertia::render('Admin/Fees/Create', [
             'students' => $students,
@@ -169,8 +180,18 @@ class StaffFeeController extends Controller
     {
         $this->authorize('update', $fee);
 
-        $students = Student::orderBy('full_name')
-            ->get(['id', 'student_no', 'full_name']);
+        $students = Student::query()
+            ->with('user')
+            ->leftJoin('users', 'students.user_id', '=', 'users.id')
+            ->select('students.*')
+            ->orderBy('users.name')
+            ->get()
+            ->map(fn (Student $s) => [
+                'id' => $s->id,
+                'student_no' => $s->student_no,
+                'full_name' => $s->user?->name,
+                'email' => $s->user?->email,
+            ]);
 
         return Inertia::render('Admin/Fees/Edit', [
             'fee' => [

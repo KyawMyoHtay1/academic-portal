@@ -131,8 +131,8 @@
         <div class="info-box">
             <h3>Student Information</h3>
             <p><span class="info-label">Student No:</span> {{ $student->student_no }}</p>
-            <p><span class="info-label">Name:</span> {{ $student->full_name }}</p>
-            <p><span class="info-label">Email:</span> {{ $student->email }}</p>
+            <p><span class="info-label">Name:</span> {{ $student->user?->name ?? 'N/A' }}</p>
+            <p><span class="info-label">Email:</span> {{ $student->user?->email ?? 'N/A' }}</p>
             <p><span class="info-label">Programme:</span> {{ $student->programme ?? 'N/A' }}</p>
         </div>
     </div>

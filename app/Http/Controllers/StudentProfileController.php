@@ -39,9 +39,9 @@ class StudentProfileController extends Controller
             'student' => [
                 'id' => $student->id,
                 'student_no' => $student->student_no,
-                'full_name' => $student->full_name,
+                'full_name' => $student->user?->name,
                 'dob' => $student->dob,
-                'email' => $student->email,
+                'email' => $student->user?->email,
                 'phone' => $student->phone,
                 'address' => $student->address,
                 'programme' => $student->programme,

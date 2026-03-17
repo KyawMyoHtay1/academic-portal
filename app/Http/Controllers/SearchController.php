@@ -136,20 +136,24 @@ class SearchController extends Controller
         $results = [];
 
         // Students
-        $students = Student::where(function ($query) use ($term) {
-            $query->where('full_name', 'like', $term)
-                ->orWhere('student_no', 'like', $term)
-                ->orWhere('email', 'like', $term);
-        })
+        $students = Student::query()
+            ->with('user')
+            ->where(function ($query) use ($term): void {
+                $query->where('student_no', 'like', $term)
+                    ->orWhereHas('user', function ($uq) use ($term): void {
+                        $uq->where('name', 'like', $term)
+                            ->orWhere('email', 'like', $term);
+                    });
+            })
             ->limit(self::LIMIT_PER_TYPE)
-            ->get(['id', 'full_name', 'student_no', 'email']);
+            ->get(['id', 'user_id', 'student_no']);
 
         foreach ($students as $s) {
             $results[] = [
                 'type' => 'student',
                 'id' => $s->id,
-                'title' => $s->full_name,
-                'subtitle' => $s->student_no ? "Student #{$s->student_no}" : $s->email,
+                'title' => $s->user?->name ?? $s->student_no,
+                'subtitle' => $s->student_no ? "Student #{$s->student_no}" : ($s->user?->email ?? ''),
                 'url' => route('students.edit', $s),
             ];
         }

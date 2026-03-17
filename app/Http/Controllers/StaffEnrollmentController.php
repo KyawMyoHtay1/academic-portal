@@ -297,7 +297,7 @@ class StaffEnrollmentController extends Controller
         return [
             'requested_at' => 'course_student.updated_at',
             'student_no' => 'students.student_no',
-            'student_name' => 'students.full_name',
+            'student_name' => 'users.name',
             'programme' => 'students.programme',
             'status' => 'course_student.status',
             'course_code' => 'courses.course_code',
@@ -313,6 +313,7 @@ class StaffEnrollmentController extends Controller
         $query = DB::table('course_student')
             ->join('courses', 'course_student.course_id', '=', 'courses.id')
             ->join('students', 'course_student.student_id', '=', 'students.id')
+            ->leftJoin('users', 'students.user_id', '=', 'users.id')
             ->select(
                 'course_student.id as enrollment_id',
                 'course_student.created_at',
@@ -326,8 +327,8 @@ class StaffEnrollmentController extends Controller
                 'courses.photo as course_photo',
                 'students.id as student_id',
                 'students.student_no',
-                'students.full_name as student_name',
-                'students.email as student_email',
+                'users.name as student_name',
+                'users.email as student_email',
                 'students.programme',
                 'students.photo as student_photo'
             );
@@ -336,9 +337,9 @@ class StaffEnrollmentController extends Controller
             $search = $filters['search'];
             $query->where(function ($q) use ($search): void {
                 $like = '%'.$search.'%';
-                $q->where('students.full_name', 'like', $like)
+                $q->where('users.name', 'like', $like)
                     ->orWhere('students.student_no', 'like', $like)
-                    ->orWhere('students.email', 'like', $like)
+                    ->orWhere('users.email', 'like', $like)
                     ->orWhere('students.programme', 'like', $like)
                     ->orWhere('courses.course_code', 'like', $like)
                     ->orWhere('courses.title', 'like', $like);
