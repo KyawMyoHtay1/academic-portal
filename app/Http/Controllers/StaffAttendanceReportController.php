@@ -75,6 +75,7 @@ class StaffAttendanceReportController extends Controller
 
         // Students with low attendance (below effective threshold)
         $studentsWithLowAttendance = Student::query()
+            ->with('user:id,name,email')
             ->when(
                 $filters['programme'] !== '' && $filters['programme'] !== 'all',
                 function (Builder $query) use ($filters) {
@@ -115,8 +116,8 @@ class StaffAttendanceReportController extends Controller
                 return [
                     'id' => $student->id,
                     'student_no' => $student->student_no,
-                    'full_name' => $student->full_name,
-                    'email' => $student->email,
+                    'full_name' => $student->user?->name ?? $student->full_name,
+                    'email' => $student->user?->email ?? $student->email,
                     'programme' => $student->programme,
                     'total' => $total,
                     'present' => $present,
@@ -181,7 +182,7 @@ class StaffAttendanceReportController extends Controller
 
         // Recent attendance records (last 30 days)
         $recentRecords = Attendance::query()
-            ->with(['student', 'subject.course'])
+            ->with(['student.user', 'subject.course'])
             ->where('date', '>=', now()->subDays(30))
             ->tap(function ($query) use ($filters) {
                 $this->applyAttendanceFilters($query, $filters);
@@ -196,7 +197,7 @@ class StaffAttendanceReportController extends Controller
                     'id' => $attendance->id,
                     'date' => $attendance->date->format('Y-m-d'),
                     'student_no' => $attendance->student->student_no,
-                    'student_name' => $attendance->student->full_name,
+                    'student_name' => $attendance->student->user?->name ?? $attendance->student->full_name,
                     'subject_code' => $attendance->subject?->subject_code ?? 'N/A',
                     'course_code' => $courseCode,
                     'status' => $attendance->status,
@@ -252,7 +253,11 @@ class StaffAttendanceReportController extends Controller
         [$filters] = $this->resolveReportFilters($request);
 
         $records = Attendance::query()
-            ->with(['student:id,student_no,full_name,programme,intake_year', 'subject.course:id,course_code,semester'])
+            ->with([
+                'student:id,user_id,student_no,programme,intake_year',
+                'student.user:id,name,email',
+                'subject.course:id,course_code,semester',
+            ])
             ->tap(function ($query) use ($filters) {
                 $this->applyAttendanceFilters($query, $filters);
             })
@@ -266,7 +271,7 @@ class StaffAttendanceReportController extends Controller
                 return [
                     'date' => $attendance->date?->format('Y-m-d'),
                     'student_no' => $student?->student_no ?? 'N/A',
-                    'student_name' => $student?->full_name ?? 'N/A',
+                    'student_name' => $student?->user?->name ?? $student?->full_name ?? 'N/A',
                     'programme' => $student?->programme ?? 'N/A',
                     'intake_year' => $student?->intake_year ?? 'N/A',
                     'subject_code' => $subject?->subject_code ?? 'N/A',
@@ -767,7 +772,11 @@ class StaffAttendanceReportController extends Controller
         $records = collect();
         if ($selectedDate !== '') {
             $records = Attendance::query()
-                ->with(['student:id,student_no,full_name,programme', 'subject.course:id,course_code'])
+                ->with([
+                    'student:id,user_id,student_no,programme',
+                    'student.user:id,name,email',
+                    'subject.course:id,course_code',
+                ])
                 ->tap(function ($query) use ($filters) {
                     $this->applyAttendanceFilters($query, $filters);
                 })
@@ -783,7 +792,7 @@ class StaffAttendanceReportController extends Controller
                     return [
                         'id' => $attendance->id,
                         'student_no' => $student?->student_no ?? 'N/A',
-                        'student_name' => $student?->full_name ?? 'N/A',
+                        'student_name' => $student?->user?->name ?? $student?->full_name ?? 'N/A',
                         'programme' => $student?->programme ?? 'N/A',
                         'subject_code' => $subject?->subject_code ?? 'N/A',
                         'course_code' => $course?->course_code ?? 'N/A',
