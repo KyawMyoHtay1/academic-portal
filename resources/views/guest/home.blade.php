@@ -585,16 +585,16 @@
                         <p class="text-lg leading-relaxed text-slate-600">
                             {{ \Illuminate\Support\Str::limit($story->body, 120) }}
                         </p>
-                        <div class="flex items-center justify-between pt-2">
-                            <a href="{{ route('guest.news.show', $story->id) }}" class="inline-flex items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
+                        <div class="flex items-end justify-between gap-4 pt-2">
+                            <a href="{{ route('guest.news.show', $story->id) }}" class="inline-flex shrink-0 items-center gap-1 rounded-full bg-orange-500 px-5 py-2 text-lg font-semibold text-white transition hover:bg-orange-600">
                                 Read More
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
                             </a>
-                            <div class="flex items-center gap-3 text-sm">
-                                <span class="font-semibold text-orange-500">{{ $story->author?->name ?? 'University Academic Portal' }}</span>
-                                <span class="inline-flex items-center gap-1 text-slate-500">
+                            <div class="grid min-w-0 gap-1 text-right text-sm">
+                                <span class="font-semibold leading-tight text-orange-500">{{ $story->author?->name ?? 'University Academic Portal' }}</span>
+                                <span class="inline-flex items-center justify-end gap-1 text-slate-500">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
