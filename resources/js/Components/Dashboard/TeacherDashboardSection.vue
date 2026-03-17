@@ -74,7 +74,8 @@ defineProps({
 });
 </script>
 
-<template>            <div v-else class="space-y-6">
+<template>
+    <div class="space-y-6">
                 <div class="grid gap-4 lg:grid-cols-3">
                     <div
                         class="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4"
@@ -762,4 +763,3 @@ defineProps({
                 </div>
             </div>
 </template>
-

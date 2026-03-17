@@ -74,7 +74,8 @@ defineProps({
 });
 </script>
 
-<template>            <div v-else-if="role === 'staff'" class="space-y-6">
+<template>
+    <div class="space-y-6">
                 <div class="grid gap-4 md:grid-cols-3">
                     <div
                         class="rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4"
@@ -1135,4 +1136,3 @@ defineProps({
                 </div>
             </div>
 </template>
-
