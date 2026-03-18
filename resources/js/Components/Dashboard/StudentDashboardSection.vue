@@ -196,8 +196,9 @@ defineProps({
                 <!-- GPA & Key Metrics Banner -->
                 <div class="grid gap-4 md:grid-cols-3">
                     <!-- GPA Card -->
-                    <div
+                    <Link
                         v-if="stats.gpa !== null"
+                        :href="route('student.grades.index')"
                         class="group relative overflow-hidden rounded-xl border-2 border-portal-navy bg-gradient-to-br from-portal-navy via-blue-700 to-indigo-800 p-6 text-white shadow-xl transition-all duration-300 hover:scale-105"
                     >
                         <div class="relative z-10">
@@ -224,7 +225,7 @@ defineProps({
                                 />
                             </svg>
                         </div>
-                    </div>
+                    </Link>
 
                     <!-- Pending Enrollments Alert -->
                     <Link
