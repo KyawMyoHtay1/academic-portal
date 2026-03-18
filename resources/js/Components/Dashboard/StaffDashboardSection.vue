@@ -348,9 +348,14 @@ defineProps({
                         </div>
                     </Link>
 
-                    <div
+                    <Link
                         v-if="stats.pendingWithdrawals > 0"
-                        class="group relative overflow-hidden rounded-xl border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 p-5"
+                        :href="
+                            route('admin.enrollments.index', {
+                                status: 'withdrawal_pending',
+                            })
+                        "
+                        class="group relative overflow-hidden rounded-xl border-2 border-red-300 bg-gradient-to-br from-red-50 to-red-100 p-5 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -399,7 +404,7 @@ defineProps({
                                 }"
                             ></div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
 
                 <!-- Dashboard charts - Staff -->
