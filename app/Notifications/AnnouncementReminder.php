@@ -14,6 +14,13 @@ class AnnouncementReminder extends Notification implements ShouldQueue
 
     public function __construct(protected Announcement $announcement) {}
 
+    public function viaConnections(): array
+    {
+        return [
+            'mail' => 'database',
+        ];
+    }
+
     public function via(object $notifiable): array
     {
         $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];

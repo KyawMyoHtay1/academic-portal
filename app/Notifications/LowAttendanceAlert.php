@@ -18,6 +18,13 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
         protected float $threshold,
     ) {}
 
+    public function viaConnections(): array
+    {
+        return [
+            'mail' => 'database',
+        ];
+    }
+
     public function via(object $notifiable): array
     {
         $preferences = is_array($notifiable->preferences ?? null) ? $notifiable->preferences : [];
