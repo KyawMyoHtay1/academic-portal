@@ -75,7 +75,8 @@ class StaffAttendanceReportPageBuilder
                     'absent' => $course->total_attendances - $course->present_attendances,
                     'rate' => $rate,
                 ];
-            });
+            })
+            ->values();
 
         // Students with low attendance (below effective threshold)
         $studentsWithLowAttendance = Student::query()
@@ -182,7 +183,8 @@ class StaffAttendanceReportPageBuilder
                     'absent' => $subject->total_attendances - $subject->present_attendances,
                     'rate' => $rate,
                 ];
-            });
+            })
+            ->values();
 
         // Recent attendance records (last 30 days)
         $recentRecords = Attendance::query()

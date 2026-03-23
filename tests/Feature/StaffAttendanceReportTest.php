@@ -82,4 +82,78 @@ class StaffAttendanceReportTest extends TestCase
             ->where('lowAttendanceStudents.0.reason', '25.00% below global threshold')
         );
     }
+
+    public function test_staff_attendance_report_serializes_grouped_rows_as_arrays(): void
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+        ]);
+
+        $studentUser = User::factory()->create([
+            'role' => 'student',
+        ]);
+
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'student_no' => 'STU2002',
+            'full_name' => 'Array Serialization Student',
+            'email' => 'array-serialization-student@example.test',
+            'programme' => 'Computer Science',
+            'intake_year' => '2025',
+        ]);
+
+        $emptyCourse = Course::create([
+            'course_code' => 'CSC100',
+            'title' => 'Empty Course',
+            'credits' => 20,
+            'semester' => 'Semester 1',
+        ]);
+
+        $activeCourse = Course::create([
+            'course_code' => 'CSC200',
+            'title' => 'Active Course',
+            'credits' => 20,
+            'semester' => 'Semester 1',
+        ]);
+
+        Subject::create([
+            'course_id' => $emptyCourse->id,
+            'subject_code' => 'SUB100',
+            'title' => 'Empty Subject',
+            'credits' => 20,
+        ]);
+
+        $activeSubject = Subject::create([
+            'course_id' => $activeCourse->id,
+            'subject_code' => 'SUB200',
+            'title' => 'Active Subject',
+            'credits' => 20,
+        ]);
+
+        $student->courses()->attach($activeCourse->id, ['status' => 'approved']);
+
+        Attendance::create([
+            'subject_id' => $activeSubject->id,
+            'student_id' => $student->id,
+            'date' => now()->toDateString(),
+            'status' => 'present',
+        ]);
+
+        $response = $this
+            ->actingAs($staff)
+            ->get(route('admin.attendance.report'));
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Attendance/Report')
+            ->where('byCourse', fn ($value) => is_array($value)
+                && array_is_list($value)
+                && count($value) === 1
+                && ($value[0]['course_code'] ?? null) === 'CSC200')
+            ->where('bySubject', fn ($value) => is_array($value)
+                && array_is_list($value)
+                && count($value) === 1
+                && ($value[0]['subject_code'] ?? null) === 'SUB200')
+        );
+    }
 }
