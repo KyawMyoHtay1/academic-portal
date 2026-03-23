@@ -45,6 +45,7 @@ class SecurityHeaders
             'https://translate.googleapis.com',
             'https://translate.google.com',
         ];
+        $workerSources = ["'self'"];
 
         if ($isLocal) {
             // Allow Vite/HMR regardless of localhost/loopback port in local development.
@@ -52,6 +53,8 @@ class SecurityHeaders
             $styleSources[] = 'http:';
             $connectSources[] = 'http:';
             $connectSources[] = 'ws:';
+            $workerSources[] = 'blob:';
+            $workerSources[] = 'http:';
         }
 
         $frameAncestors = $allowSameOriginEmbedding ? "'self'" : "'none'";
@@ -65,6 +68,7 @@ class SecurityHeaders
             "img-src 'self' data: blob: https:",
             "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net",
             'connect-src '.implode(' ', $connectSources),
+            'worker-src '.implode(' ', $workerSources),
             "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.google.com https://www.gstatic.com",
             "object-src 'none'",
             "base-uri 'self'",
