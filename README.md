@@ -1060,3 +1060,632 @@ Limit thumbnail generation to selected folders:
 ```bash
 php artisan images:backfill-table-thumbs --folder=users --folder=students
 ```
+
+## Configuration Reference
+
+### Core application
+
+```env
+APP_NAME=
+APP_ENV=
+APP_KEY=
+APP_DEBUG=
+APP_URL=
+```
+
+Notes:
+
+- `APP_URL` affects storage URLs, generated links, and Stripe return URLs
+- `APP_ENV=local` enables the local email-verification shortcut route
+
+### Database
+
+Default local setting:
+
+```env
+DB_CONNECTION=sqlite
+```
+
+MySQL example:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=academic_portal
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Framework config also includes `mariadb`, `pgsql`, and `sqlsrv` connections, but the repository defaults and documentation focus on SQLite and MySQL.
+
+### Cache, queue, sessions, and files
+
+Default local values:
+
+```env
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+SESSION_DRIVER=database
+FILESYSTEM_DISK=local
+```
+
+Notes:
+
+- queue jobs are stored in `jobs`
+- failed queue jobs are stored in `failed_jobs`
+- cache uses the `cache` table by default
+- sessions use the `sessions` table by default
+- public uploaded assets use the `public` disk exposed through `public/storage`
+
+### Attendance alerts
+
+Environment defaults:
+
+```env
+ATTENDANCE_LOW_THRESHOLD=75
+ATTENDANCE_ALERT_COOLDOWN_DAYS=7
+```
+
+Application-level behavior:
+
+- these values are read from config by default
+- staff can override them in Settings
+- overrides are stored in `system_settings`
+- values are normalized to:
+  - threshold: `1-100`
+  - cooldown: `0-90` days
+
+### Realtime and broadcasting
+
+Local defaults:
+
+```env
+BROADCAST_CONNECTION=log
+REVERB_APP_ID=local-app-id
+REVERB_APP_KEY=local-app-key
+REVERB_APP_SECRET=local-app-secret
+REVERB_HOST=127.0.0.1
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+VITE_REVERB_HOST="${REVERB_HOST}"
+VITE_REVERB_PORT="${REVERB_PORT}"
+VITE_REVERB_SCHEME="${REVERB_SCHEME}"
+```
+
+Notes:
+
+- leaving `BROADCAST_CONNECTION=log` keeps local setup simple
+- switch to `reverb` only when you need live websocket updates
+- frontend Echo is only bootstrapped when the app key is present in Vite env
+
+### Stripe
+
+```env
+STRIPE_KEY=
+STRIPE_SECRET=
+STRIPE_WEBHOOK_SECRET=
+```
+
+Notes:
+
+- checkout sessions are priced in GBP
+- webhook verification requires the exact signing secret from Stripe CLI or dashboard
+- webhook payloads are stored in `stripe_webhook_events`
+
+### Google reCAPTCHA v3
+
+```env
+RECAPTCHA_SITE_KEY=
+RECAPTCHA_SECRET_KEY=
+RECAPTCHA_SCORE_THRESHOLD=0.5
+```
+
+Notes:
+
+- if keys are blank, verification is skipped for local development
+- the service returns false on empty token or verification failure
+- public forms and auth flows only enforce reCAPTCHA when site/secret keys are configured
+
+### Mail
+
+Default local mail behavior:
+
+```env
+MAIL_MAILER=log
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+Notes:
+
+- with `MAIL_MAILER=log`, email-capable notifications are written to logs instead of sent
+- configure SMTP or another real mailer if you want mail delivery for reminder/alert notifications
+
+### Optional Redis and AWS placeholders
+
+The repository includes default Laravel placeholders for:
+
+- Redis cache/session/queue backing
+- AWS/S3 filesystem integration
+- SES mail
+- SQS queue transport
+
+These are available through config but are not required for the default local bootstrap.
+
+### Application-level settings stored in the database
+
+The settings page manages two categories of values:
+
+1. user notification preferences in `users.preferences`
+2. staff-managed attendance alert defaults in `system_settings`
+
+Settings currently exposed in the UI include:
+
+- per-category notification toggles
+- email notification toggles
+- attendance low-threshold default
+- attendance cooldown days default
+
+## Data, Storage, and Files
+
+### Public storage layout
+
+The `public` disk points to:
+
+```text
+storage/app/public
+```
+
+and is exposed at:
+
+```text
+public/storage
+```
+
+Typical stored folders include:
+
+- `users/`
+- `students/`
+- `courses/`
+- `subjects/`
+- `assignments/`
+
+### Image processing behavior
+
+`ImageService` stores optimized variants of uploaded images.
+
+Main image constraints:
+
+- max width: `800`
+- max height: `600`
+- JPEG quality: `85`
+
+Table-thumbnail variants:
+
+- max width: `160`
+- max height: `160`
+- JPEG quality: `72`
+- generated under a nested `table/` folder beside the source folder
+
+Example:
+
+```text
+courses/example.jpg
+courses/table/example.jpg
+```
+
+### Upload constraints
+
+| Upload type | Accepted formats | Limit | Where enforced |
+| --- | --- | --- | --- |
+| Student photo | `jpeg`, `jpg`, `png` | `2048KB` | student store/update requests |
+| Student ID card | `pdf`, `jpeg`, `jpg`, `png` | `5120KB` | student store/update requests |
+| Student transcript | `pdf`, `jpeg`, `jpg`, `png` | `5120KB` | student store/update requests |
+| Teacher assignment allowed types | `pdf`, `doc`, `docx`, `txt`, `zip`, `rar` | configurable | teacher assignment requests |
+| Teacher assignment max file size | integer KB | `1-10240KB` | teacher assignment requests |
+| Student assignment upload | validated against assignment config | default fallback `5120KB` if unset | student assignment controller |
+
+Oversized request handling:
+
+- `bootstrap/app.php` catches `PostTooLargeException`
+- the app redirects back with friendly errors for `photo`, `file`, `id_card`, and `transcript`
+
+### Assignment file handling
+
+- student submissions are stored on the `public` disk under `assignments/`
+- resubmitting replaces the previous file if the submission has not yet been graded
+- once graded, resubmission is blocked
+- teachers can download:
+  - individual submissions
+  - a ZIP of all submissions for an assignment
+
+### User manual PDF
+
+The app expects the manual in `public/docs/`.
+
+Recommended filename:
+
+```text
+public/docs/University_Academic_Portal_User_Manual.pdf
+```
+
+Supported resolved names:
+
+- `University_Academic_Portal_User_Manual.pdf`
+- `University Academic Portal User Manual.pdf`
+
+Relevant routes:
+
+- `/guest/user-manual`
+- `/guest/user-manual/download`
+
+The helper note in [public/docs/README.md](public/docs/README.md) also points to this exact filename.
+
+## Reports and Exports
+
+The portal supports CSV and PDF export in multiple modules.
+
+Student-facing exports:
+
+- attendance report: CSV/PDF
+- timetable: CSV/PDF
+
+Staff-facing exports:
+
+- enrollments: CSV/PDF
+- attendance report: CSV/PDF
+- fee ledger: CSV/PDF
+- fee receipt: PDF
+- grade sheet by subject: CSV/PDF
+- timetables: CSV/PDF
+
+Implementation details:
+
+- PDF output is rendered from Blade templates
+- report generation uses DomPDF
+- teacher ZIP export of submissions uses `ZipArchive` rather than PDF/CSV
+
+## Testing and Quality
+
+### Main commands
+
+Run backend formatting and tests:
+
+```bash
+composer check
+```
+
+Run the full local quality gate on Windows:
+
+```powershell
+./check.ps1
+```
+
+Run the full local quality gate on macOS/Linux:
+
+```bash
+./check.sh
+```
+
+Run backend tests only:
+
+```bash
+php artisan test
+```
+
+Run frontend build validation:
+
+```bash
+npm run build
+```
+
+Run Pint only:
+
+```bash
+./vendor/bin/pint --test
+```
+
+### Suite coverage
+
+The repository includes tests for:
+
+- authentication and registration
+- email verification and password flows
+- terms and conditions access
+- role-based route protection
+- student, subject, course, and user management
+- teacher course assignment visibility
+- enrollment review and schedule-conflict blocking
+- fee workflow and Stripe webhook processing
+- staff attendance reporting
+- teacher final-grade submission
+- teacher draft ownership protections
+- grade review workflow
+- failed-job management
+- search scoping
+- low-attendance alert job behavior
+- grade calculation and letter-grade mapping
+
+### Test environment defaults
+
+From `phpunit.xml`:
+
+- `APP_ENV=testing`
+- database: in-memory SQLite
+- queue: `sync`
+- broadcast: `null`
+- cache: `array`
+- session: `array`
+- mail: `array`
+
+Test bootstrap also clears reCAPTCHA keys in `tests/TestCase.php` so auth tests remain deterministic regardless of a developer's local `.env`.
+
+### Pre-commit hooks
+
+Install repository-managed hooks:
+
+```bash
+composer hooks:install
+```
+
+Check the active hooks path:
+
+```bash
+composer hooks:status
+```
+
+Current pre-commit gate:
+
+- `composer check`
+- `npm run check:frontend`
+
+### CI
+
+GitHub Actions workflow:
+
+```text
+.github/workflows/ci.yml
+```
+
+Current CI tasks:
+
+- PHP dependency install
+- JS dependency install
+- environment preparation
+- Pint check
+- `php artisan test`
+- `npm run build`
+
+## Production Deployment Guide
+
+### Baseline infrastructure
+
+The deployment diagram in `deployment/AcademicPortal_Deployment.plantuml` models a production setup with:
+
+- client browsers on mobile/laptop
+- web server running Apache or Nginx
+- PHP 8.2
+- Laravel 12 application runtime
+- Vue 3 + Inertia frontend
+- primary MySQL database
+- backup database server
+- Stripe as an external payment service
+- SMTP/email service
+
+That is a reasonable production target for this app.
+
+### Deployment checklist
+
+1. Provision the server and database.
+2. Point the web root to the Laravel `public/` directory.
+3. Deploy application code.
+4. Install PHP dependencies without dev packages:
+
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+5. Install/build frontend assets:
+
+```bash
+npm ci
+npm run build
+```
+
+6. Create and configure `.env`.
+7. Set a real `APP_KEY`.
+8. Configure `APP_URL` to the production domain.
+9. Configure database credentials.
+10. Configure Stripe secrets if payments are enabled.
+11. Configure mail if email-capable notifications should be sent.
+12. Run migrations:
+
+```bash
+php artisan migrate --force
+```
+
+13. Create the storage symlink:
+
+```bash
+php artisan storage:link
+```
+
+14. Cache config and views:
+
+```bash
+php artisan config:cache
+php artisan view:cache
+```
+
+15. Start long-running workers and scheduler.
+
+### Long-running processes
+
+At minimum, a production deployment should run:
+
+- web server / PHP-FPM
+- queue worker
+- scheduler trigger
+
+Typical commands:
+
+Queue worker:
+
+```bash
+php artisan queue:work --tries=3 --timeout=120
+```
+
+Scheduler via cron every minute:
+
+```bash
+php artisan schedule:run
+```
+
+If realtime messaging is enabled:
+
+```bash
+php artisan reverb:start
+```
+
+### Backups, logs, and operational monitoring
+
+Recommended operational baseline:
+
+- back up the main application database
+- keep backups for `stripe_webhook_events`, `fee_status_logs`, `grade_review_logs`, and `enrollment_status_logs`
+- monitor `failed_jobs`
+- monitor application logs for:
+  - `queue.job_failed`
+  - Stripe webhook failures
+  - enrollment notification failures
+  - reCAPTCHA verification errors
+- do not leave `MAIL_MAILER=log` in production if you expect actual email delivery
+
+### Production caveats
+
+- Do not rely on `sync` queue mode if you want background alerting and operational isolation.
+- Route caching is not currently a safe optimization target because `routes/web.php` contains many closure-defined routes.
+- If teacher ZIP download is required, ensure the PHP ZIP extension is installed.
+- If image upload/optimization is required, ensure GD is installed.
+- If you enable Reverb, make sure websocket ports and reverse-proxy rules are configured correctly.
+- If the app is served over HTTPS in production, secure-cookie and HSTS settings should be reviewed together with proxy configuration.
+
+## Project Documentation Assets
+
+This repository also contains project/report artifacts beyond runtime code.
+
+Written documents:
+
+- `docs/Chapter1.md`
+- `docs/CHAPTER2_REWRITE.md`
+- `docs/CHAPTER3_REWRITE.md`
+- `docs/CHAPTER4_REWRITE.md`
+- `docs/CHAPTER5_REWRITE.md`
+- `docs/CHAPTER6_REWRITE.md`
+- `docs/CHAPTER7_REWRITE.md`
+- `docs/APPENDIX_REWRITE.md`
+
+Diagram source folders:
+
+- `class_diagram/`
+- `deployment/`
+- `sequence/`
+- `sitemap/`
+- `usecase/`
+
+Rendered diagram output:
+
+- `out/`
+
+These assets are useful if you need architectural diagrams, academic report material, or presentation support in addition to the running application itself.
+
+## Troubleshooting
+
+### Uploaded images or documents are not visible
+
+Run:
+
+```bash
+php artisan storage:link
+```
+
+### Queue-backed features are not processing
+
+Start a worker:
+
+```bash
+php artisan queue:work
+```
+
+Affected areas include:
+
+- low-attendance alerts
+- queued notifications
+- failed-job visibility and retry workflows
+
+### Messages save correctly but do not appear live
+
+Check:
+
+- `BROADCAST_CONNECTION=reverb`
+- Reverb credentials are set
+- `php artisan reverb:start` is running
+- Vite was restarted after changing `VITE_REVERB_*`
+
+### Stripe webhook signature verification fails
+
+Make sure:
+
+- `STRIPE_WEBHOOK_SECRET` matches the secret from `stripe listen` or the Stripe dashboard
+
+### Payment stays in `payment_pending`
+
+Possible causes:
+
+- student submitted manual confirmation and staff has not reviewed it yet
+- Stripe checkout started but webhook processing is not reaching the app
+- queue/notification problems are masking status updates
+- wrong Stripe secret or payment-intent mismatch prevented transition
+
+### Enrollment approval is blocked unexpectedly
+
+The app can block approval when timetable overlap is detected between the requested course and an already approved course for the same student.
+
+### Public/auth forms are blocked by reCAPTCHA locally
+
+Either:
+
+- leave `RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY` blank locally
+
+or:
+
+- configure both correctly and restart Vite / clear config cache if needed
+
+### Search returns no results for short input
+
+Global search requires at least 2 characters before returning results.
+
+### Large uploads fail before validation runs
+
+The server may be hitting PHP's `post_max_size` or `upload_max_filesize`. The app already catches `PostTooLargeException`, but the server limits still need to be increased if your intended uploads are larger.
+
+### Seeded photos did not appear
+
+That usually means the image host was unreachable during seeding. Re-run the seeder later if you want those downloaded demo images.
+
+### Config changes are not taking effect
+
+If you cached config previously, clear it:
+
+```bash
+php artisan config:clear
+```
+
+### Route caching fails
+
+That is expected with the current route file because it contains many closure-based routes. Use config/view caching instead of `route:cache` until those routes are converted to controller actions.
