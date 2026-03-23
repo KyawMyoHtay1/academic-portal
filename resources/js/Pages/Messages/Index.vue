@@ -535,7 +535,7 @@ watch(
     }
 );
 
-watch(replyForm.processing, (processing) => {
+watch(() => replyForm.processing, (processing) => {
     if (!processing && pendingThreadAutoScroll.value) {
         scrollThreadToBottom("smooth");
     }
