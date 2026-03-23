@@ -576,6 +576,7 @@ const quickActions = computed(() => {
 
             <StudentDashboardSection
                 v-if="role === 'student'"
+                :user="user"
                 :role="role"
                 :stats="stats"
                 :charts="charts"

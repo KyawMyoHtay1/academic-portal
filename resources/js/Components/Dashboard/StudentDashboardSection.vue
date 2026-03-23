@@ -7,6 +7,10 @@ const DashboardChart = defineAsyncComponent(() =>
 );
 
 defineProps({
+    user: {
+        type: Object,
+        default: null,
+    },
     role: {
         type: String,
         required: true,
