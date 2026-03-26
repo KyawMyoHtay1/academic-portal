@@ -146,14 +146,10 @@ class StaffAttendanceReportTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
             ->component('Admin/Attendance/Report')
-            ->where('byCourse', fn ($value) => is_array($value)
-                && array_is_list($value)
-                && count($value) === 1
-                && ($value[0]['course_code'] ?? null) === 'CSC200')
-            ->where('bySubject', fn ($value) => is_array($value)
-                && array_is_list($value)
-                && count($value) === 1
-                && ($value[0]['subject_code'] ?? null) === 'SUB200')
+            ->has('byCourse', 1)
+            ->where('byCourse.0.course_code', 'CSC200')
+            ->has('bySubject', 1)
+            ->where('bySubject.0.subject_code', 'SUB200')
         );
     }
 }
