@@ -15,20 +15,32 @@ class StaffAttendanceAlertsController extends Controller
             'cooldown_days' => ['nullable', 'integer', 'min:0', 'max:90'],
         ]);
 
-        $threshold = array_key_exists('threshold', $data) ? (float) $data['threshold'] : null;
-        $cooldownDays = array_key_exists('cooldown_days', $data) ? (int) $data['cooldown_days'] : null;
+        $hasThresholdOverride = array_key_exists('threshold', $data);
+        $hasCooldownOverride = array_key_exists('cooldown_days', $data);
+
+        $threshold = $hasThresholdOverride ? (float) $data['threshold'] : null;
+
+        // Manual runs should be able to resend alerts immediately from the dashboard.
+        // The scheduled console command still uses the configured cooldown.
+        $cooldownDays = $hasCooldownOverride ? (int) $data['cooldown_days'] : 0;
 
         SendLowAttendanceAlertsJob::dispatch($threshold, $cooldownDays);
 
         $parts = [];
-        if ($threshold !== null) {
+        if ($hasThresholdOverride) {
             $parts[] = sprintf('threshold %.2f%%', $threshold);
         }
-        if ($cooldownDays !== null) {
+        if ($hasCooldownOverride) {
             $parts[] = sprintf('cooldown %d day(s)', $cooldownDays);
         }
         $suffix = $parts === [] ? '' : ' ('.implode(', ', $parts).')';
 
-        return back()->with('success', 'Low attendance alerts have been queued'.$suffix.'.');
+        $message = 'Low attendance alerts have been queued'.$suffix.'.';
+
+        if (! $hasCooldownOverride) {
+            $message .= ' Manual runs bypass cooldown.';
+        }
+
+        return back()->with('success', $message);
     }
 }
