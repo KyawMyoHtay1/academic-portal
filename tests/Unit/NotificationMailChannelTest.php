@@ -7,8 +7,11 @@ use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Notifications\AnnouncementPublished;
+use App\Notifications\AnnouncementReminder;
 use App\Notifications\AttendanceAlert;
+use App\Notifications\LowAttendanceAlert;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use stdClass;
 use Tests\TestCase;
 
@@ -32,6 +35,8 @@ class NotificationMailChannelTest extends TestCase
         $mail = $notification->toMail($notifiable);
         $this->assertSame('New announcement published', $mail->subject);
         $this->assertSame('View announcements', $mail->actionText);
+        $this->assertInstanceOf(ShouldQueue::class, $notification);
+        $this->assertSame(['mail' => 'database'], $notification->viaConnections());
     }
 
     public function test_attendance_alert_adds_mail_channel_when_email_notifications_are_enabled(): void
@@ -68,5 +73,25 @@ class NotificationMailChannelTest extends TestCase
         $mail = $notification->toMail($notifiable);
         $this->assertSame('Attendance recorded', $mail->subject);
         $this->assertSame('View attendance', $mail->actionText);
+        $this->assertInstanceOf(ShouldQueue::class, $notification);
+        $this->assertSame(['mail' => 'database'], $notification->viaConnections());
+    }
+
+    public function test_reminder_notifications_queue_mail_on_the_database_connection(): void
+    {
+        $announcementReminder = new AnnouncementReminder(new Announcement([
+            'title' => 'Final reminder',
+        ]));
+
+        $lowAttendanceAlert = new LowAttendanceAlert(
+            student: new \App\Models\Student(['id' => 5]),
+            rate: 63.5,
+            threshold: 75.0,
+        );
+
+        $this->assertInstanceOf(ShouldQueue::class, $announcementReminder);
+        $this->assertSame(['mail' => 'database'], $announcementReminder->viaConnections());
+        $this->assertInstanceOf(ShouldQueue::class, $lowAttendanceAlert);
+        $this->assertSame(['mail' => 'database'], $lowAttendanceAlert->viaConnections());
     }
 }

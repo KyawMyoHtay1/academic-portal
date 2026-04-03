@@ -4,14 +4,22 @@ namespace App\Notifications;
 
 use App\Models\Attendance;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AttendanceAlert extends Notification
+class AttendanceAlert extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(protected Attendance $attendance) {}
+
+    public function viaConnections(): array
+    {
+        return [
+            'mail' => 'database',
+        ];
+    }
 
     public function via(object $notifiable): array
     {

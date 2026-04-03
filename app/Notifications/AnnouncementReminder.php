@@ -4,14 +4,22 @@ namespace App\Notifications;
 
 use App\Models\Announcement;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AnnouncementReminder extends Notification
+class AnnouncementReminder extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(protected Announcement $announcement) {}
+
+    public function viaConnections(): array
+    {
+        return [
+            'mail' => 'database',
+        ];
+    }
 
     public function via(object $notifiable): array
     {
