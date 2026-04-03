@@ -4,7 +4,6 @@ namespace App\Services\AttendanceReports;
 
 use App\Models\Attendance;
 use App\Models\Course;
-use App\Models\Student;
 use App\Models\Subject;
 use App\Services\AttendanceReports\Concerns\BuildsStaffAttendanceReportData;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +15,7 @@ class StaffAttendanceReportPageBuilder
 
     public function __construct(
         private readonly StaffAttendanceReportFiltersResolver $filtersResolver,
+        private readonly LowAttendanceAlertTargetResolver $lowAttendanceAlertTargetResolver,
     ) {}
 
     /**
@@ -28,7 +28,6 @@ class StaffAttendanceReportPageBuilder
         $courses = $resolved['options']['courses'];
         $subjects = $resolved['options']['subjects'];
         $thresholdContext = $this->resolveThresholdContext($filters, $courses, $subjects);
-        $effectiveThreshold = $thresholdContext['value'];
 
         $attendanceScope = Attendance::query();
         $this->applyAttendanceFilters($attendanceScope, $filters);
@@ -79,73 +78,17 @@ class StaffAttendanceReportPageBuilder
             ->values()
             ->all();
 
-        // Students with low attendance (below effective threshold)
-        $studentsWithLowAttendance = Student::query()
-            ->with('user:id,name,email')
-            ->when(
-                $filters['programme'] !== '' && $filters['programme'] !== 'all',
-                function (Builder $query) use ($filters) {
-                    $query->where('programme', $filters['programme']);
-                }
+        $studentsWithLowAttendance = $this->lowAttendanceAlertTargetResolver
+            ->buildRows(
+                $filters,
+                $courses,
+                $subjects,
+                limit: 20
             )
-            ->when(
-                $filters['intake_year'] !== '' && $filters['intake_year'] !== 'all',
-                function (Builder $query) use ($filters) {
-                    $query->where('intake_year', $filters['intake_year']);
-                }
-            )
-            ->when(
-                $filters['semester'] !== '' && $filters['semester'] !== 'all',
-                function (Builder $query) use ($filters) {
-                    $query->whereHas('courses', function (Builder $courseQuery) use ($filters) {
-                        $courseQuery->where('semester', $filters['semester']);
-                    });
-                }
-            )
-            ->get()
-            ->map(function ($student) use ($filters, $effectiveThreshold, $thresholdContext) {
-                $studentAttendance = Attendance::query()
-                    ->where('student_id', $student->id);
-                $this->applyAttendanceFilters(
-                    $studentAttendance,
-                    $filters,
-                    applyStudentFilters: false,
-                    applyIntakeFilter: false
-                );
-
-                $total = (clone $studentAttendance)->count();
-                $present = (clone $studentAttendance)
-                    ->where('status', 'present')
-                    ->count();
-                $rate = $total > 0 ? round(($present / $total) * 100, 2) : null;
-
-                return [
-                    'id' => $student->id,
-                    'student_no' => $student->student_no,
-                    'full_name' => $student->user?->name ?? $student->full_name,
-                    'email' => $student->user?->email ?? $student->email,
-                    'programme' => $student->programme,
-                    'total' => $total,
-                    'present' => $present,
-                    'absent' => $total - $present,
-                    'rate' => $rate,
-                    'deficit' => $rate !== null ? max(round($effectiveThreshold - $rate, 2), 0) : null,
-                    'reason' => $rate !== null && $rate < $effectiveThreshold
-                        ? sprintf(
-                            '%.2f%% below %s threshold',
-                            max(round($effectiveThreshold - $rate, 2), 0),
-                            $thresholdContext['label']
-                        )
-                        : null,
-                ];
-            })
-            ->filter(function ($student) use ($effectiveThreshold) {
-                return $student['rate'] !== null && $student['rate'] < $effectiveThreshold;
-            })
-            ->sortBy('rate')
-            ->values()
-            ->take(20)
-            ->all(); // Top 20 students with lowest attendance
+            ->map(fn (array $student) => collect($student)
+                ->except(['user_id', 'threshold', 'threshold_label', 'notify_attendance', 'email_notifications'])
+                ->all())
+            ->all();
 
         // Attendance by subject
         $attendanceBySubject = Subject::query()

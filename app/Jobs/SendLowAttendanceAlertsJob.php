@@ -22,7 +22,8 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
 
     public function __construct(
         private readonly ?float $thresholdOverride = null,
-        private readonly ?int $cooldownDaysOverride = null
+        private readonly ?int $cooldownDaysOverride = null,
+        private readonly ?array $studentSnapshots = null,
     ) {}
 
     /**
@@ -54,6 +55,12 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
         $threshold = max(1, min(100, (float) $threshold));
         $cooldownDays = max(0, min(90, (int) $cooldownDays));
         $now = now();
+
+        if ($this->studentSnapshots !== null) {
+            $this->handleSelectedStudents($threshold, $cooldownDays, $now);
+
+            return;
+        }
 
         DB::table('attendances')
             ->select([
@@ -90,34 +97,92 @@ class SendLowAttendanceAlertsJob implements ShouldQueue
                     $studentId = (int) $row->student_id;
                     $student = $studentsById->get($studentId);
                     $state = $statesByStudentId->get($studentId);
-
-                    $wasBelow = (bool) ($state?->is_below_threshold ?? false);
-                    $newlyBelow = $isBelow && ! $wasBelow;
-
-                    $cooldownOk = true;
-                    if ($state?->last_alert_sent_at) {
-                        $cooldownOk = $state->last_alert_sent_at->lte($now->copy()->subDays($cooldownDays));
-                    }
-
-                    // Alert if: (1) newly dropped below threshold, OR (2) still below and cooldown passed
-                    $shouldAlert = ($newlyBelow || ($isBelow && $cooldownOk)) && $student && $student->user;
-
-                    $lastAlertSentAt = $state?->last_alert_sent_at;
-                    if ($shouldAlert) {
-                        $student->user->notify(new LowAttendanceAlert($student, $rate, $threshold));
-                        $lastAlertSentAt = $now;
-                    }
-
-                    LowAttendanceAlertState::updateOrCreate(
-                        ['student_id' => $studentId],
-                        [
-                            'last_rate' => $rate,
-                            'is_below_threshold' => $isBelow,
-                            'last_alert_sent_at' => $lastAlertSentAt,
-                        ]
+                    $this->processStudentRate(
+                        studentId: $studentId,
+                        student: $student,
+                        state: $state,
+                        rate: $rate,
+                        threshold: $threshold,
+                        cooldownDays: $cooldownDays,
+                        now: $now
                     );
                 }
             });
+    }
+
+    private function handleSelectedStudents(float $threshold, int $cooldownDays, $now): void
+    {
+        $snapshots = collect($this->studentSnapshots ?? [])
+            ->filter(fn ($snapshot) => isset($snapshot['student_id'], $snapshot['rate']))
+            ->keyBy(fn ($snapshot) => (int) $snapshot['student_id']);
+
+        if ($snapshots->isEmpty()) {
+            return;
+        }
+
+        $studentIds = $snapshots->keys()->all();
+
+        $studentsById = Student::query()
+            ->whereIn('id', $studentIds)
+            ->with('user')
+            ->get()
+            ->keyBy('id');
+
+        $statesByStudentId = LowAttendanceAlertState::query()
+            ->whereIn('student_id', $studentIds)
+            ->get()
+            ->keyBy('student_id');
+
+        foreach ($snapshots as $studentId => $snapshot) {
+            $this->processStudentRate(
+                studentId: (int) $studentId,
+                student: $studentsById->get((int) $studentId),
+                state: $statesByStudentId->get((int) $studentId),
+                rate: round((float) $snapshot['rate'], 2),
+                threshold: $threshold,
+                cooldownDays: $cooldownDays,
+                now: $now
+            );
+        }
+    }
+
+    private function processStudentRate(
+        int $studentId,
+        ?Student $student,
+        ?LowAttendanceAlertState $state,
+        float $rate,
+        float $threshold,
+        int $cooldownDays,
+        $now
+    ): void {
+        $isBelow = $rate < $threshold;
+        $wasBelow = (bool) ($state?->is_below_threshold ?? false);
+        $newlyBelow = $isBelow && ! $wasBelow;
+
+        $cooldownOk = true;
+        if ($state?->last_alert_sent_at) {
+            $cooldownOk = $state->last_alert_sent_at->lte($now->copy()->subDays($cooldownDays));
+        }
+
+        $preferences = is_array($student?->user?->preferences ?? null) ? $student->user->preferences : [];
+        $notificationsEnabled = $student && $student->user && (($preferences['notify_attendance'] ?? true) !== false);
+
+        $shouldAlert = ($newlyBelow || ($isBelow && $cooldownOk)) && $notificationsEnabled;
+
+        $lastAlertSentAt = $state?->last_alert_sent_at;
+        if ($shouldAlert) {
+            $student->user->notify(new LowAttendanceAlert($student, $rate, $threshold));
+            $lastAlertSentAt = $now;
+        }
+
+        LowAttendanceAlertState::updateOrCreate(
+            ['student_id' => $studentId],
+            [
+                'last_rate' => $rate,
+                'is_below_threshold' => $isBelow,
+                'last_alert_sent_at' => $lastAlertSentAt,
+            ]
+        );
     }
 
     public function retryUntil(): DateTimeInterface

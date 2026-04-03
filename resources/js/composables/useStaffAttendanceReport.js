@@ -220,12 +220,46 @@ const clearReportFilters = () => {
 
 const runLowAttendanceAlerts = () => {
     sendingAlerts.value = true;
+    const cooldownOverride = normalizedCooldownDays();
+    const payload = {
+        programme:
+            programmeFilter.value !== "all"
+                ? programmeFilter.value
+                : undefined,
+        intake_year:
+            intakeYearFilter.value !== "all"
+                ? intakeYearFilter.value
+                : undefined,
+        semester:
+            semesterFilter.value !== "all"
+                ? semesterFilter.value
+                : undefined,
+        course_id:
+            courseFilter.value !== "all"
+                ? Number(courseFilter.value)
+                : undefined,
+        subject_id:
+            subjectFilter.value !== "all"
+                ? Number(subjectFilter.value)
+                : undefined,
+        date_from: dateFrom.value || undefined,
+        date_to: dateTo.value || undefined,
+        threshold: normalizedThreshold(),
+        course_threshold: normalizedCourseThreshold(),
+        subject_threshold: normalizedSubjectThreshold(),
+        bypass_cooldown: cooldownOverride === undefined || cooldownOverride === defaultCooldownDays,
+    };
+
+    if (
+        cooldownOverride !== undefined &&
+        cooldownOverride !== defaultCooldownDays
+    ) {
+        payload.cooldown_days = cooldownOverride;
+    }
+
     router.post(
         route("admin.attendance.alerts.run"),
-        {
-            threshold: thresholdValue.value,
-            cooldown_days: normalizedCooldownDays(),
-        },
+        payload,
         {
             preserveScroll: true,
             onFinish: () => {
