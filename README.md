@@ -87,7 +87,7 @@ This is not a minimal student portal. It is a full role-based academic operation
 - Timetable CRUD and export
 - Announcement management and reminder sending
 - Attendance report generation and export
-- Manual low-attendance alert dispatch
+- Manual low-attendance alert dispatch from the staff attendance report
 - Contact-message and feedback-message inbox management
 - Failed-jobs review and retry controls
 - Staff dashboard with queue-health, fee, attendance, and approval metrics
@@ -204,7 +204,10 @@ The application uses the queue system for asynchronous features. Current built-i
 - queue failure logging
 - notifications that implement `ShouldQueue`
 
-The scheduler dispatches `attendance:send-low-attendance-alerts` daily from `bootstrap/app.php`.
+Low-attendance alerts can be dispatched in two ways:
+
+- automatically each day by the scheduler via `attendance:send-low-attendance-alerts`
+- manually from the staff attendance report for the currently selected filters
 
 ### External integrations
 
@@ -590,12 +593,14 @@ Announcements:
 Attendance alerts:
 
 1. Scheduler dispatches the low-attendance job daily.
-2. The job computes per-student attendance rate.
-3. Threshold comes from:
+2. Staff can also dispatch low-attendance alerts manually from the attendance report.
+3. Manual report-triggered alerts use the current report filters and, by default, bypass cooldown.
+4. The job computes per-student attendance rate.
+5. Threshold comes from:
    - `system_settings` if staff changed it
    - otherwise `.env` / `config/attendance_alerts.php`
-4. Alerts are sent when newly below threshold or when cooldown has elapsed.
-5. `low_attendance_alert_states` prevents spam.
+6. Alerts are sent when newly below threshold or when cooldown has elapsed.
+7. `low_attendance_alert_states` prevents spam.
 
 ## Dashboards, Search, and Notifications
 
@@ -710,7 +715,7 @@ Current notification categories in `app/Notifications` include:
 Channel behavior:
 
 - most notifications are database-only
-- `LowAttendanceAlert` and `AnnouncementReminder` can also use the `mail` channel when `email_notifications` is enabled and mail is configured
+- `LowAttendanceAlert`, `AnnouncementReminder`, `AnnouncementPublished`, and `AttendanceAlert` can also use the `mail` channel when `email_notifications` is enabled and mail is configured
 
 ### Logging and audit trails
 
@@ -1038,6 +1043,14 @@ Local-only one-click verification for the current signed-in user:
 ```
 
 Dispatch low-attendance alerts manually:
+
+- dashboard/manual filtered dispatch:
+
+```text
+POST /admin/attendance/alerts/run
+```
+
+- scheduled/console dispatch:
 
 ```bash
 php artisan attendance:send-low-attendance-alerts
