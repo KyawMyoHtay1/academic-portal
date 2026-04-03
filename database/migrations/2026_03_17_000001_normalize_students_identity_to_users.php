@@ -39,23 +39,15 @@ return new class extends Migration
 
         $studentsEmailUniqueIndex = $this->getUniqueIndexNameForColumn('students', 'email');
 
-        Schema::table('students', function (Blueprint $table) use ($studentsEmailUniqueIndex) {
-            if (Schema::hasColumn('students', 'email')) {
-                // Index names differ across databases/environments; don't fail the migration if absent.
-                if ($studentsEmailUniqueIndex) {
-                    try {
-                        $table->dropUnique($studentsEmailUniqueIndex);
-                    } catch (\Throwable $e) {
-                        // ignore
-                    }
-                }
-                try {
-                    $table->dropUnique(['email']);
-                } catch (\Throwable $e) {
-                    // ignore
-                }
-            }
+        if (Schema::hasColumn('students', 'email') && $studentsEmailUniqueIndex) {
+            DB::statement(sprintf(
+                'ALTER TABLE `%s` DROP INDEX `%s`',
+                'students',
+                $studentsEmailUniqueIndex
+            ));
+        }
 
+        Schema::table('students', function (Blueprint $table) {
             // Remove duplicate identity fields; users is the source of truth.
             if (Schema::hasColumn('students', 'full_name')) {
                 $table->dropColumn('full_name');
