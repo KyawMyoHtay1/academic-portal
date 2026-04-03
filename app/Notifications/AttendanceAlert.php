@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Attendance;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class AttendanceAlert extends Notification
@@ -19,7 +20,33 @@ class AttendanceAlert extends Notification
             return [];
         }
 
-        return ['database'];
+        $channels = ['database'];
+        if (($preferences['email_notifications'] ?? true) === true) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $message = (new MailMessage)
+            ->subject('Attendance recorded')
+            ->greeting('Hello '.($notifiable->name ?? 'Student').',')
+            ->line(sprintf(
+                'Your attendance for %s (%s) on %s is marked as %s.',
+                $this->attendance->course->title,
+                $this->attendance->course->course_code,
+                $this->attendance->date->format('Y-m-d'),
+                ucfirst($this->attendance->status)
+            ));
+
+        $url = $this->resolveUrl($notifiable);
+        if ($url) {
+            $message->action('View attendance', $url);
+        }
+
+        return $message;
     }
 
     public function toArray(object $notifiable): array

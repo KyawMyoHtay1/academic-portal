@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Announcement;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class AnnouncementPublished extends Notification
@@ -22,7 +23,27 @@ class AnnouncementPublished extends Notification
             return [];
         }
 
-        return ['database'];
+        $channels = ['database'];
+        if (($preferences['email_notifications'] ?? true) === true) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        [$subject, $intro] = match ($this->action) {
+            'updated' => ['Announcement updated', 'An announcement has been updated and may need your attention.'],
+            default => ['New announcement published', 'A new announcement has been published for you.'],
+        };
+
+        return (new MailMessage)
+            ->subject($subject)
+            ->greeting('Hello '.($notifiable->name ?? 'User').',')
+            ->line($intro)
+            ->line((string) $this->announcement->title)
+            ->action('View announcements', route('announcements.index'));
     }
 
     public function toArray(object $notifiable): array
