@@ -177,6 +177,35 @@ Important points:
 - configure a real mailer if you want actual email delivery
 - if mail is not configured correctly, database notifications may still work while email does not
 
+### SMTP example
+
+If you want real email delivery, set mail variables in `.env`.
+
+Minimal SMTP example:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@example.com
+MAIL_PASSWORD=your_app_password
+MAIL_FROM_ADDRESS=your_email@example.com
+MAIL_FROM_NAME="${APP_NAME}"
+MAIL_TIMEOUT=10
+```
+
+Notes:
+
+- Laravel defaults to the `log` mailer if `MAIL_MAILER` is not set
+- Gmail requires an app password, not your normal account password
+- Gmail SMTP is acceptable for local testing, but not ideal for bulk reminder delivery
+- after changing mail settings, clear config and cache:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+```
+
 Manual low-attendance console dispatch:
 
 ```bash
@@ -245,6 +274,7 @@ This repository also contains project-report assets, including:
 
 - check your mail settings in `.env`
 - make sure `php artisan queue:work` is running
+- clear config after changing mail settings
 - inspect `storage/logs/laravel.log`
 
 ### Low-attendance alerts are not processing
