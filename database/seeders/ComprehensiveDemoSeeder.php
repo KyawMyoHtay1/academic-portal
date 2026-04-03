@@ -229,11 +229,9 @@ class ComprehensiveDemoSeeder extends Seeder
                 ['user_id' => $user->id],
                 [
                     'student_no' => sprintf('DEMO%05d', $user->id),
-                    'full_name' => $user->name,
                     'dob' => Carbon::now()->subYears(18 + ($index % 4))->subDays($index)->toDateString(),
                     'gender' => ['Male', 'Female', 'Other'][$index % 3],
                     'nationality' => $nationalities[$index % count($nationalities)],
-                    'email' => $user->email,
                     'phone' => sprintf('+254700%04d', 1000 + $index),
                     'address' => sprintf('Demo Street %d, Nairobi', $index + 1),
                     'emergency_contact_name' => sprintf('Guardian %02d', $index + 1),

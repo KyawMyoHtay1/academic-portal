@@ -84,11 +84,9 @@ class SampleDataSeeder extends Seeder
                 ['user_id' => $user->id],
                 [
                     'student_no' => sprintf('STU%03d', $idx + 1),
-                    'full_name' => $user->name,
                     'dob' => Carbon::now()->subYears(18 + ($idx % 4))->subMonths($idx)->format('Y-m-d'),
                     'gender' => ['Male', 'Female', 'Other'][$idx % 3],
                     'nationality' => 'Nigerian',
-                    'email' => $user->email,
                     'phone' => '555-010'.($idx + 1),
                     'address' => 'Demo Address '.($idx + 1),
                     'emergency_contact_name' => 'Guardian '.($idx + 1),
