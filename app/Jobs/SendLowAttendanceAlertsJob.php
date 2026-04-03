@@ -8,7 +8,6 @@ use App\Notifications\LowAttendanceAlert;
 use App\Support\AttendanceAlertSettings;
 use DateTimeInterface;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class SendLowAttendanceAlertsJob implements ShouldQueue
+class SendLowAttendanceAlertsJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 
 Artisan::command('attendance:send-low-attendance-alerts', function () {
     SendLowAttendanceAlertsJob::dispatch();
-    $this->info('Dispatched low attendance alerts job.');
+    $this->info('Low attendance alerts job completed.');
 })->purpose('Send automated low attendance alerts to students');
 
 Artisan::command('images:backfill-table-thumbs {--force : Regenerate existing table thumbnails} {--folder=* : Limit to specific public disk folders}', function () {

@@ -35,7 +35,7 @@ class StaffAttendanceAlertsController extends Controller
         }
         $suffix = $parts === [] ? '' : ' ('.implode(', ', $parts).')';
 
-        $message = 'Low attendance alerts have been queued'.$suffix.'.';
+        $message = 'Low attendance alerts have been sent'.$suffix.'.';
 
         if (! $hasCooldownOverride) {
             $message .= ' Manual runs bypass cooldown.';

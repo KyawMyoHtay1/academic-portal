@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Student;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class LowAttendanceAlert extends Notification implements ShouldQueue
+class LowAttendanceAlert extends Notification
 {
     use Queueable;
 
@@ -17,13 +16,6 @@ class LowAttendanceAlert extends Notification implements ShouldQueue
         protected float $rate,
         protected float $threshold,
     ) {}
-
-    public function viaConnections(): array
-    {
-        return [
-            'mail' => 'database',
-        ];
-    }
 
     public function via(object $notifiable): array
     {
