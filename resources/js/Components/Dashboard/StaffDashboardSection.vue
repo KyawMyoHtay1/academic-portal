@@ -839,8 +839,9 @@ defineProps({
                                     </p>
                                     <p class="mt-1 text-sm text-slate-700">
                                         Manually run the low attendance alert
-                                        check. Alerts will be queued and sent in
-                                        the background.
+                                        check. Eligible students are notified
+                                        immediately (in-app and by email when
+                                        enabled in their settings).
                                     </p>
 
                                     <!-- Status indicator -->
