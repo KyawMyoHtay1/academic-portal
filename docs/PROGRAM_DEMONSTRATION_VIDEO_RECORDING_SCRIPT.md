@@ -9,7 +9,7 @@
   - student account
 - Also prepare:
   - one terminal window for the queue worker
-  - one mail inbox window such as Gmail, Mailpit, or your configured local mail viewer
+  - one mail inbox window such as Mailpit or your configured local mail viewer
 - Use seeded demo accounts:
   - Staff: `alice.staff@example.com`
   - Teacher: `amelia.teacher@example.com`
@@ -45,7 +45,7 @@ Say:
 
 "This system is developed using Laravel, Vue.js, Inertia, Tailwind CSS, and MySQL. The main purpose of the project is to replace manual and spreadsheet-based academic administration with one integrated web-based platform."
 
-"The portal supports the major academic processes including student registration, course enrollment, grades, fee management, timetable access, attendance tracking, and communication for students, teachers, staff, and public users."
+"The portal supports the major academic processes, including student registration, course enrollment, grades, fee management, timetable access, attendance tracking, and communication for students, teachers, staff, and public users."
 
 ## Segment 2: Public Pages and Portal Entry
 
@@ -62,7 +62,7 @@ Say:
 
 "I will begin with the public-facing side of the system. Public visitors can browse university information, view courses, read announcements, send contact or feedback messages, and access the user manual."
 
-"This is important because the portal is not only a back-office system. It also gives the university a proper public entry point, improves accessibility, and provides a more professional and organised experience."
+"This is important because the portal is not only a back-office system. It also gives the university a proper public entry point, improves accessibility, and provides a more professional and organized experience."
 
 "The guest pages also connect naturally to the authenticated parts of the portal, so users can move from public information into the academic workflows more smoothly."
 
@@ -142,7 +142,7 @@ Say:
 
 "Now I am showing the student perspective. Students can browse the course catalog, search for courses, review the details, and then submit an enrollment request through the portal."
 
-"This is much more efficient than paper-based course registration, because the student can see available courses directly and the request is recorded immediately in the system."
+"This is much more efficient than paper-based course registration because the student can see available courses directly and the request is recorded immediately in the system."
 
 "On `My Courses`, the student can also see their own enrollment status, so there is no need to ask staff manually for progress updates."
 
@@ -305,7 +305,7 @@ Say:
 - Stay on the staff attendance reporting area
 - If low-attendance controls are visible, click `Send Low Attendance Alerts`
 - Show the success flash message if it appears
-- Open your mail inbox window and show the received low-attendance email if your mail setup is active
+- Open the mail inbox window and show the received low-attendance email if your mail setup is active
 
 "An important enhancement in this module is low-attendance monitoring. The system can identify students who fall below the attendance threshold and support alert workflows."
 
@@ -348,7 +348,7 @@ Say:
 
 "To make the implementation more visible, I am also using this section to demonstrate explicit CRUD actions. I create a temporary announcement, update it, and then remove it after showing the workflow."
 
-"That is important in a program demonstration, because it proves that the system is not only displaying data, but also supports real create, update, and delete operations through the user interface."
+"That is important in a program demonstration because it proves that the system is not only displaying data, but also supports real create, update, and delete operations through the user interface."
 
 "Staff can create announcements, set priority, control audience visibility, and send reminders. Students and teachers can then read those announcements and acknowledge important ones when required."
 
