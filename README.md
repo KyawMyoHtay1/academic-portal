@@ -267,6 +267,7 @@ This repository also contains project-report assets, including:
 
 - UML diagrams under `usecase/`, `class_diagram/`, `sequence/`, `deployment/`, and `sitemap/`
 - report/dissertation chapter drafts under `docs/`
+- a screencast walkthrough script at `docs/SCREENCAST_SCRIPT.md`
 
 ## Troubleshooting
 
