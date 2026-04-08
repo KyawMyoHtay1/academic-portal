@@ -6,8 +6,18 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createApp, h } from "vue";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 
+const configuredAppName =
+    typeof document !== "undefined"
+        ? document
+              .querySelector('meta[name="application-name"]')
+              ?.getAttribute("content")
+        : null;
+
 // Default application name shown in browser titles
-const appName = import.meta.env.VITE_APP_NAME || "University Academic Portal";
+const appName =
+    configuredAppName ||
+    import.meta.env.VITE_APP_NAME ||
+    "University Academic Portal";
 const disableNativeValidation =
     import.meta.env.DEV ||
     String(import.meta.env.VITE_DISABLE_HTML5_VALIDATION || "").toLowerCase() ===

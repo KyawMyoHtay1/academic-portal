@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="portal-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1f3a"/>
+      <stop offset="100%" stop-color="#162d4d"/>
+    </linearGradient>
+    <linearGradient id="portal-gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd54f"/>
+      <stop offset="50%" stop-color="#f4b400"/>
+      <stop offset="100%" stop-color="#e0a000"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" ry="12" fill="url(#portal-bg)"/>
+  <path d="M24 13v24" stroke="url(#portal-gold)" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M24 15Q16 18 16 26Q16 34 24 34Q32 34 32 26Q32 18 24 15Z" fill="url(#portal-gold)" fill-opacity="0.92"/>
+  <path d="M24 7.5L25.4 10.2L28.4 10.6L26.2 12.8L26.8 15.8L24 14.2L21.2 15.8L21.8 12.8L19.6 10.6L22.6 10.2Z" fill="url(#portal-gold)"/>
+</svg>
