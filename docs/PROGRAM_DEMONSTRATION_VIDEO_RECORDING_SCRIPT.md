@@ -1,6 +1,6 @@
-# University Academic Portal Screencast Script
+# University Academic Portal Program Demonstration Video Recording Script
 
-This document provides a 15-20 minute screencast script for the University Academic Portal. It is aligned with the implemented system, the three timeboxes, and the project report structure.
+This document provides a 15-20 minute program demonstration video recording script for the University Academic Portal. It is aligned with the implemented system, the three timeboxes, and the project report structure.
 
 ## Recording Goal
 
