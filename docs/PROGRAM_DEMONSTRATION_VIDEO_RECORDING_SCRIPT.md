@@ -7,11 +7,16 @@
   - staff account
   - teacher account
   - student account
+- Also prepare:
+  - one terminal window for the queue worker
+  - one mail inbox window such as Gmail, Mailpit, or your configured local mail viewer
 - Use seeded demo accounts:
   - Staff: `alice.staff@example.com`
   - Teacher: `amelia.teacher@example.com`
   - Student: `student01@example.com`
   - Password: `Password123!`
+- If your local notification flow uses queued jobs, start this before recording:
+  - `php artisan queue:work -v`
 - If Stripe, email delivery, or queue processing are not configured locally, point at the related workflow and explain it instead of risking a live failure.
 - If a page contains long tables, use the first visible seeded record rather than scrolling too much.
 
@@ -280,24 +285,29 @@ Say:
 
 "On the staff side, `Attendance Report` provides a broader view across courses and subjects. This makes it much easier to identify attendance issues than paper-based registers."
 
-## Segment 14: Low-Attendance Monitoring and Alerts
+## Segment 14: Low-Attendance Monitoring, Queue, and Email Alerts
 
-Time: `15:25-16:00`
+Time: `15:25-16:20`
 
 Say:
 
+- In the separate terminal, make sure `php artisan queue:work -v` is running
 - Stay on the staff attendance reporting area
-- If low-attendance controls are visible, point at them
+- If low-attendance controls are visible, click `Send Low Attendance Alerts`
+- Show the success flash message if it appears
+- Open your mail inbox window and show the received low-attendance email if your mail setup is active
 
 "An important enhancement in this module is low-attendance monitoring. The system can identify students who fall below the attendance threshold and support alert workflows."
 
-"These alerts can also work with queue-based processing and email delivery when the environment is configured."
+"Here I am also demonstrating the queued notification flow. The alert action places the email-capable notifications into the queue, and the queue worker processes them in the background."
+
+"If the mail configuration is active, the affected user also receives the alert by email. This is useful because it shows that the portal supports both in-app notifications and email communication for important academic events."
 
 "This makes the attendance process more proactive, because staff can identify risk cases earlier instead of waiting for manual reports."
 
 ## Segment 15: Announcements, Messages, and Notifications
 
-Time: `16:00-17:30`
+Time: `16:20-17:40`
 
 Say:
 
@@ -318,11 +328,13 @@ Say:
 
 "Staff can create announcements, set priority, control audience visibility, and send reminders. Students and teachers can then read those announcements and acknowledge important ones when required."
 
+"This module also supports email-backed notifications when the queue and mail configuration are enabled, so announcement publishing and reminder actions can reach users both inside the portal and through email."
+
 "The portal also includes internal messaging and a notification centre, which helps keep academic communication inside one system instead of spreading it across notice boards, paper messages, or disconnected emails."
 
 ## Segment 16: Contact Messages, Feedback, Search, Settings, Failed Jobs, and Closing
 
-Time: `17:30-20:00`
+Time: `17:40-20:00`
 
 Say:
 
@@ -347,4 +359,3 @@ Say:
 "Future improvements could include advanced analytics, stronger accessibility support, MFA, mobile optimisation, and deeper integration with other university systems."
 
 "Thank you for watching."
-
