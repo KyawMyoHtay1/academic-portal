@@ -20,6 +20,16 @@
 - If Stripe, email delivery, or queue processing are not configured locally, point at the related workflow and explain it instead of risking a live failure.
 - If a page contains long tables, use the first visible seeded record rather than scrolling too much.
 
+## Important Demo Rule
+
+- You do not need to perform full CRUD on every module during the screencast.
+- You should perform at least a few clear state-changing actions live, such as:
+  - one `Create`
+  - one `Update`
+  - one `Delete`
+  - key workflow actions like `Approve`, `Reject`, `Acknowledge`, `Mark as handled`, or `Send Low Attendance Alerts`
+- In this script, the strongest explicit CRUD example is the announcement module, while the enrollment, grading, payment, attendance, and messaging sections demonstrate real business workflow changes.
+
 # Recording Flow
 
 ## Segment 1: Opening and Home Page
@@ -313,18 +323,32 @@ Say:
 
 - Stay in the staff tab
 - Click `Communication > Announcements`
-- Point at `Create Announcement`
-- Point at filters and the `Remind` action
+- Click `Create Announcement`
+- Enter a short temporary title such as `Demo Academic Portal Notice`
+- Enter a short body such as `This is a temporary announcement created during the final demonstration.`
+- Choose a priority
+- Choose an audience such as students
+- Click `Create`
+- Show the success message and the new announcement in the list
+- Click `Edit` on the same announcement
+- Change one word in the title or body
+- Save the update
+- Point at the filters and the `Remind` action
 - Switch to the student or teacher tab
 - Click `Communication > Announcements`
 - Open one announcement
 - Point at or click `Acknowledge` if visible
+- Return to the staff tab if needed and point at or click `Delete` on the temporary announcement
 - Click `Communication > Messages`
 - Point at the message tabs, search, `Unread only`, `Reply`, and `Send Reply`
 - Click `Communication > Notifications`
 - Point at `Mark all as read`, `Open`, and `Mark as read`
 
 "Communication is centralised through announcements, direct messages, and notifications."
+
+"To make the implementation more visible, I am also using this section to demonstrate explicit CRUD actions. I create a temporary announcement, update it, and then remove it after showing the workflow."
+
+"That is important in a program demonstration, because it proves that the system is not only displaying data, but also supports real create, update, and delete operations through the user interface."
 
 "Staff can create announcements, set priority, control audience visibility, and send reminders. Students and teachers can then read those announcements and acknowledge important ones when required."
 
