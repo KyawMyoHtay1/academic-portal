@@ -256,6 +256,8 @@ Say:
 
 "The portal also supports a live Stripe checkout flow, so I am now selecting a fee and clicking `Pay Now`. This redirects the student to Stripe's secure hosted checkout page."
 
+"I am now completing the payment using Stripe test mode. For this demonstration, I am using a Stripe test card, so no real money is being charged."
+
 "For demonstration purposes, this payment is completed in Stripe test mode. After the payment, the student returns to the portal and the fee status is updated to paid or payment pending, depending on the confirmation timing and local project configuration."
 
 "This is useful because it shows that the portal is not only storing fee records, but is also integrated with a real external payment gateway. If online checkout is not used, the student can still choose the `Submit Proof` path for manual payment review."
