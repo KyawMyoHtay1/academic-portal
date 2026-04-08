@@ -17,6 +17,8 @@
   - Password: `Password123!`
 - If your local notification flow uses queued jobs, start this before recording:
   - `php artisan queue:work -v`
+- If you plan to demonstrate live Stripe, make sure Stripe test mode is configured and at least one student fee is still in `pending` or `failed` status.
+- If your local Stripe setup relies on webhook forwarding, start that before recording as well.
 - If Stripe, email delivery, or queue processing are not configured locally, point at the related workflow and explain it instead of risking a live failure.
 - If a page contains long tables, use the first visible seeded record rather than scrolling too much.
 
@@ -232,26 +234,35 @@ Say:
 
 "If a payment is waiting for confirmation, staff can approve or reject it. If it has already been paid, the system can generate a receipt."
 
-## Segment 11: Student Fee View and Stripe Workflow
+## Segment 11: Student Fee View and Live Stripe Workflow
 
-Time: `12:15-12:50`
+Time: `12:15-13:15`
 
 Say:
 
 - Switch to the student tab
 - Click `Finance > Fees`
 - Point at the `Cards` and `Table` view toggle
-- Point at `Pay Now`, `Submit Proof`, or `Payment Pending Approval` if visible
+- On a fee with status `pending` or `failed`, click `Pay Now`
+- Accept the confirmation dialog
+- Show the Stripe Checkout page
+- Complete the payment in Stripe test mode
+- Wait for the app to return to `My Fees`
+- Show the success flash message if it appears
+- Point at the updated fee status such as `Paid` or `Payment Pending Approval`
+- Point at `Submit Proof` as the alternative manual payment confirmation path if visible
 
 "From the student side, fee information is shown more clearly. The student can see fee status, due dates, and the current payment state in one place."
 
-"The portal also supports Stripe checkout and webhook processing for online payment integration. In this recording, I am focusing on the fee workflow and payment state management rather than performing a live payment."
+"The portal also supports a live Stripe checkout flow, so I am now selecting a fee and clicking `Pay Now`. This redirects the student to Stripe's secure hosted checkout page."
 
-"This gives students better visibility and reduces the need to visit staff just to ask about payment status."
+"For demonstration purposes, this payment is completed in Stripe test mode. After the payment, the student returns to the portal and the fee status is updated to paid or payment pending, depending on the confirmation timing and local project configuration."
+
+"This is useful because it shows that the portal is not only storing fee records, but is also integrated with a real external payment gateway. If online checkout is not used, the student can still choose the `Submit Proof` path for manual payment review."
 
 ## Segment 12: Timetable Management and Role-Based Timetable Views
 
-Time: `12:50-14:05`
+Time: `13:15-14:30`
 
 Say:
 
@@ -276,7 +287,7 @@ Say:
 
 ## Segment 13: Attendance Recording, Student View, and Reports
 
-Time: `14:05-15:25`
+Time: `14:30-15:50`
 
 Say:
 
@@ -297,7 +308,7 @@ Say:
 
 ## Segment 14: Low-Attendance Monitoring, Queue, and Email Alerts
 
-Time: `15:25-16:20`
+Time: `15:50-16:45`
 
 Say:
 
@@ -317,7 +328,7 @@ Say:
 
 ## Segment 15: Announcements, Messages, and Notifications
 
-Time: `16:20-17:40`
+Time: `16:45-18:05`
 
 Say:
 
@@ -358,7 +369,7 @@ Say:
 
 ## Segment 16: Contact Messages, Feedback, Search, Settings, Failed Jobs, and Closing
 
-Time: `17:40-20:00`
+Time: `18:05-20:00`
 
 Say:
 
