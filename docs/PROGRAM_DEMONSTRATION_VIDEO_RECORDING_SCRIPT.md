@@ -3,20 +3,20 @@
 ## Recording Setup
 
 - Prepare four browser tabs before recording:
-  - guest / public site
-  - staff account
-  - teacher account
-  - student account
+    - guest / public site
+    - staff account
+    - teacher account
+    - student account
 - Also prepare:
-  - one terminal window for the queue worker
-  - one mail inbox window such as Mailpit or your configured local mail viewer
+    - one terminal window for the queue worker
+    - one mail inbox window such as Mailpit or your configured local mail viewer
 - Use seeded demo accounts:
-  - Staff: `alice.staff@example.com`
-  - Teacher: `amelia.teacher@example.com`
-  - Student: `student01@example.com`
-  - Password: `Password123!`
+    - Staff: `alice.staff@example.com`
+    - Teacher: `amelia.teacher@example.com`
+    - Student: `student01@example.com`
+    - Password: `Password123!`
 - If your local notification flow uses queued jobs, start this before recording:
-  - `php artisan queue:work -v`
+    - `php artisan queue:work -v`
 - If you plan to demonstrate live Stripe, make sure Stripe test mode is configured and at least one student fee is still in `pending` or `failed` status.
 - If your local Stripe setup relies on webhook forwarding, start that before recording as well.
 - If Stripe, email delivery, or queue processing are not configured locally, point at the related workflow and explain it instead of risking a live failure.
@@ -26,10 +26,10 @@
 
 - You do not need to perform full CRUD on every module during the screencast.
 - You should perform at least a few clear state-changing actions live, such as:
-  - one `Create`
-  - one `Update`
-  - one `Delete`
-  - key workflow actions like `Approve`, `Reject`, `Acknowledge`, `Mark as handled`, or `Send Low Attendance Alerts`
+    - one `Create`
+    - one `Update`
+    - one `Delete`
+    - key workflow actions like `Approve`, `Reject`, `Acknowledge`, `Mark as handled`, or `Send Low Attendance Alerts`
 - In this script, the strongest explicit CRUD example is the announcement module, while the enrollment, grading, payment, attendance, and messaging sections demonstrate real business workflow changes.
 
 # Recording Flow
