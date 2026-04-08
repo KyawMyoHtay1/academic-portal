@@ -1,6 +1,6 @@
 # University Academic Portal Program Demonstration Video Recording Script
 
-This document provides a 15-20 minute program demonstration video recording script for the University Academic Portal. It is aligned with the implemented system, the three timeboxes, and the project report structure.
+This document provides a 15-20 minute program demonstration video recording script for the University Academic Portal. It is aligned with the implemented system, the three timeboxes, and the project report structure, and it includes what to click, what to show, and what to say.
 
 ## Recording Goal
 
@@ -113,6 +113,82 @@ So the script uses two levels:
 | `17:00-18:20` | Announcements, messages, notifications, contact messages, feedback inbox | "Communication is centralised through announcements, direct messages, notifications, and guest contact and feedback forms. Staff and teachers can create announcements, control visibility, set priority, send reminders, and require acknowledgement. Users can send direct messages, read notifications, and manage unread items. Staff can also manage contact and feedback inboxes from the guest site." |
 | `18:20-19:10` | Global search, settings, failed jobs page, or dashboard | "In addition to the main workflows, the portal also includes user settings, structured search, notification preferences, and supporting administrative tools such as failed-jobs monitoring. These features improve maintainability, monitoring, and overall usability of the system." |
 | `19:10-20:00` | Dashboard or diagrams/documentation assets | "From the development perspective, the system was implemented using Agile DSDM and divided into three timeboxes. The design was supported by use case diagrams, class diagrams, sequence diagrams, ERD, sitemap, prototypes, testing evidence, deployment planning, and user manual documentation. In conclusion, the University Academic Portal successfully integrates the major academic administration processes into one platform. It improves efficiency, reduces manual errors, strengthens communication, and supports staff, teachers, students, and guests through role-based workflows. Future improvements could include advanced analytics, stronger accessibility support, MFA, mobile optimisation, and deeper integration with other university systems. Thank you for watching." |
+
+## Exact Click-By-Click Recording Order
+
+Use this section while recording if you want a more guided walkthrough. The labels below match the current sidebar and page actions in the app.
+
+Important:
+
+- For actions that change seeded data, either perform them live or point at the button and explain the workflow.
+- If a table is long, use the first visible record instead of scrolling too much.
+- Keep all four tabs logged in before you start: guest, staff, teacher, student.
+
+| Time | Tab / role | Exact clicks | What to highlight while speaking |
+| --- | --- | --- | --- |
+| `0:00-1:10` | Guest | Open the home page. Stay on the landing page and scroll slightly if needed. | Project title, portal purpose, and that this is one integrated academic platform. |
+| `1:10-3:00` | Guest | Use the top navigation to open `Courses`, `News`, `About`, `Contact`, `Feedback`, and `User Manual`. | Public access, course discovery, announcements, and guest communication forms. |
+| `3:00-4:00` | Login / tabs | Briefly show the login page if needed, then switch across the prepared `Staff`, `Teacher`, and `Student` tabs. | Role-based access, registration, login, password reset, and email verification by narration. |
+| `4:00-5:30` | Staff | In the staff tab, click `Dashboard`. | Summary cards, quick links, and that staff manages the main academic records. |
+| `5:30-6:00` | Staff | Click `People > Manage Users`. Point at `Add User`, the role tabs `All`, `Students`, `Teachers`, `Staff`, and the search box. | User creation, role assignment, search, filtering, sorting, and administration controls. |
+| `6:00-6:35` | Staff | Click `People > Student Records`. Point at `Add student`, then on the first row click `Quick view`, then `Done`. | Student registration, academic records, quick profile access, and filter options. |
+| `6:35-7:00` | Staff | Click `Academics > Manage Courses`. Point at `Create Course`, then on the first visible row click `Quick view`, then `Done`. | Course catalog management, credits, semesters, enrollment status, and course details. |
+| `7:00-7:20` | Staff | Click `Academics > Manage Subjects`. Point at `Create Subject`, then on the first visible row point at `Assign Teachers` or click it and return. | Subject setup, assigned teachers, and the teacher assignment workflow. |
+| `7:20-8:00` | Student | Switch to the student tab. Click `Academics > Courses`. Optionally type in the course search, click `Quick view` on one course card, then click `Enroll to course` or `Enroll`. | Students browse available courses and submit enrollment requests through the portal. |
+| `8:00-8:25` | Student | Click `Academics > My Courses`. | Pending or approved enrollment status and the student self-service view. |
+| `8:25-8:50` | Staff | Switch back to staff. Click `Academics > Enrollment Requests`. If needed, click the `Pending` tab, then on a request click `Details` and point at `Approve Enrollment` or `Reject Enrollment`. | Staff approval and rejection workflow, pending status, and controlled enrollment management. |
+| `8:50-9:25` | Teacher | Switch to the teacher tab. Click `Teaching > Assignments`. Open the first subject card. | Assignment management as part of the grading workflow. |
+| `9:25-10:20` | Teacher | Click `Teaching > Grades`. Open the first subject card. On the grade entry page, point at `Save Draft Grades`. If you want to show the full workflow, also point at the final submission action for grade review. | Teachers record grades, save draft data, and prepare final submission for staff review. |
+| `10:20-10:55` | Staff | Switch to staff. Click `Academics > Grade Reviews`. On the subject list click `Review`. On the review page point at `Approve`, `Reject`, and the `Rejection reason (required)` field. | Grade review, approval, rejection, and auditability. |
+| `10:55-11:20` | Student | Switch to student. Click `Academics > Grades`. | Approved grades, grade breakdowns, and GPA visibility for students. |
+| `11:20-12:10` | Staff | Switch to staff. Click `Finance > Manage Fees`. Point at `Create Fee`, `Remind Filtered Overdue`, `Export CSV`, `Export PDF`, and on a row click `Details`. If a row is `payment_pending`, point at `Approve Payment` and `Reject`. If a row is `paid`, point at `Receipt`. | Fee records, payment review, overdue reminders, exports, and receipt generation. |
+| `12:10-12:40` | Student | Switch to student. Click `Finance > Fees`. Point at the `Cards` / `Table` view toggle and the actions `Pay Now`, `Submit Proof`, or `Payment Pending Approval` if visible. | Student fee visibility and payment status tracking. |
+| `12:40-13:30` | Staff | Switch to staff. Click `Academics > Manage Timetable`. Point at `Create Entry`, filters, `Export PDF`, `Export CSV`, `Week view`, and click `Details` on one row. | Timetable creation, validation, filtering, and reporting options. |
+| `13:30-14:00` | Teacher | Switch to teacher. Click `Teaching > Timetable`. | Teacher-specific weekly timetable view. |
+| `14:00-14:20` | Student | Switch to student. Click `Academics > Timetable`. | Student timetable access and weekly layout. |
+| `14:20-15:05` | Teacher | Switch to teacher. Click `Teaching > Mark Attendance`. Open the first subject card. On the attendance page, show the student list and attendance actions. | Digital attendance capture by teacher and subject. |
+| `15:05-15:35` | Student | Switch to student. Click `Academics > Attendance`. | Personal attendance statistics and breakdowns. |
+| `15:35-16:20` | Staff | Switch to staff. Click `Academics > Attendance Report`. | Course and subject summaries, low-attendance identification, and reporting. |
+| `16:20-17:00` | Staff | Stay on attendance reporting or related alert controls. If low-attendance alert controls are visible, point at them and explain the queue-backed alert workflow. | Attendance alerts, threshold monitoring, and background processing support. |
+| `17:00-17:25` | Staff | Click `Communication > Announcements`. Point at `Create Announcement`, filters, and on one row point at `Remind`, `Edit`, and `Delete`. | Staff announcement management, priority, audience, and reminders. |
+| `17:25-17:45` | Student or teacher | Switch to student or teacher. Click `Communication > Announcements`. Open one announcement, then point at or click `Acknowledge` if available. | Role-based announcement visibility and acknowledgement. |
+| `17:45-18:00` | Any logged-in role | Click `Communication > Messages`. Point at the message tabs, search, `Unread only`, `Mark as read`, `Reply`, and `Send Reply`. | Internal messaging and read-state workflow. |
+| `18:00-18:20` | Any logged-in role | Click `Communication > Notifications`. Point at `Mark all as read`, the notification tabs, `Open`, and `Mark as read`. | Centralised notification center across modules. |
+| `18:20-18:40` | Staff | Click `Communication > Contact Messages`. Point at filters, `Add note` / `Edit note`, and `Mark read`. | Guest contact inbox and internal follow-up notes. |
+| `18:40-19:00` | Staff | Click `Communication > Feedback Messages`. Point at filters, `Mark read`, and `Mark as handled`. | Guest feedback inbox and handling status. |
+| `19:00-19:20` | Staff | In the header, use the global search field. Then click `Settings` in the sidebar or from the user menu. | Search, preferences, and notification settings. |
+| `19:20-19:35` | Staff | Click `Academics > Failed Jobs`. | Supporting admin monitoring and maintainability features. |
+| `19:35-20:00` | Dashboard / docs | Return to `Dashboard`, or briefly show diagrams or report assets if you want a closing technical summary. | DSDM timeboxes, design artefacts, testing, deployment planning, and conclusion. |
+
+## Exact Actions Worth Naming Out Loud
+
+These are useful button names to mention exactly during the demo because they match the current UI:
+
+- `Add User`
+- `Add student`
+- `Create Course`
+- `Create Subject`
+- `Assign Teachers`
+- `Quick view`
+- `Enroll to course`
+- `Details`
+- `Approve Enrollment`
+- `Reject Enrollment`
+- `Save Draft Grades`
+- `Review`
+- `Approve`
+- `Reject`
+- `Create Fee`
+- `Approve Payment`
+- `Receipt`
+- `Create Entry`
+- `Week view`
+- `Create Announcement`
+- `Remind`
+- `Acknowledge`
+- `Mark all as read`
+- `Add note`
+- `Mark as handled`
 
 ## Feature Coverage Matrix
 
