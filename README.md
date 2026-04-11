@@ -251,11 +251,6 @@ php artisan cache:clear
 app/                Application logic
 config/             Laravel configuration
 database/           Migrations, factories, seeders
-docs/               Report/documentation chapters
-class_diagram/      PlantUML class diagrams and ERD
-sequence/           PlantUML sequence diagrams
-usecase/            PlantUML use case diagrams
-deployment/         Deployment diagram
 resources/          Blade, Vue, CSS, frontend assets
 routes/             Web and console routes
 tests/              Feature and unit tests
