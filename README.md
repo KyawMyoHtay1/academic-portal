@@ -256,14 +256,6 @@ routes/             Web and console routes
 tests/              Feature and unit tests
 ```
 
-## Documentation Assets
-
-This repository also contains project-report assets, including:
-
-- UML diagrams under `usecase/`, `class_diagram/`, `sequence/`, `deployment/`, and `sitemap/`
-- report/dissertation chapter drafts under `docs/`
-- a program demonstration video recording script at `docs/PROGRAM_DEMONSTRATION_VIDEO_RECORDING_SCRIPT.md`
-
 ## Troubleshooting
 
 ### Emails are not sending
