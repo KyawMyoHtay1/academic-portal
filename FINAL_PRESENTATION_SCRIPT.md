@@ -5,14 +5,12 @@
 This file is prepared for:
 
 - final live presentation
-- screen-recorded program demonstration
 - documentation summary
 - Q&A preparation
 
-You can use this same script for both:
+This version is focused on the live final presentation.
 
-- the recorded demo video
-- the final in-person presentation
+Your screencast can stay more detailed, but your live presentation should be cleaner, shorter, and more confident.
 
 ## Teacher Guideline Match
 
@@ -25,16 +23,25 @@ This presentation pack matches these requirements:
 - no PowerPoint required
 - Q&A section will be included
 
-## Screen Recording Link
+## Important Live Presentation Rule
 
-Paste your final video link here before submission:
+Because you already explained many technical details in your screencast, do not repeat everything in the final presentation.
 
-`Video URL: [PASTE YOUR SCREEN RECORDING URL HERE]`
+In the live presentation, focus on:
 
-Important reminder:
+- what the system does
+- how each role uses it
+- how the project is structured in the documentation
+- what the final result achieved
 
-- put this URL in a very visible place in your final document
-- best places are the title page, abstract page, or first pages of the report
+Do not spend too much time repeating:
+
+- recording setup
+- queue worker commands
+- Stripe test card numbers
+- mail configuration details
+- long technical setup explanations
+- every single CRUD action
 
 ## Final Submission Checklist
 
@@ -47,6 +54,18 @@ Important reminder:
 - Attend the final presentation. Do not be absent.
 - If you have a schedule problem, inform the teacher early.
 - No PowerPoint is required.
+
+## Video Link Reminder
+
+Paste your final video link into the final document in a visible place:
+
+`Video URL: [PASTE YOUR SCREEN RECORDING URL HERE]`
+
+Best places:
+
+- title page
+- abstract page
+- first few pages of the report
 
 ## Project Title
 
