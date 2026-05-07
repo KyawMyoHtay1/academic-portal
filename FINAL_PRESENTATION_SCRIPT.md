@@ -1,12 +1,52 @@
-# Final Presentation Script
+# Final Presentation Pack
 
-## Teacher Guideline
+## Purpose
 
-Final presentation should be within 20 minutes total:
+This file is prepared for:
 
-- 15 minutes for program demonstration
-- 5 minutes for documentation summary
-- Present in English conversation
+- final live presentation
+- screen-recorded program demonstration
+- documentation summary
+- Q&A preparation
+
+You can use this same script for both:
+
+- the recorded demo video
+- the final in-person presentation
+
+## Teacher Guideline Match
+
+This presentation pack matches these requirements:
+
+- present in English conversation
+- overall presentation time around 20 minutes
+- program demonstration around 15 minutes
+- documentation summary around 5 minutes
+- no PowerPoint required
+- Q&A section will be included
+
+## Screen Recording Link
+
+Paste your final video link here before submission:
+
+`Video URL: [PASTE YOUR SCREEN RECORDING URL HERE]`
+
+Important reminder:
+
+- put this URL in a very visible place in your final document
+- best places are the title page, abstract page, or first pages of the report
+
+## Final Submission Checklist
+
+- Record the program demonstration in English conversation.
+- Put the recording URL in a visible place in the final document.
+- Re-upload the Term 1 Project Proposal file to UoG Moodle.
+- Keep plagiarism below `20%`.
+- If plagiarism is `20%` or above, revise and submit again.
+- Make sure `Proposal + Program + Final Document` are not late.
+- Attend the final presentation. Do not be absent.
+- If you have a schedule problem, inform the teacher early.
+- No PowerPoint is required.
 
 ## Project Title
 
@@ -18,70 +58,86 @@ Password for seeded demo users:
 
 `Password123!`
 
-Suggested accounts for the presentation:
+Recommended accounts:
 
-- Staff: `alice.staff@example.com`
-- Teacher: `amelia.teacher@example.com`
 - Student: `student01@example.com`
+- Teacher: `amelia.teacher@example.com`
+- Staff: `alice.staff@example.com`
 
-## Presentation Flow
+## Recommended Demo Order
 
-1. Opening
-2. Project overview
-3. Guest features
-4. Student features
-5. Teacher features
-6. Staff features
-7. Documentation summary
-8. Conclusion
+1. Home page
+2. Public pages
+3. Student login and student features
+4. Teacher login and teacher features
+5. Staff login and staff features
+6. Final document summary
+7. Conclusion
+8. Q&A
 
-## Full Script
+## Must-Show Features
+
+If you want the safest and strongest presentation, make sure you show these:
+
+- guest home page
+- guest courses or news
+- student course enrolment or my courses
+- student grades
+- student attendance or timetable
+- student fees
+- teacher attendance
+- teacher grade submission
+- teacher assignments
+- staff enrolment approval
+- staff fee management
+- staff grade review
+- staff timetable or attendance report
+- announcements or messaging
+
+## Full Live Script
 
 ### 0:00 - 0:40 Opening
 
 Say:
 
-"Good morning teacher and everyone. Today I would like to present my final project, which is called University Academic Portal. This system is designed to support the daily academic operations of a university. It includes public pages and also role-based functions for students, teachers, and staff. In this presentation, I will first demonstrate the program for about 15 minutes, and after that I will briefly summarize the documentation for about 5 minutes."
+"Good morning teacher and everyone. Today I would like to present my final year project, which is called University Academic Portal. This system is designed to manage the main academic processes of a university in one web-based platform. First, I will demonstrate the program for around fifteen minutes. After that, I will give a short five-minute summary of the documentation."
 
 Action:
 
 Open the home page.
 
-### 0:40 - 1:30 Project Overview
+### 0:40 - 1:20 Project Overview
+
+Say:
+
+"The main purpose of this project is to replace manual and spreadsheet-based academic work with one centralized system. The portal supports students, teachers, staff, and also guest users. The core modules include registration, course enrolment, grades, fees, assignments, timetable, attendance, announcements, messaging, notifications, and public contact features."
 
 Action:
 
 Stay on the home page and point to the main navigation.
 
-Say:
-
-"The main goal of this project is to make academic management more organized, faster, and easier to use. Instead of handling many activities manually, this portal centralizes important processes such as course enrollment, attendance, grades, fees, assignments, announcements, messaging, and timetable management. The system also supports notifications and report export features."
-
-### 1:30 - 3:00 Guest Features
+### 1:20 - 2:40 Guest Features
 
 Say:
 
-"First, I will show the guest side of the system. This part is available without logging in. Visitors can view the home page,
+"First, I will show the guest side of the portal. This part can be used without login. Visitors can view the home page, browse courses, read news or announcements, and access information pages such as about, services, support, vision, and contact."
 
--Open Courses.
+"The portal also provides contact and feedback forms for communication. In addition, there is a user manual page where users can preview or download the manual. This public section is important because it gives useful information to visitors and prospective students before they sign in."
 
-browse courses,
+Action:
 
--Open News.
+Open:
 
-read announcements or news, and
+- Courses
+- News
+- Contact
+- User Manual
 
--Open Contact
+### 2:40 - 3:40 Student Login
 
-access information pages such as about, vision, services, support, and contact. The portal also provides contact and feedback forms, so visitors can communicate with the university.
+Say:
 
--Open User Manual.
-
-In addition, there is a user manual page where users can preview or download the manual."
-
-"This public section is useful because it gives general information to new students and visitors before they create an account or sign in."
-
-### 3:00 - 4:30 Student Login and Dashboard
+"Next, I will log in as a student."
 
 Action:
 
@@ -90,94 +146,78 @@ Log in with:
 - Email: `student01@example.com`
 - Password: `Password123!`
 
-Say:
-
-"Next, I will log in as a student. After login, the student sees a personalized dashboard. This dashboard gives a quick summary of important academic information, such as courses, notifications, and other updates.
-
--Open Profile.
-
-The student can also manage profile settings and access the main student services from one place."
-
-### 4:30 - 6:30 Student Features
+### 3:40 - 6:40 Student Features
 
 Say:
 
-"On the student side, the first important feature is course browsing and enrollment.
+"After login, the student can access the main student dashboard and academic services. One important feature is course browsing and course enrolment. The student can request enrolment and later check the status in My Courses."
+
+"The student can also view grades, attendance, and timetable. These features help students monitor their academic progress clearly. The assignment module allows students to open an assignment, submit files, and later view feedback or grades."
+
+"Another important module is fees. Students can view fee records, see payment status, and submit payment confirmation. They can also read announcements, receive notifications, and use internal messaging."
 
 Action:
 
 Show:
 
-- Open Courses or My Courses
+- Dashboard
+- Courses or My Courses
+- Student Grades
+- Student Attendance
+- Student Timetable
+- Student Assignments
+- Student Fees
+- Announcements or Notifications
 
-A student can view available courses and send an enrollment request. After approval, the course appears in My Courses."
+### 6:40 - 7:20 Student Summary
 
-- Open Student Grades
+Say:
 
-"Students can also check their grades,
+"So, from the student side, the portal gives one place to manage academic information instead of checking different manual records or separate systems."
 
-- Open Student Attendance and timetable
+### 7:20 - 8:00 Teacher Login
 
-view attendance records, and see their timetable. These features help students monitor their academic progress in one place.
+Say:
 
-- Open Student Assignments
+"Now I will switch to the teacher role."
 
-The portal also includes assignment submission, so students can open an assignment, upload their work, and track submission status."
-
-- Open Student Fees
-
-"Another important feature is fee management. Students can see fee records and payment status. They can also submit payment information.
-
-- Open Announcements
-
-In addition, students can read announcements, receive notifications, and use the internal messaging feature to communicate inside the system."
-
-### 6:30 - 8:30 Teacher Login and Features
+Action:
 
 Log in with:
 
 - Email: `amelia.teacher@example.com`
 - Password: `Password123!`
 
-Say:
-
-"Now I will switch to the teacher role. The teacher module focuses on academic delivery and class management.
-
-Action:
-
-Then show:
-
-- Open Teacher Courses
-
-After logging in, the teacher can view assigned courses and subjects."
-
-- Open Teacher Attendance
-
-"One major feature is attendance management. The teacher can open a subject and mark students as present or absent.
-
-- Open Teacher Grades
-
-Another important feature is grade management. The teacher can enter marks, save grade data, and submit final grades for review."
-
-- Open Teacher Assignments
-
-"The teacher can also create assignments, publish them, review student submissions, and give marks or feedback.
-
-- Open Teacher Timetable
-
-On top of that, teachers can view their timetable and manage their own announcements."
-
-### 8:30 - 10:00 Teacher Workflow Value
-
-Action:
-
-Show one attendance subject page and one grade page briefly.
+### 8:00 - 10:30 Teacher Features
 
 Say:
 
-"This teacher workflow improves efficiency because teachers do not need to manage attendance, grades, and assignments separately. Everything is available in one portal. It also improves accuracy because records are stored digitally and can later be reviewed by staff."
+"The teacher module focuses on teaching and academic delivery. Teachers can view their assigned courses and subjects. One important feature is attendance recording. The teacher opens a subject and marks students as present or absent."
 
-### 10:00 - 12:30 Staff Login and Core Management
+"Another major feature is grade management. The teacher can enter marks, save draft grades, and submit final grades for staff review. The assignment module allows teachers to create assignments, publish them, review submissions, and grade student work. Teachers can also view their timetable and manage their own announcements."
+
+Action:
+
+Show:
+
+- Teacher Courses
+- Teacher Attendance
+- Teacher Grades
+- Teacher Assignments
+- Teacher Timetable
+- Teacher Announcements if time allows
+
+### 10:30 - 11:00 Teacher Summary
+
+Say:
+
+"This workflow helps teachers manage academic tasks more efficiently because attendance, grading, assignments, and timetable access are all connected in one system."
+
+### 11:00 - 11:40 Staff Login
+
+Say:
+
+"Next, I will log in as staff, which is the main administrative role."
 
 Action:
 
@@ -186,114 +226,239 @@ Log in with:
 - Email: `alice.staff@example.com`
 - Password: `Password123!`
 
-"Next, I will log in as staff, which is the administrative role in this system. Staff users have the broadest management access.
-
-Then show:
-
-- Students
-- Users
-- Courses
-- Subjects
-- Timetables
+### 11:40 - 14:20 Staff Features
 
 Say:
 
-They can manage students, users, courses, subjects, and timetables."
+"Staff users have the broadest management access. They can manage users, students, courses, subjects, and timetables. They can also assign teachers to courses or subjects and review academic records."
 
-"This role is important because staff members control the administrative side of the academic process.
+"For enrolment management, staff can approve or reject student enrolment and withdrawal requests. In the fee module, staff can create fees, review payment confirmation, approve or reject payments, and generate receipts."
 
--Open Create form and edit form or assign teachers
-
-For example, they can create or edit courses and subjects, assign teachers, and manage user accounts based on role."
-
-### 12:30 - 14:30 Staff Review, Reports, and Alerts
+"In the grade module, staff can review teacher-submitted grades and approve or reject them. Staff can also manage announcements, view contact and feedback messages from the public, and use attendance reports and low-attendance alerts for monitoring."
 
 Action:
 
 Show:
 
-- Enrollments
-
-Say:
-
-"Staff can also review and approve student enrollment requests. This creates a clear workflow between student requests and administrative approval.
-
+- Users
+- Students
+- Courses
+- Subjects
+- Enrolments
 - Fees
-
-In the fee module, staff can manage fee records, review payments, approve or reject them, and generate receipts or exports."
-
 - Grades
-
-"In the grade module, staff can review submitted grades and approve or reject them. This adds control and quality checking before final academic records are confirmed.
-
-- Open announcements page, Contact Messages or Feedback Messages and failed jobs
-
-Staff can also manage announcements, handle contact and feedback messages from the public, and view failed jobs for maintenance purposes."
-
+- Timetables
 - Attendance Report
-- Attendance Alerts
+- Contact Messages or Feedback Messages
 
-"One more useful feature is attendance reporting and low-attendance alerts. Staff can generate attendance reports and manually trigger alerts for students who fall below the attendance threshold. This supports early intervention."
-
-### 14:30 - 15:00 Demo Conclusion
+### 14:20 - 15:00 Program Demo Conclusion
 
 Say:
 
-"To summarize the system demonstration, this portal connects the full academic workflow. A student can request enrollment, a teacher can manage learning activities, and staff can review, approve, and monitor the whole process. So the portal is not only a website, but a complete academic management system with role-based access and connected workflows."
+"To summarize the demonstration, this portal connects the full academic workflow. Students can request enrolment and track their own progress. Teachers can manage attendance, grades, and assignments. Staff can manage records, approvals, payments, timetables, and monitoring. So, this is a complete role-based academic management system rather than a simple website."
 
-### 15:00 - 16:00 Documentation Summary: Background, Aim, and Objectives
+## Documentation Summary Script
 
-Say:
-
-"Now I will briefly summarize the documentation. In my proposal and final report, I first explained the background of the current manual system. Many university processes such as student registration, course enrolment, grade submission, fee payment, timetable management, attendance, and communication are often handled by paper records, spreadsheets, or separate channels."
-
-"Because of that, the main issues are delay, duplication, human error, and difficulty in tracking academic information. So, the aim of this project was to design, develop, and evaluate a University Academic Portal that brings these academic processes into one centralized web-based system for students, teachers, and staff."
-
-### 16:00 - 17:00 Documentation Summary: Investigation and Methodology
+### 15:00 - 16:00 Background, Problem, Aim
 
 Say:
 
-"In the documentation, I also included investigation and comparative analysis. I reviewed similar academic portals such as the University of Greenwich and the University of Bath, and I compared their public features and usability. This helped me identify useful ideas such as clear navigation, online services, academic information access, and help support."
+"Now I will briefly summarize the documentation. In the proposal and final report, I first explained the background of the current manual system. Many university processes such as registration, enrolment, grade submission, fee handling, timetable management, attendance, and communication are often managed by paper, spreadsheets, or separate channels."
 
-"For the development methodology, I used Agile DSDM. I selected DSDM because it supports timeboxing, iterative development, continuous feedback, and MoSCoW prioritization. This was suitable for my project because I needed to complete the system within a fixed academic schedule while still improving features step by step."
+"Because of that, the main issues are delay, duplication, human error, and difficulty in getting accurate information on time. So, the aim of this project was to design, develop, and evaluate a University Academic Portal that puts these academic processes into one centralized web-based system."
 
-### 17:00 - 18:00 Documentation Summary: Requirements, Design, and Timeboxes
+Action:
 
-Say:
+Open the final document or a page showing introduction, aim, or abstract.
 
-"In the design chapter, I defined the target users, functional requirements, non-functional requirements, and MoSCoW priorities. The main user groups are guests, students, teachers, and administrative staff. The documentation also includes use case diagrams, class diagrams, sequence diagrams, ERD, sitemap, screen designs, and deployment diagram."
-
-"The implementation was organized into three timeboxes. Timebox 1 focused on student registration and course registration. Timebox 2 focused on grades, fee payment, and assignment management. Timebox 3 focused on timetable, attendance, announcements, messaging, notifications, contact, and feedback. This structure helped me build the system in a controlled and incremental way."
-
-### 18:00 - 19:00 Documentation Summary: Implementation, Testing, and Deployment
+### 16:00 - 17:00 Investigation and Methodology
 
 Say:
 
-"For implementation, the project used Laravel and PHP for the backend, Vue.js with Inertia for the frontend, Tailwind CSS for the interface, and MySQL as the main database in the documentation. The portal follows the MVC architecture, which helps keep the system organized, maintainable, and scalable."
+"In the documentation, I also included investigation and comparative analysis. I reviewed similar academic portals such as the University of Greenwich and the University of Bath. This helped me understand useful public features, usability ideas, and academic service structure."
 
-"The report also includes detailed functional testing and usability testing for each timebox. Functional testing checked whether each module worked correctly, while usability testing was based on Nielsen's usability heuristics. After testing, I made refinements such as clearer status messages, improved layouts, pagination, filters, timetable readability, and better notification handling. In addition, the documentation includes deployment planning, data migration, user training, and the user manual."
+"For development methodology, I used Agile DSDM. I selected DSDM because it supports timeboxing, iterative development, continuous feedback, and MoSCoW prioritization. This was suitable for my project because I needed to complete the system within a fixed academic schedule while still improving features step by step."
 
-### 19:00 - 20:00 Documentation Summary: Evaluation, Strengths, and Future Improvement
+Action:
+
+Open pages showing literature review or methodology if available.
+
+### 17:00 - 18:00 Requirements, Design, Timeboxes
 
 Say:
 
-"In the final evaluation chapter, I assessed the system against the original aim, objectives, methodology choice, timebox plan, and similar systems. The result is that the main objectives were achieved successfully. The completed portal integrates the main academic workflows into one role-based system and reduces the weaknesses of the manual process."
+"In the design chapter, I defined the target users, functional requirements, non-functional requirements, and MoSCoW priorities. The main user groups are guests, students, teachers, and staff."
 
-"The strengths of the project are integrated academic processes, role-based access, clear workflows, audit logs, and a maintainable technology stack. The current weaknesses are that large-scale real-world deployment, advanced analytics, accessibility improvements, and full scalability testing are still future work. Overall, the project provides a strong foundation for a real university academic portal. Thank you for listening. I am ready for your questions."
+"The documentation includes use case diagrams, class diagrams, sequence diagrams, ERD, sitemap, screen designs, and deployment diagram. The implementation was divided into three timeboxes. Timebox 1 focused on registration and enrolment. Timebox 2 focused on grades, fees, payments, and assignments. Timebox 3 focused on timetable, attendance, announcements, messaging, notifications, contact, and feedback."
 
-## Quick Demo Order
+Action:
 
-1. Home page
-2. Public courses, news, contact, and user manual
-3. Student login and student features
-4. Teacher login and teacher features
-5. Staff login and staff features
-6. Documentation summary
-7. Conclusion
+Open:
 
-## Delivery Tips
+- whole system use case diagram
+- ERD or class diagram
+- one sequence diagram
+
+### 18:00 - 19:00 Implementation, Testing, Deployment
+
+Say:
+
+"For implementation, the project used Laravel and PHP for the backend, Vue.js with Inertia for the frontend, Tailwind CSS for the interface, and MySQL as the main database in the documentation. The portal follows MVC architecture, which helps keep the system organized and maintainable."
+
+"The report also includes functional testing and usability testing for each timebox. Functional testing checked whether each module worked correctly, while usability testing was based on Nielsen's usability heuristics. The documentation also includes deployment planning, data migration, training plans, and the user manual."
+
+Action:
+
+Open:
+
+- testing section
+- deployment diagram
+- user manual page
+
+### 19:00 - 20:00 Evaluation, Strengths, Future Work
+
+Say:
+
+"In the final evaluation chapter, I assessed the system against the original aims, objectives, methodology choice, timebox plan, and similar systems. The main objectives were achieved successfully, and the final system integrates the key academic workflows into one role-based portal."
+
+"The strengths of the project are integrated academic processes, role-based access, clear workflows, audit logs, and a maintainable technology stack. The current limitations are that large-scale real-world deployment, advanced analytics, accessibility improvements, and full scalability testing are still future work. Overall, this project provides a strong foundation for a real university academic portal. Thank you for listening. I am ready for your questions."
+
+## Easy Speaking Version
+
+Use this shorter version if you want something easier to memorize.
+
+### Opening
+
+"Good morning teacher. Today I will present my final year project, University Academic Portal. First, I will show the system for about fifteen minutes. After that, I will summarize the documentation for about five minutes."
+
+### Guest Part
+
+"This is the guest side of the system. Visitors can view courses, news, contact pages, and the user manual. This helps new users get information before login."
+
+### Student Part
+
+"Now I am logging in as a student. Students can request course enrolment, view grades, attendance, timetable, assignments, fees, announcements, and notifications."
+
+### Teacher Part
+
+"Now I am logging in as a teacher. Teachers can manage attendance, enter grades, create assignments, review submissions, and check their timetable."
+
+### Staff Part
+
+"Now I am logging in as staff. Staff can manage users, students, courses, subjects, enrolments, fees, grades, timetables, reports, and communication modules."
+
+### Demo Closing
+
+"So, the portal connects the full academic workflow between students, teachers, and staff in one centralized system."
+
+### Documentation Part
+
+"In the documentation, I explained the background of the manual system, the problems, the project aim, and the proposed solution. I also included literature review, DSDM methodology, requirements, design diagrams, three timeboxes, testing, deployment, training, evaluation, strengths, weaknesses, and future improvements."
+
+### Final Closing
+
+"Overall, the project successfully developed a role-based academic portal that improves efficiency, organization, and access to academic information. Thank you. I am ready for questions."
+
+## Q&A Preparation
+
+### Q1. Why did you choose this project?
+
+Answer:
+
+"I chose this project because universities often have many academic processes that become slow and error-prone when they are handled manually. I wanted to build one centralized system that improves efficiency for students, teachers, and staff."
+
+### Q2. Why did you choose Laravel and Vue.js?
+
+Answer:
+
+"I chose Laravel because it provides strong MVC structure, routing, validation, authentication, and database support. I chose Vue.js with Inertia because it allows a modern and responsive user interface while still working smoothly with Laravel."
+
+### Q3. Why did you choose DSDM?
+
+Answer:
+
+"I chose DSDM because it supports timeboxing, iterative development, MoSCoW prioritization, and continuous feedback. That matched my fixed academic schedule and allowed me to develop the project step by step."
+
+### Q4. Who are the main users of the system?
+
+Answer:
+
+"The main users are guests, students, teachers, and staff. Each role has different permissions and different responsibilities inside the system."
+
+### Q5. What are the main modules in your system?
+
+Answer:
+
+"The main modules are registration, course enrolment, grades, fees and payments, assignments, timetable, attendance, announcements, messaging, notifications, contact, and feedback."
+
+### Q6. What is the strongest part of your project?
+
+Answer:
+
+"I think the strongest part is that it integrates many academic workflows into one role-based portal. Instead of handling enrolment, grades, fees, and communication separately, the system connects them in one platform."
+
+### Q7. What was the biggest challenge?
+
+Answer:
+
+"One of the biggest challenges was managing a full-stack project across multiple modules and timeboxes. Another challenge was keeping the documentation, diagrams, testing, and implementation consistent while the system continued to evolve."
+
+### Q8. What testing did you do?
+
+Answer:
+
+"I carried out functional testing and usability testing for each timebox. I also used automated tests in the project for key workflows such as role access, enrolment, grades, fees, and attendance-related behavior."
+
+### Q9. How is security handled in your system?
+
+Answer:
+
+"The system uses authentication, role-based access control, validation, password hashing, and review workflows. It also includes protections such as email verification, throttling, and controlled approval flows in important modules like grades and payments."
+
+### Q10. What are the limitations of your system?
+
+Answer:
+
+"The main limitations are that it has not yet been deployed in a real university environment at large scale, and it still needs more advanced analytics, accessibility improvements, localization, and broader scalability testing."
+
+### Q11. What future improvements would you add?
+
+Answer:
+
+"In the future, I would like to add advanced dashboards, mobile app support, multilingual support, stronger accessibility features, MFA, and integration with other institutional systems such as LMS platforms."
+
+### Q12. Did your final system fully follow the proposal?
+
+Answer:
+
+"Yes, the final system follows the main proposal scope. During development, some refinements were added, such as stronger tracking, alerts, and assignment support, but these improvements still matched the overall project aim and timebox structure."
+
+## Final Delivery Tips
 
 - Speak slowly and clearly.
-- Do not click every small feature.
-- Focus on one story: student request, teacher action, and staff approval.
-- If time is short, skip registration and go directly to demo accounts.
+- Keep your mouse movement calm.
+- Do not click every button.
+- Show one clean workflow for each role.
+- Keep the documentation part simple and structured.
+- Practice once with a timer.
+- Try to finish in `18 to 19 minutes` so you still have time for Q&A.
+
+## Safe Backup Plan If Time Runs Short
+
+If you are running out of time, skip these first:
+
+- detailed guest pages beyond one or two examples
+- teacher announcements
+- failed jobs page
+- extra filters or edit forms
+
+Do not skip these:
+
+- one student workflow
+- one teacher workflow
+- one staff workflow
+- one short documentation summary
+
+## Final One-Sentence Closing
+
+"Thank you for listening. This project demonstrates how a University Academic Portal can improve academic management by integrating student, teacher, and staff workflows into one system."
