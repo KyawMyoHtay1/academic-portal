@@ -241,45 +241,45 @@ Say:
 
 "To summarize the system demonstration, this portal connects the full academic workflow. A student can request enrollment, a teacher can manage learning activities, and staff can review, approve, and monitor the whole process. So the portal is not only a website, but a complete academic management system with role-based access and connected workflows."
 
-### 15:00 - 16:00 Documentation Summary: Project Objective
+### 15:00 - 16:00 Documentation Summary: Background, Aim, and Objectives
 
 Say:
 
-"Now I will briefly summarize the documentation. The objective of this project was to build a role-based academic portal that solves common university management problems. These problems include manual enrollment handling, disconnected communication, difficulty in tracking grades and attendance, and inefficient fee management."
+"Now I will briefly summarize the documentation. In my proposal and final report, I first explained the background of the current manual system. Many university processes such as student registration, course enrolment, grade submission, fee payment, timetable management, attendance, and communication are often handled by paper records, spreadsheets, or separate channels."
 
-"The proposed solution was to create one integrated web application where guest users, students, teachers, and staff all have appropriate access to the functions they need."
+"Because of that, the main issues are delay, duplication, human error, and difficulty in tracking academic information. So, the aim of this project was to design, develop, and evaluate a University Academic Portal that brings these academic processes into one centralized web-based system for students, teachers, and staff."
 
-### 16:00 - 17:00 Documentation Summary: Development Scope
-
-Say:
-
-"In terms of scope, the project includes public pages, authentication, student profile management, course enrollment, grades, attendance, assignments, fees, announcements, messaging, timetables, and dashboards. Based on the project files and diagrams, the system was developed in multiple timeboxed stages."
-
-"Timebox 1 mainly focused on registration, student profile, and course-related processes. Timebox 2 expanded into grades, fees, assignments, and communication. Timebox 3 added attendance, timetables, alerts, and more advanced administrative workflows."
-
-### 17:00 - 18:00 Documentation Summary: Design Artifacts
+### 16:00 - 17:00 Documentation Summary: Investigation and Methodology
 
 Say:
 
-"The documentation also includes several system design artifacts. There are use case diagrams for the whole system and for different timeboxes. There are sequence diagrams that explain workflows such as student registration, grades, fees, assignments, attendance, timetable, and communication. There are class diagrams and an ERD to show the system structure and database relationships. There is also a deployment diagram and a sitemap."
+"In the documentation, I also included investigation and comparative analysis. I reviewed similar academic portals such as the University of Greenwich and the University of Bath, and I compared their public features and usability. This helped me identify useful ideas such as clear navigation, online services, academic information access, and help support."
 
-"These diagrams were useful because they helped me plan the system clearly before and during implementation."
+"For the development methodology, I used Agile DSDM. I selected DSDM because it supports timeboxing, iterative development, continuous feedback, and MoSCoW prioritization. This was suitable for my project because I needed to complete the system within a fixed academic schedule while still improving features step by step."
 
-### 18:00 - 19:00 Documentation Summary: Technology and Testing
-
-Say:
-
-"For implementation, I used Laravel 12 for the backend and Vue 3 with Inertia.js for the frontend. Vite and Tailwind CSS were used for the interface. The system supports SQLite by default and can also work with MySQL or MariaDB. It also includes Stripe payment integration, PDF export, notifications, and queue-backed background tasks."
-
-"For testing, the project includes automated tests. In the project structure, there are feature tests and unit tests that help verify important workflows such as authentication, role access, enrollments, grades, attendance alerts, fees, and other system behaviors."
-
-### 19:00 - 20:00 Final Conclusion
+### 17:00 - 18:00 Documentation Summary: Requirements, Design, and Timeboxes
 
 Say:
 
-"In conclusion, the University Academic Portal is a complete academic management solution that improves organization, transparency, and efficiency for different users in the university environment. Students can manage their academic information more easily, teachers can handle teaching-related tasks more effectively, and staff can control administrative workflows more accurately."
+"In the design chapter, I defined the target users, functional requirements, non-functional requirements, and MoSCoW priorities. The main user groups are guests, students, teachers, and administrative staff. The documentation also includes use case diagrams, class diagrams, sequence diagrams, ERD, sitemap, screen designs, and deployment diagram."
 
-"This project also helped me apply software engineering concepts such as system analysis, role-based design, database modeling, workflow integration, and testing. Thank you for listening. I am ready for your questions."
+"The implementation was organized into three timeboxes. Timebox 1 focused on student registration and course registration. Timebox 2 focused on grades, fee payment, and assignment management. Timebox 3 focused on timetable, attendance, announcements, messaging, notifications, contact, and feedback. This structure helped me build the system in a controlled and incremental way."
+
+### 18:00 - 19:00 Documentation Summary: Implementation, Testing, and Deployment
+
+Say:
+
+"For implementation, the project used Laravel and PHP for the backend, Vue.js with Inertia for the frontend, Tailwind CSS for the interface, and MySQL as the main database in the documentation. The portal follows the MVC architecture, which helps keep the system organized, maintainable, and scalable."
+
+"The report also includes detailed functional testing and usability testing for each timebox. Functional testing checked whether each module worked correctly, while usability testing was based on Nielsen's usability heuristics. After testing, I made refinements such as clearer status messages, improved layouts, pagination, filters, timetable readability, and better notification handling. In addition, the documentation includes deployment planning, data migration, user training, and the user manual."
+
+### 19:00 - 20:00 Documentation Summary: Evaluation, Strengths, and Future Improvement
+
+Say:
+
+"In the final evaluation chapter, I assessed the system against the original aim, objectives, methodology choice, timebox plan, and similar systems. The result is that the main objectives were achieved successfully. The completed portal integrates the main academic workflows into one role-based system and reduces the weaknesses of the manual process."
+
+"The strengths of the project are integrated academic processes, role-based access, clear workflows, audit logs, and a maintainable technology stack. The current weaknesses are that large-scale real-world deployment, advanced analytics, accessibility improvements, and full scalability testing are still future work. Overall, the project provides a strong foundation for a real university academic portal. Thank you for listening. I am ready for your questions."
 
 ## Quick Demo Order
 
