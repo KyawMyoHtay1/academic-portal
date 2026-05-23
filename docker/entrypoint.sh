@@ -18,5 +18,6 @@ if [ "$(id -u)" = "0" ]; then
   chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 fi
 
-exec "$@"
+php /var/www/html/artisan package:discover --ansi
 
+exec "$@"

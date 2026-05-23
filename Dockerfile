@@ -53,7 +53,7 @@ RUN mkdir -p \
         storage/framework/views \
         storage/logs \
         bootstrap/cache \
-    && composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader \
+    && composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts \
     && chown -R www-data:www-data storage bootstrap/cache
 
 FROM node:22-bookworm-slim AS frontend
