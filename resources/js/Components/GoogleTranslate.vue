@@ -1,122 +1,142 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 
+const GOOGLE_TRANSLATE_SRC = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+
 const showDropdown = ref(false);
 const currentLanguage = ref('English');
 const containerRef = ref(null);
 
 const languages = [
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-    { code: 'zh-CN', name: '中文 (简体)', flag: '🇨🇳' },
-    { code: 'zh-TW', name: '中文 (繁體)', flag: '🇹🇼' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-    { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩' },
-    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
-    { code: 'ko', name: '한국어', flag: '🇰🇷' },
-    { code: 'pt', name: 'Português', flag: '🇵🇹' },
-    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'th', name: 'ไทย', flag: '🇹🇭' },
-    { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+    { code: 'en', name: 'English' },
+    { code: 'ar', name: 'Arabic' },
+    { code: 'zh-CN', name: 'Chinese (Simplified)' },
+    { code: 'zh-TW', name: 'Chinese (Traditional)' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'hi', name: 'Hindi' },
+    { code: 'id', name: 'Indonesian' },
+    { code: 'it', name: 'Italian' },
+    { code: 'ja', name: 'Japanese' },
+    { code: 'ko', name: 'Korean' },
+    { code: 'pt', name: 'Portuguese' },
+    { code: 'ru', name: 'Russian' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'th', name: 'Thai' },
+    { code: 'tr', name: 'Turkish' },
+    { code: 'vi', name: 'Vietnamese' },
 ];
 
-onMounted(() => {
-    // Initialize Google Translate if not already done
-    const initGoogleTranslate = () => {
-        const element = document.getElementById('google_translate_element');
-        if (!element) return;
+let translateLoader = null;
 
-        // Check if already initialized
-        if (document.querySelector('.goog-te-combo')) {
-            return;
-        }
+const updateCurrentLanguageFromCookie = () => {
+    const cookie = document.cookie.match(/(?:^|; )googtrans=([^;]*)/);
+    const langCode = cookie?.[1]?.split('/').pop() ?? 'en';
+    const language = languages.find((item) => item.code === langCode);
+    currentLanguage.value = language?.name ?? 'English';
+};
 
-        // Wait for Google Translate API to be available
-        if (window.google && window.google.translate) {
-            try {
-                new google.translate.TranslateElement({
-                    pageLanguage: 'en',
-                    includedLanguages: 'ar,zh-CN,zh-TW,fr,de,hi,id,it,ja,ko,pt,ru,es,th,tr,vi',
-                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                    autoDisplay: false
-                }, 'google_translate_element');
-            } catch (e) {
-                console.warn('Google Translate initialization error:', e);
-            }
-        }
-    };
-
-    // Try to initialize immediately
-    if (window.googleTranslateElementInit) {
-        window.googleTranslateElementInit();
+const initGoogleTranslate = () => {
+    const element = document.getElementById('google_translate_element');
+    if (!element || !window.google?.translate) {
+        return;
     }
 
-    // Also try after delays (Google Translate loads asynchronously)
-    setTimeout(initGoogleTranslate, 500);
-    setTimeout(initGoogleTranslate, 1500);
-    setTimeout(initGoogleTranslate, 3000);
+    if (document.querySelector('.goog-te-combo')) {
+        return;
+    }
 
-    // Check if Google Translate has set a language
-    const checkLanguage = () => {
-        const cookie = document.cookie.match(/(?:^|; )googtrans=([^;]*)/);
-        if (cookie) {
-            const langCode = cookie[1].split('/').pop();
-            const lang = languages.find(l => l.code === langCode);
-            if (lang) {
-                currentLanguage.value = lang.name;
-            }
-        }
-    };
+    element.innerHTML = '';
 
-    // Check immediately and periodically
-    checkLanguage();
-    setInterval(checkLanguage, 1000);
-});
+    try {
+        new window.google.translate.TranslateElement(
+            {
+                pageLanguage: 'en',
+                includedLanguages: languages
+                    .filter((language) => language.code !== 'en')
+                    .map((language) => language.code)
+                    .join(','),
+                layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false,
+            },
+            'google_translate_element',
+        );
+    } catch (error) {
+        console.warn('Google Translate initialization error:', error);
+    }
+};
 
-const selectLanguage = (langCode) => {
+const ensureGoogleTranslateLoaded = async () => {
+    if (window.google?.translate) {
+        initGoogleTranslate();
+        return;
+    }
+
+    if (!translateLoader) {
+        translateLoader = new Promise((resolve, reject) => {
+            window.googleTranslateElementInit = () => {
+                initGoogleTranslate();
+                resolve();
+            };
+
+            const script = document.createElement('script');
+            script.src = GOOGLE_TRANSLATE_SRC;
+            script.async = true;
+            script.defer = true;
+            script.onerror = () => {
+                translateLoader = null;
+                reject(new Error('Failed to load Google Translate.'));
+            };
+
+            document.head.appendChild(script);
+        }).catch((error) => {
+            console.warn(error.message);
+        });
+    }
+
+    await translateLoader;
+};
+
+const toggleDropdown = async () => {
+    showDropdown.value = !showDropdown.value;
+
+    if (showDropdown.value) {
+        await ensureGoogleTranslateLoaded();
+    }
+};
+
+const selectLanguage = async (langCode) => {
     showDropdown.value = false;
-    
-    // Update current language display immediately
-    const lang = languages.find(l => l.code === langCode);
-    if (lang) {
-        currentLanguage.value = lang.name;
+
+    const language = languages.find((item) => item.code === langCode);
+    if (language) {
+        currentLanguage.value = language.name;
     }
-    
-    // Method 1: Try using the select element (preferred)
+
+    await ensureGoogleTranslateLoaded();
+
     const select = document.querySelector('.goog-te-combo');
-    if (select && select.options) {
-        // Find the option with matching value
-        for (let i = 0; i < select.options.length; i++) {
-            const option = select.options[i];
+    if (select?.options) {
+        for (let index = 0; index < select.options.length; index += 1) {
+            const option = select.options[index];
+
             if (option.value === langCode || option.value === `/en/${langCode}`) {
-                select.selectedIndex = i;
+                select.selectedIndex = index;
                 select.dispatchEvent(new Event('change', { bubbles: true }));
                 return;
             }
         }
     }
 
-    // Method 2: Direct cookie manipulation (fallback - requires page reload)
-    const setCookie = (name, value, days = 365) => {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-    };
+    const expires = new Date();
+    expires.setTime(expires.getTime() + 365 * 24 * 60 * 60 * 1000);
 
     if (langCode === 'en') {
-        // Remove translation cookie to reset to English
         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     } else {
-        // Set translation cookie
-        setCookie('googtrans', `/en/${langCode}`);
+        document.cookie = `googtrans=/en/${langCode};expires=${expires.toUTCString()};path=/`;
     }
-    
-    // Reload page to apply translation
+
     window.location.reload();
 };
 
@@ -124,7 +144,6 @@ const resetLanguage = () => {
     selectLanguage('en');
 };
 
-// Handle clicks outside dropdown
 const handleClickOutside = (event) => {
     if (showDropdown.value && containerRef.value && !containerRef.value.contains(event.target)) {
         showDropdown.value = false;
@@ -132,6 +151,7 @@ const handleClickOutside = (event) => {
 };
 
 onMounted(() => {
+    updateCurrentLanguageFromCookie();
     document.addEventListener('click', handleClickOutside);
 });
 
@@ -142,16 +162,14 @@ onUnmounted(() => {
 
 <template>
     <div ref="containerRef" class="relative">
-        <!-- Google Translate Element (hidden visually but present in DOM) -->
         <div id="google_translate_element" style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;"></div>
 
-        <!-- Custom Language Selector -->
         <div class="relative">
             <button
-                @click.stop="showDropdown = !showDropdown"
                 type="button"
                 class="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-portal-navy focus:ring-offset-2"
                 :class="{ 'ring-2 ring-portal-navy': showDropdown }"
+                @click.stop="toggleDropdown"
             >
                 <svg
                     class="h-4 w-4 text-slate-500"
@@ -167,7 +185,7 @@ onUnmounted(() => {
                     />
                 </svg>
                 <span class="hidden md:inline">{{ currentLanguage }}</span>
-                <span class="md:hidden">🌐</span>
+                <span class="md:hidden">Lang</span>
                 <svg
                     class="h-4 w-4 text-slate-400 transition-transform"
                     :class="{ 'rotate-180': showDropdown }"
@@ -184,7 +202,6 @@ onUnmounted(() => {
                 </svg>
             </button>
 
-            <!-- Dropdown Menu -->
             <transition
                 enter-active-class="transition duration-100 ease-out"
                 enter-from-class="opacity-0 scale-95"
@@ -199,24 +216,21 @@ onUnmounted(() => {
                 >
                     <div class="max-h-64 overflow-y-auto py-1">
                         <button
-                            v-for="lang in languages"
-                            :key="lang.code"
-                            @click.stop="selectLanguage(lang.code)"
+                            v-for="language in languages"
+                            :key="language.code"
                             type="button"
                             class="flex w-full items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-                            :class="{
-                                'bg-slate-50 font-medium': currentLanguage === lang.name
-                            }"
+                            :class="{ 'bg-slate-50 font-medium': currentLanguage === language.name }"
+                            @click.stop="selectLanguage(language.code)"
                         >
-                            <span class="text-lg">{{ lang.flag }}</span>
-                            <span>{{ lang.name }}</span>
+                            <span>{{ language.name }}</span>
                         </button>
                     </div>
                     <div class="border-t border-slate-200 px-4 py-2">
                         <button
-                            @click.stop="resetLanguage"
                             type="button"
                             class="w-full text-left text-xs text-slate-500 hover:text-slate-700"
+                            @click.stop="resetLanguage"
                         >
                             Reset to English
                         </button>
@@ -228,7 +242,6 @@ onUnmounted(() => {
 </template>
 
 <style>
-/* Hide Google Translate's default UI */
 .goog-te-banner-frame,
 .goog-te-menu-value,
 .goog-te-menu-frame {
@@ -239,7 +252,6 @@ body {
     top: 0 !important;
 }
 
-/* Style the Google Translate select that appears in the hidden element */
 #google_translate_element select.goog-te-combo {
     display: none;
 }

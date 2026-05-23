@@ -33,7 +33,7 @@ RUN apt-get update \
         pdo_sqlite \
         zip \
     && rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork expires headers rewrite \
+    && a2enmod deflate mpm_prefork expires headers rewrite \
     && sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" \
         /etc/apache2/apache2.conf \
         /etc/apache2/conf-available/*.conf \
@@ -107,4 +107,4 @@ RUN chmod +x /usr/local/bin/entrypoint \
 EXPOSE 80
 
 ENTRYPOINT ["entrypoint"]
-CMD ["sh", "-lc", "exec php artisan serve --host=0.0.0.0 --port=${PORT:-80}"]
+CMD ["apache2-foreground"]

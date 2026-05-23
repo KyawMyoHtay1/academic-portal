@@ -9,6 +9,20 @@ generate_app_key() {
   php -r "echo 'base64:'.base64_encode(random_bytes(32));"
 }
 
+configure_apache_port() {
+  if [ -z "${PORT:-}" ] || [ "${PORT}" = "80" ] || [ ! -f /etc/apache2/ports.conf ]; then
+    return
+  fi
+
+  sed -ri "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf
+
+  for site in /etc/apache2/sites-available/*.conf /etc/apache2/sites-enabled/*.conf; do
+    if [ -f "$site" ]; then
+      sed -ri "s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/g" "$site"
+    fi
+  done
+}
+
 mkdir -p \
   "$APP_ROOT/storage/app/private" \
   "$APP_ROOT/storage/app/public" \
@@ -75,6 +89,7 @@ if [ "$SEED_DEMO_DATA" = "true" ] || [ "$SEED_DEMO_DATA" = "1" ]; then
 fi
 
 php "$APP_ROOT/artisan" config:cache
+php "$APP_ROOT/artisan" event:cache
 php "$APP_ROOT/artisan" view:cache
 
 if [ "${1:-}" = "apache2-foreground" ] && [ -d /etc/apache2/mods-enabled ]; then
@@ -84,6 +99,8 @@ if [ "${1:-}" = "apache2-foreground" ] && [ -d /etc/apache2/mods-enabled ]; then
   if [ -f /etc/apache2/mods-available/mpm_prefork.conf ]; then
     ln -sf ../mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf
   fi
+
+  configure_apache_port
 fi
 
 exec "$@"

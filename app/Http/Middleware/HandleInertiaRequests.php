@@ -32,49 +32,20 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        $announcementsWidget = [
-            'unreadCount' => 0,
-            'latest' => [],
-        ];
         $notificationsPreview = [
             'items' => [],
         ];
+        $unreadAnnouncementCount = 0;
 
         if ($user) {
             // unread = visible announcements that don't have a read_at record for this user
-            $unreadCount = Announcement::query()
+            $unreadAnnouncementCount = Announcement::query()
                 ->currentlyVisible()
                 ->visibleToUser($user)
                 ->whereDoesntHave('reads', function ($q) use ($user) {
                     $q->where('user_id', $user->id)->whereNotNull('read_at');
                 })
                 ->count();
-
-            $latest = Announcement::query()
-                ->with('author')
-                ->currentlyVisible()
-                ->visibleToUser($user)
-                ->orderByDesc('pinned')
-                ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'important' THEN 2 WHEN 'info' THEN 3 ELSE 4 END")
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get()
-                ->map(function ($a) {
-                    return [
-                        'id' => $a->id,
-                        'title' => $a->title,
-                        'priority' => $a->priority ?? 'info',
-                        'pinned' => (bool) $a->pinned,
-                        'created_at' => $a->created_at->format('Y-m-d'),
-                        'author' => $a->author?->name ?? 'Staff',
-                    ];
-                })
-                ->all();
-
-            $announcementsWidget = [
-                'unreadCount' => $unreadCount,
-                'latest' => $latest,
-            ];
 
             $notificationsPreview = [
                 'items' => $user->unreadNotifications()
@@ -123,9 +94,8 @@ class HandleInertiaRequests extends Middleware
                 'notifications' => $user
                     ? $user->unreadNotifications()->count()
                     : 0,
-                'announcements' => $announcementsWidget['unreadCount'] ?? 0,
+                'announcements' => $unreadAnnouncementCount,
             ],
-            'announcementsWidget' => $announcementsWidget,
             'notificationsPreview' => $notificationsPreview,
             'recaptchaSiteKey' => config('recaptcha.site_key'),
         ];
