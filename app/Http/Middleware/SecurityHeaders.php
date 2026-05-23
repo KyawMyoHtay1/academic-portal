@@ -28,6 +28,7 @@ class SecurityHeaders
             'https://www.google.com',
             'https://www.gstatic.com',
             'https://translate.google.com',
+            'https://translate-pa.googleapis.com',
             'https://translate.googleapis.com',
         ];
         $styleSources = [
@@ -42,6 +43,7 @@ class SecurityHeaders
             'https://api.stripe.com',
             'https://www.google.com',
             'https://www.gstatic.com',
+            'https://translate-pa.googleapis.com',
             'https://translate.googleapis.com',
             'https://translate.google.com',
         ];
@@ -66,6 +68,7 @@ class SecurityHeaders
             'style-src '.implode(' ', $styleSources),
             'style-src-elem '.implode(' ', $styleSources),
             "img-src 'self' data: blob: https:",
+            "media-src 'self' data: blob: https:",
             "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net",
             'connect-src '.implode(' ', $connectSources),
             'worker-src '.implode(' ', $workerSources),
@@ -74,6 +77,7 @@ class SecurityHeaders
             "base-uri 'self'",
             "form-action 'self'",
             "frame-ancestors {$frameAncestors}",
+            'upgrade-insecure-requests',
         ]);
         $response->headers->set('Content-Security-Policy', $csp);
 
