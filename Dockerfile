@@ -107,4 +107,4 @@ RUN chmod +x /usr/local/bin/entrypoint \
 EXPOSE 80
 
 ENTRYPOINT ["entrypoint"]
-CMD ["apache2-foreground"]
+CMD ["sh", "-lc", "exec php artisan serve --host=0.0.0.0 --port=${PORT:-80}"]
