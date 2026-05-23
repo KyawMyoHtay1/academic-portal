@@ -28,6 +28,7 @@ fi
 
 export QUEUE_CONNECTION="${QUEUE_CONNECTION:-sync}"
 export MAIL_MAILER="${MAIL_MAILER:-log}"
+export SEED_DEMO_DATA="${SEED_DEMO_DATA:-false}"
 
 if [ "$DB_CONNECTION" = "sqlite" ]; then
   mkdir -p "$APP_ROOT/database"
@@ -67,6 +68,10 @@ done
 
 if [ "$SEEDED_FRESH_SQLITE" -eq 1 ]; then
   php "$APP_ROOT/artisan" db:seed --class=ComprehensiveDemoSeeder --force
+fi
+
+if [ "$SEED_DEMO_DATA" = "true" ] || [ "$SEED_DEMO_DATA" = "1" ]; then
+  php "$APP_ROOT/artisan" db:seed --force
 fi
 
 exec "$@"
