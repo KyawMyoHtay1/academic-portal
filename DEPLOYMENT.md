@@ -1,5 +1,7 @@
 # Deployment Guide
 
+For the quickest live portfolio demo with a real HTTPS URL, use the Railway-specific guide in [RAILWAY_DEPLOYMENT.md](RAILWAY_DEPLOYMENT.md).
+
 This repository now includes a Docker-based production setup for the Laravel + Vue/Inertia app.
 
 It is built around the way this project already works in code:
@@ -152,4 +154,3 @@ docker compose -f docker-compose.production.yml run --rm --no-deps app php artis
 docker compose -f docker-compose.production.yml up -d
 docker compose -f docker-compose.production.yml exec app php artisan migrate --force
 ```
-
