@@ -43,7 +43,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 FROM php-base AS vendor
 
-COPY . .
+COPY composer.json composer.lock artisan ./
+COPY app ./app
+COPY bootstrap ./bootstrap
+COPY config ./config
+COPY database ./database
+COPY routes ./routes
 
 RUN mkdir -p \
         storage/app/private \
@@ -72,7 +77,14 @@ RUN npm run build
 
 FROM php-base AS app
 
-COPY . .
+COPY artisan composer.json composer.lock ./
+COPY app ./app
+COPY bootstrap ./bootstrap
+COPY config ./config
+COPY database ./database
+COPY public ./public
+COPY resources ./resources
+COPY routes ./routes
 COPY --from=vendor /var/www/html/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
