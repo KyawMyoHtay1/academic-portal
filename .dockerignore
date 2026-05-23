@@ -1,0 +1,17 @@
+.env
+.env.*
+.git
+.github
+.vscode
+node_modules
+vendor
+public/build
+public/hot
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+out
+FINAL_PRESENTATION_SCRIPT.md
+*.log
+
