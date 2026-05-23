@@ -32,6 +32,8 @@ RUN apt-get update \
         pdo_mysql \
         pdo_sqlite \
         zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
     && rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod deflate mpm_prefork expires headers rewrite \
     && sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" \

@@ -9,6 +9,22 @@ generate_app_key() {
   php -r "echo 'base64:'.base64_encode(random_bytes(32));"
 }
 
+configure_redis_defaults() {
+  if [ -z "${REDIS_URL:-}" ] && [ -z "${REDIS_HOST:-}" ]; then
+    return
+  fi
+
+  export SESSION_DRIVER="${SESSION_DRIVER:-redis}"
+  export SESSION_CONNECTION="${SESSION_CONNECTION:-default}"
+  export SESSION_STORE="${SESSION_STORE:-redis}"
+  export CACHE_STORE="${CACHE_STORE:-redis}"
+  export QUEUE_CONNECTION="${QUEUE_CONNECTION:-redis}"
+  export REDIS_QUEUE_CONNECTION="${REDIS_QUEUE_CONNECTION:-default}"
+  export REDIS_QUEUE="${REDIS_QUEUE:-default}"
+  export REDIS_CACHE_CONNECTION="${REDIS_CACHE_CONNECTION:-cache}"
+  export REDIS_CACHE_LOCK_CONNECTION="${REDIS_CACHE_LOCK_CONNECTION:-default}"
+}
+
 configure_apache_port() {
   if [ -z "${PORT:-}" ] || [ "${PORT}" = "80" ] || [ ! -f /etc/apache2/ports.conf ]; then
     return
@@ -39,6 +55,8 @@ fi
 if [ -z "${DB_CONNECTION:-}" ]; then
   export DB_CONNECTION=sqlite
 fi
+
+configure_redis_defaults
 
 export QUEUE_CONNECTION="${QUEUE_CONNECTION:-sync}"
 export MAIL_MAILER="${MAIL_MAILER:-log}"

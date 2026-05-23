@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\NewMessageReceived;
 use App\Services\AuthenticatedNavigationStateService;
 use App\Services\ImageService;
+use App\Services\MessageConversationSummaryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ class MessageController extends Controller
 {
     public function __construct(
         private readonly AuthenticatedNavigationStateService $navigationStateService,
+        private readonly MessageConversationSummaryService $conversationSummaryService,
     ) {}
 
     /**
@@ -42,6 +44,7 @@ class MessageController extends Controller
 
             if ($messagesMarkedAsRead > 0) {
                 $this->navigationStateService->clearForUser($user);
+                $this->conversationSummaryService->clearForUser($user);
             }
         }
 
@@ -88,7 +91,7 @@ class MessageController extends Controller
                 ];
             });
 
-        $conversations = $this->buildConversationSummaries($user->id);
+        $conversations = $this->conversationSummaryService->buildForUser($user->id);
 
         return Inertia::render('Messages/Index', [
             'messages' => $messages,
@@ -168,6 +171,11 @@ class MessageController extends Controller
             $this->navigationStateService->clearForUser($receiver);
         }
 
+        $this->conversationSummaryService->clearForUsers([
+            $user,
+            $receiver,
+        ]);
+
         try {
             broadcast(new MessageSent($message, [
                 (int) $user->id,
@@ -208,6 +216,7 @@ class MessageController extends Controller
         if (! $message->read) {
             $message->update(['read' => true]);
             $this->navigationStateService->clearForUser($user);
+            $this->conversationSummaryService->clearForUser($user);
 
             Log::info('message.read', [
                 'message_id' => $message->id,
@@ -233,63 +242,5 @@ class MessageController extends Controller
         return User::query()
             ->whereKey($withUser)
             ->first();
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function buildConversationSummaries(int $userId): array
-    {
-        $messages = Message::query()
-            ->with([
-                'sender:id,name,role,photo',
-                'receiver:id,name,role,photo',
-            ])
-            ->where(function ($query) use ($userId) {
-                $query->where('sender_id', $userId)
-                    ->orWhere('receiver_id', $userId);
-            })
-            ->orderByDesc('created_at')
-            ->get();
-
-        $summaries = [];
-
-        foreach ($messages as $message) {
-            $otherUser = $message->sender_id === $userId
-                ? $message->receiver
-                : $message->sender;
-
-            if (! $otherUser) {
-                continue;
-            }
-
-            $otherUserId = (int) $otherUser->id;
-            if (! array_key_exists($otherUserId, $summaries)) {
-                $summaries[$otherUserId] = [
-                    'user_id' => $otherUserId,
-                    'name' => $otherUser->name,
-                    'role' => $otherUser->role,
-                    'photo' => $otherUser->photo,
-                    'photo_thumb' => ImageService::tablePath($otherUser->photo),
-                    'last_message' => $message->body,
-                    'last_sender_id' => $message->sender_id,
-                    'last_is_sent' => $message->sender_id === $userId,
-                    'last_read' => (bool) $message->read,
-                    'last_at' => $message->created_at?->timestamp ? $message->created_at->timestamp * 1000 : null,
-                    'unread_count' => 0,
-                ];
-            }
-
-            if ($message->receiver_id === $userId && ! $message->read) {
-                $summaries[$otherUserId]['unread_count']++;
-            }
-        }
-
-        return collect($summaries)
-            ->sortByDesc(function (array $row) {
-                return (int) ($row['last_at'] ?? 0);
-            })
-            ->values()
-            ->all();
     }
 }
