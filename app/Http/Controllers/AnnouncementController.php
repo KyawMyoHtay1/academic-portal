@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\AnnouncementRead;
+use App\Services\AuthenticatedNavigationStateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -11,6 +12,10 @@ use Inertia\Response;
 
 class AnnouncementController extends Controller
 {
+    public function __construct(
+        private readonly AuthenticatedNavigationStateService $navigationStateService,
+    ) {}
+
     /**
      * Display all announcements for authenticated users.
      */
@@ -80,6 +85,8 @@ class AnnouncementController extends Controller
             ]
         );
 
+        $this->navigationStateService->clearForUser($user);
+
         return back();
     }
 
@@ -106,6 +113,8 @@ class AnnouncementController extends Controller
                 'acknowledged_at' => now(),
             ]
         );
+
+        $this->navigationStateService->clearForUser($user);
 
         return back();
     }

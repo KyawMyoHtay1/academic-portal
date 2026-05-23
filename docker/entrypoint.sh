@@ -90,6 +90,7 @@ fi
 
 php "$APP_ROOT/artisan" config:cache
 php "$APP_ROOT/artisan" event:cache
+php "$APP_ROOT/artisan" route:cache
 php "$APP_ROOT/artisan" view:cache
 
 if [ "${1:-}" = "apache2-foreground" ] && [ -d /etc/apache2/mods-enabled ]; then

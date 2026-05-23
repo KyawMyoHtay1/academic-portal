@@ -7,6 +7,7 @@ use App\Http\Requests\Messages\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
 use App\Notifications\NewMessageReceived;
+use App\Services\AuthenticatedNavigationStateService;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -18,6 +19,10 @@ use Throwable;
 
 class MessageController extends Controller
 {
+    public function __construct(
+        private readonly AuthenticatedNavigationStateService $navigationStateService,
+    ) {}
+
     /**
      * Display the current user's inbox (both received and sent messages).
      */
@@ -29,11 +34,15 @@ class MessageController extends Controller
 
         // Opening a conversation marks unread incoming messages in that thread as read.
         if ($conversationUserId !== null) {
-            Message::query()
+            $messagesMarkedAsRead = Message::query()
                 ->where('sender_id', $conversationUserId)
                 ->where('receiver_id', $user->id)
                 ->where('read', false)
                 ->update(['read' => true]);
+
+            if ($messagesMarkedAsRead > 0) {
+                $this->navigationStateService->clearForUser($user);
+            }
         }
 
         // Get both received and sent messages (paginated to avoid loading large inboxes).
@@ -155,6 +164,8 @@ class MessageController extends Controller
                 senderName: (string) $user->name,
                 body: (string) $data['body'],
             ));
+
+            $this->navigationStateService->clearForUser($receiver);
         }
 
         try {
@@ -196,6 +207,7 @@ class MessageController extends Controller
 
         if (! $message->read) {
             $message->update(['read' => true]);
+            $this->navigationStateService->clearForUser($user);
 
             Log::info('message.read', [
                 'message_id' => $message->id,

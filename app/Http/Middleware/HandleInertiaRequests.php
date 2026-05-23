@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Announcement;
+use App\Services\AuthenticatedNavigationStateService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -31,41 +31,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-
-        $notificationsPreview = [
-            'items' => [],
-        ];
-        $unreadAnnouncementCount = 0;
-
-        if ($user) {
-            // unread = visible announcements that don't have a read_at record for this user
-            $unreadAnnouncementCount = Announcement::query()
-                ->currentlyVisible()
-                ->visibleToUser($user)
-                ->whereDoesntHave('reads', function ($q) use ($user) {
-                    $q->where('user_id', $user->id)->whereNotNull('read_at');
-                })
-                ->count();
-
-            $notificationsPreview = [
-                'items' => $user->unreadNotifications()
-                    ->orderByDesc('created_at')
-                    ->limit(6)
-                    ->get()
-                    ->map(function ($notification) {
-                        return [
-                            'id' => $notification->id,
-                            'title' => (string) ($notification->data['title'] ?? 'Notification'),
-                            'message' => (string) ($notification->data['message'] ?? ''),
-                            'read_at' => $notification->read_at?->toIso8601String(),
-                            'created_at' => $notification->created_at?->toIso8601String(),
-                            'created_label' => $notification->created_at?->diffForHumans(),
-                            'url' => (string) ($notification->data['url'] ?? ''),
-                        ];
-                    })
-                    ->all(),
-            ];
-        }
+        $navigationState = app(AuthenticatedNavigationStateService::class)->buildForUser($user);
 
         return [
             ...parent::share($request),
@@ -87,16 +53,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
             ],
-            'unread' => [
-                'messages' => $user
-                    ? $user->receivedMessages()->where('read', false)->count()
-                    : 0,
-                'notifications' => $user
-                    ? $user->unreadNotifications()->count()
-                    : 0,
-                'announcements' => $unreadAnnouncementCount,
-            ],
-            'notificationsPreview' => $notificationsPreview,
+            ...$navigationState,
             'recaptchaSiteKey' => config('recaptcha.site_key'),
         ];
     }

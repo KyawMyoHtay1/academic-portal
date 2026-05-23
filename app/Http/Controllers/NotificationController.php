@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AuthenticatedNavigationStateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -9,6 +10,10 @@ use Inertia\Response;
 
 class NotificationController extends Controller
 {
+    public function __construct(
+        private readonly AuthenticatedNavigationStateService $navigationStateService,
+    ) {}
+
     /**
      * Display a list of the authenticated user's notifications.
      */
@@ -48,6 +53,7 @@ class NotificationController extends Controller
         $user = Auth::user();
         $notification = $user->notifications()->where('id', $id)->firstOrFail();
         $notification->markAsRead();
+        $this->navigationStateService->clearForUser($user);
 
         return back();
     }
@@ -59,6 +65,7 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
         $user->unreadNotifications->markAsRead();
+        $this->navigationStateService->clearForUser($user);
 
         return back()->with('success', 'All notifications marked as read.');
     }
