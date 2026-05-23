@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Academic Portal</title>
+    <meta name="description" content="Portfolio showcase for the University Academic Portal, a Laravel + Vue system for students, teachers, and staff.">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Portfolio Project</p>
+                <h1>University Academic Portal</h1>
+                <p class="hero-text">
+                    A full-stack academic management system built with Laravel, Vue, Inertia, and MySQL for three core roles:
+                    students, teachers, and staff.
+                </p>
+                <div class="hero-badges">
+                    <span>Laravel 12</span>
+                    <span>Vue 3 + Inertia</span>
+                    <span>Role-based workflows</span>
+                    <span>Queue + Scheduler</span>
+                </div>
+                <div class="hero-actions">
+                    <a class="button button-primary" href="https://github.com/KyawMyoHtay1/academic-portal/tree/deployment">View Source</a>
+                    <a class="button button-secondary" href="https://github.com/KyawMyoHtay1/academic-portal/blob/deployment/README.md">Technical README</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <img src="./assets/hero-about.jpg" alt="University campus hero artwork used in the project">
+                <div class="hero-card">
+                    <strong>GitHub Pages Mode</strong>
+                    <p>This public link is a portfolio showcase. The full Laravel app needs backend hosting, a database, queue workers, and scheduled jobs.</p>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="section section-grid">
+                <article class="panel stat-panel">
+                    <p class="stat-value">3</p>
+                    <p class="stat-label">Primary user roles</p>
+                </article>
+                <article class="panel stat-panel">
+                    <p class="stat-value">12+</p>
+                    <p class="stat-label">Core workflow areas</p>
+                </article>
+                <article class="panel stat-panel">
+                    <p class="stat-value">20+</p>
+                    <p class="stat-label">Feature tests and unit tests</p>
+                </article>
+            </section>
+
+            <section class="section">
+                <div class="section-heading">
+                    <p class="eyebrow">System Overview</p>
+                    <h2>What the portal manages</h2>
+                </div>
+                <div class="feature-grid">
+                    <article class="panel feature-card">
+                        <h3>Student Experience</h3>
+                        <p>Registration, course enrolment, grades, fees, assignments, timetable, attendance, announcements, notifications, and messaging.</p>
+                    </article>
+                    <article class="panel feature-card">
+                        <h3>Teacher Workspace</h3>
+                        <p>Attendance recording, grade submission, assignment creation and marking, teacher announcements, and timetable access.</p>
+                    </article>
+                    <article class="panel feature-card">
+                        <h3>Staff Administration</h3>
+                        <p>Student and user management, courses, subjects, timetables, enrolment approvals, fee processing, grade review, attendance reports, and support inboxes.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section section-grid section-grid-wide">
+                <article class="panel detail-card">
+                    <p class="eyebrow">Project Stack</p>
+                    <h2>Built as a real application, not a static prototype</h2>
+                    <ul class="detail-list">
+                        <li>Backend: Laravel 12 on PHP 8.2+</li>
+                        <li>Frontend: Vue 3, Inertia.js, Vite, Tailwind CSS</li>
+                        <li>Data: SQLite for local development, MySQL/MariaDB for production</li>
+                        <li>Background processing: queued notifications plus scheduled attendance alerts</li>
+                        <li>Extra capabilities: PDF export, image handling, Stripe payment flow, optional realtime messaging</li>
+                    </ul>
+                </article>
+                <article class="panel detail-card note-card">
+                    <p class="eyebrow">Demo Note</p>
+                    <h2>Why this page is a showcase instead of the full app</h2>
+                    <p>
+                        GitHub Pages is ideal for public portfolio presentation, but this portal itself depends on server-side PHP,
+                        persistent storage, a SQL database, queue workers, and scheduled commands. Because of that, this <code>github.io</code>
+                        page is used as a clean project presentation layer.
+                    </p>
+                    <p>
+                        The backend-ready deployment setup for the real application is included in the repository for Railway and Docker-based hosting.
+                    </p>
+                </article>
+            </section>
+
+            <section class="section">
+                <div class="section-heading">
+                    <p class="eyebrow">Architecture</p>
+                    <h2>Design and documentation highlights</h2>
+                </div>
+                <div class="diagram-grid">
+                    <figure class="panel diagram-card">
+                        <img src="./assets/usecase-diagram.png" alt="Whole system use case diagram">
+                        <figcaption>
+                            <strong>Whole system use case</strong>
+                            <span>Shows how guests, students, teachers, and staff interact with the portal.</span>
+                        </figcaption>
+                    </figure>
+                    <figure class="panel diagram-card">
+                        <img src="./assets/erd-diagram.png" alt="Academic Portal entity relationship diagram">
+                        <figcaption>
+                            <strong>Entity relationship diagram</strong>
+                            <span>Documents the database structure behind users, students, enrolments, grades, fees, attendance, and messaging.</span>
+                        </figcaption>
+                    </figure>
+                    <figure class="panel diagram-card">
+                        <img src="./assets/deployment-diagram.png" alt="Academic Portal deployment diagram">
+                        <figcaption>
+                            <strong>Deployment view</strong>
+                            <span>Illustrates the application, database, and infrastructure layout used for real hosting.</span>
+                        </figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <section class="section section-grid section-grid-wide">
+                <article class="panel account-card">
+                    <p class="eyebrow">Demo Accounts</p>
+                    <h2>Suggested portfolio walkthrough users</h2>
+                    <div class="account-list">
+                        <div>
+                            <strong>Student</strong>
+                            <span><code>student01@example.com</code></span>
+                        </div>
+                        <div>
+                            <strong>Teacher</strong>
+                            <span><code>amelia.teacher@example.com</code></span>
+                        </div>
+                        <div>
+                            <strong>Staff</strong>
+                            <span><code>alice.staff@example.com</code></span>
+                        </div>
+                    </div>
+                    <p class="account-password">Password: <code>Password123!</code></p>
+                </article>
+                <article class="panel account-card">
+                    <p class="eyebrow">Repository Links</p>
+                    <h2>Explore the project materials</h2>
+                    <div class="link-stack">
+                        <a href="https://github.com/KyawMyoHtay1/academic-portal">GitHub repository</a>
+                        <a href="https://github.com/KyawMyoHtay1/academic-portal/tree/deployment">Deployment branch</a>
+                        <a href="https://github.com/KyawMyoHtay1/academic-portal/blob/deployment/RAILWAY_DEPLOYMENT.md">Railway deployment guide</a>
+                        <a href="https://github.com/KyawMyoHtay1/academic-portal/blob/deployment/FINAL_PRESENTATION_SCRIPT.md">Presentation script</a>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
