@@ -1,23 +1,72 @@
 #!/bin/sh
 set -eu
 
-mkdir -p \
-  /var/www/html/storage/app/private \
-  /var/www/html/storage/app/public \
-  /var/www/html/storage/framework/cache/data \
-  /var/www/html/storage/framework/sessions \
-  /var/www/html/storage/framework/views \
-  /var/www/html/storage/logs \
-  /var/www/html/bootstrap/cache
+APP_ROOT="/var/www/html"
+SQLITE_DB="$APP_ROOT/database/database.sqlite"
+SEEDED_FRESH_SQLITE=0
 
-if [ ! -e /var/www/html/public/storage ]; then
-  ln -s /var/www/html/storage/app/public /var/www/html/public/storage
+generate_app_key() {
+  php -r "echo 'base64:'.base64_encode(random_bytes(32));"
+}
+
+mkdir -p \
+  "$APP_ROOT/storage/app/private" \
+  "$APP_ROOT/storage/app/public" \
+  "$APP_ROOT/storage/framework/cache/data" \
+  "$APP_ROOT/storage/framework/sessions" \
+  "$APP_ROOT/storage/framework/views" \
+  "$APP_ROOT/storage/logs" \
+  "$APP_ROOT/bootstrap/cache"
+
+if [ -z "${APP_KEY:-}" ]; then
+  export APP_KEY="$(generate_app_key)"
+fi
+
+if [ -z "${DB_CONNECTION:-}" ]; then
+  export DB_CONNECTION=sqlite
+fi
+
+export QUEUE_CONNECTION="${QUEUE_CONNECTION:-sync}"
+export MAIL_MAILER="${MAIL_MAILER:-log}"
+
+if [ "$DB_CONNECTION" = "sqlite" ]; then
+  mkdir -p "$APP_ROOT/database"
+
+  if [ ! -f "$SQLITE_DB" ]; then
+    touch "$SQLITE_DB"
+    SEEDED_FRESH_SQLITE=1
+  fi
+
+  if [ -z "${DB_DATABASE:-}" ]; then
+    export DB_DATABASE="$SQLITE_DB"
+  fi
+
+  export SESSION_DRIVER="${SESSION_DRIVER:-file}"
+  export CACHE_STORE="${CACHE_STORE:-file}"
+fi
+
+if [ ! -e "$APP_ROOT/public/storage" ]; then
+  ln -s "$APP_ROOT/storage/app/public" "$APP_ROOT/public/storage"
 fi
 
 if [ "$(id -u)" = "0" ]; then
-  chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+  chown -R www-data:www-data "$APP_ROOT/storage" "$APP_ROOT/bootstrap/cache" "$APP_ROOT/database"
 fi
 
-php /var/www/html/artisan package:discover --ansi
+php "$APP_ROOT/artisan" package:discover --ansi
+
+attempt=0
+until php "$APP_ROOT/artisan" migrate --force; do
+  attempt=$((attempt + 1))
+  if [ "$attempt" -ge 15 ]; then
+    echo "Migration failed after $attempt attempts." >&2
+    exit 1
+  fi
+  sleep 2
+done
+
+if [ "$SEEDED_FRESH_SQLITE" -eq 1 ]; then
+  php "$APP_ROOT/artisan" db:seed --class=ComprehensiveDemoSeeder --force
+fi
 
 exec "$@"
