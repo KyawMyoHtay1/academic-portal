@@ -63,6 +63,8 @@ RUN mkdir -p \
 
 FROM node:22-bookworm-slim AS frontend
 
+ENV npm_config_legacy_peer_deps=true
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
