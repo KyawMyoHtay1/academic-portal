@@ -74,6 +74,9 @@ if [ "$SEED_DEMO_DATA" = "true" ] || [ "$SEED_DEMO_DATA" = "1" ]; then
   php "$APP_ROOT/artisan" db:seed --force
 fi
 
+php "$APP_ROOT/artisan" config:cache
+php "$APP_ROOT/artisan" view:cache
+
 if [ "${1:-}" = "apache2-foreground" ] && [ -d /etc/apache2/mods-enabled ]; then
   rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf
   ln -sf ../mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load
