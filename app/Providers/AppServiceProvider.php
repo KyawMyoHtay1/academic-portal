@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,7 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Vite::prefetch(concurrency: 3);
+        if (app()->isProduction()) {
+            URL::forceScheme('https');
+        }
 
         Queue::failing(function (JobFailed $event): void {
             Log::error('queue.job_failed', [

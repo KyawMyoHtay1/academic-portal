@@ -353,21 +353,6 @@
         }
     </style>
     @stack('styles')
-    <!-- Google Translate -->
-    <script type="text/javascript">
-        window.googleTranslateElementInit = function() {
-            const element = document.getElementById('google_translate_element');
-            if (element && window.google && window.google.translate) {
-                new google.translate.TranslateElement({
-                    pageLanguage: 'en',
-                    includedLanguages: 'ar,zh-CN,zh-TW,fr,de,hi,id,it,ja,ko,pt,ru,es,th,tr,vi',
-                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                    autoDisplay: false
-                }, 'google_translate_element');
-            }
-        };
-    </script>
-    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body class="text-slate-900">
     <div class="guest-shell-bg" aria-hidden="true">
@@ -1150,12 +1135,68 @@
         });
 
         // Google Translate Functions
-        function toggleTranslateDropdown() {
-            const dropdown = document.getElementById('translate-dropdown');
-            dropdown.classList.toggle('hidden');
+        const googleTranslateScriptSrc = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        let googleTranslateLoader;
+
+        function initGoogleTranslateElement() {
+            const element = document.getElementById('google_translate_element');
+
+            if (!element || !window.google || !window.google.translate || document.querySelector('.goog-te-combo')) {
+                return;
+            }
+
+            element.innerHTML = '';
+            new window.google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'ar,zh-CN,zh-TW,fr,de,hi,id,it,ja,ko,pt,ru,es,th,tr,vi',
+                layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
         }
 
-        function changeLanguage(langCode) {
+        function ensureGoogleTranslateLoaded() {
+            if (window.google && window.google.translate) {
+                initGoogleTranslateElement();
+                return Promise.resolve();
+            }
+
+            if (!googleTranslateLoader) {
+                googleTranslateLoader = new Promise(function (resolve, reject) {
+                    window.googleTranslateElementInit = function() {
+                        initGoogleTranslateElement();
+                        resolve();
+                    };
+
+                    const script = document.createElement('script');
+                    script.src = googleTranslateScriptSrc;
+                    script.async = true;
+                    script.defer = true;
+                    script.onerror = function () {
+                        googleTranslateLoader = null;
+                        reject(new Error('Failed to load Google Translate.'));
+                    };
+
+                    document.head.appendChild(script);
+                }).catch(function (error) {
+                    console.warn(error.message);
+                });
+            }
+
+            return googleTranslateLoader;
+        }
+
+        async function toggleTranslateDropdown() {
+            const dropdown = document.getElementById('translate-dropdown');
+            dropdown.classList.toggle('hidden');
+
+            if (!dropdown.classList.contains('hidden')) {
+                await ensureGoogleTranslateLoaded();
+            }
+        }
+
+        async function changeLanguage(langCode) {
+            await ensureGoogleTranslateLoaded();
+
             const select = document.querySelector('.goog-te-combo');
             if (select) {
                 // Find the option with matching value

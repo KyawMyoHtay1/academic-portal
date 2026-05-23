@@ -9,7 +9,12 @@ It is built around the way this project already works in code:
 - one web process for the app
 - one queue worker for notifications and background jobs
 - one scheduler process for daily tasks like low-attendance alerts
+<<<<<<< HEAD
 - MySQL for the application database, sessions, cache, and queued jobs
+=======
+- MySQL for the application database
+- optional Redis for the fastest sessions, cache, and queued jobs
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 
 ## Why MySQL Instead of SQLite
 

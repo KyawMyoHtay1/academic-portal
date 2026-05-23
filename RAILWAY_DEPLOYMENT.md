@@ -18,6 +18,13 @@ Create four Railway services in one project:
 3. Worker service
 4. Cron service
 
+<<<<<<< HEAD
+=======
+For the best performance, add a fifth optional service:
+
+5. Redis
+
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 The app service is the only one that gets a public HTTPS domain.
 
 ## Files Added For Railway
@@ -180,6 +187,28 @@ Copy the same non-domain variables to the worker and cron services.
 
 The worker and cron services need the same database and Laravel configuration as the app service.
 
+<<<<<<< HEAD
+=======
+## 6A. Best Performance With Redis
+
+If you want the fastest production setup, add a Railway Redis service and then set these variables on the app, worker, and cron services:
+
+```env
+REDIS_URL=${{Redis.REDIS_URL}}
+SESSION_DRIVER=redis
+SESSION_CONNECTION=default
+SESSION_STORE=redis
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+REDIS_QUEUE_CONNECTION=default
+REDIS_QUEUE=default
+REDIS_CACHE_CONNECTION=cache
+REDIS_CACHE_LOCK_CONNECTION=default
+```
+
+This reduces database load from sessions, cache, and queued jobs.
+
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 ## 7. Generate The Public HTTPS Link
 
 In the app service:
@@ -232,4 +261,7 @@ https://<generated-name>.up.railway.app
 ```
 
 If you later connect your own custom domain, Railway also supports automatic SSL for that domain.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74

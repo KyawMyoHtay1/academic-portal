@@ -687,16 +687,10 @@ defineProps({
                                 </p>
                                 <p class="mt-1 text-sm text-slate-700">
                                     <span
-                                        v-if="
-                                            $page.props.announcementsWidget
-                                                ?.unreadCount > 0
-                                        "
+                                        v-if="unread.announcements > 0"
                                         class="font-semibold"
                                     >
-                                        {{
-                                            $page.props.announcementsWidget
-                                                .unreadCount
-                                        }}
+                                        {{ unread.announcements }}
                                         unread
                                     </span>
                                     <span v-else class="text-slate-500">

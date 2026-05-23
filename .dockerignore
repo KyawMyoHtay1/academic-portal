@@ -2,16 +2,43 @@
 .env.*
 .git
 .github
+<<<<<<< HEAD
+=======
+.githooks
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 .vscode
 node_modules
 vendor
 public/build
 public/hot
+<<<<<<< HEAD
+=======
+public/storage
+railway
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 storage/logs/*
+<<<<<<< HEAD
 out
 FINAL_PRESENTATION_SCRIPT.md
 *.log
 
+=======
+storage/pail
+storage/app/public/*
+tests
+out
+docs
+check.ps1
+check.sh
+DEPLOYMENT.md
+FINAL_PRESENTATION_SCRIPT.md
+GITHUB_PAGES.md
+RAILWAY_DEPLOYMENT.md
+STRIPE_SETUP_GUIDE.md
+count())
+environment())
+*.log
+>>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74

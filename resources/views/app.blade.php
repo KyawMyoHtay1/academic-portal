@@ -16,31 +16,6 @@
         <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.site_key') }}"></script>
         @endif
 
-        <!-- Google Translate -->
-        <script type="text/javascript">
-            window.googleTranslateElementInit = function() {
-                // Wait for the element to exist (Inertia.js loads content dynamically)
-                const checkElement = setInterval(function() {
-                    const element = document.getElementById('google_translate_element');
-                    if (element && window.google && window.google.translate) {
-                        clearInterval(checkElement);
-                        new google.translate.TranslateElement({
-                            pageLanguage: 'en',
-                            includedLanguages: 'ar,zh-CN,zh-TW,fr,de,hi,id,it,ja,ko,pt,ru,es,th,tr,vi',
-                            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                            autoDisplay: false
-                        }, 'google_translate_element');
-                    }
-                }, 100);
-                
-                // Stop checking after 5 seconds
-                setTimeout(function() {
-                    clearInterval(checkElement);
-                }, 5000);
-            };
-        </script>
-        <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
         <!-- Scripts -->
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])

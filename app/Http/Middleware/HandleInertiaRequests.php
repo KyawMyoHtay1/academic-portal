@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Announcement;
+use App\Services\AuthenticatedNavigationStateService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -31,70 +31,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-
-        $announcementsWidget = [
-            'unreadCount' => 0,
-            'latest' => [],
-        ];
-        $notificationsPreview = [
-            'items' => [],
-        ];
-
-        if ($user) {
-            // unread = visible announcements that don't have a read_at record for this user
-            $unreadCount = Announcement::query()
-                ->currentlyVisible()
-                ->visibleToUser($user)
-                ->whereDoesntHave('reads', function ($q) use ($user) {
-                    $q->where('user_id', $user->id)->whereNotNull('read_at');
-                })
-                ->count();
-
-            $latest = Announcement::query()
-                ->with('author')
-                ->currentlyVisible()
-                ->visibleToUser($user)
-                ->orderByDesc('pinned')
-                ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'important' THEN 2 WHEN 'info' THEN 3 ELSE 4 END")
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get()
-                ->map(function ($a) {
-                    return [
-                        'id' => $a->id,
-                        'title' => $a->title,
-                        'priority' => $a->priority ?? 'info',
-                        'pinned' => (bool) $a->pinned,
-                        'created_at' => $a->created_at->format('Y-m-d'),
-                        'author' => $a->author?->name ?? 'Staff',
-                    ];
-                })
-                ->all();
-
-            $announcementsWidget = [
-                'unreadCount' => $unreadCount,
-                'latest' => $latest,
-            ];
-
-            $notificationsPreview = [
-                'items' => $user->unreadNotifications()
-                    ->orderByDesc('created_at')
-                    ->limit(6)
-                    ->get()
-                    ->map(function ($notification) {
-                        return [
-                            'id' => $notification->id,
-                            'title' => (string) ($notification->data['title'] ?? 'Notification'),
-                            'message' => (string) ($notification->data['message'] ?? ''),
-                            'read_at' => $notification->read_at?->toIso8601String(),
-                            'created_at' => $notification->created_at?->toIso8601String(),
-                            'created_label' => $notification->created_at?->diffForHumans(),
-                            'url' => (string) ($notification->data['url'] ?? ''),
-                        ];
-                    })
-                    ->all(),
-            ];
-        }
+        $navigationState = app(AuthenticatedNavigationStateService::class)->buildForUser($user);
 
         return [
             ...parent::share($request),
@@ -116,17 +53,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
             ],
-            'unread' => [
-                'messages' => $user
-                    ? $user->receivedMessages()->where('read', false)->count()
-                    : 0,
-                'notifications' => $user
-                    ? $user->unreadNotifications()->count()
-                    : 0,
-                'announcements' => $announcementsWidget['unreadCount'] ?? 0,
-            ],
-            'announcementsWidget' => $announcementsWidget,
-            'notificationsPreview' => $notificationsPreview,
+            ...$navigationState,
             'recaptchaSiteKey' => config('recaptcha.site_key'),
         ];
     }
