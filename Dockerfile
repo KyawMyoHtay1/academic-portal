@@ -1,4 +1,4 @@
-FROM php:8.2-apache-bookworm AS php-base
+FROM php:8.4-apache-bookworm AS php-base
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public \
     COMPOSER_ALLOW_SUPERUSER=1

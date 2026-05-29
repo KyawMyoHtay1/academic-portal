@@ -54,7 +54,7 @@ It combines:
 
 ## Stack
 
-- Backend: Laravel 12, PHP 8.2+
+- Backend: Laravel 12, PHP 8.4+
 - Frontend: Vue 3, Inertia.js, Vite, Tailwind CSS
 - Database: SQLite by default in `.env.example`, MySQL/MariaDB also supported
 - Queue/session/cache: database-backed by default
@@ -68,7 +68,7 @@ It combines:
 
 ### Prerequisites
 
-- PHP 8.2+
+- PHP 8.4+
 - Composer 2+
 - Node.js 20+
 - npm 10+
