@@ -6,10 +6,6 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 "$SCRIPT_DIR/bootstrap-runtime.sh"
 
 cd /var/www/html
-<<<<<<< HEAD
-exec php artisan serve --host=0.0.0.0 --port="${PORT:-8080}"
-
-=======
 
 if command -v apache2-foreground >/dev/null 2>&1 && [ -f /etc/apache2/ports.conf ]; then
   if [ -n "${PORT:-}" ] && [ "${PORT}" != "80" ]; then
@@ -26,4 +22,3 @@ if command -v apache2-foreground >/dev/null 2>&1 && [ -f /etc/apache2/ports.conf
 fi
 
 exec php artisan serve --host=0.0.0.0 --port="${PORT:-8080}"
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74

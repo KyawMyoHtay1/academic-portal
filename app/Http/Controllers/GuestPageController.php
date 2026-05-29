@@ -96,14 +96,23 @@ class GuestPageController extends Controller
 
     private function resolveUserManualPath(): string
     {
+        $docsDirectory = public_path('docs');
         $candidates = [
-            public_path('docs/University_Academic_Portal_User_Manual.pdf'),
-            public_path('docs/University Academic Portal User Manual.pdf'),
+            $docsDirectory.'/University_Academic_Portal_User_Manual.pdf',
+            $docsDirectory.'/University Academic Portal User Manual.pdf',
         ];
 
         foreach ($candidates as $path) {
             if (is_file($path)) {
                 return $path;
+            }
+        }
+
+        if (is_dir($docsDirectory)) {
+            $pdfFiles = glob($docsDirectory.'/*.pdf') ?: [];
+
+            if ($pdfFiles !== []) {
+                return $pdfFiles[0];
             }
         }
 

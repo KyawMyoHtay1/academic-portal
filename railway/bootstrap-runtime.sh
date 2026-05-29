@@ -3,8 +3,6 @@ set -eu
 
 APP_ROOT="/var/www/html"
 
-<<<<<<< HEAD
-=======
 configure_redis_defaults() {
   if [ -z "${REDIS_URL:-}" ] && [ -z "${REDIS_HOST:-}" ]; then
     return
@@ -23,7 +21,6 @@ configure_redis_defaults() {
 
 configure_redis_defaults
 
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 mkdir -p \
   "$APP_ROOT/storage/app/private" \
   "$APP_ROOT/storage/app/public" \
@@ -38,7 +35,3 @@ if [ ! -e "$APP_ROOT/public/storage" ]; then
 fi
 
 chmod -R ug+rwx "$APP_ROOT/storage" "$APP_ROOT/bootstrap/cache" || true
-<<<<<<< HEAD
-
-=======
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74

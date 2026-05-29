@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 FROM php:8.2-apache-bookworm AS php-base
-=======
-FROM php:8.4-apache-bookworm AS php-base
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public \
     COMPOSER_ALLOW_SUPERUSER=1
@@ -36,14 +32,10 @@ RUN apt-get update \
         pdo_mysql \
         pdo_sqlite \
         zip \
-<<<<<<< HEAD
-    && a2enmod expires headers rewrite \
-=======
     && pecl install redis \
     && docker-php-ext-enable redis \
     && rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod deflate mpm_prefork expires headers rewrite \
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
     && sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" \
         /etc/apache2/apache2.conf \
         /etc/apache2/conf-available/*.conf \
@@ -54,16 +46,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 FROM php-base AS vendor
 
-<<<<<<< HEAD
-COPY . .
-=======
 COPY composer.json composer.lock artisan ./
 COPY app ./app
 COPY bootstrap ./bootstrap
 COPY config ./config
 COPY database ./database
 COPY routes ./routes
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 
 RUN mkdir -p \
         storage/app/private \
@@ -78,11 +66,8 @@ RUN mkdir -p \
 
 FROM node:22-bookworm-slim AS frontend
 
-<<<<<<< HEAD
-=======
 ENV npm_config_legacy_peer_deps=true
 
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -97,9 +82,6 @@ RUN npm run build
 
 FROM php-base AS app
 
-<<<<<<< HEAD
-COPY . .
-=======
 COPY artisan composer.json composer.lock ./
 COPY app ./app
 COPY bootstrap ./bootstrap
@@ -108,7 +90,6 @@ COPY database ./database
 COPY public ./public
 COPY resources ./resources
 COPY routes ./routes
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 COPY --from=vendor /var/www/html/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint

@@ -115,6 +115,12 @@
         .guest-nav-cluster::-webkit-scrollbar {
             display: none;
         }
+        .guest-mobile-disclosure > summary {
+            list-style: none;
+        }
+        .guest-mobile-disclosure > summary::-webkit-details-marker {
+            display: none;
+        }
         .guest-progress-track {
             position: fixed;
             left: 0;
@@ -335,13 +341,6 @@
             .guest-grid-overlay {
                 opacity: 0.09;
             }
-            .guest-nav-cluster {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                width: 100%;
-                padding-bottom: 0.3rem;
-            }
         }
         @media (prefers-reduced-motion: reduce) {
             .guest-orb,
@@ -430,15 +429,29 @@
         $guestShowBreadcrumbs = $guestCurrentLabel && $guestRouteName !== 'guest.home';
         $guestActiveLinkClass = 'bg-slate-100 text-[color:var(--portal-navy)] font-semibold';
         $guestInactiveLinkClass = 'text-slate-700 hover:text-[color:var(--portal-navy)] hover:bg-slate-100 transition-colors';
+        $guestAboutActive = request()->routeIs('guest.about', 'guest.vision', 'guest.policies', 'guest.feedback');
+        $guestHelpActive = request()->routeIs('guest.services', 'guest.support', 'guest.user-manual.page', 'guest.contact');
     @endphp
 
     <nav class="guest-glass-nav sticky top-0 z-30">
         <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-            <a href="{{ route('guest.home') }}" class="portal-logo-link flex items-center gap-3 text-xl font-bold text-[color:var(--portal-navy)]">
+            <a href="{{ route('guest.home') }}" class="portal-logo-link flex min-w-0 items-center gap-3 text-xl font-bold text-[color:var(--portal-navy)]">
                 @include('guest.partials.portal-logo', ['variant' => 'nav'])
-                <span class="tracking-tight">University Academic <span class="text-[color:var(--portal-gold)]">Portal</span></span>
+                <span class="truncate tracking-tight">University Academic <span class="text-[color:var(--portal-gold)]">Portal</span></span>
             </a>
-            <div class="guest-nav-cluster flex flex-wrap items-center gap-2 text-sm lg:w-auto">
+            <button
+                type="button"
+                id="guest-mobile-menu-button"
+                class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:border-[color:var(--portal-navy)] hover:text-[color:var(--portal-navy)] lg:hidden"
+                aria-controls="guest-mobile-menu"
+                aria-expanded="false"
+                aria-label="Toggle navigation menu"
+            >
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <div class="guest-nav-cluster hidden flex-wrap items-center gap-2 text-sm lg:flex lg:w-auto">
                 {{-- Main links --}}
                 <a href="{{ route('guest.home') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {{ request()->routeIs('guest.home') ? $guestActiveLinkClass : $guestInactiveLinkClass }}" @if(request()->routeIs('guest.home')) aria-current="page" @endif>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -470,7 +483,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="invisible absolute right-0 z-40 top-full w-44 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                    <div class="invisible absolute right-0 z-40 top-full w-44 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                         <a href="{{ route('guest.about') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.about') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">About Us</a>
                         <a href="{{ route('guest.vision') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.vision') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Our Vision</a>
                         <a href="{{ route('guest.policies') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.policies') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Policies & Guidelines</a>
@@ -489,7 +502,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="invisible absolute right-0 z-40 top-full w-52 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                    <div class="invisible absolute right-0 z-40 top-full w-52 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                         <a href="{{ route('guest.services') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.services') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Academic Services</a>
                         <a href="{{ route('guest.support') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.support') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Support & Help Desk</a>
                         <a href="{{ route('guest.user-manual.page') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('guest.user-manual.page') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">User Manual</a>
@@ -527,7 +540,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-                        <div class="invisible absolute right-0 z-40 top-full w-40 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
+                        <div class="invisible absolute right-0 z-40 top-full w-40 rounded-xl border border-slate-200 bg-white py-2 text-sm text-slate-700 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                             @if (Route::has('login'))
                                 <a href="{{ route('login') }}" class="block px-4 py-2 hover:bg-slate-50 {{ request()->routeIs('login') ? 'font-semibold text-[color:var(--portal-navy)]' : '' }}">Login</a>
                             @endif
@@ -623,6 +636,77 @@
                                 <span>🇻🇳</span>
                                 <span>Tiếng Việt</span>
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="guest-mobile-menu" class="hidden w-full lg:hidden">
+                <div class="mt-1 space-y-4 rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg shadow-slate-200/70 backdrop-blur">
+                    <div class="grid gap-2">
+                        <a href="{{ route('guest.home') }}" data-mobile-menu-close class="flex items-center rounded-2xl px-4 py-3 {{ request()->routeIs('guest.home') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
+                            Home
+                        </a>
+                        <a href="{{ route('guest.courses') }}" data-mobile-menu-close class="flex items-center rounded-2xl px-4 py-3 {{ request()->routeIs('guest.courses*') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
+                            Courses
+                        </a>
+                        <a href="{{ route('guest.news') }}" data-mobile-menu-close class="flex items-center rounded-2xl px-4 py-3 {{ request()->routeIs('guest.news*') ? $guestActiveLinkClass : $guestInactiveLinkClass }}">
+                            News
+                        </a>
+                    </div>
+
+                    <details class="guest-mobile-disclosure rounded-2xl border border-slate-200 bg-slate-50/70" @if($guestAboutActive) open @endif>
+                        <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-slate-700">
+                            <span>About</span>
+                            <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </summary>
+                        <div class="space-y-2 border-t border-slate-200 px-3 py-3">
+                            <a href="{{ route('guest.about') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.about') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">About Us</a>
+                            <a href="{{ route('guest.vision') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.vision') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">Our Vision</a>
+                            <a href="{{ route('guest.policies') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.policies') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">Policies & Guidelines</a>
+                            <a href="{{ route('guest.feedback') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.feedback') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">Feedback</a>
+                        </div>
+                    </details>
+
+                    <details class="guest-mobile-disclosure rounded-2xl border border-slate-200 bg-slate-50/70" @if($guestHelpActive) open @endif>
+                        <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-slate-700">
+                            <span>Help & Services</span>
+                            <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </summary>
+                        <div class="space-y-2 border-t border-slate-200 px-3 py-3">
+                            <a href="{{ route('guest.services') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.services') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">Academic Services</a>
+                            <a href="{{ route('guest.support') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.support') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">Support & Help Desk</a>
+                            <a href="{{ route('guest.user-manual.page') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.user-manual.page') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">User Manual</a>
+                            <a href="{{ route('guest.contact') }}" data-mobile-menu-close class="block rounded-xl px-3 py-2 text-sm {{ request()->routeIs('guest.contact') ? 'bg-white font-semibold text-[color:var(--portal-navy)]' : 'text-slate-700 hover:bg-white' }}">Contact Us</a>
+                        </div>
+                    </details>
+
+                    @if (Route::has('login') || Route::has('register'))
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Account</p>
+                            <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                                @if (Route::has('login'))
+                                    <a href="{{ route('login') }}" data-mobile-menu-close class="inline-flex items-center justify-center rounded-xl border border-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-[color:var(--portal-navy)] transition-colors hover:bg-[color:var(--portal-navy)] hover:text-white">Login</a>
+                                @endif
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" data-mobile-menu-close class="inline-flex items-center justify-center rounded-xl bg-[color:var(--portal-navy)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">Register</a>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Language</p>
+                        <div class="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+                            <button type="button" onclick="changeLanguage('en')" class="rounded-xl bg-white px-3 py-2 text-slate-700 hover:bg-slate-100">English</button>
+                            <button type="button" onclick="changeLanguage('ar')" class="rounded-xl bg-white px-3 py-2 text-slate-700 hover:bg-slate-100">Arabic</button>
+                            <button type="button" onclick="changeLanguage('zh-CN')" class="rounded-xl bg-white px-3 py-2 text-slate-700 hover:bg-slate-100">Chinese</button>
+                            <button type="button" onclick="changeLanguage('fr')" class="rounded-xl bg-white px-3 py-2 text-slate-700 hover:bg-slate-100">French</button>
+                            <button type="button" onclick="changeLanguage('ja')" class="rounded-xl bg-white px-3 py-2 text-slate-700 hover:bg-slate-100">Japanese</button>
+                            <button type="button" onclick="changeLanguage('es')" class="rounded-xl bg-white px-3 py-2 text-slate-700 hover:bg-slate-100">Spanish</button>
                         </div>
                     </div>
                 </div>
@@ -860,6 +944,41 @@
 
             window.addEventListener('beforeunload', showLoading);
             window.addEventListener('pageshow', hideLoading);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var menuButton = document.getElementById('guest-mobile-menu-button');
+            var mobileMenu = document.getElementById('guest-mobile-menu');
+            if (!menuButton || !mobileMenu) return;
+
+            function closeMobileMenu() {
+                mobileMenu.classList.add('hidden');
+                menuButton.setAttribute('aria-expanded', 'false');
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.remove('hidden');
+                menuButton.setAttribute('aria-expanded', 'true');
+            }
+
+            menuButton.addEventListener('click', function () {
+                if (mobileMenu.classList.contains('hidden')) {
+                    openMobileMenu();
+                    return;
+                }
+
+                closeMobileMenu();
+            });
+
+            mobileMenu.querySelectorAll('[data-mobile-menu-close]').forEach(function (link) {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 1024) {
+                    closeMobileMenu();
+                }
+            });
         });
 
         // Auto-dismiss and close handlers for guest flash toasts.

@@ -1,26 +1,6 @@
 #!/bin/sh
 set -eu
 
-<<<<<<< HEAD
-mkdir -p \
-  /var/www/html/storage/app/private \
-  /var/www/html/storage/app/public \
-  /var/www/html/storage/framework/cache/data \
-  /var/www/html/storage/framework/sessions \
-  /var/www/html/storage/framework/views \
-  /var/www/html/storage/logs \
-  /var/www/html/bootstrap/cache
-
-if [ ! -e /var/www/html/public/storage ]; then
-  ln -s /var/www/html/storage/app/public /var/www/html/public/storage
-fi
-
-if [ "$(id -u)" = "0" ]; then
-  chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-fi
-
-php /var/www/html/artisan package:discover --ansi
-=======
 APP_ROOT="/var/www/html"
 SQLITE_DB="$APP_ROOT/database/database.sqlite"
 SEEDED_FRESH_SQLITE=0
@@ -141,6 +121,5 @@ if [ "${1:-}" = "apache2-foreground" ] && [ -d /etc/apache2/mods-enabled ]; then
 
   configure_apache_port
 fi
->>>>>>> 1e9f232bbdeac9084abc1815f7f1e7cc8a564a74
 
 exec "$@"
